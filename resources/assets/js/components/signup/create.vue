@@ -1,0 +1,305 @@
+<template>
+
+    <div class="panel panel-default">
+        
+        <div class="panel-heading">           
+             <span class="panel-title">
+                   <h4 v-html="title"></h4>
+             </span>           
+        </div>
+        <div class="panel-body">
+            <form v-if="initialized" @submit.prevent="onSubmit" class="form">
+               <div class="row">
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>報名日期</label>
+                            <div>
+                                <date-picker :option="datePickerOption" :date="date" ></date-picker>
+                            </div>
+                            <input type="hidden" name="signup.date" class="form-control" v-model="signup.date"  >
+                            <small v-if="form.errors.has('user.profile.fullname')" v-text="form.errors.get('user.profile.fullname')" class="text-danger"></small>
+                        </div>  
+                   </div>
+                   <div class="col-sm-9">
+                        <div v-if="course_id" class="form-group"> 
+                           <label>報名課程</label>
+                           <input class="form-control" type="text"  :value="courseName" disabled>
+                        </div>
+                        <div v-else class="form-group"> 
+                           <label>報名課程</label>
+                              <combination-select :with_course="combinationSettings.withCourse"
+                              @ready="onCombinationReady" @course-changed="onCourseSelected"></combination-select>
+
+
+                              <small v-if="form.errors.has('signup.course_id')" v-text="form.errors.get('signup.course_id')" class="text-danger" >身分證號</small>
+                        </div>  
+                   </div>
+               </div>
+               <div class="row">
+                   <div class="col-sm-3">
+                        <div v-if="user_id" class="form-group"> 
+                           <label>姓名</label>
+                           <input class="form-control" type="text"  :value="user.profile.fullname" disabled>
+                            <small class="text-danger" v-if="form.errors.has('signup.user_id')" v-text="form.errors.get('signup.user_id')"></small>
+
+                        </div>
+                        <div v-else class="form-group"> 
+                           <label>姓名</label>
+                             <drop-down  v-model="selectedUser" :options="userOptions" label="text"></drop-down>
+                             <small class="text-danger" v-if="form.errors.has('signup.user_id')" v-text="form.errors.get('signup.user_id')"></small>
+
+                         </div>  
+                   </div>
+               </div>
+               <div v-if="user" class="row">
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>性別</label>
+                           
+                            <input class="form-control" type="text"  :value="$options.filters.genderText(user.profile.gender)" disabled>
+                           
+                        </div>  
+                   </div>
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>生日</label>
+                           <input class="form-control" type="text"  :value="user.profile.dob" disabled>
+                       
+                         </div>  
+                   </div>
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>身分證號</label>
+                           
+                            <input class="form-control" type="text"  :value="user.profile.SID" disabled>
+                        
+                        </div>  
+                   </div>
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>電話</label>
+                           <input class="form-control" type="text"  :value="user.phone" disabled>
+                        
+                         </div>  
+                   </div>
+               </div>
+               <div class="row">
+                   <div class="col-sm-9">
+                        <div class="form-group"> 
+                           <label>折扣優惠</label>
+                           <div>
+                               <toggle :items="discountOptions"   :default_val="discount_id" @selected=setDiscount></toggle>
+                           </div>
+                        </div>  
+                   </div>
+                   
+               </div>  
+               <div class="row">
+                    <div class="col-sm-6">
+                        <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確定</button>
+                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      <button class="btn btn-default" @click.prevent="canceled">取消</button>
+                  </div>
+
+
+
+                </div>    
+                  
+            </form>
+        </div>
+    </div>
+    
+</template>
+<script>
+    export default {
+        name: 'CreateSignup',
+        props: {
+            course_id:{
+               type: Number,
+               default: 0
+            },
+            user_id:{
+               type: Number,
+               default: 0
+            },
+        },
+        data() {
+            return {
+                title:Helper.getIcon('Signups')  + '  新增報名表',
+                initialized:false,
+
+                signup:{},
+                selectedUser:null,
+                user:null,
+
+                
+                courseName:'',
+                discount_id:0,
+                form: new Form({
+                   signup:{}
+                }),
+
+                userOptions:[],
+                courseOptions:[],
+                discountOptions:[],
+
+                datePickerOption:{},
+                date: {
+                    time: ''
+                },
+
+                combinationSettings:{
+                   withCourse:true,
+
+                },
+
+            }
+        },
+        watch: {
+            selectedUser: function () {
+              this.user=null
+               this.getUser()               
+            },
+            date: {
+              handler: function () {
+                  this.signup.date=this.date.time
+                  this.clearErrorMsg('signup.date')
+              },
+              deep: true
+            },
+    
+        },
+        beforeMount() {
+            this.init()
+        },
+        methods: {
+            init() {
+                this.fetchData() 
+                this.datePickerOption=Helper.datetimePickerOption()
+
+            },
+            fetchData() {
+                let getData=Signup.create(this.course_id,this.user_id)
+                     
+                getData.then(data => {
+                    this.signup=data.signup
+                    this.date.time=this.signup.date
+                    
+                    if(data.course){
+                        this.courseName= Course.getFormatedCourseName(data.course,true)                   
+                    }
+
+                    if(data.user){
+                        this.user=data.user
+                    }
+
+                    
+
+                    this.courseOptions=data.courseOptions
+                    this.userOptions=data.userOptions   
+
+                    this.loadDiscountOptions(data.discountOptions)
+
+                    this.initialized=true
+                   
+                })
+                .catch(error=> {
+                    Helper.BusEmitError(error)                        
+                })
+                
+            },
+            getUser(){
+                let user_id=this.selectedUser.value
+                let user=User.edit(user_id)   
+                  user.then(data => {
+                      this.user = data.user
+                      this.clearErrorMsg('signup.user_id')                    
+                  })
+                  .catch(error => {
+                      Helper.BusEmitError(error)                                        
+                  })
+            },
+            setUser(user){
+               if(user){
+                    this.selectedUser = {
+                       text: user.profile.fullname,
+                       value: user.id
+                    }
+               }
+            },
+            onCombinationReady(params){
+                this.onCourseSelected(params.course)
+            },
+            onCourseSelected(val){
+             
+               this.signup.course_id=val
+               this.clearErrorMsg('signup.course_id')
+               this.clearErrorMsg()
+
+            },
+            
+            loadDiscountOptions(options){
+                this.discountOptions=options
+                let noDiscount={ text:'無' , value:'0' }
+                this.discountOptions.splice(0, 0, noDiscount);
+            },       
+            setDiscount(val) {
+                this.signup.discount_id = val;
+            },  
+            onSubmit() {
+              
+                if(this.course_id){
+                    if(this.selectedUser){
+                       this.signup.user_id = this.selectedUser.value
+                    }else{
+                       this.signup.user_id =''
+                    }
+                }
+
+                let errors={}
+                   let signup=this.signup
+                 
+                   if(!signup.course_id) {
+                      errors['signup.course_id']=['必須選擇報名課程']
+                   }
+                   if(!signup.user_id) {
+                      errors['signup.user_id']=['必須選擇姓名']
+                   }
+                   
+                   this.form.onFail(errors)
+                   if(this.form.errors.any()){
+                      return false
+                   }
+                
+                    this.submitForm()
+            },
+            clearErrorMsg(name) {
+                this.form.errors.clear(name)
+            },
+            submitForm() {
+
+                this.form = new Form({
+                   signup:this.signup
+                })
+
+                let store=Signup.store(this.form)
+                
+                store.then(data => {
+                   Helper.BusEmitOK()
+                   this.$emit('saved',data)                            
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error) 
+                })
+            },
+            canceled(){
+                this.$emit('canceled')
+            }
+
+
+
+
+        },
+
+    }
+</script>

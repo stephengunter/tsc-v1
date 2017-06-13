@@ -1,0 +1,106 @@
+<?php
+
+//  Route::get('/test', function(){
+//    //  Artisan::call('migrate');
+//   Artisan::call('db:seed');
+    
+//  });
+
+Route::get('/', 'HomeController@index');
+Route::get('errors', function(){
+    return view('errors');
+});
+
+Route::get('login', '\App\Http\Controllers\Auth\SessionsController@create')->name('login');
+Route::post('login', '\App\Http\Controllers\Auth\SessionsController@store');
+Route::post('logout', '\App\Http\Controllers\Auth\SessionsController@destroy');
+
+Route::get('email-unconfirmed/{email}', '\App\Http\Controllers\Auth\EmailConfirmController@create')->name('email-unconfirmed');
+Route::post('send-confirmation-mail', '\App\Http\Controllers\Auth\EmailConfirmController@sendMail')->name('send-confirmation-mail');
+Route::get('email-confirmation/user/{user}/token/{token}','\App\Http\Controllers\Auth\EmailConfirmController@confirmEmail');
+
+Route::get('reset-password/user/{user}/token/{token}','\App\Http\Controllers\Auth\ResetPasswordController@create');
+
+Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
+Route::put('users/{user}/update-photo',['uses'=>'\App\Http\Controllers\User\UsersController@updatePhoto']);
+Route::post('users/find-users', ['uses' => '\App\Http\Controllers\User\UsersController@findUsers']);
+
+Route::get('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@create');
+Route::post('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@store');
+Route::get('signups/index-options', '\App\Http\Controllers\Signups\SignupsController@indexOptions');
+Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsController@statusOptions');
+
+Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
+
+Route::get('courses/options', 'CoursesController@options');
+
+Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
+Route::put('centers/{id}/display-order',['uses'=>'\App\Http\Controllers\Settings\CentersController@updateDisplayOrder']);
+Route::put('centers/{id}/update-photo',['uses'=>'\App\Http\Controllers\Settings\CentersController@updatePhoto']);
+
+Route::resource('home', 'HomeController');
+
+Route::resource('change-password', '\App\Http\Controllers\Auth\ChangePasswordController',['only' => ['index','store']]);
+Route::resource('forgot-password', '\App\Http\Controllers\Auth\ForgotPasswordController',['only' => ['index','store']]);
+Route::resource('reset-password', '\App\Http\Controllers\Auth\ResetPasswordController',['only' => ['store']]);
+
+Route::resource('users', '\App\Http\Controllers\User\UsersController');
+Route::resource('user-roles', '\App\Http\Controllers\User\UserRolesController');
+Route::resource('user-centers', '\App\Http\Controllers\User\UserCenterController');
+Route::resource('photoes', 'PhotoesController');
+
+Route::resource('volunteers', '\App\Http\Controllers\User\VolunteersController');
+
+Route::resource('contactinfoes', '\App\Http\Controllers\Contact\ContactInfoesController');
+Route::resource('address', '\App\Http\Controllers\Contact\AddressController');
+Route::resource('cities', '\App\Http\Controllers\Contact\CitiesController', ['only' => ['index']]);
+Route::resource('districts', '\App\Http\Controllers\Contact\DistrictsController', ['only' => ['index']]);
+
+Route::resource('signups', '\App\Http\Controllers\Signups\SignupsController');
+Route::resource('tuitions', '\App\Http\Controllers\Signups\TuitionsController');
+Route::resource('back-tuitions', '\App\Http\Controllers\Signups\BackTuitionsController');
+Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
+Route::resource('courses', 'CoursesController');
+Route::resource('teachers', 'TeachersController');
+
+Route::resource('terms', '\App\Http\Controllers\Settings\TermsController');
+Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
+Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController');
+Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
+Route::resource('titles', '\App\Http\Controllers\Settings\TitlesController');
+
+// Route::group(['prefix' => 'api/'], function() {
+//     Route::resource('sessions', '\App\Http\Controllers\Auth\SessionsController');
+//     Route::resource('home', 'HomeController');
+//     Route::resource('users', 'UsersController');
+//     Route::resource('user-roles', 'UserRolesController');
+//     Route::resource('teachers', 'TeachersController');
+//     Route::resource('photoes', 'PhotoesController');
+//     Route::resource('address', 'AddressController');
+//     Route::resource('contactinfo', 'ContactInfoController');
+//     Route::resource('centers', 'CentersController');
+//     Route::resource('categories', 'CategoriesController');
+//     Route::resource('courses', 'CoursesController');
+//     Route::resource('classtimes', 'ClassTimesController');
+//     Route::resource('schedules', 'SchedulesController');
+//     Route::resource('terms', 'TermsController');
+//     Route::resource('classrooms', 'ClassroomsController');
+//     Route::resource('lessons', 'LessonsController');
+//     Route::resource('titles', 'TitlesController');
+//     Route::resource('volunteers', 'VolunteersController'); 
+//     Route::resource('admins', 'AdminsController');   
+//     Route::resource('holidays', 'HolidaysController');
+//     Route::resource('centerteacher', 'CenterTeacherController');
+//     Route::resource('centervolunteer', 'CenterVolunteerController');
+//     Route::resource('centeradmin', 'CenterAdminController');
+//     Route::resource('category-course', 'CategoryCourseController');
+//     Route::resource('discounts', 'DiscountsController');
+//     Route::resource('identities', 'IdentitiesController');
+//     Route::resource('signups', 'SignupsController');
+//     Route::resource('tuitions', 'TuitionsController');
+//     Route::resource('back-tuitions', 'BackTuitionsController');
+//     Route::resource('refunds', 'RefundsController');
+// });
+
+
+

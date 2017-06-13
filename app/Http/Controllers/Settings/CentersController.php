@@ -1,0 +1,241 @@
+<?php
+
+namespace App\Http\Controllers\Settings;
+
+use App\Http\Controllers\BaseController;
+use Illuminate\Http\Request;
+
+use App\Repositories\Centers;
+use App\Repositories\Users;
+use App\Http\Requests\Settings\CenterRequest;
+
+use App\Center;
+
+use App\Http\Middleware\CheckAdmin;
+use App\Support\Helper;
+
+use DB;
+
+class CentersController extends BaseController
+{
+    public function __construct(Centers $centers, Users $users,CheckAdmin $checkAdmin)
+     {
+        // $exceptAdmin=['index','show','activeCenters'];
+		
+        $exceptAdmin=[];
+        $allowVisitors=[];
+
+        $this->setMiddleware( $exceptAdmin, $allowVisitors);
+
+        $this->centers=$centers;
+        $this->users=$users;
+
+        $this->setCheckAdmin($checkAdmin);
+	}
+
+    public function index()
+    {
+        if(!request()->ajax()){
+            return view('centers.index');                   
+        }  
+        $centers=$this->centers->getAll()->orderBy('active','desc')->filterPaginateOrder();
+      
+        foreach ($centers as $item) {
+             $item->contactInfo= $item->contactInfo();
+             if($item->contactInfo)
+             {
+                 $item->contactInfo->addressA=$item->contactInfo->addressA();
+             }
+            
+        }
+        
+        return response()
+            ->json([
+                'model' => $centers
+            ]);
+       
+    }
+    public function create()
+    {
+        if(!request()->ajax()){
+            return view('centers.create');                   
+        }  
+
+        $center= Center::initialize();
+       
+        return response()
+            ->json([
+                'center' => $center
+            ]);
+    }
+    public function store(CenterRequest $request)
+    {
+        $current_user=$this->currentUser();
+        $updated_by=$current_user->id;
+        $removed=false;
+
+        $values=$request->getValues($updated_by,$removed);
+        
+        $center= DB::transaction(function() 
+        use($values,$current_user){
+              $center=Center::create($values);
+            
+              $center->admins()->attach($current_user->id);
+              return $center;
+              
+        });
+
+       
+       
+        return response()->json($center);
+      
+    }
+    public function show($id)
+    {
+        
+        if(!request()->ajax()){
+            return view('centers.details')->with([ 'id' => $id ]);          
+        }  
+
+        $center=$this->centers->findOrFail($id);        
+        $current_user=$this->currentUser();
+
+        $center->canEdit=$center->canEditBy($current_user);
+        $center->canDelete=$center->canDeleteBy($current_user);
+        
+         return response()
+                ->json([
+                    'center' => $center
+                ]);
+       
+    }
+    public function edit($id)
+    {
+        $center=$this->centers->findOrFail($id);    
+        $current_user=$this->currentUser();
+        if(!$center->canEditBy($current_user)){
+            return  $this->unauthorized();       
+        }
+
+         return response()
+                ->json([
+                    'center' => $center
+                ]);        
+    }
+    public function update(CenterRequest $request, $id)
+    {
+         $center=$this->centers->findOrFail($id);    
+         $current_user=$this->currentUser();
+         if(!$center->canEditBy($current_user)){
+             return  $this->unauthorized();      
+         }
+         $updated_by=$current_user->id;
+         $removed=false;
+         $values= $request->getValues($updated_by,$removed);
+         $center->update($values);
+
+          return response()->json($center);
+    }
+    public function updateDisplayOrder(Request $request, $id)
+    {
+            $up=$request['up'];
+            $center=$this->centers->updateDisplayOrder($up, $id);
+
+            return response()->json($center);
+
+    }
+    public function updatePhoto(Request $request, $id)
+    {
+        $center=$this->centers->findOrFail($id);
+        $current_user=$this->currentUser();
+        if(!$center->canEditBy($current_user)){
+            return  $this->unauthorized();  
+        }
+
+        
+        $center->photo_id=$request['photo_id'];
+        $center->updated_by=$current_user->id;
+        $center->save();
+           
+        return response()->json(['saved' => true ]);            
+
+    }
+    public function updateContactInfo(Request $request, $id)
+    {
+        $center=$this->centers->findOrFail($id);
+        $current_user=$this->currentUser();
+        if(!$center->canEditBy($current_user)){
+             return  $this->unauthorized();  
+        }
+
+        $contact_info=$request['contact_info'];
+        $values=Helper::setUpdatedBy(['contact_info'=>$contact_info],$current_user->id);
+        
+        $center->update($values);
+           
+            return response()
+                    ->json([
+                        'saved' => true
+                    ]);   
+          
+
+    }
+
+    public function destroy($id)
+    {
+        $center=$this->centers->findOrFail($id);
+        $current_user=$this->currentUser();
+        if(!$center->canDeleteBy($current_user)){
+             return  $this->unauthorized();  
+        }
+
+        $this->centers->delete($id ,$current_user->id);
+
+        return response() ->json(['deleted' => true ]);
+         
+    }
+   
+    
+
+    public function options()
+    {
+         $options=$this->centers->options();
+            return response()
+            ->json([
+                'options' => $options
+            ]);
+    }
+
+    public function adminCenterOptions()
+    {
+        $current_user=$this->checkAdmin->getAdmin();
+        $validCenters=$current_user->admin->validCenters();
+        $options=$this->centers->optionsConverting($validCenters);
+              return response()
+            ->json([
+                'options' => $options
+            ]);
+    }
+
+    public function activeCenters()
+    {
+         $centers=$this->centers->activeCenters()->get();
+       
+        foreach ($centers as $item) {
+             $item->contactInfo= $item->contactInfo();
+             $item->photo= $item->photo();
+             if($item->contactInfo)
+             {
+                 $item->contactInfo->addressA=$item->contactInfo->addressA();
+             }
+            
+        }
+        
+        return response()
+            ->json([
+                'centers' => $centers
+            ]);
+    }
+
+    
+}

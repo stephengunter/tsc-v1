@@ -1,0 +1,15 @@
+html * {
+    font-family: "微軟正黑體", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.show-data {
+    font-size: 18px;
+}
+
+.label-title {
+    font-size: 15px;
+}
+
+.profile-img {
+    max-width: 200px;
+}
