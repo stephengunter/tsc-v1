@@ -60,6 +60,10 @@ Vue.component('teacher-index', require('./views/teachers/index') )
 Vue.component('teacher-create', require('./views/teachers/create') )
 Vue.component('teacher-details', require('./views/teachers/details') )
 
+Vue.component('course-index', require('./views/courses/index') )
+Vue.component('course-create', require('./views/courses/create') )
+Vue.component('course-details', require('./views/courses/details') )
+
 Vue.component('center-index', require('./views/centers/index') )
 Vue.component('center-create', require('./views/centers/create') )
 Vue.component('center-details', require('./views/centers/details') )

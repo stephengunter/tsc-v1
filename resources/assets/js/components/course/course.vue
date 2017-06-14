@@ -1,132 +1,113 @@
 <template>
-<div v-if="courseLoaded">
- 
-   <show-course   v-if="isReadOnly" @beginEditCourse="beginEdit" @beginDelete="beginDelete"
-   :course="course"  :canEdit="canEdit">
-   </show-course>
+<div>
+    
+    <show v-if="readOnly"  :id="id" can_edit="can_edit"  :can_back="can_back"  
+       :version="version"  @begin-edit="beginEdit" @loaded="onDataLoaded"
+       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" >                 
+    </show>
 
-   <edit-course v-if="!isReadOnly" @saved="onCourseSaved" @photoChanged="onPhotoChanged" @endEditCourse="endEdit"
-    :id="course.id" :canEdit="canEdit">        
-    </edit-course>
+    <edit v-else :id="id" 
+       @saved="onSaved"   @canceled="onEditCanceled" >                 
+    </edit> 
 
-    <modal :showbtn="true"  :show.sync="showConfirm" @ok="deleteCourse"  @closed="closeConfirm" ok-text="確定"
-        effect="fade" width="800">
-      <div slot="modal-header" class="modal-header modal-header-danger">
-         
-          <button id="close-button" type="button" class="close" data-dismiss="modal" @click="closeConfirm">
-              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-          </button>
-           <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
-      </div>
-      <div slot="modal-body" class="modal-body">
-          <h3 v-text="confirmMsg"> </h3>
-      </div>
-   </modal>
+    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+      @close="closeConfirm" @confirmed="deleteCourse">        
+    </delete-confirm>
+    
 
 </div>
 </template>
 <script>
-    import ShowCourse from '../../components/course/show-course.vue'
-    import EditCourse from '../../components/course/edit-course.vue'
- 
+    import Show from '../../components/course/show.vue'
+    import Edit from '../../components/course/edit.vue'
+
+
     export default {
-        props: ['id', 'version'],
+        name:'Course',
         components: {
-            'show-course':ShowCourse,  
-            'edit-course':EditCourse,  
-            Modal
+            Show,
+            Edit,
         },
-        name: 'Course',
-
-
+        props: {
+            id: {
+              type: Number,
+              default: 0
+            },
+            can_edit:{
+               type: Boolean,
+               default: true
+            },          
+            can_back:{
+              type: Boolean,
+              default: true
+            },
+            version: {
+              type: Number,
+              default: 0
+            },
+        },
         data() {
             return {
-                canEdit:false,
-                course:{
-                    id:0
-                },
-                isReadOnly:true,
-                courseLoaded:false,
+                readOnly:true,
+                deleteConfirm:{
+                    id:0,
+                    show:false,
+                    msg:'',
 
-                showConfirm:false,
-                confirmMsg:''
+                }    
             }
-        },  
+        },
         beforeMount(){
             this.init()
         },
         watch: {
             'id': 'init',
-            'version': 'init',
+            'version':'init'
         },
         methods: {
             init() {
-               this.canEdit=false
-               this.course={}
-               this.isReadOnly=true
-               this.courseLoaded=false
-
-               this.showConfirm=false
-               this.confirmMsg=''
-
-               this.fetchData()
-            },
-            fetchData() {
-                let url = '/api/courses/' + this.id;
-                axios.get(url)
-                    .then(response => {
-                        this.course = response.data.course
-                        this.courseLoaded=true
-                        this.canEdit=this.course.canEdit
-                        this.$emit('courseLoaded',this.course);
-                    })
-                    .catch(function(error) {
-                        console.log(error)
-                    })
-            },    
+               this.readOnly=true
+               this.deleteConfirm={
+                    id:0,
+                    show:false,
+                    msg:''
+               }
+            },      
+            onDataLoaded(course){
+                this.$emit('loaded',course)
+            },        
             beginEdit() {
-                 this.isReadOnly=false
+                this.readOnly=false
             },
-            endEdit(){
-                 this.isReadOnly=true
-            },
-            onCourseSaved(){
+            onEditCanceled(){
                 this.init()
             },
-            onPhotoChanged(photoId){
-               this.init()
-               
+            onSaved(course){
+                this.init()
+                this.$emit('saved',course)
             },
-            beginDelete(){
-                let refreshToken=this.$auth.refreshToken()
-                refreshToken.then(() => {
-                    this.confirmMsg='確定要刪除此課程嗎？'
-                    this.showConfirm=true
-                }).catch(error => {
-                     this.$auth.logout()
-                     Bus.$emit('login')
-                })
-                
+            
+            onBtnBackClicked(){
+                this.$emit('btn-back-clicked')
+            },
+            beginDelete(values){
+                this.deleteConfirm.msg='確定要刪除 ' + values.name + ' 的課程資料嗎？'
+                this.deleteConfirm.id=values.id
+                this.deleteConfirm.show=true                
             },
             closeConfirm(){
-                  this.showConfirm=false
+                this.deleteConfirm.show=false
             },
             deleteCourse(){
-                let url = '/api/courses/' + this.id 
-                let form=new Form()
-                form.delete(url)
-                .then(result => {
+                let id = this.deleteConfirm.id 
+                let remove= Course.delete(id)
+                remove.then(result => {
                     Helper.BusEmitOK('刪除成功')
-                   
                     this.$emit('deleted')
-                    this.closeConfirm();
                 })
                 .catch(error => {
-                                           
-                    Helper.BusEmitError('刪除失敗')
-
-                    this.closeConfirm();
-                       
+                    Helper.BusEmitError(error,'刪除失敗')
+                    this.closeConfirm()   
                 })
             },
             

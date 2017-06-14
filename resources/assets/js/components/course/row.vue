@@ -1,0 +1,98 @@
+<template>
+   <tr>
+        <td v-if="remove">
+            <button @click="removeItem(course.id,course.name)" class="btn btn-danger btn-xs">
+             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </button>
+        </td>
+        <td v-if="select">
+             <checkbox @selected="selected(course.id)" @unselected="unselected(course.id)" ></checkbox>
+        </td>
+        <td v-text="course.center.name"></td>   
+        
+        <td v-text="course.number"></td>   
+        <td>
+            <a herf="#" @click="selected(course.id)">
+                   {{ course.name }}
+            </a>
+        </td> 
+        <td v-if="!more" v-html="teachersText(course.teachers)"></td> 
+        <td v-if="!more" v-html="getClassTimesText(course.class_times)"></td> 
+        <td v-if="!more" v-html="period(course.begin_date , course.end_date)"></td> 
+        <td v-if="!more" v-html="period(course.open_date , course.close_date)"></td> 
+        <td v-if="!more" v-html="$options.filters.activeLabel(course.active)" ></td> 
+
+        <td v-if="more" v-text="course.credit_count"></td>
+        <td v-if="more" v-text="course.weeks"></td>
+        <td v-if="more" v-text="course.hours"></td>
+        <td v-if="more">{{ course.tuition | formatMoney }}</td>
+        <td v-if="more" v-text="course.materials">
+        <td v-if="more">{{ course.cost | formatMoney }}</td>
+        <td v-if="more" v-text="course.limit"></td>
+        <td v-if="more" v-text="course.min"></td>
+    </tr>                   
+       
+</template>
+<script>
+  
+    export default {
+        name: 'CourseRow',
+        props: {
+            course: {
+               type: Object,
+               default: null
+            },
+            more:{
+               type: Boolean,
+               default: false
+            },
+            remove:{
+               type: Boolean,
+               default: false
+            },
+            select:{
+               type: Boolean,
+               default: false
+            },
+            
+        },
+        data() {
+            return {
+                thead:[],
+            }
+        },
+        beforeMount(){
+            
+        },
+        
+        methods: {
+            
+            teachersText(teachers){
+                 return Course.teachersText(teachers)             
+            },
+            getClassTimesText(class_times){
+                return Course.getClassTimesText(class_times)             
+            },
+            
+            period(begin,end){
+               return Helper.period(begin,end)
+            },
+            removeItem(id,name){
+                let values={
+                    id:id,
+                    name:name
+                }
+                this.$emit('remove-clicked',values)
+            },
+            selected(id){
+                this.$emit('selected',id)
+            },
+            unselected(id){
+                 this.$emit('unselected',id)
+            }
+            
+            
+        },
+        
+    }
+</script>

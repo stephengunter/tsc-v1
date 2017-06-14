@@ -33,17 +33,17 @@ class TeachersController extends BaseController
                                 Centers $centers, CheckAdmin $checkAdmin)                               
     {
         //  $exceptAdmin=['create','edit','store','show','edit','update','updateUser'];
-		 $exceptAdmin=[];
-         $allowVisitors=[];
+		$exceptAdmin=[];
+        $allowVisitors=[];
 
-         $this->setMiddleware( $exceptAdmin, $allowVisitors);
+        $this->setMiddleware( $exceptAdmin, $allowVisitors);
         
-		 $this->teachers=$teachers;       
-         $this->users=$users;  
-         $this->courses=$courses; 
-         $this->centers=$centers; 
+		$this->teachers=$teachers;       
+        $this->users=$users;  
+        $this->courses=$courses; 
+        $this->centers=$centers; 
 
-         $this->checkAdmin=$checkAdmin;
+        $this->setCheckAdmin($checkAdmin);
          
 	}
 	public function index()
@@ -69,10 +69,12 @@ class TeachersController extends BaseController
         }
 
         $teacherList=$teacherList->filterPaginateOrder();   
-
-        foreach($teacherList as $teacher){
-            $teacher->centerNames=$teacher->centerNames();
+        if(count($teacherList)){
+            foreach($teacherList as $teacher){
+                $teacher->centerNames=$teacher->centerNames();
+            }
         }
+        
                                     
         return response()
             ->json([

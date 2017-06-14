@@ -97,8 +97,7 @@
                 }),
 
                 activeOptions:CommonService.activeOptions(),
-
-                showModal: false,
+                
                 photo_id: 0,
 
                 imageUpload:{

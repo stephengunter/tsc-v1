@@ -5,6 +5,14 @@ class Course {
             this[property] = data[property];
         }
 
+        this.teachersText=Course.teachersText(data.teachers)
+        this.categoriesText=Course.categoriesText(data.categories)
+        this.classTimesText=Course.getClassTimesText(data.class_times)
+
+        this.canNetSignup='可'
+        if(Helper.tryParseInt(data.net_signup) < 1){
+            this.canNetSignup='否'
+        } 
        
 
     }
@@ -13,6 +21,9 @@ class Course {
     }
     static source(){
         return '/courses'
+    }
+    static createUrl(){
+         return this.source() + '/create' 
     }
     static showUrl(id){
          return this.source() + '/' + id
@@ -77,6 +88,35 @@ class Course {
                     reject(error);
                 })
         })
+    }
+    static updatePhoto(courseId, photoId) {
+        let form = new Form({
+            photo_id: photoId
+        })
+        let url ='/courses/' + courseId + '/update-photo'
+        let method = 'put'
+        return new Promise((resolve, reject) => {
+            form.submit(method,url)
+                .then(saved => {
+                    resolve(saved);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+       
+    }
+    static indexOptions(){
+        let url =this.source() + '/index-options' 
+        return new Promise((resolve, reject) => {
+                     axios.get(url)
+                    .then(response => {
+                        resolve(response.data);
+                    })
+                    .catch(error => {
+                        reject(error);
+                    })
+                })  
     }
     static options(searchParams){
         let url =this.source() + '/options' 
@@ -213,6 +253,9 @@ class Course {
             return course.name + '  (編號 ' + course.number + ' )'
         }
        return course.name + ' &nbsp (編號 ' + course.number + ' )'
+    }
+    static weeksOptions(){
+        return Helper.numberOptions(1,30)
     }
     
    

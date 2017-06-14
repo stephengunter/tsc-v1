@@ -34,7 +34,10 @@ Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsContr
 
 Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
 
-Route::get('courses/options', 'CoursesController@options');
+Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
+Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
+Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);
+
 
 Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
 Route::put('centers/{id}/display-order',['uses'=>'\App\Http\Controllers\Settings\CentersController@updateDisplayOrder']);
@@ -62,7 +65,8 @@ Route::resource('signups', '\App\Http\Controllers\Signups\SignupsController');
 Route::resource('tuitions', '\App\Http\Controllers\Signups\TuitionsController');
 Route::resource('back-tuitions', '\App\Http\Controllers\Signups\BackTuitionsController');
 Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
-Route::resource('courses', 'CoursesController');
+
+Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
 Route::resource('teachers', 'TeachersController');
 
 Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');

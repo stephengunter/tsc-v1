@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Course;
 
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
@@ -21,24 +21,25 @@ use App\Http\Middleware\CheckAdmin;
 
 class CoursesController extends BaseController
 {
-  
+    protected $key='courses';
     public function __construct(Courses $courses, Categories $categories, Teachers $teachers,
                                  Terms $terms , Centers $centers, Weekdays $weekdays,CheckAdmin $checkAdmin)
                                
     {
        
-         $exceptAdmin=['activeCourses','details'];
-         $allowVisitors=[];
-		 $this->setMiddleware( $exceptAdmin, $allowVisitors);
-         
-		 $this->courses=$courses;
-         $this->categories=$categories;
-         $this->teachers=$teachers;
-         $this->terms=$terms;
-         $this->centers=$centers;
-         $this->weekdays=$weekdays;
+        //  $exceptAdmin=['activeCourses','details'];
+        $exceptAdmin=[];
+        $allowVisitors=[];
+        $this->setMiddleware( $exceptAdmin, $allowVisitors);
+        
+        $this->courses=$courses;
+        $this->categories=$categories;
+        $this->teachers=$teachers;
+        $this->terms=$terms;
+        $this->centers=$centers;
+        $this->weekdays=$weekdays;
 
-         $this->checkAdmin=$checkAdmin;
+        $this->setCheckAdmin($checkAdmin);
        
       
 
@@ -64,30 +65,41 @@ class CoursesController extends BaseController
     }
     public function index()
     {
-         $request = request();
-         $termId=(int)$request->term; 
-         $categoryId=(int)$request->category;       
-         $centerId=(int)$request->center;
-         $weekdayId=(int)$request->weekday;
-         $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId)->filterPaginateOrder();
+        if(!request()->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('courses.index')
+                    ->with(['menus' => $menus]);
+        }          
+        $request = request();
+        $termId=(int)$request->term; 
+        $categoryId=(int)$request->category;       
+        $centerId=(int)$request->center;
+        $weekdayId=(int)$request->weekday;
+        $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId)->filterPaginateOrder();
         
-         foreach ($courseList as $course) {
-            
-              foreach ($course->classTimes as $classTime) {
-                $classTime->weekday;
-             }
-         }
-        
+        if(count($courseList)){
+            foreach ($courseList as $course) {
+                foreach ($course->classTimes as $classTime) {
+                  $classTime->weekday;
+                }
+                foreach ($course->teachers as $teacher) {
+                  $teacher->name=$teacher->getName();
+                }
+            }
+        }
 
-           return response()
-            ->json([
-                'model' => $courseList
-            ]);
+        return response() ->json(['model' => $courseList  ]);  
        
     }
     public function create()
-    {
-        $current_user=$this->checkAdmin->getAdmin();
+    {   
+        if(!request()->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('courses.create')
+                    ->with(['menus' => $menus]);
+        }  
+
+        $current_user=$this->currentUser();
         $validCenters=$current_user->admin->validCenters();
         $centerOptions=$this->centers->optionsConverting($validCenters);
 
@@ -136,41 +148,47 @@ class CoursesController extends BaseController
     }
     public function show($id)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        if(!request()->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('courses.details')
+                    ->with([ 'menus' => $menus,
+                              'id' => $id     
+                        ]);
+        }  
+        $current_user=$this->currentUser();
         $course = Course::with('center','categories','teachers','classTimes')->findOrFail($id);
         $course->canEdit=$course->canEditBy($current_user);
         $course->canDelete=$course->canDeleteBy($current_user);
-         foreach ($course->classTimes as $classTime) {
+        foreach ($course->classTimes as $classTime) {
                 $classTime->weekday;
-             }
-         return response()
-                ->json([
-                    'course' => $course
-                ]);
-       
+        }
+        foreach ($course->teachers as $teacher) {
+                $teacher->name=$teacher->getName();
+        }
+        return response()->json(['course' => $course]);
     }
     public function edit($id)
     {
         $course = Course::findOrFail($id);     
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         if(!$course->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);      
+            return  $this->unauthorized(); 
         }
 
         $validCenters=$current_user->admin->validCenters();
         $centerOptions=$this->centers->optionsConverting($validCenters);
 
-        $course->categories=$this->categories->optionsConverting($course->categories()->select('id','name')->get());
-      
-        $course->teachers=$this->teachers->optionsConverting($course->teachers()->select('user_id','name')->get());
-        
         
         $publicCategories=false;
         $categoryOptions=$this->categories->options($publicCategories);
         $teacherOptions=$this->teachers->optionsByCenter($course->center_id);
         $termOptions=$this->terms->options();
-       
-       
+
+        $course->categories;
+        $course->teachers;
+        foreach ($course->teachers as $teacher) {
+                $teacher->name=$teacher->getName();
+        }
        
         return response()
             ->json([
@@ -178,24 +196,22 @@ class CoursesController extends BaseController
                 'centerOptions' => $centerOptions,
                 'categoryOptions' => $categoryOptions,
                 'teacherOptions' => $teacherOptions,
-                  'termOptions' => $termOptions,
+                'termOptions' => $termOptions,
             ]);    
     }
     public function update(CourseRequest $request, $id)
     {
         $course = Course::with('center')->findOrFail($id);     
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         if(!$course->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);      
+            return  $this->unauthorized();         
         }
         $removed=false;
         $updated_by=$current_user->id;
 
-        $courseValues=$request->getCourseValues($updated_by,$removed);
-        
-        $categoryIds = $request->getCategoryIds();
-        $teacherIds = $request->getTeacherIds();      
-        
+        $courseValues=$request->getCourseValues($updated_by,$removed);       
+        $categoryIds = $request->getCategoryIds();      
+        $teacherIds = $request->getTeacherIds();   
        
         $course = $this->courses->update($courseValues , $categoryIds, $teacherIds ,$id);
        
@@ -227,20 +243,17 @@ class CoursesController extends BaseController
     public function updatePhoto(Request $request, $id)
     {
         $course=Course::findOrFail($id); 
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         if(!$course->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);      
+           return  $this->unauthorized();   
         }
             
-        
-         $photo_id = $request['photo_id'];
-         $values=Helper::setUpdatedBy(['photo_id'=>$photo_id],$current_user->id);        
-         $course->update($values);
-            
-          return response()
-                ->json([
-                     'saved' => true
-                ]);   
+        $course->photo_id=$request['photo_id'];
+        $course->updated_by=$current_user->id;
+        $course->save();
+
+         
+        return response()->json(['saved' => true ]);      
 
     }
     public function showSignup($id)

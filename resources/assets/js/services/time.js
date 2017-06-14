@@ -64,6 +64,10 @@ class TimeService {
         if (!timeObj) return ''
         return timeObj.HH + ':' + timeObj.mm
     }
+    static period(begin, end) {
+        if (!begin || !end) return ''
+        return begin + ' ~ ' + end
+    }
     static yearOptions() {
         let thisYear = Moment().year()
         let max = thisYear + 1

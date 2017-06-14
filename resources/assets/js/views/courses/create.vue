@@ -1,52 +1,54 @@
 <template>
-    <div v-show="courseLoaded">
-        
-        <edit-course @courseLoaded="onCourseLoaded"  @endEditCourse="endEditCourse" @saved="onCourseSaved" :id="id" ></edit-course>
-         
-       
-    </div>
+    <!-- <edit-course :course_id="course_id" :user_id="user_id"
+      @canceled="onCanceled" @saved="onSaved">
+          
+    </edit-course> -->
 </template>
 
-
 <script>
-    
-    import EditCourse from '../../components/course/edit-course.vue'
+    import EditCourse from '../../components/course/edit.vue'
 
     export default {
-        components:{
-            EditCourse,
+        name: 'CourseCreate',
+        components: {
+            'edit-course':EditCourse
         },
-        name:'CreateCourse',
-        data()  {
-            return {                
-                id:0,
-                isReadOnly:false,
-                courseLoaded:false,
+        props: {
+            course_id:{
+               type: Number,
+               default: 0
+            },
+            user_id:{
+               type: Number,
+               default: 0
+            },
+        },   
+        data() {
+            return {
+                
+                
+             
             }
         },
-        beforeMount(){
-            this.init()
+        beforeMount() {
+             this.init()
         },
-        methods:{
+        methods: {
             init(){
-                this.isReadOnly=false
+                
+             
             },
-            beginEditcourse() {
-                 this.isReadOnly=false
+            onCanceled(){
+                this.$emit('canceled')
             },
-            endEditCourse(){
-                this.$router.push('/courses');
+            onSaved(){
+                this.$emit('saved')
             },
-            onCourseLoaded(){
-                this.courseLoaded=true
-            },
-            onCourseSaved(course){                
-                let url='/courses/' + course.id
-                this.$router.push(url);
-            },           
+            
            
-
-        }
+            
+            
+        },
 
     }
 </script>

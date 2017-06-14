@@ -282,7 +282,19 @@
 
                         this.begin_date.time=course.begin_date
                         this.end_date.time=course.end_date
-                        this.categories=course.categories
+                        // this.categories=course.categories
+
+                        if(course.categories.length){
+                            for(let i=0; i<course.categories.length; i++){
+                                let item={
+                                    value:1,
+                                    text:'tesyt'
+                                }
+                                this.categories.push(item)
+                            }
+                        }
+
+
                         this.teachers=course.teachers
 
                         this.centerOptions=response.data.centerOptions

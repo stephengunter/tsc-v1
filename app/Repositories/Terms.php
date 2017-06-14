@@ -72,7 +72,7 @@ class Terms
 
     public function options()
     {
-        $terms=$this->getAll()->get();
+        $terms=$this->getAll()->orderBy('number','desc')->get();
         return $this->optionsConverting($terms);
     }
     public function optionsConverting($terms)

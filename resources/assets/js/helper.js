@@ -9,6 +9,19 @@ class Helper {
         if(!val) return 0
         return parseInt(val)
     }
+    static getOptions(list, valueKey, textKey){
+        let options=[]
+        if(list.length<1) return []
+        for(let i=0; i<list.length; i++){
+            let item={
+                value:list[i][valueKey],
+                text:list[i][textKey]
+            }
+            options.push(item)
+        }
+        return options
+
+    }
     static getIcon(title){
         title=title.toLowerCase()
         let html = ''
@@ -252,8 +265,7 @@ class Helper {
         return url
     }
     static period(begin, end) {
-        if (!begin || !end) return ''
-        return begin + ' ~ ' + end
+        return TimeService.period(begin, end)
     }
     static hasOptionValue(options, value) {
         let hasMatch = false
