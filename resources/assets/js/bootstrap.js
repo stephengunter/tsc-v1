@@ -64,11 +64,14 @@ Vue.component('center-index', require('./views/centers/index') )
 Vue.component('center-create', require('./views/centers/create') )
 Vue.component('center-details', require('./views/centers/details') )
 
+Vue.component('discount-index', require('./views/discounts/index') )
+Vue.component('identity-index', require('./views/identities/index') )
+
 Vue.component('term-index', require('./views/terms/index') )
 Vue.component('holiday-index', require('./views/holidays/index') )
 Vue.component('classroom-index', require('./views/classrooms/index') )
 Vue.component('title-index', require('./views/titles/index') )
-Vue.component('discount-index', require('./views/discounts/index') )
+
 
 
 
@@ -102,12 +105,14 @@ import Refund from './models/refund.js'
 import Center from './models/center.js'
 import Teacher from './models/teacher.js'
 import Volunteer from './models/volunteer.js'
+import Discount from './models/discount.js'
+import Identity from './models/identity.js'
 
 import Term from './models/term.js'
 import Holiday from './models/holiday.js'
 import Classroom from './models/classroom.js'
 import Title from './models/title.js'
-import Discount from './models/discount.js'
+
 
 import Auth from './packages/auth/Auth.js'
 Vue.use(Auth)
@@ -132,12 +137,14 @@ window.Refund=Refund
 window.Teacher=Teacher
 window.Volunteer=Volunteer
 window.Center=Center
+window.Discount=Discount
+window.Identity=Identity
 
 window.Term=Term
 window.Holiday=Holiday
 window.Classroom=Classroom
 window.Title=Title
-window.Discount=Discount
+
 
 
 

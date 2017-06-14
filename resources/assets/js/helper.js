@@ -127,6 +127,9 @@ class Helper {
     static genderOptions() {
          return CommonService.genderOptions()
     }
+    static boolOptions() {
+         return CommonService.boolOptions()
+    }
     static datetimePickerOption() {
         return TimeService.datetimePickerOption()
     }

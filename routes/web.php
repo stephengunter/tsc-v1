@@ -8,8 +8,10 @@
 
 Route::get('/', 'HomeController@index');
 Route::get('errors', function(){
-    return view('errors');
+     return view('errors');
 });
+
+Route::get('/test', '\App\Http\Controllers\Discounts\IdentitiesController@index');
 
 Route::get('login', '\App\Http\Controllers\Auth\SessionsController@create')->name('login');
 Route::post('login', '\App\Http\Controllers\Auth\SessionsController@store');
@@ -63,12 +65,15 @@ Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
 Route::resource('courses', 'CoursesController');
 Route::resource('teachers', 'TeachersController');
 
+Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');
+Route::resource('identities', '\App\Http\Controllers\Discounts\IdentitiesController');
+
 Route::resource('terms', '\App\Http\Controllers\Settings\TermsController');
 Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
 Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController');
 Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
 Route::resource('titles', '\App\Http\Controllers\Settings\TitlesController');
-Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');
+
 
 // Route::group(['prefix' => 'api/'], function() {
 //     Route::resource('sessions', '\App\Http\Controllers\Auth\SessionsController');

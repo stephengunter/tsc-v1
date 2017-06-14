@@ -36,7 +36,7 @@ class DiscountsController extends BaseController
     {
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
-            return view('settings.discount')
+            return view('discounts.index')
                     ->with(['menus' => $menus]);
         }  
 

@@ -25,7 +25,15 @@ class CommonService {
                     value: '0'
                 }]
     }
-    
+    static boolOptions(){
+        return [{
+                    text: '是',
+                    value: '1'
+                }, {
+                    text: '否',
+                    value: '0'
+                }]
+    }
     static activeOptions(){
       return  [{
                     text: '上架中',

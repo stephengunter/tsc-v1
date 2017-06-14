@@ -32876,12 +32876,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__models_center_js__ = __webpack_require__(261);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__models_teacher_js__ = __webpack_require__(269);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__models_volunteer_js__ = __webpack_require__(275);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__models_term_js__ = __webpack_require__(270);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__models_holiday_js__ = __webpack_require__(265);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__models_classroom_js__ = __webpack_require__(262);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__models_title_js__ = __webpack_require__(271);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__models_discount_js__ = __webpack_require__(528);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__packages_auth_Auth_js__ = __webpack_require__(276);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__models_discount_js__ = __webpack_require__(528);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__models_identity_js__ = __webpack_require__(541);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__models_term_js__ = __webpack_require__(270);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__models_holiday_js__ = __webpack_require__(265);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__models_classroom_js__ = __webpack_require__(262);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__models_title_js__ = __webpack_require__(271);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__packages_auth_Auth_js__ = __webpack_require__(276);
 __webpack_require__(335);
 __webpack_require__(336);
 __webpack_require__(337);
@@ -32945,11 +32946,13 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('center-index', __webpack_
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('center-create', __webpack_require__(387));
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('center-details', __webpack_require__(388));
 
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('discount-index', __webpack_require__(532));
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('identity-index', __webpack_require__(538));
+
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('term-index', __webpack_require__(405));
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('holiday-index', __webpack_require__(391));
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('classroom-index', __webpack_require__(390));
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('title-index', __webpack_require__(406));
-__WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('discount-index', __webpack_require__(532));
 
 
 window.axios = __WEBPACK_IMPORTED_MODULE_2_axios___default.a;
@@ -32989,7 +32992,8 @@ window.MomentTimeZone = __WEBPACK_IMPORTED_MODULE_4_moment_timezone___default.a;
 
 
 
-__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_27__packages_auth_Auth_js__["a" /* default */]);
+
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_28__packages_auth_Auth_js__["a" /* default */]);
 
 window.Form = __WEBPACK_IMPORTED_MODULE_5__utilities_Form__["a" /* default */];
 window.Helper = __WEBPACK_IMPORTED_MODULE_6__helper_js__["a" /* default */];
@@ -33011,12 +33015,13 @@ window.Refund = __WEBPACK_IMPORTED_MODULE_18__models_refund_js__["a" /* default 
 window.Teacher = __WEBPACK_IMPORTED_MODULE_20__models_teacher_js__["a" /* default */];
 window.Volunteer = __WEBPACK_IMPORTED_MODULE_21__models_volunteer_js__["a" /* default */];
 window.Center = __WEBPACK_IMPORTED_MODULE_19__models_center_js__["a" /* default */];
+window.Discount = __WEBPACK_IMPORTED_MODULE_22__models_discount_js__["a" /* default */];
+window.Identity = __WEBPACK_IMPORTED_MODULE_23__models_identity_js__["a" /* default */];
 
-window.Term = __WEBPACK_IMPORTED_MODULE_22__models_term_js__["a" /* default */];
-window.Holiday = __WEBPACK_IMPORTED_MODULE_23__models_holiday_js__["a" /* default */];
-window.Classroom = __WEBPACK_IMPORTED_MODULE_24__models_classroom_js__["a" /* default */];
-window.Title = __WEBPACK_IMPORTED_MODULE_25__models_title_js__["a" /* default */];
-window.Discount = __WEBPACK_IMPORTED_MODULE_26__models_discount_js__["a" /* default */];
+window.Term = __WEBPACK_IMPORTED_MODULE_24__models_term_js__["a" /* default */];
+window.Holiday = __WEBPACK_IMPORTED_MODULE_25__models_holiday_js__["a" /* default */];
+window.Classroom = __WEBPACK_IMPORTED_MODULE_26__models_classroom_js__["a" /* default */];
+window.Title = __WEBPACK_IMPORTED_MODULE_27__models_title_js__["a" /* default */];
 
 window.Vue = __WEBPACK_IMPORTED_MODULE_0_vue___default.a;
 
@@ -33277,6 +33282,11 @@ var Helper = function () {
         key: 'genderOptions',
         value: function genderOptions() {
             return CommonService.genderOptions();
+        }
+    }, {
+        key: 'boolOptions',
+        value: function boolOptions() {
+            return CommonService.boolOptions();
         }
     }, {
         key: 'datetimePickerOption',
@@ -36841,6 +36851,17 @@ var CommonService = function () {
                 value: '1'
             }, {
                 text: '未審核',
+                value: '0'
+            }];
+        }
+    }, {
+        key: 'boolOptions',
+        value: function boolOptions() {
+            return [{
+                text: '是',
+                value: '1'
+            }, {
+                text: '否',
                 value: '0'
             }];
         }
@@ -75248,6 +75269,834 @@ if (false) {
      require("vue-hot-reload-api").rerender("data-v-fdd38a2e", module.exports)
   }
 }
+
+/***/ }),
+/* 535 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'EditIdentity',
+    props: {
+        identity: {
+            type: Object,
+            default: null
+        },
+        can_edit: {
+            type: Boolean,
+            default: true
+        }
+
+    },
+
+    data: function data() {
+        return {
+            isReadOnly: true,
+
+            boolOptions: [],
+
+            loaded: false,
+            form: {}
+
+        };
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    methods: {
+        getId: function getId() {
+            if (this.identity) return Helper.tryParseInt(this.identity.id);
+            return 0;
+        },
+        init: function init() {
+            if (this.identity) {
+                this.isReadOnly = true;
+            } else {
+                this.loaded = false;
+                this.isReadOnly = false;
+                this.fetchData();
+            }
+        },
+        fetchData: function fetchData() {
+            var _this = this;
+
+            var getData = null;
+            var id = this.getId();
+            if (id) {
+                getData = Identity.edit(id);
+            } else {
+                getData = Identity.create();
+            }
+            getData.then(function (data) {
+                _this.form = new Form({
+                    identity: data.identity
+                });
+                _this.loadOptions(id);
+            }).catch(function (error) {
+                Helper.BusEmitError(error);
+            });
+        },
+        isMemberText: function isMemberText() {
+            if (parseInt(this.identity.member) > 0) return '是';
+            return '';
+        },
+        loadOptions: function loadOptions(id) {
+
+            this.boolOptions = Helper.boolOptions();
+            this.loaded = true;
+        },
+        beginEdit: function beginEdit() {
+            this.loaded = false;
+            this.isReadOnly = false;
+            this.fetchData();
+        },
+        cancelEdit: function cancelEdit() {
+            this.$emit('canceled');
+        },
+        setMember: function setMember(val) {
+            this.form.identity.member = val;
+        },
+        btnDeleteClicked: function btnDeleteClicked() {
+            var values = {
+                id: this.getId(),
+                name: this.identity.name
+            };
+            this.$emit('btn-delete-clicked', values);
+        },
+        clearErrorMsg: function clearErrorMsg(name) {
+            this.form.errors.clear(name);
+        },
+        onSubmit: function onSubmit() {
+            this.submitForm();
+        },
+        submitForm: function submitForm() {
+            var _this2 = this;
+
+            var save = null;
+            var id = this.getId();
+            if (id) {
+                save = Identity.update(this.form, id);
+            } else {
+                save = Identity.store(this.form);
+            }
+
+            save.then(function (result) {
+                Helper.BusEmitOK();
+                _this2.isReadOnly = true;
+
+                _this2.$emit('saved');
+            }).catch(function (error) {
+                Helper.BusEmitError(error, '存檔失敗');
+            });
+        }
+    }
+
+};
+
+/***/ }),
+/* 536 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_identity_edit_vue__ = __webpack_require__(537);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_identity_edit_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_identity_edit_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'IdentityIndex',
+    components: {
+        Edit: __WEBPACK_IMPORTED_MODULE_0__components_identity_edit_vue___default.a
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    computed: {
+        hasData: function hasData() {
+            if (this.identityList.length) return true;
+            return false;
+        }
+    },
+    data: function data() {
+        return {
+
+            loaded: false,
+            creating: false,
+            identityList: [],
+
+            orderOptions: {},
+
+            deleteConfirm: {
+                id: 0,
+                show: false,
+                msg: ''
+
+            }
+
+        };
+    },
+
+    methods: {
+        init: function init() {
+            this.loaded = false;
+            this.creating = false;
+
+            this.identityList = [];
+
+            this.deleteConfirm = {
+                id: 0,
+                show: false,
+                msg: ''
+
+            };
+
+            this.fetchData();
+        },
+        fetchData: function fetchData() {
+            var _this = this;
+
+            var index = Identity.index();
+            index.then(function (data) {
+
+                _this.identityList = data.identityList;
+                _this.loaded = true;
+            }).catch(function (error) {
+                Helper.BusEmitError(error);
+            });
+        },
+        onEditCanceled: function onEditCanceled() {
+            this.init();
+        },
+        beginCreate: function beginCreate() {
+            this.creating = true;
+        },
+        onCreateCanceled: function onCreateCanceled() {
+            this.init();
+        },
+        onBtnDeleteClicked: function onBtnDeleteClicked(values) {
+            this.deleteConfirm.msg = '確定要刪除身分： ' + values.name + ' 嗎？';
+            this.deleteConfirm.id = values.id;
+            this.deleteConfirm.show = true;
+        },
+        onCreated: function onCreated() {
+            this.init();
+            this.$emit('created');
+        },
+        onUpdated: function onUpdated() {
+            this.init();
+            this.$emit('updated');
+        },
+        closeConfirm: function closeConfirm() {
+            this.deleteConfirm.show = false;
+        },
+        deleteIdentity: function deleteIdentity() {
+            var _this2 = this;
+
+            var id = this.deleteConfirm.id;
+            var remove = Identity.delete(id);
+            remove.then(function (result) {
+                Helper.BusEmitOK('刪除成功');
+                _this2.init();
+                _this2.$emit('deleted');
+            }).catch(function (error) {
+                Helper.BusEmitError(error, '刪除失敗');
+                _this2.closeConfirm();
+            });
+        }
+    }
+
+};
+
+/***/ }),
+/* 537 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(535),
+  /* template */
+  __webpack_require__(539),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\identity\\edit.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] edit.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-061cdc0c", Component.options)
+  } else {
+    hotAPI.reload("data-v-061cdc0c", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 538 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(536),
+  /* template */
+  __webpack_require__(540),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\views\\identities\\index.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] index.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-6e2aef2c", Component.options)
+  } else {
+    hotAPI.reload("data-v-6e2aef2c", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 539 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return (_vm.isReadOnly) ? _c('tr', [_c('td', {
+    domProps: {
+      "textContent": _vm._s(_vm.identity.name)
+    }
+  }), _vm._v(" "), _c('td', {
+    domProps: {
+      "textContent": _vm._s(_vm.isMemberText())
+    }
+  }), _vm._v(" "), _c('td', {
+    domProps: {
+      "textContent": _vm._s(_vm.identity.ps)
+    }
+  }), _vm._v(" "), _c('td', [_c('button', {
+    staticClass: "btn btn-primary btn-xs",
+    on: {
+      "click": _vm.beginEdit
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-pencil",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  })]), _vm._v(" "), (_vm.identity.canDelete) ? _c('button', {
+    staticClass: "btn btn-danger btn-xs",
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.btnDeleteClicked($event)
+      }
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-trash",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  })]) : _vm._e()])]) : _c('tr', [(_vm.loaded) ? _c('td', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.identity.name),
+      expression: "form.identity.name"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "name": "identity.name"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.identity.name)
+    },
+    on: {
+      "keydown": function($event) {
+        _vm.clearErrorMsg('identity.name')
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.identity.name = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.form.errors.has('identity.name')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('identity.name'))
+    }
+  }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.loaded) ? _c('td', [_c('div', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.identity.member),
+      expression: "form.identity.member"
+    }],
+    attrs: {
+      "type": "hidden"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.identity.member)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.identity.member = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('toggle', {
+    attrs: {
+      "items": _vm.boolOptions,
+      "default_val": _vm.form.identity.member
+    },
+    on: {
+      "selected": _vm.setMember
+    }
+  })], 1)]) : _vm._e(), _vm._v(" "), (_vm.loaded) ? _c('td', [_c('textarea', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.identity.ps),
+      expression: "form.identity.ps"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "rows": "5",
+      "cols": "50",
+      "name": "identity.ps"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.identity.ps)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.identity.ps = $event.target.value
+      }
+    }
+  })]) : _vm._e(), _vm._v(" "), (_vm.loaded) ? _c('td', [_c('button', {
+    staticClass: "btn btn-success btn-xs",
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.onSubmit($event)
+      }
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-floppy-disk",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  })]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default btn-xs",
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.cancelEdit($event)
+      }
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-refresh",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  })])]) : _vm._e()])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-061cdc0c", module.exports)
+  }
+}
+
+/***/ }),
+/* 540 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('div', {
+    staticClass: "panel panel-default show-data"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._m(0), _vm._v(" "), _c('div', [_c('button', {
+    staticClass: "btn btn-primary btn-sm",
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.beginCreate($event)
+      }
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-plus",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v(" 新增\r\n                ")])])]), _vm._v(" "), (_vm.loaded) ? _c('div', {
+    staticClass: "panel-body"
+  }, [_c('table', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.hasData),
+      expression: "hasData"
+    }],
+    staticClass: "table table-striped",
+    staticStyle: {
+      "width": "95%"
+    }
+  }, [_vm._m(1), _vm._v(" "), _c('tbody', [_vm._l((_vm.identityList), function(identity) {
+    return _c('edit', {
+      attrs: {
+        "identity": identity
+      },
+      on: {
+        "canceled": _vm.onEditCanceled,
+        "saved": _vm.onUpdated,
+        "btn-delete-clicked": _vm.onBtnDeleteClicked
+      }
+    })
+  }), _vm._v(" "), (_vm.creating) ? _c('edit', {
+    on: {
+      "saved": _vm.onCreated,
+      "canceled": _vm.onCreateCanceled
+    }
+  }) : _vm._e()], 2)])]) : _vm._e()]), _vm._v(" "), _c('delete-confirm', {
+    attrs: {
+      "showing": _vm.deleteConfirm.show,
+      "message": _vm.deleteConfirm.msg
+    },
+    on: {
+      "close": _vm.closeConfirm,
+      "confirmed": _vm.deleteIdentity
+    }
+  })], 1)
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('span', {
+    staticClass: "panel-title"
+  }, [_c('h4', [_c('i', {
+    staticClass: "fa fa-id-card-o",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v(" 身分管理")])])
+},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('thead', [_c('tr', [_c('th', {
+    staticStyle: {
+      "width": "25%"
+    }
+  }, [_vm._v("名稱")]), _vm._v(" "), _c('th', {
+    staticStyle: {
+      "width": "20%"
+    }
+  }, [_vm._v("慈濟會員")]), _vm._v(" "), _c('th', {
+    staticStyle: {
+      "width": "35%"
+    }
+  }, [_vm._v("備註")]), _vm._v(" "), _c('th', {
+    staticStyle: {
+      "width": "20%"
+    }
+  })])])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-6e2aef2c", module.exports)
+  }
+}
+
+/***/ }),
+/* 541 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Identity = function () {
+    function Identity(data) {
+        _classCallCheck(this, Identity);
+
+        for (var property in data) {
+            this[property] = data[property];
+        }
+    }
+
+    _createClass(Identity, null, [{
+        key: 'title',
+        value: function title() {
+            return 'Identities';
+        }
+    }, {
+        key: 'source',
+        value: function source() {
+            return '/identities';
+        }
+    }, {
+        key: 'createUrl',
+        value: function createUrl() {
+            return this.source() + '/create';
+        }
+    }, {
+        key: 'storeUrl',
+        value: function storeUrl() {
+            return this.source();
+        }
+    }, {
+        key: 'showUrl',
+        value: function showUrl(id) {
+            return this.source() + '/' + id;
+        }
+    }, {
+        key: 'editUrl',
+        value: function editUrl(id) {
+            return this.showUrl(id) + '/edit';
+        }
+    }, {
+        key: 'updateUrl',
+        value: function updateUrl(id) {
+            return this.showUrl(id);
+        }
+    }, {
+        key: 'deleteUrl',
+        value: function deleteUrl(id) {
+            return this.source() + '/' + id;
+        }
+    }, {
+        key: 'index',
+        value: function index() {
+            var _this = this;
+
+            return new Promise(function (resolve, reject) {
+                var url = _this.source();
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'create',
+        value: function create() {
+            var url = this.createUrl();
+
+            return new Promise(function (resolve, reject) {
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'store',
+        value: function store(form) {
+            var url = this.storeUrl();
+            var method = 'post';
+            return new Promise(function (resolve, reject) {
+                form.submit(method, url).then(function (data) {
+                    resolve(data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'show',
+        value: function show(id) {
+            var _this2 = this;
+
+            return new Promise(function (resolve, reject) {
+                var url = _this2.showUrl(id);
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'edit',
+        value: function edit(id) {
+            var url = this.editUrl(id);
+            return new Promise(function (resolve, reject) {
+
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'update',
+        value: function update(form, id) {
+            var url = this.updateUrl(id);
+            var method = 'put';
+            return new Promise(function (resolve, reject) {
+                form.submit(method, url).then(function (data) {
+                    resolve(data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'delete',
+        value: function _delete(id) {
+            var _this3 = this;
+
+            return new Promise(function (resolve, reject) {
+                var url = _this3.deleteUrl(id);
+                var form = new Form();
+                form.delete(url).then(function (response) {
+                    resolve(true);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+        // static options(){
+        //     let url =this.source() + '/options' 
+        //     return new Promise((resolve, reject) => {
+        //                  axios.get(url)
+        //                 .then(response => {
+        //                     resolve(response.data);
+        //                 })
+        //                 .catch(error => {
+        //                     reject(error);
+        //                 })
+        //             })   //End Promise
+        // }
+
+
+    }]);
+
+    return Identity;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = Identity;
 
 /***/ })
 /******/ ]);

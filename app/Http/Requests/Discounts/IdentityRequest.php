@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Discounts;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,9 +23,9 @@ class IdentityRequest extends FormRequest
      */
     public function rules()
     {
-       
+        $id=$this->getId();
         return [
-            'identity.name' => 'required|unique:identities,name,'.$this['identity']['id'],
+            'identity.name' => 'required|unique:identities,name,'.$id,
         ];
     }
     public function messages()
@@ -34,6 +34,15 @@ class IdentityRequest extends FormRequest
             'identity.name.required' => '必須填寫名稱',
             'identity.name.unique' => '名稱與現存資料重複',
         ];
+    }
+    public function getId()
+    {
+        $values = $this['identity'];
+        $id=0;        
+        if(array_key_exists ( 'id' ,$values)){
+            $id=(int)$values['id'];
+        }  
+        return $id;
     }
     public function getValues()
     {

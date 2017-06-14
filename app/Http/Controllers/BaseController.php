@@ -183,7 +183,7 @@ class BaseController extends Controller
                 
             );
         }
-        if($key=='discounts'){
+        if($key=='discounts'|| $key=='identities'){
            return array(
                 [
                     'id' => 1,

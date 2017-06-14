@@ -1,55 +1,34 @@
 <template>
 <tr v-if="isReadOnly" >
-     <th  scope="row" v-text="term.year"></th> 
-     <td  v-text="term.order"></td> 
-     <td  v-text="term.name"></td>
-     <td  v-text="term.number"></td> 
-     <td  v-html="$options.filters.activeLabel(term.active)" ></td>
-     <td> 
-        <a v-if="term.updated_by"  href="#" @click.prevent="showUpdatedBy" >
-          {{   term.updated_at|tpeTime  }}
-        </a>
-        <span v-else>{{   term.updated_at|tpeTime  }}</span>
-        
-
-     </td>           
+     <td v-text="identity.name"></td>
+     <td v-text="isMemberText()"></td>
+     <td v-text="identity.ps"></td> 
+             
      <td>
          <button class="btn btn-primary btn-xs" @click="beginEdit">
             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
         </button>  
-         <button v-if="term.canDelete"  class="btn btn-danger btn-xs" @click.prevent="btnDeleteClicked">
+         <button v-if="identity.canDelete"  class="btn btn-danger btn-xs" @click.prevent="btnDeleteClicked">
              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
         </button>
      </td> 
 </tr>
 <tr v-else>
     <td v-if="loaded">
-          <select @change="clearErrorMsg('term.number')"   v-model="form.term.year"  class="form-control" >
-               <option v-for="item in yearOptions" :value="item.value" v-text="item.text"></option>
-          </select>
-    </td> 
-    <td v-if="loaded">
-          <select @change="clearErrorMsg('term.number')"  v-model="form.term.order"  class="form-control" >
-               <option v-for="item in orderOptions" :value="item.value" v-text="item.text"></option>
-           </select>
-    </td> 
-    <td v-if="loaded">
-          <input type="text" name="term.name" @keydown="clearErrorMsg('term.name')" class="form-control" v-model="form.term.name">
-          <small class="text-danger" v-if="form.errors.has('term.name')" v-text="form.errors.get('term.name')"></small>
+          <input type="text" name="identity.name" @keydown="clearErrorMsg('identity.name')" class="form-control" v-model="form.identity.name">
+          <small class="text-danger" v-if="form.errors.has('identity.name')" v-text="form.errors.get('identity.name')"></small>
     
-    </td>
+    </td> 
     <td v-if="loaded">
-      <small class="text-danger" v-if="form.errors.has('term.number')" v-text="form.errors.get('term.number')"></small>
-   
-    </td>
+        <div>  
+           <input type="hidden" v-model="form.identity.member"  >
+           <toggle :items="boolOptions"   :default_val="form.identity.member" @selected=setMember></toggle>
+        </div>
+    </td> 
     <td v-if="loaded">
-          <input type="hidden" v-model="form.term.active"  >
-           <toggle :items="activeOptions"   :default_val="form.term.active" @selected=setActive></toggle>
-                            
+         <textarea rows="5" cols="50" name="identity.ps" class="form-control" v-model="form.identity.ps"> </textarea>
     </td>
-    <td v-if="loaded">
-         
-    </td>
+    
     <td v-if="loaded">
          
         <button @click.prevent="onSubmit"  class="btn btn-success btn-xs">
@@ -65,9 +44,9 @@
 
 <script>
     export default {
-        name: 'EditTerm',
+        name: 'EditIdentity',
         props: {
-            term: {
+            identity: {
                type: Object,
                default: null
             },
@@ -82,9 +61,7 @@
             return {
                 isReadOnly:true,
 
-                orderOptions:[],
-                yearOptions:[],
-                activeOptions:[],
+                boolOptions:[],
 
                 loaded:false,
                 form:{},
@@ -97,11 +74,11 @@
         },
         methods: {
             getId(){
-                if(this.term) return Helper.tryParseInt(this.term.id)
+                if(this.identity) return Helper.tryParseInt(this.identity.id)
                 return 0
             },            
             init(){  
-                if(this.term){
+                if(this.identity){
                    this.isReadOnly=true                  
                 }else{
                     this.loaded=false
@@ -114,30 +91,29 @@
                 let getData=null
                 let id=this.getId()
                 if(id){
-                    getData=Term.edit(id)
+                    getData=Identity.edit(id)
                 }else{
-                    getData=Term.create()
+                    getData=Identity.create()
                 }
                 getData.then(data => {
                     this.form=new Form({
-                        term:data.term
+                        identity:data.identity
                     }) 
                     this.loadOptions(id)
+                   
                     
                 })
                 .catch(error=> {
                     Helper.BusEmitError(error)
                 })
             },
+            isMemberText(){
+                if(parseInt(this.identity.member)>0) return '是'
+                    return ''
+            },
             loadOptions(id){
-                this.activeOptions=CommonService.activeOptions()
-                this.yearOptions=Term.yearOptions()
-                this.orderOptions=Term.orderOptions()  
-
-                if(!id){
-                    this.form.term.year=this.yearOptions[0].value
-                    this.form.term.order=this.orderOptions[0].value
-                }
+                
+                this.boolOptions=Helper.boolOptions()
                 this.loaded=true
             },
            
@@ -149,13 +125,13 @@
             cancelEdit(){
                 this.$emit('canceled')
             },
-            setActive(val){
-                this.form.term.active=val
+            setMember(val) {
+                this.form.identity.member = val;
             },
             btnDeleteClicked(){
                 let values={
                     id:this.getId(),
-                    name:this.term.name
+                    name:this.identity.name
                 }
                 this.$emit('btn-delete-clicked' , values)
             },
@@ -169,9 +145,9 @@
                 let save = null
                 let id=this.getId()
                 if(id){
-                    save=Term.update(this.form, id)
+                    save=Identity.update(this.form, id)
                 }else{
-                    save=Term.store(this.form)
+                    save=Identity.store(this.form)
                 }
              
                 save.then(result => {
@@ -184,13 +160,7 @@
                     Helper.BusEmitError(error,'存檔失敗')
                 })
             },
-            showUpdatedBy(){
-               let updated_by=Helper.tryParseInt(this.term.updated_by)
-               if(updated_by){
-                  Bus.$emit('onShowEditor',updated_by)
-               }
-                
-            },
+           
             
             
             

@@ -8,6 +8,16 @@ use App\Discount;
 class Identity extends Model
 {
     protected $fillable = ['name','member','ps'];
+    
+    public static function initialize()
+	{
+		return [
+			'name'=>'',
+			'member' => 0,
+			'ps' => '',
+			
+		];
+	}
 
     public function discounts() 
 	{
@@ -17,6 +27,21 @@ class Identity extends Model
     public function validDiscounts()
 	{
         return $this->discounts()->where('removed',false);
+	}
+
+    public function canEditBy($user)
+	{
+        return $user->isAdmin();
+          
+	}
+	public function canDeleteBy($user)
+	{
+		if($this->canDelete()){
+			return $this->canEditBy($user);
+		}else{
+			return false;
+		}
+		
 	}
 
     public function canDelete()
