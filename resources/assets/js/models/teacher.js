@@ -117,8 +117,13 @@ class Teacher {
         })
     }
     
-    static statusOptions(){
-        let url =this.source() + '/status-options' 
+    static options(params){
+        let url =this.source() + '/options' 
+        if(params.course){
+            url += '?course=' + params.course
+        }else if(params.center){
+            url += '?center=' + params.center
+        }
         return new Promise((resolve, reject) => {
                      axios.get(url)
                     .then(response => {

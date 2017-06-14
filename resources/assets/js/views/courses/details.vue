@@ -2,36 +2,33 @@
 <div>
   <course v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
      @saved="courseUpdated" @loaded="onDataLoaded" :version="version"
-     @btn-back-clicked="onBtnBackClicked" @course-deleted="onCourseDeleted" > 
+     @btn-back-clicked="onBtnBackClicked" @deleted="onCourseDeleted" > 
 
   </course>
 
-  <div v-if="false"  id="tabCourse" class="panel with-nav-tabs panel-default">
+  <div  id="tabCourse" class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
             <ul class="nav nav-tabs">
                 <li class="active">
-                    <a @click="activeIndex=0" href="#user" data-toggle="tab">個人資料</a>
+                    <a @click="activeIndex=0" href="#signupInfo" data-toggle="tab">報名資訊</a>
                 </li>
-                <li>
+                <!-- <li>
                      <a @click="activeIndex=1" href="#contactinfo" data-toggle="tab">聯絡資訊</a>
                 </li>
                 <li>
                      <a @click="activeIndex=2" href="#centers" data-toggle="tab">所屬中心</a>
-                </li>
+                </li> -->
                 
             </ul>
         </div>
         <div class="panel-body">
             <div class="tab-content">
-                <div class="tab-pane fade active in" id="user">
-                    <user v-if="activeIndex==0" :id="id" :can_edit="userSettings.can_edit" :can_back="userSettings.can_back"  
-                      :hide_delete="userSettings.hide_delete"
-                      @saved="onUserSaved"  :role="userSettings.role"
-                      @user-loaded="onUserLoaded" >
-                      
-                    </user>
+                <div class="tab-pane fade active in" id="signupInfo">
+                    <signup-info v-if="activeIndex==0" :id="id" 
+                       @saved="onSignupInfoSaved"  >
+                    </signup-info>  
                 </div>
-                <div class="tab-pane fade" id="contactinfo">
+                <!-- <div class="tab-pane fade" id="contactinfo">
                     <contact-info v-if="activeIndex==1"  
                      :id="contactInfoSettings.id" :user_id="contactInfoSettings.user_id" 
                      :canEdit="contactInfoSettings.canEdit" :show_residence="contactInfoSettings.show_residence" 
@@ -41,7 +38,7 @@
                 <div class="tab-pane fade" id="centers">
                     <user-center v-if="activeIndex==2" :user_id="id" :role='role'>
                     </user-center>
-                </div>                 
+                </div>   -->               
             </div>
         </div>
   </div>
@@ -56,6 +53,7 @@
 
 <script>
     import CourseComponent from '../../components/course/course.vue'
+    import SignupInfoComponent from '../../components/course/signupinfo/view.vue'
     
     
     
@@ -63,6 +61,7 @@
         name: 'CourseDetails',
         components: {
            'course' : CourseComponent,
+           'signup-info' : SignupInfoComponent,
          
         },
         props: {
@@ -168,8 +167,8 @@
                this.user=user
                this.setContactInfo(user.contact_info)
             },
-            onUserSaved(user){
-                this.user=user
+            onSignupInfoSaved(signupinfo){
+                // this.user=user
                 this.version += 1
             },
             setContactInfo(contactInfoId){

@@ -23269,16 +23269,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         loadTeacherOptions: function loadTeacherOptions() {
-            // let center=this.form.course.center_id
-            // let url = '/api/teachers/optionsByCenter/' + center;
-            // axios.get(url)
-            //     .then(response => {
-            //         this.teachers=[]
-            //          this.teacherOptions=response.data.options
-            //     })
-            //     .catch(function(error) {
-            //         console.log(error)
-            //     })
+            var _this2 = this;
+
+            var center = this.form.course.center_id;
+            var params = {
+                center: center
+            };
+            var options = Teacher.options(params);
+            options.then(function (data) {
+                _this2.teachers = [];
+                _this2.teacherOptions = data.options;
+            }).catch(function (error) {
+                Helper.BusEmitError(error);
+            });
         },
         setActive: function setActive(val) {
             this.form.course.active = val;
@@ -23295,18 +23298,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.submitForm();
         },
         submitForm: function submitForm() {
-            var _this2 = this;
+            var _this3 = this;
 
-            var update = Course.update(this.form, this.id);
-
-            update.then(function (data) {
+            var id = this.id;
+            var store = null;
+            if (id) {
+                store = Course.update(this.form, id);
+            } else {
+                store = Course.store(this.form);
+            }
+            store.then(function (data) {
                 Helper.BusEmitOK();
-                _this2.$emit('saved', data);
+                _this3.$emit('saved', data);
             }).catch(function (error) {
                 Helper.BusEmitError(error);
             });
         },
-        canceled: function canceled() {
+        cancel: function cancel() {
             this.$emit('canceled');
         },
         onImageUploadCanceled: function onImageUploadCanceled() {
@@ -23331,7 +23339,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.imageUpload.show = false;
         },
         updatePhoto: function updatePhoto(photo) {
-            var _this3 = this;
+            var _this4 = this;
 
             var courseId = this.id;
             var photoId = 0;
@@ -23342,9 +23350,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var updatePhoto = Course.updatePhoto(courseId, photoId);
             updatePhoto.then(function (result) {
                 if (photo) {
-                    _this3.photo_id = photo.id;
+                    _this4.photo_id = photo.id;
                 } else {
-                    _this3.photo_id = 0;
+                    _this4.photo_id = 0;
                 }
             }).catch(function (error) {
                 var title = '刪除相片失敗';
@@ -23441,6 +23449,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             filter: [{
                 title: '名稱',
                 key: 'name'
+            }, {
+                title: '編號',
+                key: 'number'
             }, {
                 title: '開始日期',
                 key: 'begin_date'
@@ -31044,8 +31055,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         onCanceled: function onCanceled() {
             this.$emit('canceled');
         },
-        onSaved: function onSaved() {
-            this.$emit('saved');
+        onSaved: function onSaved(course) {
+            this.$emit('saved', course);
         }
     }
 
@@ -31059,6 +31070,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_course_course_vue__ = __webpack_require__(376);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_course_course_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_course_course_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_course_signupinfo_view_vue__ = __webpack_require__(568);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_course_signupinfo_view_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_course_signupinfo_view_vue__);
 //
 //
 //
@@ -31112,16 +31125,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
+
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
     name: 'CourseDetails',
     components: {
-        'course': __WEBPACK_IMPORTED_MODULE_0__components_course_course_vue___default.a
+        'course': __WEBPACK_IMPORTED_MODULE_0__components_course_course_vue___default.a,
+        'signup-info': __WEBPACK_IMPORTED_MODULE_1__components_course_signupinfo_view_vue___default.a
 
     },
     props: {
@@ -31225,8 +31237,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.user = user;
             this.setContactInfo(user.contact_info);
         },
-        onUserSaved: function onUserSaved(user) {
-            this.user = user;
+        onSignupInfoSaved: function onSignupInfoSaved(signupinfo) {
+            // this.user=user
             this.version += 1;
         },
         setContactInfo: function setContactInfo(contactInfoId) {
@@ -34965,19 +34977,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__models_usercenters_js__ = __webpack_require__(289);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__models_address_js__ = __webpack_require__(273);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__models_course_js__ = __webpack_require__(277);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__models_signup_js__ = __webpack_require__(283);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__models_tuition_js__ = __webpack_require__(287);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__models_refund_js__ = __webpack_require__(282);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__models_center_js__ = __webpack_require__(274);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__models_teacher_js__ = __webpack_require__(284);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__models_volunteer_js__ = __webpack_require__(290);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__models_discount_js__ = __webpack_require__(278);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__models_identity_js__ = __webpack_require__(280);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__models_term_js__ = __webpack_require__(285);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__models_holiday_js__ = __webpack_require__(279);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__models_classroom_js__ = __webpack_require__(275);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__models_title_js__ = __webpack_require__(286);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__packages_auth_Auth_js__ = __webpack_require__(291);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__models_signupinfo_js__ = __webpack_require__(566);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__models_signup_js__ = __webpack_require__(283);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__models_tuition_js__ = __webpack_require__(287);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__models_refund_js__ = __webpack_require__(282);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__models_center_js__ = __webpack_require__(274);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__models_teacher_js__ = __webpack_require__(284);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__models_volunteer_js__ = __webpack_require__(290);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__models_discount_js__ = __webpack_require__(278);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__models_identity_js__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__models_term_js__ = __webpack_require__(285);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__models_holiday_js__ = __webpack_require__(279);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__models_classroom_js__ = __webpack_require__(275);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__models_title_js__ = __webpack_require__(286);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__packages_auth_Auth_js__ = __webpack_require__(291);
 __webpack_require__(350);
 __webpack_require__(351);
 __webpack_require__(352);
@@ -35092,7 +35105,8 @@ window.MomentTimeZone = __WEBPACK_IMPORTED_MODULE_4_moment_timezone___default.a;
 
 
 
-__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_28__packages_auth_Auth_js__["a" /* default */]);
+
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_29__packages_auth_Auth_js__["a" /* default */]);
 
 window.Form = __WEBPACK_IMPORTED_MODULE_5__utilities_Form__["a" /* default */];
 window.Helper = __WEBPACK_IMPORTED_MODULE_6__helper_js__["a" /* default */];
@@ -35108,19 +35122,20 @@ window.Address = __WEBPACK_IMPORTED_MODULE_14__models_address_js__["a" /* defaul
 window.UserCenters = __WEBPACK_IMPORTED_MODULE_13__models_usercenters_js__["a" /* default */];
 
 window.Course = __WEBPACK_IMPORTED_MODULE_15__models_course_js__["a" /* default */];
-window.Signup = __WEBPACK_IMPORTED_MODULE_16__models_signup_js__["a" /* default */];
-window.Tuition = __WEBPACK_IMPORTED_MODULE_17__models_tuition_js__["a" /* default */];
-window.Refund = __WEBPACK_IMPORTED_MODULE_18__models_refund_js__["a" /* default */];
-window.Teacher = __WEBPACK_IMPORTED_MODULE_20__models_teacher_js__["a" /* default */];
-window.Volunteer = __WEBPACK_IMPORTED_MODULE_21__models_volunteer_js__["a" /* default */];
-window.Center = __WEBPACK_IMPORTED_MODULE_19__models_center_js__["a" /* default */];
-window.Discount = __WEBPACK_IMPORTED_MODULE_22__models_discount_js__["a" /* default */];
-window.Identity = __WEBPACK_IMPORTED_MODULE_23__models_identity_js__["a" /* default */];
+window.SignupInfo = __WEBPACK_IMPORTED_MODULE_16__models_signupinfo_js__["a" /* default */];
+window.Signup = __WEBPACK_IMPORTED_MODULE_17__models_signup_js__["a" /* default */];
+window.Tuition = __WEBPACK_IMPORTED_MODULE_18__models_tuition_js__["a" /* default */];
+window.Refund = __WEBPACK_IMPORTED_MODULE_19__models_refund_js__["a" /* default */];
+window.Teacher = __WEBPACK_IMPORTED_MODULE_21__models_teacher_js__["a" /* default */];
+window.Volunteer = __WEBPACK_IMPORTED_MODULE_22__models_volunteer_js__["a" /* default */];
+window.Center = __WEBPACK_IMPORTED_MODULE_20__models_center_js__["a" /* default */];
+window.Discount = __WEBPACK_IMPORTED_MODULE_23__models_discount_js__["a" /* default */];
+window.Identity = __WEBPACK_IMPORTED_MODULE_24__models_identity_js__["a" /* default */];
 
-window.Term = __WEBPACK_IMPORTED_MODULE_24__models_term_js__["a" /* default */];
-window.Holiday = __WEBPACK_IMPORTED_MODULE_25__models_holiday_js__["a" /* default */];
-window.Classroom = __WEBPACK_IMPORTED_MODULE_26__models_classroom_js__["a" /* default */];
-window.Title = __WEBPACK_IMPORTED_MODULE_27__models_title_js__["a" /* default */];
+window.Term = __WEBPACK_IMPORTED_MODULE_25__models_term_js__["a" /* default */];
+window.Holiday = __WEBPACK_IMPORTED_MODULE_26__models_holiday_js__["a" /* default */];
+window.Classroom = __WEBPACK_IMPORTED_MODULE_27__models_classroom_js__["a" /* default */];
+window.Title = __WEBPACK_IMPORTED_MODULE_28__models_title_js__["a" /* default */];
 
 window.Vue = __WEBPACK_IMPORTED_MODULE_0_vue___default.a;
 
@@ -36318,6 +36333,11 @@ var Course = function () {
             return this.source() + '/create';
         }
     }, {
+        key: 'storeUrl',
+        value: function storeUrl() {
+            return this.source();
+        }
+    }, {
         key: 'showUrl',
         value: function showUrl(id) {
             return this.source() + '/' + id;
@@ -36336,6 +36356,32 @@ var Course = function () {
         key: 'deleteUrl',
         value: function deleteUrl(id) {
             return this.source() + '/' + id;
+        }
+    }, {
+        key: 'create',
+        value: function create() {
+            var url = this.createUrl();
+
+            return new Promise(function (resolve, reject) {
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'store',
+        value: function store(form) {
+            var url = this.storeUrl();
+            var method = 'post';
+            return new Promise(function (resolve, reject) {
+                form.submit(method, url).then(function (data) {
+                    resolve(data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
         }
     }, {
         key: 'show',
@@ -37967,9 +38013,14 @@ var Teacher = function () {
             });
         }
     }, {
-        key: 'statusOptions',
-        value: function statusOptions() {
-            var url = this.source() + '/status-options';
+        key: 'options',
+        value: function options(params) {
+            var url = this.source() + '/options';
+            if (params.course) {
+                url += '?course=' + params.course;
+            } else if (params.center) {
+                url += '?center=' + params.center;
+            }
             return new Promise(function (resolve, reject) {
                 axios.get(url).then(function (response) {
                     resolve(response.data);
@@ -63066,9 +63117,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "saved": _vm.courseUpdated,
       "loaded": _vm.onDataLoaded,
       "btn-back-clicked": _vm.onBtnBackClicked,
-      "course-deleted": _vm.onCourseDeleted
+      "deleted": _vm.onCourseDeleted
     }
-  }), _vm._v(" "), (false) ? _c('div', {
+  }), _vm._v(" "), _c('div', {
     staticClass: "panel with-nav-tabs panel-default",
     attrs: {
       "id": "tabCourse"
@@ -63081,7 +63132,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "active"
   }, [_c('a', {
     attrs: {
-      "href": "#user",
+      "href": "#signupInfo",
       "data-toggle": "tab"
     },
     on: {
@@ -63089,74 +63140,23 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.activeIndex = 0
       }
     }
-  }, [_vm._v("個人資料")])]), _vm._v(" "), _c('li', [_c('a', {
-    attrs: {
-      "href": "#contactinfo",
-      "data-toggle": "tab"
-    },
-    on: {
-      "click": function($event) {
-        _vm.activeIndex = 1
-      }
-    }
-  }, [_vm._v("聯絡資訊")])]), _vm._v(" "), _c('li', [_c('a', {
-    attrs: {
-      "href": "#centers",
-      "data-toggle": "tab"
-    },
-    on: {
-      "click": function($event) {
-        _vm.activeIndex = 2
-      }
-    }
-  }, [_vm._v("所屬中心")])])])]), _vm._v(" "), _c('div', {
+  }, [_vm._v("報名資訊")])])])]), _vm._v(" "), _c('div', {
     staticClass: "panel-body"
   }, [_c('div', {
     staticClass: "tab-content"
   }, [_c('div', {
     staticClass: "tab-pane fade active in",
     attrs: {
-      "id": "user"
+      "id": "signupInfo"
     }
-  }, [(_vm.activeIndex == 0) ? _c('user', {
+  }, [(_vm.activeIndex == 0) ? _c('signup-info', {
     attrs: {
-      "id": _vm.id,
-      "can_edit": _vm.userSettings.can_edit,
-      "can_back": _vm.userSettings.can_back,
-      "hide_delete": _vm.userSettings.hide_delete,
-      "role": _vm.userSettings.role
+      "id": _vm.id
     },
     on: {
-      "saved": _vm.onUserSaved,
-      "user-loaded": _vm.onUserLoaded
+      "saved": _vm.onSignupInfoSaved
     }
-  }) : _vm._e()], 1), _vm._v(" "), _c('div', {
-    staticClass: "tab-pane fade",
-    attrs: {
-      "id": "contactinfo"
-    }
-  }, [(_vm.activeIndex == 1) ? _c('contact-info', {
-    attrs: {
-      "id": _vm.contactInfoSettings.id,
-      "user_id": _vm.contactInfoSettings.user_id,
-      "canEdit": _vm.contactInfoSettings.canEdit,
-      "show_residence": _vm.contactInfoSettings.show_residence
-    },
-    on: {
-      "created": _vm.onContactInfoCreated,
-      "deleted": _vm.onContactInfoDeleted
-    }
-  }) : _vm._e()], 1), _vm._v(" "), _c('div', {
-    staticClass: "tab-pane fade",
-    attrs: {
-      "id": "centers"
-    }
-  }, [(_vm.activeIndex == 2) ? _c('user-center', {
-    attrs: {
-      "user_id": _vm.id,
-      "role": _vm.role
-    }
-  }) : _vm._e()], 1)])])]) : _vm._e()], 1)
+  }) : _vm._e()], 1)])])])], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -65967,9 +65967,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   })], 1)])])]), _vm._v(" "), _c('div', {
     staticClass: "row"
-  }, [_c('div', {
+  }, [(_vm.id) ? _c('div', {
     staticClass: "col-sm-3"
-  }), _vm._v(" "), _c('div', {
+  }) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
   }, [_c('div', {
     staticClass: "form-group"
@@ -66067,9 +66067,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "col-sm-3"
   })]), _vm._v(" "), _c('div', {
     staticClass: "row"
-  }, [_c('div', {
+  }, [(_vm.id) ? _c('div', {
     staticClass: "col-sm-3"
-  }), _vm._v(" "), _c('div', {
+  }) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
   }, [_c('div', {
     staticClass: "form-group"
@@ -66130,9 +66130,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   })], 1)])])]), _vm._v(" "), _c('div', {
     staticClass: "row"
-  }, [_c('div', {
+  }, [(_vm.id) ? _c('div', {
     staticClass: "col-sm-3"
-  }), _vm._v(" "), _c('div', {
+  }) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "col-sm-4"
   }, [_c('button', {
     staticClass: "btn btn-success",
@@ -66145,7 +66145,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.endEdit($event)
+        _vm.cancel($event)
       }
     }
   }, [_vm._v("取消")])])])]) : _vm._e()])]), _vm._v(" "), _c('modal', {
@@ -68976,7 +68976,15 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c("div")
+  return _c('edit-course', {
+    attrs: {
+      "course_id": _vm.course_id
+    },
+    on: {
+      "canceled": _vm.onCanceled,
+      "saved": _vm.onSaved
+    }
+  })
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -78898,6 +78906,1075 @@ module.exports = function(module) {
 __webpack_require__(147);
 module.exports = __webpack_require__(148);
 
+
+/***/ }),
+/* 560 */,
+/* 561 */,
+/* 562 */,
+/* 563 */,
+/* 564 */,
+/* 565 */,
+/* 566 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SignupInfo = function () {
+    function SignupInfo(data) {
+        _classCallCheck(this, SignupInfo);
+
+        for (var property in data) {
+            this[property] = data[property];
+        }
+
+        this.canNetSignup = '可';
+        if (Helper.tryParseInt(data.net_signup) < 1) {
+            this.canNetSignup = '否';
+        }
+
+        this.cost = Helper.formatMoney(data.cost);
+        this.tuition = Helper.formatMoney(data.tuition);
+    }
+
+    _createClass(SignupInfo, null, [{
+        key: 'source',
+        value: function source() {
+            return '/course-signup-infoes';
+        }
+    }, {
+        key: 'createUrl',
+        value: function createUrl() {
+            return this.source() + '/create';
+        }
+    }, {
+        key: 'storeUrl',
+        value: function storeUrl() {
+            return this.source();
+        }
+    }, {
+        key: 'showUrl',
+        value: function showUrl(id) {
+            return this.source() + '/' + id;
+        }
+    }, {
+        key: 'editUrl',
+        value: function editUrl(id) {
+            return this.showUrl(id) + '/edit';
+        }
+    }, {
+        key: 'updateUrl',
+        value: function updateUrl(id) {
+            return this.showUrl(id);
+        }
+    }, {
+        key: 'deleteUrl',
+        value: function deleteUrl(id) {
+            return this.source() + '/' + id;
+        }
+    }, {
+        key: 'show',
+        value: function show(id) {
+            var _this = this;
+
+            return new Promise(function (resolve, reject) {
+                var url = _this.showUrl(id);
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'edit',
+        value: function edit(id) {
+            var url = this.editUrl(id);
+            return new Promise(function (resolve, reject) {
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'update',
+        value: function update(form, id) {
+            var url = this.updateUrl(id);
+            var method = 'put';
+            return new Promise(function (resolve, reject) {
+                form.submit(method, url).then(function (data) {
+                    resolve(data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }]);
+
+    return SignupInfo;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = SignupInfo;
+
+/***/ }),
+/* 567 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__show_vue__ = __webpack_require__(573);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__show_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__show_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__edit_vue__ = __webpack_require__(572);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__edit_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__edit_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'SignupInfoView',
+    components: {
+        Show: __WEBPACK_IMPORTED_MODULE_0__show_vue___default.a,
+        Edit: __WEBPACK_IMPORTED_MODULE_1__edit_vue___default.a
+    },
+    props: {
+        id: {
+            type: Number,
+            default: 0
+        },
+        can_edit: {
+            type: Boolean,
+            default: true
+        },
+        version: {
+            type: Number,
+            default: 0
+        }
+    },
+    data: function data() {
+        return {
+            readOnly: true
+        };
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    watch: {
+        'id': 'init',
+        'version': 'init'
+    },
+    methods: {
+        init: function init() {
+            this.readOnly = true;
+        },
+        onDataLoaded: function onDataLoaded(signupinfo) {
+            this.$emit('loaded', signupinfo);
+        },
+        beginEdit: function beginEdit() {
+            this.readOnly = false;
+        },
+        onEditCanceled: function onEditCanceled() {
+            this.init();
+        },
+        onSaved: function onSaved(signupinfo) {
+            this.init();
+            this.$emit('saved', signupinfo);
+        }
+    }
+};
+
+/***/ }),
+/* 568 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(567),
+  /* template */
+  __webpack_require__(569),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\course\\signupinfo\\view.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] view.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1dada24e", Component.options)
+  } else {
+    hotAPI.reload("data-v-1dada24e", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 569 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [(_vm.readOnly) ? _c('show', {
+    attrs: {
+      "id": _vm.id,
+      "can_edit": "can_edit",
+      "version": _vm.version
+    },
+    on: {
+      "begin-edit": _vm.beginEdit,
+      "loaded": _vm.onDataLoaded
+    }
+  }) : _c('edit', {
+    attrs: {
+      "id": _vm.id
+    },
+    on: {
+      "saved": _vm.onSaved,
+      "canceled": _vm.onEditCanceled
+    }
+  })], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1dada24e", module.exports)
+  }
+}
+
+/***/ }),
+/* 570 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'EditSignupInfo',
+    props: {
+        id: {
+            type: Number,
+            default: 0
+        }
+    },
+    data: function data() {
+        return {
+            loaded: false,
+
+            form: new Form({
+                signupinfo: {}
+            }),
+
+            datePickerOption: Helper.datetimePickerOption(),
+            open_date: {
+                time: ''
+            },
+            close_date: {
+                time: ''
+            },
+
+            boolOptions: Helper.boolOptions()
+
+        };
+    },
+
+    watch: {
+        open_date: {
+            handler: function handler() {
+                this.form.signupinfo.open_date = this.open_date.time;
+                this.clearErrorMsg('course.open_date');
+            },
+            deep: true
+        },
+        close_date: {
+            handler: function handler() {
+                this.form.signupinfo.close_date = this.close_date.time;
+                this.clearErrorMsg('course.close_date');
+            },
+            deep: true
+        }
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    methods: {
+        init: function init() {
+            this.loaded = false;
+
+            this.fetchData();
+        },
+        fetchData: function fetchData() {
+            var _this = this;
+
+            var id = this.id;
+            var getData = SignupInfo.edit(id);
+
+            getData.then(function (data) {
+                var signupinfo = new SignupInfo(data.signupinfo);
+                _this.form = new Form({
+                    signupinfo: signupinfo
+                });
+
+                _this.open_date.time = signupinfo.begin_date;
+                _this.close_date.time = signupinfo.end_date;
+
+                _this.loaded = true;
+            }).catch(function (error) {
+                Helper.BusEmitError(error);
+                _this.loaded = false;
+            });
+        },
+        setNetSignup: function setNetSignup(val) {
+            this.form.course.net_signup = val;
+        },
+        clearErrorMsg: function clearErrorMsg(name) {
+            this.form.errors.clear(name);
+        },
+        onSubmit: function onSubmit() {
+            this.submitForm();
+        },
+        submitForm: function submitForm() {
+            var _this2 = this;
+
+            var id = this.id;
+            var update = SignupInfo.update(this.form, id);
+
+            update.then(function (data) {
+                Helper.BusEmitOK();
+                _this2.$emit('saved', data);
+            }).catch(function (error) {
+                Helper.BusEmitError(error);
+            });
+        },
+        cancel: function cancel() {
+            this.$emit('canceled');
+        }
+    }
+
+};
+
+/***/ }),
+/* 571 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'ShowSignupInfo',
+    props: {
+        id: {
+            type: Number,
+            default: 0
+        },
+        can_edit: {
+            type: Boolean,
+            default: true
+        },
+        can_back: {
+            type: Boolean,
+            default: true
+        },
+        hide_delete: {
+            type: Boolean,
+            default: false
+        },
+        version: {
+            type: Number,
+            default: 0
+        }
+    },
+    data: function data() {
+        return {
+            loaded: false,
+            signupinfo: null
+
+        };
+    },
+
+    watch: {
+        'version': 'init'
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    methods: {
+        init: function init() {
+            this.loaded = false;
+            this.signupinfo = null;
+            if (this.id) this.fetchData();
+        },
+        fetchData: function fetchData() {
+            var _this = this;
+
+            var getData = SignupInfo.show(this.id);
+
+            getData.then(function (data) {
+                _this.signupinfo = data.signupinfo;
+
+                _this.loaded = true;
+                _this.$emit('loaded', _this.signupinfo);
+            }).catch(function (error) {
+                _this.loaded = false;
+                Helper.BusEmitError(error);
+            });
+        },
+        showUpdatedBy: function showUpdatedBy() {
+            var updated_by = Helper.tryParseInt(this.signupinfo.updated_by);
+            if (updated_by) {
+                Bus.$emit('onShowEditor', updated_by);
+            }
+        },
+        btnEditCilcked: function btnEditCilcked() {
+            this.$emit('begin-edit');
+        }
+    }
+};
+
+/***/ }),
+/* 572 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(570),
+  /* template */
+  __webpack_require__(574),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\course\\signupinfo\\edit.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] edit.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-095f27be", Component.options)
+  } else {
+    hotAPI.reload("data-v-095f27be", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 573 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(571),
+  /* template */
+  __webpack_require__(575),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\course\\signupinfo\\show.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] show.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-d4a0399e", Component.options)
+  } else {
+    hotAPI.reload("data-v-d4a0399e", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 574 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_vm._m(0), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('form', {
+    staticClass: "form",
+    on: {
+      "submit": function($event) {
+        $event.preventDefault();
+        _vm.onSubmit($event)
+      },
+      "keydown": function($event) {
+        _vm.clearErrorMsg($event.target.name)
+      }
+    }
+  }, [_c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("報名起始日")]), _vm._v(" "), _c('div', [_c('date-picker', {
+    attrs: {
+      "option": _vm.datePickerOption,
+      "date": _vm.open_date
+    }
+  })], 1), _vm._v(" "), (_vm.form.errors.has('signup.open_date')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('signup.open_date'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("報名截止日")]), _vm._v(" "), _c('div', [_c('date-picker', {
+    attrs: {
+      "option": _vm.datePickerOption,
+      "date": _vm.close_date
+    }
+  })], 1), _vm._v(" "), (_vm.form.errors.has('signup.close_date')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('signup.close_date'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("人數上限")]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.signup.limit),
+      expression: "form.signup.limit"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "name": "signup.limit"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.signup.limit)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.signup.limit = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.form.errors.has('signup.limit')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('signup.limit'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("學費")]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.signup.tuition),
+      expression: "form.signup.tuition"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "name": "signup.tuition"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.signup.tuition)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.signup.tuition = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.form.errors.has('signup.tuition')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('signup.tuition'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("材料費")]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.signup.cost),
+      expression: "form.signup.cost"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "name": "signup.cost"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.signup.cost)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.signup.cost = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.form.errors.has('signup.cost')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('signup.cost'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-6"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("材料")]), _vm._v(" "), _c('textarea', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.signup.materials),
+      expression: "form.signup.materials"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "rows": "2",
+      "cols": "50",
+      "name": "signup.materials"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.signup.materials)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.signup.materials = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.form.errors.has('signup.materials')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('signup.materials'))
+    }
+  }) : _vm._e()])])]), _vm._v(" "), _c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("網路報名")]), _vm._v(" "), _c('div', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.signup.net_signup),
+      expression: "form.signup.net_signup"
+    }],
+    attrs: {
+      "type": "hidden"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.signup.net_signup)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.signup.net_signup = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('toggle', {
+    attrs: {
+      "items": _vm.netSignupOptions,
+      "defaultVal": _vm.form.signup.net_signup
+    },
+    on: {
+      "selected": _vm.setNetSignup
+    }
+  })], 1)])]), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2)]), _vm._v(" "), _c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('button', {
+    staticClass: "btn btn-success",
+    attrs: {
+      "type": "submit",
+      "disabled": _vm.form.errors.any()
+    }
+  }, [_vm._v("確認送出")]), _vm._v("\n                           \n                     "), _c('button', {
+    staticClass: "btn btn-default",
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.endEdit($event)
+      }
+    }
+  }, [_vm._v("取消")])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-4"
+  })])])])])
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel-heading"
+  }, [_c('span', {
+    staticClass: "panel-title"
+  }, [_c('h4', [_c('i', {
+    staticClass: "fa fa-info-circle",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v("  編輯課程報名資訊\n              ")])])])
+},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  })])
+},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  })])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-095f27be", module.exports)
+  }
+}
+
+/***/ }),
+/* 575 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return (_vm.loaded) ? _c('div', {
+    staticClass: "panel panel-default show-data"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._m(0), _vm._v(" "), _c('div', [(_vm.signupinfo.canEdit) ? _c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.can_edit),
+      expression: "can_edit"
+    }],
+    staticClass: "btn btn-primary btn-sm",
+    on: {
+      "click": _vm.btnEditCilcked
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-pencil"
+  }), _vm._v(" 編輯\n                ")]) : _vm._e()])]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("報名起始日")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "textContent": _vm._s(_vm.signupinfo.open_date)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("報名截止日")]), _vm._v(" "), _c('p', [_vm._v("\n                        " + _vm._s(_vm.signupinfo.close_date) + "\n\n                        ")])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("人數上限")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "textContent": _vm._s(_vm.signupinfo.limit)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("學費")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "textContent": _vm._s(_vm.signupinfo.tuition)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("材料費")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "textContent": _vm._s(_vm.signupinfo.cost)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("材料")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "textContent": _vm._s(_vm.signupinfo.materials)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("網路報名")]), _vm._v(" "), (_vm.signupinfo.net_signupinfo) ? _c('p', [_vm._v("\n                            可\n                        ")]) : _c('p', [_vm._v("\n                            否\n                        ")])])])])]) : _vm._e()
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('span', {
+    staticClass: "panel-title"
+  }, [_c('i', {
+    staticClass: "fa fa-info-circle",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v("  課程報名資訊\n            ")])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-d4a0399e", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

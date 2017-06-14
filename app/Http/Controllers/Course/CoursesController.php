@@ -14,7 +14,6 @@ use App\Repositories\Centers;
 use App\Repositories\Weekdays;
 
 use App\Http\Requests\Course\CourseRequest;
-use App\Http\Requests\Course\SignupRequest;
 
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
@@ -128,7 +127,7 @@ class CoursesController extends BaseController
     }
     public function store(CourseRequest $request)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         $removed=false;
         $updated_by=$current_user->id;
 
@@ -140,10 +139,7 @@ class CoursesController extends BaseController
        
         $course = $this->courses->store($courseValues , $categoryIds, $teacherIds);
        
-          return response()
-                ->json([
-                    'course' => $course
-                ]);
+        return response()->json($course); 
       
     }
     public function show($id)
@@ -220,25 +216,25 @@ class CoursesController extends BaseController
                     'course' => $course
                 ]);
     }
-    public function updateDisplayOrder(Request $request, $id)
-    {
-            $course=Course::findOrFail($id); 
-            $up=$request['up'];
-            $num= rand(1, 10);
-            if($up){
-                $course->display_order += $num;
-            }else{
-                $course->display_order -= $num;
-            }
+    // public function updateDisplayOrder(Request $request, $id)
+    // {
+    //         $course=Course::findOrFail($id); 
+    //         $up=$request['up'];
+    //         $num= rand(1, 10);
+    //         if($up){
+    //             $course->display_order += $num;
+    //         }else{
+    //             $course->display_order -= $num;
+    //         }
             
-            $course->save();
+    //         $course->save();
            
-            return response()
-                ->json([
-                    'course' => $course
-                ]);    
+    //         return response()
+    //             ->json([
+    //                 'course' => $course
+    //             ]);    
 
-    }
+    // }
 
     public function updatePhoto(Request $request, $id)
     {
@@ -256,63 +252,19 @@ class CoursesController extends BaseController
         return response()->json(['saved' => true ]);      
 
     }
-    public function showSignup($id)
-    {
-        $current_user=$this->checkAdmin->getAdmin();
-        $course = Course::findOrFail($id);
-        $course->canEdit=$course->canEditBy($current_user);
-         return response()
-                ->json([
-                    'signup' => $course
-                ]);
-       
-    }
-     public function editSignup($id)
-     {
-         $course = Course::findOrFail($id);   
-         $current_user=$this->checkAdmin->getAdmin();
-         if(!$course->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);      
-         }
-       
-          return response()
-            ->json([
-                'signup' => $course,
-            ]);    
-     }
-    public function updateSignup(SignupRequest $request, $id)
-    {
-            $course = Course::with('center')->findOrFail($id);     
-            $current_user=$this->checkAdmin->getAdmin();
-            if(!$course->canEditBy($current_user)){
-                return   response()->json(['msg' => '權限不足' ]  ,  401);      
-            }
-            $removed=false;
-            $updated_by=$current_user->id;
-
-            $values=$request->getValues($updated_by,$removed);
-
-            $course->update($values);
-           
-            return response()
-                ->json([
-                    'signup' => $course
-                ]);    
-
-    }
+    
+   
     public function destroy($id)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         $course=$this->courses->findOrFail($id);
         if(!$course->canDeleteBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+           return  $this->unauthorized();     
         }
         $this->courses->delete($id,$current_user->id);
 
-        return response()
-            ->json([
-                'deleted' => true
-            ]);
+        return response()->json([ 'deleted' => true ]);
+           
     }
 
     public function optionsByTeacher($teacher)

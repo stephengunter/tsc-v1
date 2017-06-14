@@ -73,6 +73,9 @@
                     title: '名稱',
                     key: 'name',
                 },{
+                    title: '編號',
+                    key: 'number',
+                },{
                     title: '開始日期',
                     key: 'begin_date',
                 }],

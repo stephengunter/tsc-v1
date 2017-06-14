@@ -103,6 +103,7 @@ import ContactInfo from './models/contactinfo.js'
 import UserCenters from './models/usercenters.js'
 import Address from './models/address.js'
 import Course from './models/course.js'
+import SignupInfo from './models/signupinfo.js'
 import Signup from './models/signup.js'
 import Tuition from './models/tuition.js'
 import Refund from './models/refund.js'
@@ -135,6 +136,7 @@ window.Address=Address
 window.UserCenters=UserCenters
 
 window.Course=Course
+window.SignupInfo=SignupInfo
 window.Signup=Signup
 window.Tuition=Tuition
 window.Refund=Refund

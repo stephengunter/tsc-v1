@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\BaseController;
 
-use App\Http\Requests\TeacherRequest;
-use App\Http\Requests\TeacherUpdateRequest;
-use App\Http\Requests\TeacherUserRequest;
+use App\Http\Requests\Teacher\TeacherRequest;
 use Illuminate\Http\Request;
 
 use App\Teacher;
@@ -266,43 +264,28 @@ class TeachersController extends BaseController
 
     public function options()
     {
+        $request=request();
         $options=[];
         $centerId=(int)$request->center;
         if($centerId){
-            $options=$this->teachers->optionsByCenter($center);
+            $options=$this->teachers->optionsByCenter($centerId);
             return response()->json([ 'options' => $options ]);  
         }
 
         $courseId=(int)$request->course;
         if($courseId){
-            $course=$this->courses->findOrFail($course);
+            $course=$this->courses->findOrFail($courseId);
             $options=$this->teachers->optionsConverting($course->teachers);
             return response()->json([ 'options' => $options ]);  
         }
 
-        $teachers=$this->teachers->getAll();
+        $teachers=$this->teachers->getAll()->get();
         $options=$this->teachers->optionsConverting($teachers);
         return response()->json([ 'options' => $options ]);  
           
         
     }
 
-    // public function optionsByCenter($center)
-    // {
-        //     $course=$this->courses->findOrFail($course);
-       
-    //     $options=$this->teachers->optionsConverting($course->teachers);
-       
-    //     $options=$this->teachers->optionsByCenter($center);
-          
-    //        return response()
-    //             ->json([
-    //                 'options' => $options
-    //             ]);   
-        
-    // }
-
-    
     
 
 	

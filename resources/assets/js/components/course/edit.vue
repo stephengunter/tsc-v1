@@ -72,7 +72,7 @@
              
 
                 <div class="row">
-                    <div class="col-sm-3">
+                    <div v-if="id" class="col-sm-3">
                        
                     </div>
                     <div class="col-sm-3">
@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3">
+                    <div v-if="id" class="col-sm-3">
                        
                     </div>
                     <div class="col-sm-3">
@@ -144,14 +144,14 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3">
+                    <div v-if="id" class="col-sm-3">
                       
                     </div>
                     <div class="col-sm-4">
                         <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確認送出</button>
                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 
-                      <button class="btn btn-default" @click.prevent="endEdit">取消</button>
+                      <button class="btn btn-default" @click.prevent="cancel">取消</button>
                     </div>
 
                 </div>
@@ -322,16 +322,19 @@
                 
             },
             loadTeacherOptions(){
-                // let center=this.form.course.center_id
-                // let url = '/api/teachers/optionsByCenter/' + center;
-                // axios.get(url)
-                //     .then(response => {
-                //         this.teachers=[]
-                //          this.teacherOptions=response.data.options
-                //     })
-                //     .catch(function(error) {
-                //         console.log(error)
-                //     })
+                let center=this.form.course.center_id
+                let params={ 
+                    center:center
+                }
+                let options=Teacher.options(params)
+                options.then(data => {
+                    this.teachers=[]
+                    this.teacherOptions=data.options
+                })
+                .catch(error=>{
+                       Helper.BusEmitError(error) 
+                    
+                })     
             },     
             setActive(val) {
                 this.form.course.active = val
@@ -348,11 +351,14 @@
                 this.submitForm()
             },
             submitForm() {
-                
-
-                let update=Course.update(this.form , this.id)
-                
-                update.then(data => {
+                let id=this.id
+                let store=null
+                if(id){
+                    store=Course.update(this.form, id)
+                }else{
+                    store=Course.store(this.form)
+                }
+                store.then(data => {
                    Helper.BusEmitOK()
                    this.$emit('saved',data)                            
                 })
@@ -360,9 +366,7 @@
                     Helper.BusEmitError(error) 
                 })
             },
-         
-           
-            canceled(){
+            cancel(){
                 this.$emit('canceled')
             },
             onImageUploadCanceled() {

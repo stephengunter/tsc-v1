@@ -1,8 +1,8 @@
 <template>
-    <!-- <edit-course :course_id="course_id" :user_id="user_id"
+    <edit-course :course_id="course_id" 
       @canceled="onCanceled" @saved="onSaved">
           
-    </edit-course> -->
+    </edit-course>
 </template>
 
 <script>
@@ -41,8 +41,8 @@
             onCanceled(){
                 this.$emit('canceled')
             },
-            onSaved(){
-                this.$emit('saved')
+            onSaved(course){
+                this.$emit('saved',course)
             },
             
            

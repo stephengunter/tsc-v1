@@ -25,8 +25,8 @@
             onCanceled(){
                this.backToIndex()
             },
-            onSaved(user){
-               let url='/courses/' + user.id
+            onSaved(course){
+               let url='/courses/' + course.id
                Helper.redirect(url)
             },            
             backToIndex(){
