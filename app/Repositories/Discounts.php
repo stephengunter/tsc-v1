@@ -8,7 +8,7 @@ class Discounts
 {
     public function getAll()
     {
-       return Discount::where('removed',false)->orderBy('active','desc')->orderBy('points');
+       return Discount::where('removed',false);
          
     }
     public function activeDiscounts()

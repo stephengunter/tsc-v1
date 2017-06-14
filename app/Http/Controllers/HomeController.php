@@ -26,7 +26,7 @@ class HomeController extends BaseController
             return view('app');
          }  
 
-        $keys=['signups','refunds','courses','users','teachers','settings'];
+        $keys=['signups','refunds','courses','users','teachers','discounts','settings'];
         $systems=[];
         for( $i=0; $i < count($keys); $i++ ){
            $menus=array(

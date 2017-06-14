@@ -179,16 +179,27 @@ class BaseController extends Controller
                     'path' => '/classrooms',
                     'active' => $current=='classrooms'
                 ],
+               
+                
+            );
+        }
+        if($key=='discounts'){
+           return array(
                 [
-                    'id' => 5,
-                    'text' => '稱謂設定',
-                    'path' => '/titles',
-                    'active' => $current=='titles'
+                    'id' => 1,
+                    'text' => '折扣設定',
+                    'path' => '/discounts',
+                    'active' => $current=='discounts'
+                ],
+                [
+                    'id' => 2,
+                    'text' => '身分設定',
+                    'path' => '/identities',
+                    'active' => $current=='identities'
                 ],
                 
             );
         }
-
 
         return [];
     }

@@ -130,7 +130,7 @@
                 })
             },
             loadOptions(id){
-                this.activeOptions=Helper.activeOptions()
+                this.activeOptions=CommonService.activeOptions()
                 this.yearOptions=Term.yearOptions()
                 this.orderOptions=Term.orderOptions()  
 

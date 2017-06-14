@@ -1,25 +1,38 @@
 <template>
-    <div v-if="loaded" class="row">
-        <div v-if="this.systems.signups" class="col-md-6">
-            <menu-item  title="Signups" :items="this.systems.signups"></menu-item>
+<div v-if="loaded">
+    <div class="row">
+        <div v-if="keys[0]" class="col-md-6">
+            <menu-item  :title="keys[0]" :items="systems[keys[0]]"></menu-item>
         </div>
-        <div v-if="this.systems.refunds" class="col-md-6">
-            <menu-item  title="Refunds" :items="this.systems.refunds"></menu-item>
+        <div v-if="keys[1]" class="col-md-6">
+            <menu-item  :title="keys[0]" :items="systems[keys[1]]"></menu-item>
         </div>
-        <div v-if="this.systems.users" class="col-md-6">
-            <menu-item title="Users" :items="this.systems.users"></menu-item>
+    </div> 
+    <div v-if="keys.length > 2" class="row">
+        <div v-if="keys[2]" class="col-md-6">
+            <menu-item  :title="keys[2]" :items="systems[keys[2]]"></menu-item>
         </div>
-        <div v-if="this.systems.teachers" class="col-md-6">
-            <menu-item title="Teachers" :items="this.systems.teachers"></menu-item>
+        <div v-if="keys[3]" class="col-md-6">
+            <menu-item  :title="keys[3]" :items="systems[keys[3]]"></menu-item>
         </div>
-        <div v-if="this.systems.settings" class="col-md-6">
-            <menu-item title="Settings" :items="this.systems.settings"></menu-item>
-        </div>
-        
-        
-
-       
     </div>
+    <div v-if="keys.length > 4" class="row">
+        <div v-if="keys[4]" class="col-md-6">
+            <menu-item  :title="keys[4]" :items="systems[keys[4]]"></menu-item>
+        </div>
+        <div v-if="keys[5]" class="col-md-6">
+            <menu-item  :title="keys[5]" :items="systems[keys[5]]"></menu-item>
+        </div>
+    </div>  
+    <div v-if="keys.length > 6" class="row">
+        <div v-if="keys[6]" class="col-md-6">
+            <menu-item  :title="keys[6]" :items="systems[keys[6]]"></menu-item>
+        </div>
+        <div v-if="keys[7]" class="col-md-6">
+            <menu-item  :title="keys[7]" :items="systems[keys[7]]"></menu-item>
+        </div>
+    </div> 
+ </div>   
 </template>
 
 <script>
@@ -36,6 +49,8 @@
             return {
                 loaded:false,
                 systems:[],
+                keys:[],
+                test:'',
             }
         },
         beforeMount(){
@@ -52,6 +67,7 @@
                 axios.get(url)
                     .then(response => {
                         this.systems = response.data.model
+                        this.keys=Object.keys(this.systems)
                         this.loaded = true
                     })
                     .catch(error => {

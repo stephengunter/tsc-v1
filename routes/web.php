@@ -68,6 +68,7 @@ Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
 Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController');
 Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
 Route::resource('titles', '\App\Http\Controllers\Settings\TitlesController');
+Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');
 
 // Route::group(['prefix' => 'api/'], function() {
 //     Route::resource('sessions', '\App\Http\Controllers\Auth\SessionsController');

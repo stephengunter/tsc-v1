@@ -29,24 +29,28 @@
         
         methods: {
             getTitle() {
-                let html= Helper.getIcon(this.title) 
-                switch (this.title) {
-                    case 'Users':
+                let title=this.title.toLowerCase()
+                let html= Helper.getIcon(title) 
+                switch (title) {
+                    case 'users':
                         html += ' 使用者管理'
                         break
-                    case 'Teachers':
+                    case 'teachers':
                          html += ' 教師管理'
                         break
-                    case 'Courses':
+                    case 'courses':
                         html += ' 課程管理'
                          break;
-                    case 'Signups':
+                    case 'signups':
                          html += ' 報名管理'
                          break
-                    case 'Refunds':
+                    case 'refunds':
                          html += ' 退費管理'
                          break
-                    case 'Settings':
+                    case 'discounts':
+                         html += ' 折扣管理'
+                         break
+                    case 'settings':
                         html += ' 基本設定'
                          break
                 }

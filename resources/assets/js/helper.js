@@ -10,42 +10,46 @@ class Helper {
         return parseInt(val)
     }
     static getIcon(title){
+        title=title.toLowerCase()
         let html = ''
         switch (title) {
-            case 'Users':
+            case 'users':
                 html = '<i class="fa fa-user" aria-hidden="true"></i>'
                 break;
-            case 'ContactInfo':
+            case 'contactinfo':
             html = '<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>'
                 break;  
-            case 'Teachers':
+            case 'teachers':
                 html = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
                 break;
-            case 'Centers':
+            case 'centers':
                 html = '<i class="fa fa-university" aria-hidden="true"></i>'
                 break;
-            case 'Categories':
+            case 'categories':
                 html = '<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>'
                 break;
-            case 'Volunteers':
+            case 'volunteers':
                 html = '<i class="fa fa-handshake-o" aria-hidden="true"></i>'
                 break;
-            case 'Courses':
+            case 'courses':
                 html = '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>'
                 break;
-            case 'Signups':
+            case 'signups':
                 html = '<i class="fa fa-file-text-o" aria-hidden="true"></i>'
             break;
-            case 'Tuitions':
+            case 'tuitions':
                 html = '<i class="fa fa-money" aria-hidden="true"></i>'
             break;
-            case 'Refunds':
+            case 'refunds':
                 html = '<i class="fa fa-arrow-circle-left" aria-hidden="true"></i>'
             break;
-            case 'Settings':
+            case 'settings':
                 html = '<i class="fa fa-cog" aria-hidden="true"></i>'
             break;
-            case 'Admins':
+            case 'discounts':
+                html = '<span class="glyphicon glyphicon-euro" aria-hidden="true"></span>'
+            break;
+            case 'admins':
                 html = '<i class="fa fa-key" aria-hidden="true"></i>'
             break;
         }
@@ -54,35 +58,36 @@ class Helper {
     }
     static getTitleHtml(title) {
         let html = ''
+        title=title.toLowerCase()
         switch (title) {
-            case 'Users':
+            case 'users':
                 html = '<i class="fa fa-user" aria-hidden="true"></i> 使用者管理'
                 break;
-            case 'Teachers':
+            case 'teachers':
                 html = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span> 教師管理'
                 break;
-            case 'Centers':
+            case 'centers':
                 html = '<i class="fa fa-university" aria-hidden="true"></i> 開課中心'
                 break;
-            case 'Categories':
+            case 'categories':
                 html = '<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> 課程分類'
                 break;
-            case 'Volunteers':
+            case 'volunteers':
                 html = '<i class="fa fa-handshake-o" aria-hidden="true"></i> 志工管理'
                 break;
-            case 'Courses':
+            case 'courses':
                 html = '<i class="fa fa-pencil-square-o" aria-hidden="true"></i> 課程管理'
                 break;
-            case 'Signups':
+            case 'signups':
             html = '<i class="fa fa-file-text-o" aria-hidden="true"></i> 報名紀錄'
             break;
-            case 'Tuitions':
+            case 'tuitions':
             html = '<i class="fa fa-money" aria-hidden="true"></i> 繳費紀錄'
             break;
-            case 'Refunds':
+            case 'refunds':
             html = '<i class="fa fa-arrow-circle-left" aria-hidden="true"></i> 退費申請'
             break;
-            case 'Admins':
+            case 'admins':
                 html = '<i class="fa fa-key" aria-hidden="true"></i> 權限管理'
                 break;
         }

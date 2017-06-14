@@ -68,6 +68,7 @@ Vue.component('term-index', require('./views/terms/index') )
 Vue.component('holiday-index', require('./views/holidays/index') )
 Vue.component('classroom-index', require('./views/classrooms/index') )
 Vue.component('title-index', require('./views/titles/index') )
+Vue.component('discount-index', require('./views/discounts/index') )
 
 
 
@@ -106,6 +107,7 @@ import Term from './models/term.js'
 import Holiday from './models/holiday.js'
 import Classroom from './models/classroom.js'
 import Title from './models/title.js'
+import Discount from './models/discount.js'
 
 import Auth from './packages/auth/Auth.js'
 Vue.use(Auth)
@@ -135,6 +137,7 @@ window.Term=Term
 window.Holiday=Holiday
 window.Classroom=Classroom
 window.Title=Title
+window.Discount=Discount
 
 
 
