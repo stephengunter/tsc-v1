@@ -280,6 +280,7 @@ class CoursesController extends BaseController
         $teacher_id=(int)$request->teacher; 
         if($teacher_id){
             $courseList=$this->courses->getByTeacher($teacher_id)->get();
+            dd($courseList);
             $options=$this->courses->optionsConverting($courseList);
         }
         
@@ -287,7 +288,18 @@ class CoursesController extends BaseController
        
         return response()  ->json(['options' => $options ]);   
               
-                    
+        $request = request();
+         $term_id=(int)$request->term; 
+         $center_id=(int)$request->center;
+
+         $courseList=$this->courses->getAll()->where('term_id',$term_id)
+                                     ->where('center_id',$center_id)
+                                     ->get();
+         $options=$this->courses->optionsConverting($courseList);    
+         return response()
+                ->json([
+                    'options' => $options
+                ]);                       
                
         
     }
@@ -304,7 +316,19 @@ class CoursesController extends BaseController
     //             ]);   
         
     // }
-
+    public function search()
+    {
+        $courseList=[];
+        $request=request();
+        $keyword=$request->name;  
+        
+        $courseList=$this->courses->searchByName($keyword);
+        return response()
+                ->json([
+                    'courseList' => $courseList->get()
+                ]);  
+        
+    }
     public function activeCourses()
     {
         $request = request();
@@ -325,43 +349,8 @@ class CoursesController extends BaseController
                 ]);  
 
     }
-    public function details($id)
-    {
-         $course = Course::with('center','categories','teachers','classTimes','schedules')->findOrFail($id);
-         $contactInfo=$course->center->contactInfo();
-         $contactInfo->addressA=$contactInfo->addressA();
-         $course->center->contactInfo=$contactInfo;
-         
-         $course->privateCategories=$course->privateCategories();
-         $course->canSignup=$course->canSignup();
-         $course->photo= $course->photo();
-
-         foreach ($course->classTimes as $classTime) {
-                $classTime->weekday;
-         }
-         
-
-         return response()
-                ->json([
-                    'course' => $course
-                ]);
-    }
-    public function options()
-    {
-         $request = request();
-         $term_id=(int)$request->term; 
-         $center_id=(int)$request->center;
-
-         $courseList=$this->courses->getAll()->where('term_id',$term_id)
-                                     ->where('center_id',$center_id)
-                                     ->get();
-         $options=$this->courses->optionsConverting($courseList);    
-         return response()
-                ->json([
-                    'options' => $options
-                ]);                       
-
-    }
+    
+    
     
     
     

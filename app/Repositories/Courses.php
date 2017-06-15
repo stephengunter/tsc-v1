@@ -66,6 +66,13 @@ class Courses
 
         return $courseList;
     }
+    public function searchByName($name)
+    {
+        $courseList=$this->getAll();
+        if($name) $courseList=$courseList->where('name','LIKE',"%{$name}%");
+
+        return $courseList;       
+    }
     public function searchByCenter(int $center_id ,int $term_id=0)
     {
         $courseList=$this->getAll();

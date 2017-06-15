@@ -161,6 +161,23 @@ class Course {
                     })
                 })  
     }
+    static search(name,options){
+        let url =this.source() + '/search' 
+        url += '?name=' + name
+        return new Promise((resolve, reject) => {
+                     axios.get(url)
+                    .then(response => {
+                        if(options){
+                            resolve(this.toOptions(response.data.courseList))
+                        }else{
+                            resolve(response.data)
+                        }
+                    })
+                    .catch(error => {
+                        reject(error);
+                    })
+                }) 
+    }
 
   static getThead(){
     let thead= [{
@@ -286,6 +303,19 @@ class Course {
     }
     static weeksOptions(){
         return Helper.numberOptions(1,30)
+    }
+    static toOptions(courseList){
+        if(!courseList.length) return []
+         let options=[]
+        for(let i=0; i<courseList.length; i++){
+            let item={
+                value:courseList[i].id,
+                text:this.getFormatedCourseName(courseList[i],true)
+            }
+            options.push(item)
+        }
+        return options
+
     }
     
    

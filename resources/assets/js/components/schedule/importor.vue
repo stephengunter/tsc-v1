@@ -7,23 +7,38 @@
                   
                   </span>
             </span>
-            
-            <div>
-             
-            </div>
-            <div  class="form-inline">   
-                <select v-model="form.import.teacher_id"  @change="teacherChanged" class="form-control" >
+            <div   class="form-inline">   
+                <select v-show="teacherOptions.length" v-model="form.import.teacher_id"  @change="loadCourseOptions" class="form-control" >
                     <option v-for="item in teacherOptions" :value="item.value" v-text="item.text"></option>
                 </select>
                  &nbsp;&nbsp;
-                <select v-model="form.import.from_course"  @change="fetchData" class="form-control" >
+                <select v-show="courseOptions.length" v-model="selectedCourse"  class="form-control" >
                     <option v-for="item in courseOptions" :value="item.value" v-text="item.text"></option>
                 </select>
-                &nbsp;&nbsp;
-                <button type="submit" @click="courseSelected" class="btn btn-success" :disabled="!form.import.from_course">確認送出</button>
+                
+                
+            </div>
+            <div>
+                <button  v-show="isValid" @click.prevent="courseSelected" class="btn btn-success btn-sm" >確認送出</button>
+                 &nbsp;&nbsp;
+                <button  class="btn btn-default btn-sm" @click="changeMode">
+                    <span v-if="!showFilter" class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    <span v-if="showFilter" class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                </button>
             </div>
         </div>
         <div class="panel-body">
+            <div class="filter" v-if="showFilter">
+                
+                <div class="filter-input">
+                    <input type="text" class="form-control"  v-model="filterText" @keyup.enter="doSearch" placeholder="輸入課程名稱搜尋">
+                      
+                </div>
+                
+                <div  class="filter-btn">
+                    <button @click.prevent="doSearch" class="btn btn-primary btn-sm btn-block">搜尋</button>
+                </div>
+            </div>
             <table v-show="hasData" class="table table-striped" style="width: 95%;">
              <thead> 
                 <tr> 
@@ -73,6 +88,10 @@
             hasData(){
                 if(this.scheduleList.length) return true
                 return false    
+            },
+            isValid(){
+                if(Helper.tryParseInt(this.selectedCourse) <1 ) return false
+                return this.hasData
             }
         },
         data() {
@@ -80,17 +99,29 @@
                 
                 loaded:false,  
                 courseOptions:[],             
-                scheduleList:[],                
+                scheduleList:[],    
+
+                selectedCourse:0,            
             
                 form:{},
+                showFilter:false,
+
+                filterText:'',
              
             }
+        },
+        watch: {
+            selectedCourse: function () {
+               this.fetchData()
+            }
+           
         },
         methods: {
             init(){
                
                 this.loaded=false  
                 
+                this.selectedCourse=0
 
                 this.teacherOptions=[]
                 this.courseOptions=[]   
@@ -105,14 +136,14 @@
                 let create=this.create()
 
                 create.then(() => {
-                    this.fetchData()
+                    
                 }).catch(error => {
                     Helper.BusEmitError(error)
                     this.loaded = false
                 })
             },
             fetchData(){
-                let course=this.form.import.from_course
+                let course=this.selectedCourse
                 if(!course) return false
                 let getData=Schedule.index(course)               
               
@@ -147,9 +178,10 @@
                 });
             },
             
-            loadCourseOptions(val){
+            loadCourseOptions(){
+                let teacher=this.form.import.teacher_id
                 let params={
-                    teacher:val
+                    teacher:teacher
                 }
                 let options=Course.options(params)
                 options.then((data) => {
@@ -159,18 +191,44 @@
                 })
             },
             setCourseOptions(options){
-                 for(let i = options.length-1; i>=0; i--){
-                   if (options.value == this.course_id ) {
+
+                for(let i = options.length-1; i>=0; i--){
+
+                   if (options[i].value == this.course_id ) {
+                  
                           options.splice(i, 1);
                    }                           
                 }
                 if(options.length){
-                    this.form.import.from_course=options[0].value
+                    this.selectedCourse=options[0].value
                 }
                 this.courseOptions=options
             },
             courseSelected(){
-                this.$emit('courseSelected',this.selectedId);
+                alert(this.selectedCourse)
+                //this.$emit('courseSelected',this.selectedId);
+            },
+            changeMode() {
+                this.showFilter = !this.showFilter;
+                if (!this.showFilter) {
+                     this.init()
+                }else{
+                    this.scheduleList=[]
+                    this.teacherOptions=[]
+                    this.courseOptions=[]
+                    this.selectedCourse=0
+                }
+            },
+            doSearch(){
+                this.selectedCourse=0
+                this.scheduleList=[]
+                this.courseOptions=[]
+                let search=Course.search(this.filterText,true)
+                search.then((options) => {
+                    this.setCourseOptions(options)
+                }).catch(error => {
+                    Helper.BusEmitError(error)
+                })
             }
         }
      }

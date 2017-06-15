@@ -5,7 +5,7 @@
             <menu-item  :title="keys[0]" :items="systems[keys[0]]"></menu-item>
         </div>
         <div v-if="keys[1]" class="col-md-6">
-            <menu-item  :title="keys[0]" :items="systems[keys[1]]"></menu-item>
+            <menu-item  :title="keys[1]" :items="systems[keys[1]]"></menu-item>
         </div>
     </div> 
     <div v-if="keys.length > 2" class="row">

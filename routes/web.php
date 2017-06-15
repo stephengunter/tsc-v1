@@ -34,6 +34,7 @@ Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsContr
 
 Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
 
+Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
 Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
 Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
 Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);

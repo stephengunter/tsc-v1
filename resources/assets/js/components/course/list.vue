@@ -60,7 +60,7 @@
         },
         data() {
             return {
-                title:Helper.getIcon('Courses')  + '  報名紀錄',
+                title:Helper.getIcon('Courses')  + '  課程管理',
                 loaded:false,
                 source: Course.source(),
                 
