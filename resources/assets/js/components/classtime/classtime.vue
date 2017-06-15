@@ -5,157 +5,188 @@
             <span class="panel-title">
                 <h4><i class="fa fa-clock-o" aria-hidden="true"></i> 課程時間</h4>
             </span>
+            
             <div>
-                <button v-if="canEdit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
+                <button v-if="can_edit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
                 </button>
             </div>
             
         </div>  <!-- End panel-heading-->
         <div v-if="loaded" class="panel-body">
-
-            <edit-classtime v-for="classTime in classTimes" :classTime="classTime"
-             :canEdit="canEdit"  :course_id="course_id"  @btnDeleteClicked="btnDeleteClicked" 
-             @saved="classTimeUpdated">
-                 
-            </edit-classtime>
-
-            
-
-
-            <edit-classtime v-if="creating" :canEdit="canEdit"  :course_id="course_id"
-             @saved="classTimeCreated"   @endEdit="endCreate" >
-             
+            <table  v-show="hasData || creating"  class="table table-striped" style="width: 95%;">
+                <thead> 
+                    
+                    <tr> 
+                        <th style="width:35%">上課時間</th> 
+                        <th style="width:15%"></th> 
+                        <th style="width:15%"></th> 
+                        <th style="width:25%">最後更新</th>
+                        <th style="width:10%"></th>
+                    </tr> 
                    
-            </edit-classtime>  
+                </thead>
+                <tbody> 
+                
+                    <edit v-if="creating" :course_id="course_id"  @saved="onCreated" 
+                       @canceled="onCreateCanceled" > 
+                    </edit>  
 
+                    <edit  v-for="classtime in classtimeList"  :classtime="classtime" 
+                        :can_edit="can_edit"
+                        @editting="onEditting" @canceled="onEditCanceled"
+                        @saved="onUpdated"  @btn-delete-clicked="beginDelete" >
+                    </edit>
+
+               
+                
+                </tbody>
             
-            
-   
+            </table>
+
+
+           
 
         </div><!-- End panel-body-->
-    </div>
 
-    <modal :showBtn="true"  :show.sync="showConfirm" @ok="deleteClassTime"  @closed="closeConfirm" ok-text="確定"
-        effect="fade" width="800">
-          <div slot="modal-header" class="modal-header modal-header-danger">
+    </div>   
+                   
            
-            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="closeConfirm">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-            </button>
-             <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
-          </div>
-        <div slot="modal-body" class="modal-body">
-            <h3 v-text="confirmMsg"> </h3>
-        </div>
-     </modal>
+
+    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+      @close="onDeleteCanceled" @confirmed="deleteClasstime">        
+    </delete-confirm>
 
 </div>
 
 </template>
 
 <script>
-    import EditClassTime from '../../components/classtime/edit-classtime.vue'
+    import Edit from '../../components/classtime/edit.vue'
     export default {
-        name: 'ClassTime',
+        name: 'Classtime',
         components: {
-             'edit-classtime':EditClassTime,
-             'modal': Modal,
+             Edit,
         },
-        props: ['course_id','canEdit'],
+        props: {
+            course_id: {
+              type: Number,
+              default: 0
+            },
+            can_edit:{
+               type: Boolean,
+               default: true
+            },            
+        },
         beforeMount() {
            this.init()
+        },
+        computed:{
+            hasData(){
+                if(this.classtimeList.length) return true
+                return false    
+            },
+            indexMode(){
+                if(this.creating) return false
+                if(this.seleted) return false
+                    return true
+            }
         },
         data() {
             return {
                 loaded:false,
                 creating:false,
-                classTimes:[],
-                showConfirm:false,
-                confirmMsg:'',
-                deleteId:0,
+                seleted:0,
+                classtimeList:[],
+
+                deleteConfirm:{
+                    id:0,
+                    show:false,
+                    msg:'',
+
+                }
+               
             }
         },
         methods: {
             init() {
                 this.loaded=false
+
                 this.creating=false
-                this.showConfirm=false
-                this.confirmMsg=''
-                this.deleteId=0
-                this.classTimes=[]
-                this.fetchData()         
-            }, 
+                this.seleted=0
+                
+                this.deleteConfirm={
+                    id:0,
+                    show:false,
+                    msg:''
+                }
+
+                this.classtimeList=[]
+                this.fetchData()
+            },
             fetchData() {
-                let url = '/api/classtimes?course=' + this.course_id                
-                axios.get(url)
-                    .then(response => {
-                        this.classTimes=response.data.classTimes
-                       
-                        this.loaded = true
+                let getData=Classtime.index(this.course_id)
+                    getData.then(data => {
+                      
+                       this.classtimeList=data.classtimeList
+                       this.loaded = true
+                        
                     })
-                    .catch(function(error) {
-                        console.log(error)
+                    .catch(error => {
+                        Helper.BusEmitError(error)
                     })
             },
-            clearErrorMsg(name) {
-                this.form.errors.clear(name);
-            },
+            
             beginCreate(){
                 this.creating=true
             },
             endCreate(){
                  this.creating=false
             },
-            cancelEdit(){
-               
-               this.$emit('endEditClassTime')
+            onEditting(id){
+                this.seleted=id
+            },
+            OnEditCanceled(){
+                this.seleted=0
             },
             cancelCreate(){
                this.creating=false
                
             },
-            btnDeleteClicked(values){
-                let refreshToken=this.$auth.refreshToken()
-                refreshToken.then(() => {
-                    this.confirmMsg='確定要刪除 ' + values.name + ' 嗎？'
-                    this.deleteId=values.id
-                    this.showConfirm=true
-                }).catch(error => {
-                     this.$auth.logout()
-                     Bus.$emit('login')
-                })
-                
+            beginDelete(values){
+                this.deleteConfirm.msg='確定要刪除 ' + values.name + ' 嗎？'
+                this.deleteConfirm.id=values.id
+                this.deleteConfirm.show=true                
             },
-            closeConfirm(){
-                this.showConfirm=false
+            onDeleteCanceled(){
+                this.deleteConfirm.show=false
             },
-            deleteClassTime(){
-
-                let url = '/api/classtimes/' + this.deleteId 
-                let form=new Form()
-                form.delete(url)
-                .then(result => {
-                    this.init()
+            deleteClasstime(){
+                 let id = this.deleteConfirm.id 
+                let remove= Classtime.delete(id)
+                remove.then(result => {
                     Helper.BusEmitOK('刪除成功')
-
-                    this.$emit('classTimeChanged') 
-                    this.deleteId=0;
-                    this.closeConfirm();
+                    this.init()
+                    this.$emit('deleted')
                 })
                 .catch(error => {
-                                   
                     Helper.BusEmitError(error,'刪除失敗')
-                    this.closeConfirm();
-                       
+                    this.closeConfirm()   
                 })
             },
-            classTimeUpdated(classTime){
-                 this.$emit('classTimeChanged')  
+            onCreated(classtime){    
+                this.init()
+                this.$emit('created',classtime)
             },
-            classTimeCreated(classTime){      
-                  this.init()  
-                  this.$emit('classTimeChanged')  
+            onCreateCanceled(){
+                this.init()
+            },
+            onEditCanceled(){
+                this.init()
+            },
+            onUpdated(classtime){ 
+                 this.init()
+                 this.$emit('updated',classtime)
             },
             
            

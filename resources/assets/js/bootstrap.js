@@ -23,6 +23,7 @@ Vue.component('photo', require('./components/Photo') )
 Vue.component('image-upload', require('./components/ImageUpload') )
 Vue.component('role-label', require('./components/RoleLabel') )
 Vue.component('combination-select', require('./components/CombinationSelect') )
+Vue.component('updated', require('./components/Updated') )
 
 
 Vue.component('menus', require('./views/menus') )
@@ -104,6 +105,9 @@ import UserCenters from './models/usercenters.js'
 import Address from './models/address.js'
 import Course from './models/course.js'
 import SignupInfo from './models/signupinfo.js'
+import Classtime from './models/classtime.js'
+import Schedule from './models/schedule.js'
+
 import Signup from './models/signup.js'
 import Tuition from './models/tuition.js'
 import Refund from './models/refund.js'
@@ -137,6 +141,9 @@ window.UserCenters=UserCenters
 
 window.Course=Course
 window.SignupInfo=SignupInfo
+window.Classtime=Classtime
+window.Schedule=Schedule
+
 window.Signup=Signup
 window.Tuition=Tuition
 window.Refund=Refund

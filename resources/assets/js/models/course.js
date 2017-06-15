@@ -273,7 +273,7 @@ class Course {
         let html=''
         if(class_times.length){
             for (var i = 0; i < class_times.length; i++) {
-                html += Helper.classTimeFullText(class_times[i])   + '&nbsp;'
+                html += Classtime.classTimeFullText(class_times[i])   + '&nbsp;'
             }
         }
         return html               

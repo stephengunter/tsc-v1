@@ -51,7 +51,7 @@ class SignupInfoRequest extends FormRequest
     {
         $values=$this->get('signupinfo');
         $keys=[ 'open_date','close_date','limit','tuition',
-            'cost','materials','net_signupinfo'
+            'cost','materials','net_signup'
         ];
         $values = array_only($values, $keys);
         $values= Helper::setUpdatedBy($values,$updated_by);

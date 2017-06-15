@@ -70,6 +70,12 @@ Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
 Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
 Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
                                         ['only' => ['show','edit','update']]);
+Route::resource('classtimes', '\App\Http\Controllers\Course\ClassTimesController');
+Route::resource('schedules', '\App\Http\Controllers\Course\SchedulesController');
+Route::resource('import-schedules', '\App\Http\Controllers\Course\ImportSchedulesController', 
+                                     ['only' => ['create','store']]);
+
+
 Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');
 
 Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');

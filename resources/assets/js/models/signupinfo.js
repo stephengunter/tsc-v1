@@ -11,6 +11,7 @@ class SignupInfo {
         }
         
         this.cost= Helper.formatMoney(data.cost)
+        
         this.tuition= Helper.formatMoney(data.tuition)
        
 

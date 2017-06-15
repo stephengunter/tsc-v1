@@ -5,96 +5,102 @@
             <span class="panel-title">
                 <h4><i class="fa fa-calendar-o" aria-hidden="true"></i> 課程預定進度</h4>
             </span>
+            
             <div>
-                
-                <button v-if="canEdit" class="btn btn-warning btn-sm" @click.prevent="beginImport">
+                <button v-if="can_edit" class="btn btn-warning btn-sm" @click.prevent="beginImport">
                     <span aria-hidden="true" class="glyphicon glyphicon-forward"></span> 匯入
                 </button>
-                <button   v-if="canEdit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
+                <button v-if="can_edit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
                 </button>
             </div>
             
         </div>  <!-- End panel-heading-->
         <div v-if="loaded" class="panel-body">
-            <table v-show="hasData" class="table table-striped" style="width: 95%;">
-             <thead> 
-                <tr> 
-                    <th style="width:7%">#</th> 
-                    <th style="width:35%">課目標題</th> 
-                    <th style="width:35%">內容</th> 
-                    <th style="width:15%">材料</th>
-                    <th style="width:8%"></th> 
-                </tr> 
-            </thead>
-            <tbody> 
-                <edit-schedule v-for="schedule in scheduleList"  :schedule="schedule" 
-                     @saved="scheduleUpdated"  @btnDeleteClicked="btnDeleteClicked" >
-                </edit-schedule>
-                
-            </tbody> 
-            </table>
-            
-
-            
-
-
-            <create-schedule v-if="creating"  :course_id="course_id" @saved="scheduleCreated"
-               @cancelCreate="endCreate" >
+            <table v-show="hasData || creating" class="table table-striped" style="width: 99%;">
+                <thead> 
+                    
+                    <tr v-if="indexMode"> 
+                        <th style="width:7%">#</th> 
+                        <th style="width:25%">課目標題</th> 
+                        <th style="width:25%">內容</th> 
+                        <th style="width:15%">材料</th>
+                        <th style="width:15%">最後更新</th>
+                        <th style="width:8%"></th> 
+                    </tr> 
+                    <tr v-else>
+                        <th style="width:12%">順序</th> 
+                        <th style="width:30%">課目標題</th> 
+                        <th style="width:30%">內容</th> 
+                        <th style="width:20%">材料</th>
+                        <th style="width:8%"></th>
+                    </tr>
                    
-            </create-schedule>  
+                </thead>
+                <tbody> 
+                    <edit v-if="creating" :course_id="course_id"  @saved="onCreated" 
+                       @canceled="onCreateCanceled" > 
+                    </edit>  
+
+                    <edit  v-for="schedule in scheduleList"  :schedule="schedule" 
+                        :can_edit="can_edit" :editting="!indexMode"
+                        @editting="onEditting" @canceled="onEditCanceled"
+                        @saved="onUpdated"  @btn-delete-clicked="beginDelete" >
+                    </edit>
+                </tbody>
+            
+            </table>
+
+
+           
 
         </div><!-- End panel-body-->
 
-    </div>
-
-    <modal :showBtn="true"  :show.sync="showConfirm" @ok="deleteschedule"  @closed="closeConfirm" ok-text="確定"
-        effect="fade" width="800">
-          <div slot="modal-header" class="modal-header modal-header-danger">
-           
-            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="closeConfirm">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-            </button>
-             <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
-          </div>
-        <div slot="modal-body" class="modal-body">
-            <h3 v-text="confirmMsg"> </h3>
-        </div>
-    </modal>
-
-     <modal :showbtn="false" :width="1000" :show.sync="showImport"  @closed="showImport=false" 
+    </div>   
+                   
+    <modal :showbtn="false" :width="importSettings.width" :show.sync="importSettings.show"  @closed="importCanceled" 
         effect="fade">
           <div slot="modal-header" class="modal-header">
            
-            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="showImport=false">
+            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="importCanceled">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
             </button>
            <h3>從舊課程中匯入</h3>
           </div>
         <div slot="modal-body" class="modal-body">
            
-            <teacher-course v-if="showImport" :course_id="course_id" @courseSelected="importSchedules"></teacher-course>
+            <importor v-if="importSettings.show" :course_id="course_id" ></importor>
       
         </div>
-    </modal>
+    </modal>       
+
+    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+      @close="onDeleteCanceled" @confirmed="deleteSchedule">        
+    </delete-confirm>
 
 </div>
 
 </template>
 
 <script>
-    import EditSchedule from '../../components/schedule/edit-schedule.vue'
-    import CreateSchedule from '../../components/schedule/create-schedule.vue'
-    import TeacherCourse from '../../components/teacher-course/teacher-course.vue'
+    import Edit from '../../components/schedule/edit.vue'
+    import Importor from '../../components/schedule/importor.vue'
     export default {
         name: 'Schedule',
         components: {
-             'edit-schedule':EditSchedule,
-             'create-schedule':CreateSchedule,
-             'teacher-course':TeacherCourse,
-             'modal': Modal,
+             Edit,
+             Importor
         },
-        props: ['course_id', 'canEdit'],
+        props: {
+            course_id: {
+              type: Number,
+              default: 0
+            },
+            can_edit:{
+               type: Boolean,
+               default: true
+            },            
+        },
         beforeMount() {
            this.init()
         },
@@ -102,130 +108,129 @@
             hasData(){
                 if(this.scheduleList.length) return true
                 return false    
+            },
+            indexMode(){
+                if(this.creating) return false
+                if(this.seleted) return false
+                    return true
             }
         },
         data() {
             return {
                 loaded:false,
                 creating:false,
+                seleted:0,
                 scheduleList:[],
-                showConfirm:false,
-                confirmMsg:'',
-                showImport:false,
-                deleteId:0,
-                orderOptions:{},
-             
+
+                deleteConfirm:{
+                    id:0,
+                    show:false,
+                    msg:'',
+
+                },
+
+                importSettings:{
+                    course_id:0,
+                    show:false,
+                    width:1000,
+                }
+               
             }
         },
         methods: {
             init() {
                 this.loaded=false
+
                 this.creating=false
+                this.seleted=0
+                
+                this.deleteConfirm={
+                    id:0,
+                    show:false,
+                    msg:''
+                }
 
-                this.showConfirm=false
-                this.confirmMsg=''
-
-                this.showImport=false
+                this.importSettings={
+                    course_id:0,
+                    show:false,
+                    width:1000,
+                }
 
                 this.scheduleList=[]
-              
-                this.deleteId=''
-                this.orderOptions={}
-                
-                this.fetchData()         
-            }, 
+                this.fetchData()
+            },
             fetchData() {
-                let url = '/api/schedules?course=' + this.course_id                
-                axios.get(url)
-                    .then(response => {
-                       
-                       this.scheduleList=response.data.scheduleList
+                let getData=Schedule.index(this.course_id)
+                    getData.then(data => {
+                      
+                       this.scheduleList=data.scheduleList
                        this.loaded = true
                         
                     })
-                    .catch(function(error) {
-                        console.log(error)
+                    .catch(error => {
+                        Helper.BusEmitError(error)
                     })
             },
-            clearErrorMsg(name) {
-                this.form.errors.clear(name);
-            },
+            
             beginCreate(){
                 this.creating=true
             },
             endCreate(){
                  this.creating=false
             },
-            cancelEdit(){
-               
-               this.$emit('endEditschedule')
+            onEditting(id){
+                this.seleted=id
+            },
+            OnEditCanceled(){
+                this.seleted=0
             },
             cancelCreate(){
                this.creating=false
                
             },
-            btnDeleteClicked(values){
-                let refreshToken=this.$auth.refreshToken()
-                refreshToken.then(() => {
-                    this.confirmMsg='確定要刪除課程進度 ' + values.name + ' 嗎？'
-                    this.deleteId=values.id
-                    this.showConfirm=true
-                }).catch(error => {
-                     this.$auth.logout()
-                     Bus.$emit('login')
-                })
-                
+            beginImport(){
+                this.importSettings.course_id=this.course_id
+                this.importSettings.show=true
             },
-            closeConfirm(){
-                this.showConfirm=false
+            importCanceled(){
+                this.importSettings.show=false
             },
-            deleteschedule(){
-                let url = '/api/schedules/' + this.deleteId 
-                let form=new Form()
-                form.delete(url)
-                .then(result => {
-                    this.init()
+            beginDelete(values){
+                this.deleteConfirm.msg='確定要刪除 ' + values.name + ' 嗎？'
+                this.deleteConfirm.id=values.id
+                this.deleteConfirm.show=true                
+            },
+            onDeleteCanceled(){
+                this.deleteConfirm.show=false
+            },
+            deleteSchedule(){
+                 let id = this.deleteConfirm.id 
+                let remove= Schedule.delete(id)
+                remove.then(result => {
                     Helper.BusEmitOK('刪除成功')
-                    this.deleteId=0;
-                    this.closeConfirm();
+                    this.init()
+                    this.$emit('deleted')
                 })
                 .catch(error => {
                     Helper.BusEmitError(error,'刪除失敗')
-                    
-                    this.closeConfirm();
-                       
+                    this.closeConfirm()   
                 })
             },
-            scheduleCreated(schedule){    
-                   this.init()
+
+            onCreated(schedule){    
+                this.init()
+                this.$emit('created',schedule)
             },
-            scheduleUpdated(schedule){ 
-                  this.init()
+            onCreateCanceled(){
+                this.init()
             },
-            beginImport(){
-                 this.showImport=true
+            onEditCanceled(){
+                this.init()
             },
-            importSchedules(course){
-                let form=new Form({
-                    from_course:course,
-                    to_course:this.course_id
-                })
-                let url='/api/schedules/import'
-                form.post(url)
-                    .then(result => {
-                        this.init()
-                        Helper.BusEmitOK('匯入成功')
-                        
-                        this.showImport=false
-                    })
-                    .catch(error => {
-                                             
-                        Helper.BusEmitError(error,'匯入失敗')
-                       
-                        this.showImport=false
-                           
-                    })
-            }
+            onUpdated(schedule){ 
+                 this.init()
+                 this.$emit('updated',schedule)
+            },
             
            
         },

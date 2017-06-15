@@ -153,11 +153,17 @@ class CoursesController extends BaseController
         }  
         $current_user=$this->currentUser();
         $course = Course::with('center','categories','teachers','classTimes')->findOrFail($id);
+        
         $course->canEdit=$course->canEditBy($current_user);
         $course->canDelete=$course->canDeleteBy($current_user);
+
         foreach ($course->classTimes as $classTime) {
                 $classTime->weekday;
         }
+        $course->classTimes= $course->classTimes->sortBy('weekday_id')
+                                                ->sortBy('on')->values()->all();;
+        
+        
         foreach ($course->teachers as $teacher) {
                 $teacher->name=$teacher->getName();
         }
@@ -267,18 +273,37 @@ class CoursesController extends BaseController
            
     }
 
-    public function optionsByTeacher($teacher)
+    public function options()
     {
+        $options=[];
+        $request = request();
+        $teacher_id=(int)$request->teacher; 
+        if($teacher_id){
+            $courseList=$this->courses->getByTeacher($teacher_id)->get();
+            $options=$this->courses->optionsConverting($courseList);
+        }
+        
        
-        $courseList=$this->courses->getByTeacher($teacher)->get();
        
-        $options=$this->courses->optionsConverting($courseList);
-           return response()
-                ->json([
-                    'options' => $options
-                ]);   
+        return response()  ->json(['options' => $options ]);   
+              
+                    
+               
         
     }
+
+    // public function optionsByTeacher($teacher)
+    // {
+       
+    //     $courseList=$this->courses->getByTeacher($teacher)->get();
+       
+    //     $options=$this->courses->optionsConverting($courseList);
+    //        return response()
+    //             ->json([
+    //                 'options' => $options
+    //             ]);   
+        
+    // }
 
     public function activeCourses()
     {

@@ -1,9 +1,9 @@
 <template>
 <div>
     
-    <show v-if="readOnly"  :id="id" can_edit="can_edit"  
-       :version="version"  @begin-edit="beginEdit" @loaded="onDataLoaded"
-      >                 
+    <show v-if="readOnly"  :signupinfo="signupinfo" can_edit="can_edit"  
+         @begin-edit="beginEdit"  >       
+               
     </show>
 
     <edit v-else :id="id" 
@@ -25,38 +25,44 @@
             Edit,
         },
         props: {
-            id: {
-              type: Number,
-              default: 0
+            course: {
+              type: Object,
+              default: null
             },
             can_edit:{
                type: Boolean,
                default: true
             },   
-            version: {
-              type: Number,
-              default: 0
-            },
         },
         data() {
             return {
                 readOnly:true,
+                signupinfo:null,
             }
+        },
+        computed: {
+            id() {
+               if(this.course) return this.course.id
+                return 0
+            },
         },
         beforeMount(){
             this.init()
         },
-        watch: {
-            'id': 'init',
-            'version':'init'
+        watch:{
+            course: {
+              handler: function () {
+                  this.signupinfo=new SignupInfo(this.course)
+              },
+             
+            },            
         },
         methods: {
             init() {
                this.readOnly=true
+               this.signupinfo=new SignupInfo(this.course)
             },      
-            onDataLoaded(signupinfo){
-                this.$emit('loaded',signupinfo)
-            },        
+                  
             beginEdit() {
                 this.readOnly=false
             },

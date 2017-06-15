@@ -115,10 +115,7 @@ new Vue({
             this.showUpdatedBy=false
         },
 
-        onForgotPassword(){
-               let url='/forgot-password'
-                alert(url) 
-        },
+        
         
 
     },

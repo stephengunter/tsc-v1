@@ -1,0 +1,177 @@
+<template>
+     <div class="panel panel-default">
+        <div class="panel-heading">
+            <span  class="panel-title">
+                 <span  class="panel-title">
+                    <h4><i class="fa fa-calendar-o" aria-hidden="true"></i> 課程進度</h4>
+                  
+                  </span>
+            </span>
+            
+            <div>
+             
+            </div>
+            <div  class="form-inline">   
+                <select v-model="form.import.teacher_id"  @change="teacherChanged" class="form-control" >
+                    <option v-for="item in teacherOptions" :value="item.value" v-text="item.text"></option>
+                </select>
+                 &nbsp;&nbsp;
+                <select v-model="form.import.from_course"  @change="fetchData" class="form-control" >
+                    <option v-for="item in courseOptions" :value="item.value" v-text="item.text"></option>
+                </select>
+                &nbsp;&nbsp;
+                <button type="submit" @click="courseSelected" class="btn btn-success" :disabled="!form.import.from_course">確認送出</button>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table v-show="hasData" class="table table-striped" style="width: 95%;">
+             <thead> 
+                <tr> 
+                    <th style="width:10%">#</th> 
+                    <th style="width:35%">課目標題</th> 
+                    <th style="width:35%">內容</th> 
+                    <th style="width:20%">材料</th>
+                   
+                </tr> 
+            </thead>
+            <tbody> 
+               
+                <tr v-for="schedule in scheduleList"> 
+                    <th scope="row" v-text="schedule.order"></th> 
+                    <td v-text="schedule.title"></td> 
+                    <td v-text="schedule.content"></td>
+                    <td v-text="schedule.materials"></td>                     
+                </tr> 
+                
+            </tbody> 
+            </table>
+
+
+           
+
+        </div><!-- End panel-body-->
+       
+    </div>
+</template>
+
+
+
+<script>
+     export default {
+        props: {
+            course_id: {
+                type: Number,
+                default: 0
+            },  
+        },
+        name: 'ScheduleImportor',
+       
+        beforeMount() {
+           this.init()
+        },
+        computed:{
+            hasData(){
+                if(this.scheduleList.length) return true
+                return false    
+            }
+        },
+        data() {
+            return {
+                
+                loaded:false,  
+                courseOptions:[],             
+                scheduleList:[],                
+            
+                form:{},
+             
+            }
+        },
+        methods: {
+            init(){
+               
+                this.loaded=false  
+                
+
+                this.teacherOptions=[]
+                this.courseOptions=[]   
+
+                this.scheduleList=[]       
+
+                this.form=new Form({
+                    import:{}
+                })         
+                
+
+                let create=this.create()
+
+                create.then(() => {
+                    this.fetchData()
+                }).catch(error => {
+                    Helper.BusEmitError(error)
+                    this.loaded = false
+                })
+            },
+            fetchData(){
+                let course=this.form.import.from_course
+                if(!course) return false
+                let getData=Schedule.index(course)               
+              
+                getData.then(data => {
+
+                   this.scheduleList=data.scheduleList
+                   this.loaded = true
+                    
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error)
+                    this.loaded = false
+                })
+            },
+            create(){
+                return new Promise((resolve, reject) => {
+                     let url = '/import-schedules/create?course=' + this.course_id 
+                     axios.get(url)
+                    .then(response => {
+                        this.form=new Form({
+                           import:response.data.import
+                        })
+                        this.teacherOptions = response.data.teacherOptions 
+                     
+                        this.setCourseOptions(response.data.courseOptions)
+
+                        resolve(true);
+                    })
+                    .catch(error => {
+                         reject(error);
+                    })
+                });
+            },
+            
+            loadCourseOptions(val){
+                let params={
+                    teacher:val
+                }
+                let options=Course.options(params)
+                options.then((data) => {
+                     this.setCourseOptions(data.options)
+                }).catch(error => {
+                    Helper.BusEmitError(error)
+                })
+            },
+            setCourseOptions(options){
+                 for(let i = options.length-1; i>=0; i--){
+                   if (options.value == this.course_id ) {
+                          options.splice(i, 1);
+                   }                           
+                }
+                if(options.length){
+                    this.form.import.from_course=options[0].value
+                }
+                this.courseOptions=options
+            },
+            courseSelected(){
+                this.$emit('courseSelected',this.selectedId);
+            }
+        }
+     }
+</script>

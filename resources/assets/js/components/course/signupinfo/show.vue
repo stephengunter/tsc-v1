@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="loaded" class="panel panel-default show-data">
+    <div v-if="signupinfo" class="panel panel-default show-data">
         <div class="panel-heading">
             <span class="panel-title">
                <i class="fa fa-info-circle" aria-hidden="true"></i>  課程報名資訊
@@ -84,9 +84,9 @@
     export default {
         name: 'ShowSignupInfo', 
         props: {
-            id: {
-              type: Number,
-              default: 0
+            signupinfo: {
+              type: Object,
+              default: null
             },
             can_edit:{
                type: Boolean,
@@ -100,45 +100,14 @@
               type: Boolean,
               default: false
             },
-            version: {
-              type: Number,
-              default: 0
-            },
         },
         data() {
              return {
-                loaded:false,
-                signupinfo:null,
-
+               
             }
         },
-        watch: {
-            'version':'init'
-        },
-        beforeMount() {
-            this.init()
-        },  
-        methods: {    
-            init(){
-                this.loaded=false
-                this.signupinfo=null
-                if(this.id) this.fetchData()
-               
-            },
-            fetchData() {
-                let getData=SignupInfo.show(this.id)
-               
-                getData.then(data => {
-                    this.signupinfo = data.signupinfo
-                    
-                    this.loaded = true 
-                    this.$emit('loaded',this.signupinfo)
-                })
-                .catch(error=> {
-                    this.loaded = false 
-                    Helper.BusEmitError(error)
-                })
-            },   
+         
+        methods: {  
             showUpdatedBy(){
                let updated_by=Helper.tryParseInt(this.signupinfo.updated_by)
                if(updated_by){

@@ -1,16 +1,22 @@
 <template>
 <div>
   <course v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
-     @saved="courseUpdated" @loaded="onDataLoaded" :version="version"
+     @saved="onCourseUpdated" @loaded="onDataLoaded" :version="version"
      @btn-back-clicked="onBtnBackClicked" @deleted="onCourseDeleted" > 
 
   </course>
 
-  <div  id="tabCourse" class="panel with-nav-tabs panel-default">
+  <div v-if="loaded" id="tabCourse" class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
             <ul class="nav nav-tabs">
                 <li class="active">
                     <a @click="activeIndex=0" href="#signupInfo" data-toggle="tab">報名資訊</a>
+                </li>
+                <li class="">
+                    <a @click="activeIndex=1" href="#classtime" data-toggle="tab">上課時間</a>
+                </li>
+                <li class="">
+                     <a @click="activeIndex=2" href="#schedule" data-toggle="tab">預定進度</a>
                 </li>
                 <!-- <li>
                      <a @click="activeIndex=1" href="#contactinfo" data-toggle="tab">聯絡資訊</a>
@@ -21,24 +27,27 @@
                 
             </ul>
         </div>
-        <div class="panel-body">
+        <div  class="panel-body">
             <div class="tab-content">
                 <div class="tab-pane fade active in" id="signupInfo">
-                    <signup-info v-if="activeIndex==0" :id="id" 
+                    <signup-info v-if="activeIndex==0" :course="course" 
                        @saved="onSignupInfoSaved"  >
                     </signup-info>  
                 </div>
-                <!-- <div class="tab-pane fade" id="contactinfo">
-                    <contact-info v-if="activeIndex==1"  
-                     :id="contactInfoSettings.id" :user_id="contactInfoSettings.user_id" 
-                     :canEdit="contactInfoSettings.canEdit" :show_residence="contactInfoSettings.show_residence" 
-                     @created="onContactInfoCreated" @deleted="onContactInfoDeleted">             
-                    </contact-info>
+                <div class="tab-pane fade" id="classtime">
+                    <classtime v-if="activeIndex==1"  
+                      :course_id="id"   :canEdit="course.canEdit" 
+                     @created="onClasstimeChanged" @deleted="onClasstimeChanged"
+                     @updated="onClasstimeChanged"   >             
+                    </classtime>
                 </div>
-                <div class="tab-pane fade" id="centers">
-                    <user-center v-if="activeIndex==2" :user_id="id" :role='role'>
-                    </user-center>
-                </div>   -->               
+                <div class="tab-pane fade" id="schedule">
+                    <schedule v-if="activeIndex==2"  
+                      :course_id="id"   :canEdit="course.canEdit" 
+                     @created="onScheduleChanged" @deleted="onScheduleChanged"
+                     @updated="onScheduleChanged"   >             
+                    </schedule>
+                </div>                 
             </div>
         </div>
   </div>
@@ -54,6 +63,8 @@
 <script>
     import CourseComponent from '../../components/course/course.vue'
     import SignupInfoComponent from '../../components/course/signupinfo/view.vue'
+    import ClasstimeComponent from '../../components/classtime/classtime.vue'
+    import ScheduleComponent from '../../components/schedule/schedule.vue'
     
     
     
@@ -62,6 +73,8 @@
         components: {
            'course' : CourseComponent,
            'signup-info' : SignupInfoComponent,
+           'classtime' : ClasstimeComponent,
+           'schedule' : ScheduleComponent
          
         },
         props: {
@@ -145,7 +158,10 @@
             editCanceled(){
                this.readonly=true
             },
-            courseUpdated(){
+            onSignupInfoSaved(signupinfo){
+                this.version += 1
+            },
+            onCourseUpdated(){
                this.init()
             },
             onBtnBackClicked(){
@@ -154,40 +170,12 @@
             onCourseDeleted(){
                this.$emit('course-deleted')
             },
-            showUpdatedBy(){
-                Bus.$emit('onShowEditor',this.course.updated_by)
+            onClasstimeChanged(){
+                 this.version += 1
             },
-            onTuitionChanged(){
-                this.current_version += 1               
-            },
-            onRefundChanged(){
-                this.current_version += 1               
-            },
-            onUserLoaded(user){
-               this.user=user
-               this.setContactInfo(user.contact_info)
-            },
-            onSignupInfoSaved(signupinfo){
-                // this.user=user
-                this.version += 1
-            },
-            setContactInfo(contactInfoId){
-                let id = Helper.tryParseInt(contactInfoId)
-                if(id){
-                    this.user.contact_info=null
-                }else{
-                     this.user.contact_info=id
-                }
-                
-                this.contactInfoSettings.id=id
-                this.contactInfoSettings.user_id=this.user.id
-            },
-            onContactInfoCreated(contactInfoId){
-                this.setContactInfo(contactInfoId)
-            },
-            onContactInfoDeleted(){ 
-                this.setContactInfo(null)
-            },
+            onScheduleChanged(){
+                 
+            }
             
         }, 
 

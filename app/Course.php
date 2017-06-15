@@ -125,7 +125,11 @@ class Course extends Model
     {
         return $this->signups()->where('removed',false);
     }
-
+    public function getClasstimes()
+    {
+        return $this->classTimes()->orderBy('weekday_id')
+                                         ->orderBy('on')->get();
+    }
 
     public function canViewBy($user)
     {

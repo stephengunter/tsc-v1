@@ -22,22 +22,22 @@ class ClassTimeRequest extends FormRequest
     {  
 
         return [
-           'classTime.on' =>'required',
-            'classTime.off' =>'required',
+            'classtime.on' =>'required',
+            'classtime.off' =>'required',
         ];
     }
 
     public function messages()
     {
         return [
-            'classTime.on.required' => '必須選擇上課時間',
-             'classTime.off.required' => '必須選擇下課時間',
+            'classtime.on.required' => '必須選擇上課時間',
+             'classtime.off.required' => '必須選擇下課時間',
             
         ];
     }
     public function getValues($updated_by,$removed)
     {
-        $values=$this->get('classTime');
+        $values=$this->get('classtime');
         $values= Helper::setUpdatedBy($values,$updated_by);
         return Helper::setRemoved($values,$removed);
     }

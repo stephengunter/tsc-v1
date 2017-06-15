@@ -148,9 +148,6 @@
             doSearch(){
                this.fetchData()
             },
-            clearErrorMsg(name) {
-                this.form.errors.clear(name);
-            },
            
             beginCreate(){
                 this.creating=true

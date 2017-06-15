@@ -179,11 +179,9 @@ class Helper {
         }
         return html
     }
-    static classTimeFullText(classTime) {
-        let day = classTime.weekday.text
-        let on = this.timeString(classTime.on)
-        let off = this.timeString(classTime.off)
-        return day + ' ' + on + ' - ' + off
+    static classTimeFullText(data) {
+        
+        return Classtime.classTimeFullText(data) 
     }
 
     static statusHtml(active) {
@@ -194,8 +192,11 @@ class Helper {
         }
 
     }
-    static formatMoney(money) {
-        if (!money) return ''
+    static formatMoney(money,wantInt) {
+        if (!money){
+            if(wantInt) return 0
+              return ''
+        }
         money=String(money)
         let pos = money.indexOf(".")
         if (pos < 0) return money

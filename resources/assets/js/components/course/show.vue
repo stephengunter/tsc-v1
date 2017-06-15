@@ -88,10 +88,7 @@
                 </div>
                
                 <div class="col-sm-3">
-                    <label class="label-title">網路報名</label>
-                    <p>
-                         {{ course.canNetSignup }}
-                    </p> 
+                    
                     
                 </div>
             </div> 

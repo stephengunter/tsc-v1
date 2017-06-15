@@ -133,13 +133,7 @@
                         </div>
                     </div>
                     <div class="col-sm-3">
-                        <div class="form-group">
-                            <label>網路報名</label>
-                            <div>
-                            <input type="hidden" v-model="form.course.net_signup"  >
-                             <toggle :items="boolOptions"   :default_val="form.course.net_signup" @selected="setNetSignup"></toggle>
-                            </div>
-                        </div>
+                       
                       
                     </div>
                 </div>
@@ -218,7 +212,6 @@
                 creditCountOptions:Helper.numberOptions(0,15),
                 weeksOptions:Course.weeksOptions(),
                 activeOptions:Helper.activeOptions(),
-                boolOptions:Helper.boolOptions(),
 
                 photo_id: 0,
                 imageUpload:{
@@ -338,9 +331,6 @@
             },     
             setActive(val) {
                 this.form.course.active = val
-            },
-            setNetSignup(val){
-                this.form.course.net_signup = val
             },
             clearErrorMsg(name) {
                 this.form.errors.clear(name)
