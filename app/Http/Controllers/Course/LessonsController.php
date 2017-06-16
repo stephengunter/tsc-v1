@@ -55,12 +55,21 @@ class LessonsController extends BaseController
             return view('lessons.index')
                     ->with(['menus' => $menus]);
         } 
-
         $course=$request->get('course');
         if(!$course) abort(404);
        
-        $lessonList=$this->lessons->getByCourse($course)->filterPaginateOrder();;
+        $lessonList=$this->lessons->getAll()   
+                                  ->with('classroom')
+                                  ->where('course_id', $course)
+                                  ->filterPaginateOrder();
 
+        if(count($lessonList)){
+           
+            foreach ($lessonList as $lesson) {
+                $lesson->teachers=$lesson->teachers();
+                $lesson->volunteers=$lesson->volunteers();
+            }
+        }
         
          return response() ->json(['model' => $lessonList  ]);  
        
@@ -138,19 +147,16 @@ class LessonsController extends BaseController
         }
 
         $lesson= Lesson::initialize($course);
-        return response()->json(['lesson' => $lesson ]);
-        
         
         $teachers=$this->teachers->optionsConverting($course->teachers);
         $volunteers=[];
+       
+        
 
         $centerId=$course->center_id;
         $classroomOptions=$this->classrooms->options($centerId);
-        
-       
-        $lesson['classroom_id'] = $classroomOptions[0]['value'];
-
-        $volunteerOptions=$this->volunteers->options($centerId);
+        $lesson['classroom_id']=$classroomOptions[0]['value'];
+        $volunteerOptions=$this->volunteers->options($centerId);       
         $teacherOptions=$this->teachers->optionsConverting($course->teachers);
 
         return response()
@@ -167,15 +173,23 @@ class LessonsController extends BaseController
     }
     public function store(LessonRequest $request)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         $removed=false;
         $updated_by=$current_user->id;
-        $values=$request->getValues($updated_by,$removed);
 
+        $values=$request->getValues($updated_by,$removed);
         $course_id=$values['course_id']; 
         $course=Course::findOrFail($course_id);
         if(!$course->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized();
+        }
+        
+        if($request->isDayOff()){
+            $fields=['course_id','date','status','ps' ,'removed','updated_by'];
+            $values= array_only($values, $fields);           
+           
+            $lesson=$this->lessons->store($values);
+            return response()->json($lesson);
         }
 
         $lesson=$this->lessons->store($values);

@@ -1,5 +1,6 @@
 <template>
-    <data-viewer v-if="loaded"  :default_search="defaultSearch" :default_order="defaultOrder"
+    <data-viewer v-if="loaded"  :default_search="defaultSearch" 
+      :default_order="defaultOrder"  :default_direction="defaultDirection"
       :source="source" :search_params="searchParams"  :thead="thead" :no_search="can_select"  
       :filter="filter"  :title="title" :create_text="createText" 
       @refresh="init" :version="version"   @beginCreate="beginCreate"
@@ -68,7 +69,8 @@
                 source: Lesson.source(),
                 
                 defaultSearch:'date',
-                defaultOrder:'order',                
+                defaultOrder:'order',   
+                defaultDirection:'asc',             
                 create: Lesson.createUrl(),
                 
                 thead:[],
@@ -91,7 +93,7 @@
         computed: {
             createText(){
                 if(this.hide_create) return ''
-                return '新增報名'
+                return '新增紀錄'
             },
         },
         methods: {
@@ -136,11 +138,19 @@
                     })
                 })   //End Promise
             },
+            onBtnViewMoreClicked(){
+                this.viewMore=!this.viewMore
+                for (var i = this.thead.length - 1; i >= 0; i--) {
+                    if(!this.thead[i].static){
+                        this.thead[i].default = !this.thead[i].default
+                    }
+                    
+                }
+            },
+
             onDataLoaded(data){
-                // if(data.summary)  this.summary=data.summary
-                // else this.summary=null
-            }, 
-            
+                this.hasData=data.model.total
+            },
             onRowSelected(id){
                 this.$emit('selected',id)
             },

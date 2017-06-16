@@ -24,21 +24,30 @@ class LessonRequest extends FormRequest
      */
     public function rules()
     {
+        if($this->isDayOff()){
+            return [];
+        }
         return [
-             'lesson.order' =>'required',
-              'lesson.on' =>'required',
-              'lesson.off' =>'required',
-               'lesson.teachers'  => 'required',
+            'lesson.order' =>'required',
+            'lesson.on' =>'required',
+            'lesson.off' =>'required',
+            'lesson.teachers'  => 'required',
         ];
     }
     public function messages()
     {
         return [
             'lesson.order.required' => '必須選擇順序',
-             'lesson.teachers.required' => '必須選擇授課教師',
+            'lesson.teachers.required' => '必須選擇授課教師',
             'lesson.on.required' => '必須選擇上課時間',
             'lesson.off.required' => '必須選擇下課時間',
         ];
+    }
+
+    public function isDayOff()
+    {
+        $status=(int)$this['lesson']['status'];
+        return $status < 0 ; 
     }
     public function getValues($updated_by,$removed)
     {

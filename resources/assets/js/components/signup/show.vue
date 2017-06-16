@@ -52,13 +52,8 @@
                 </div>
                 <div class="col-sm-3">
                     <label class="label-title">最後更新</label>
-                    <p v-if="!signup.updated_by"> {{   signup.updated_at|tpeTime  }}</p>
-                    <p v-else>
-                      <a  href="#" @click.prevent="showUpdatedBy" >
-                          {{   signup.updated_at|tpeTime  }}
-                      </a>
-                      
-                    </p>          
+                    <updated :entity="signup"></updated>
+                           
                 </div>
                   
             </div>   <!-- End row-->

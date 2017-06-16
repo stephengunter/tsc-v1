@@ -11,14 +11,14 @@
         <td  v-text="lessonTime()"></td> 
         <td  v-html="position()"></td>
 
-        <td v-if="!more" v-text="lesson.title"></td> 
-        <td v-if="!more" v-text="lesson.content"></td> 
-        <td v-if="!more" v-text="lesson.materials"></td> 
-        <td v-if="!more" v-text="lesson.ps"></td> 
-
-        <td v-if="more" v-html="teachersText()"></td> 
-        <td v-if="more" v-html="volunteersText()"></td> 
+        <td v-if="more" v-text="lesson.title"></td> 
+        <td v-if="more" v-text="lesson.content"></td> 
+        <td v-if="more" v-text="lesson.materials"></td> 
         <td v-if="more" v-text="lesson.ps"></td> 
+
+        <td v-if="!more" v-html="teachersText()"></td> 
+        <td v-if="!more" v-html="volunteersText()"></td> 
+        <td v-if="!more" v-text="lesson.ps"></td> 
         
     </tr>                   
        
@@ -40,7 +40,7 @@
         },
         data() {
             return {
-                thead:[],
+                
             }
         },
         beforeMount(){
@@ -61,9 +61,11 @@
                 return Lesson.positionText(this.lesson)
             },
             teachersText(){
+                 
                  return Lesson.teacherNames(this.lesson.teachers)             
             },
             volunteersText(){
+               
                 return Lesson.volunteerNames(this.lesson.volunteers) 
             },        
             

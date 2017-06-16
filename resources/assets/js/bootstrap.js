@@ -24,6 +24,7 @@ Vue.component('image-upload', require('./components/ImageUpload') )
 Vue.component('role-label', require('./components/RoleLabel') )
 Vue.component('combination-select', require('./components/CombinationSelect') )
 Vue.component('updated', require('./components/Updated') )
+Vue.component('admin-card', require('./components/AdminCard') )
 
 
 Vue.component('menus', require('./views/menus') )
@@ -32,7 +33,7 @@ Vue.component('login', require('./components/auth/login') )
 Vue.component('forgot-password', require('./components/auth/password/forgot') )
 Vue.component('reset-password', require('./components/auth/password/reset') )
 Vue.component('change-password', require('./components/auth/password/change') )
-Vue.component('user-card', require('./components/user/card') )
+
 
 Vue.component('signup-view', require('./views/signups/view') )
 Vue.component('signup-index', require('./views/signups/index') )

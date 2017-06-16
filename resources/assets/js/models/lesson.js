@@ -97,6 +97,19 @@ class Lesson {
                 })
         })
     }
+    static submitDayoff(){
+        let url =this.storeUrl() + '/dayOff'
+        let method='post'
+        return new Promise((resolve, reject) => {
+            form.submit(method,url)
+                .then(data => {
+                    resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+    }
     static delete(id) {
         return new Promise((resolve, reject) => {
             let url =this.deleteUrl(id) 
@@ -139,18 +152,21 @@ class Lesson {
                 }, {
                     title: '狀態',
                     key: 'status',
+                    static:true,
                     sort: true,
                     default:true,
                      width:'8%'
                 }, {
                     title: '時間',
                     key: 'time',
+                    static:true,
                     sort: false,
                     default:true,
                     width:'11%'
                 }, {
                     title: '地點',
                     key: 'position',
+                    static:true,
                     sort: false,
                     default:true,
                     width:'11%'
@@ -212,7 +228,7 @@ class Lesson {
        return course.number + ' ' + course.name
     }
     static statusLabel(status) {
-        status=parseInt(tstatus)
+        status=parseInt(status)
        if(status<0) return '<span class="label label-danger">停課</span>'
        if(status>0) return '<span class="label label-default">已結束</span>'
        return ''
@@ -258,6 +274,18 @@ class Lesson {
         }else{
           return ''
         }
+    }
+    static statusOptions(){
+        return [{
+                    text: '一般',
+                    value: '0'
+                }, {
+                    text: '已結束',
+                    value: '1'
+                },{
+                    text: '停課',
+                    value: '-1'
+                }]
     }
    
    

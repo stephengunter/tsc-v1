@@ -64,7 +64,11 @@ class Lesson extends Model
     {
 		$ids =$this->teacherIds();
         if(empty($ids))  return null;
-        return Teacher::whereIn('user_id', $ids)->get();
+        $teachers=Teacher::whereIn('user_id', $ids)->get();
+        foreach ($teachers as $teacher) {
+                $teacher->name=$teacher->getName();
+        }
+        return $teachers;
 	}
     public function teacherIds() 
     {

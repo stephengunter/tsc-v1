@@ -73,17 +73,21 @@ class Volunteers
     }
     public function options($center)
     {
-        $volunteerList=$this->getByCenter($center)->get();
-        return $this->optionsConverting($volunteerList);
+        $volunteerList=$this->getByCenter($center);
+        if(!count($volunteerList)){
+            return [];
+        }
+        
+        return $this->optionsConverting($volunteerList->get());
        
     }
     public function optionsConverting($volunteerList)
     {
         $volunteerOptions=[];
-        foreach($volunteerList as $user)
+        foreach($volunteerList as $volunteer)
         {
-            $item=[ 'text' => $user->profile->fullname , 
-                     'value' => $user->id , 
+            $item=[ 'text' => $volunteer->getName() , 
+                     'value' => $volunteer->user_id , 
                  ];
             array_push($volunteerOptions,  $item);
         }

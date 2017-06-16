@@ -21,7 +21,7 @@
                     effect="fade" width="800"  
                     @closed="endShowUpdatedBy">
                     <div slot="modal-body" class="modal-body">
-                        <user-card v-if="showUpdatedBy" :id="editor.updated_by" ></user-card>
+                        <admin-card v-if="showUpdatedBy" :id="editor.updated_by" ></admin-card>
                     </div>
                 </modal>
 

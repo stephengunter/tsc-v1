@@ -143,7 +143,7 @@ class SignupsController extends BaseController
     
     public function store(SignupRequest $request)
     {  
-         $current_user=$this->checkAdmin->getAdmin();
+         $current_user=$this->currentUser();
          $updated_by=$current_user->id;
          $values=$request->getValues($updated_by);
 
@@ -175,9 +175,9 @@ class SignupsController extends BaseController
     public function edit($id)
     {
         $signup=$this->signups->findOrFail($id);  
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         if(!$signup->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized();  
         }  
 
         $course_id=$signup->course_id;
@@ -201,9 +201,9 @@ class SignupsController extends BaseController
     public function update(SignupRequest $request, $id)
     {
          $signup=$this->signups->findOrFail($id);  
-         $current_user=$this->checkAdmin->getAdmin();
+         $current_user=$this->currentUser();
          if(!$signup->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized();  
          } 
 
          $updated_by=$current_user->id;
@@ -246,11 +246,11 @@ class SignupsController extends BaseController
                         ]);
          }  
 
-        $current_user=request()->user();
+        $current_user=$this->currentUser();
 
         $signup=Signup::with('course','user.profile')->findOrFail($id);
         if(!$signup->canViewBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);
+            return  $this->unauthorized(); 
         }
 
          $signup->canEdit=$signup->canEditBy($current_user);
@@ -266,10 +266,10 @@ class SignupsController extends BaseController
     public function destroy($id)
     {
         $signup=$this->signups->findOrFail($id); 
-        $current_user=request()->user();
+        $current_user=$this->currentUser();
 
         if(!$signup->canDeleteBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized();
         }    
 
         $this->signups->delete($id, $current_user->id);
@@ -279,13 +279,6 @@ class SignupsController extends BaseController
                     'deleted' => true
                 ]);
     }
-
-    // public function newStudent()
-    // {
-    //      $menus=$this->menus($this->key); 
-    //      return view('signups.new student')->with(['menus' => $menus]);
-    // }
-
     public function getByUser($user)
     {
         $signupList=$this->signups->getByUser($user);

@@ -130,7 +130,9 @@ class UsersController extends BaseController
             return  $this->unauthorized();   
         }
 
-       
+        if($user->admin){
+           $user->admin->validCenters = $user->admin->validCenters();
+        }
         
 
         $user->defaultRole=$user->defaultRole();

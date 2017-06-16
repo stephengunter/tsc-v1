@@ -122,11 +122,15 @@
             },
             default_order:{
                type: String,
-               default: ''
+               default: 'updated_at'
+            },
+            default_direction:{
+               type: String,
+               default: 'desc'
             },
             default_search:{
                type: String,
-               default: ''
+               default: 'updated_at'
             },
             version:{
                type: Number,
@@ -200,11 +204,11 @@
                     data: []
                 }
                 this.params={
-                    column: 'updated_at',
-                    direction: 'desc',
+                    column: this.default_order,  
+                    direction: this.default_direction,
                     per_page: 10,
                     page: 1,
-                    search_column: 'updated_at',
+                    search_column: this.default_search,
                     search_operator: 'like',
                     search_query_1: '',
                     search_query_2: ''
@@ -221,12 +225,7 @@
                     not_in: 'NOT IN',
                     between: 'BETWEEN'
                 }
-                if(this.default_order){
-                    this.params.column=this.default_order 
-                }
-                if(this.default_search){
-                    this.params.search_column=this.default_search 
-                }
+                
                 this.originUrl = this.buildURL();
                 this.fetchData(this.originUrl)
             },

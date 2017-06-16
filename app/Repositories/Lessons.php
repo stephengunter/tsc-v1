@@ -13,11 +13,9 @@ class Lessons
     {
          return Lesson::where('removed',false);
     }
-    public function getByCourse($course,$withClassroom=true)
+    public function getByCourse($course)
     {
-        $all=$this->getAll();
-        if($withClassroom) return $all->with('classroom')->where('course_id', $course)->orderBy('date')->orderBy('order');
-        return $all->where('course_id', $course)->orderBy('date')->orderBy('order');
+         return $this->getAll()->where('course_id', $course);
             
     }
     public function findOrFail($id)
