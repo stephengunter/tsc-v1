@@ -87,8 +87,10 @@ class ImportSchedulesController extends BaseController
     }
     public function store(Request $request)
     {
-         $from_course=$request['from_course'];  
-         $to_course=$request['to_course'];  
+         $values=$request['import']; 
+         
+         $from_course=$values['from_course'];  
+         $to_course=$values['to_course'];  
 
          $current_user=$this->currentUser(); 
          $toCourse=Course::findOrFail($to_course);

@@ -47,6 +47,9 @@ class Helper {
             case 'courses':
                 html = '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>'
                 break;
+            case 'lessons':
+                html = '<i class="fa fa-calendar-check-o" aria-hidden="true"></i>'
+                break;    
             case 'signups':
                 html = '<i class="fa fa-file-text-o" aria-hidden="true"></i>'
             break;

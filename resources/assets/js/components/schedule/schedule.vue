@@ -69,7 +69,10 @@
           </div>
         <div slot="modal-body" class="modal-body">
            
-            <importor v-if="importSettings.show" :course_id="course_id" ></importor>
+            <importor v-if="importSettings.show" :course_id="course_id" 
+              @success="onImportSuccess" @failed="onImportFailed">
+                
+            </importor>
       
         </div>
     </modal>       
@@ -188,13 +191,7 @@
                this.creating=false
                
             },
-            beginImport(){
-                this.importSettings.course_id=this.course_id
-                this.importSettings.show=true
-            },
-            importCanceled(){
-                this.importSettings.show=false
-            },
+            
             beginDelete(values){
                 this.deleteConfirm.msg='確定要刪除 ' + values.name + ' 嗎？'
                 this.deleteConfirm.id=values.id
@@ -231,6 +228,22 @@
                  this.init()
                  this.$emit('updated',schedule)
             },
+            beginImport(){
+                this.importSettings.course_id=this.course_id
+                this.importSettings.show=true
+            },
+            importCanceled(){
+                this.importSettings.show=false
+            },
+            onImportSuccess(){
+                this.importSettings.show=false
+                Helper.BusEmitOK('匯入成功')
+                this.init()
+            },
+            onImportFailed(error){
+                this.importSettings.show=false
+                Helper.BusEmitError(error,'匯入失敗')
+            }
             
            
         },

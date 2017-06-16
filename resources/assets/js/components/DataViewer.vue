@@ -4,16 +4,20 @@
         <div class="panel-heading">
              <span  class="panel-title">
                  <span  class="panel-title"  v-html="title">
-                
-                  </span>
+                 </span>
              </span>
            
              <slot name="header"></slot>
-            
+              
+
              <div>   
                 <a  v-if="showCreateBtn()" class="btn btn-primary btn-sm" @click.prevent="createClicked"
                    v-text="create_text" >
                 </a>
+                
+                <slot name="btn"></slot>
+                
+               
                 <button v-if="!showFilter"  class="btn btn-default btn-sm" @click="fetchData()">
                      <span  class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                 </button>
@@ -21,7 +25,8 @@
                     <span v-if="!showFilter" class="glyphicon glyphicon-search" aria-hidden="true"></span>
                     <span v-if="showFilter" class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                 </button>
-            </div>
+             </div>
+             
         </div>
         <div class="panel-body">
             <div class="filter" v-if="showFilter">

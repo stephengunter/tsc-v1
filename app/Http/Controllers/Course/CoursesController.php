@@ -280,13 +280,11 @@ class CoursesController extends BaseController
         $teacher_id=(int)$request->teacher; 
         if($teacher_id){
             $courseList=$this->courses->getByTeacher($teacher_id)->get();
-            dd($courseList);
             $options=$this->courses->optionsConverting($courseList);
+            return response()  ->json(['options' => $options ]);   
         }
+       
         
-       
-       
-        return response()  ->json(['options' => $options ]);   
               
         $request = request();
          $term_id=(int)$request->term; 

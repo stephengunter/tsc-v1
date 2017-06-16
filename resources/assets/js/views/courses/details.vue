@@ -12,18 +12,18 @@
                 <li class="active">
                     <a @click="activeIndex=0" href="#signupInfo" data-toggle="tab">報名資訊</a>
                 </li>
-                <li class="">
+                <li>
                     <a @click="activeIndex=1" href="#classtime" data-toggle="tab">上課時間</a>
                 </li>
-                <li class="">
+                <li>
                      <a @click="activeIndex=2" href="#schedule" data-toggle="tab">預定進度</a>
                 </li>
-                <!-- <li>
-                     <a @click="activeIndex=1" href="#contactinfo" data-toggle="tab">聯絡資訊</a>
+                <li>
+                     <a @click="activeIndex=3" href="#signupRecord" data-toggle="tab">報名紀錄</a>
                 </li>
                 <li>
-                     <a @click="activeIndex=2" href="#centers" data-toggle="tab">所屬中心</a>
-                </li> -->
+                     <a @click="activeIndex=4" href="#lesson" data-toggle="tab">課堂紀錄表</a>
+                </li>
                 
             </ul>
         </div>
@@ -47,7 +47,31 @@
                      @created="onScheduleChanged" @deleted="onScheduleChanged"
                      @updated="onScheduleChanged"   >             
                     </schedule>
-                </div>                 
+                </div>
+                <div class="tab-pane fade" id="signupRecord">
+                    <div  v-if="activeIndex==3"  >
+                       <signup-list v-show="!signupRecordSettings.creating" :course_id="id" 
+                            :hide_create="signupRecordSettings.hide_create" 
+                            :version="signupRecordSettings.version" 
+                            :can_select="signupRecordSettings.can_select"
+                            @selected="onSignupRecordSelected" @begin-create="onBeginCreateSignupRecord">
+                       </signup-list>
+                       <create-signup v-show="signupRecordSettings.creating" :course_id="id" 
+                            @canceled="onCreateSignupCanceled" @saved="onSignupCreated">
+                       </create-signup>
+                     </div>  
+                </div>
+                <div class="tab-pane fade" id="lesson">
+                      <div  v-if="activeIndex==4" >
+                         <lesson-list v-show="!lessonSettings.creating" :course_id="id" 
+                            :hide_create="lessonSettings.hide_create" 
+                            :version="lessonSettings.version" 
+                            :can_select="lessonSettings.can_select"
+                            @selected="onLessonSelected" @begin-create="onBeginCreateLesson">
+                         </lesson-list>
+
+                      </div>
+                </div>                   
             </div>
         </div>
   </div>
@@ -65,8 +89,10 @@
     import SignupInfoComponent from '../../components/course/signupinfo/view.vue'
     import ClasstimeComponent from '../../components/classtime/classtime.vue'
     import ScheduleComponent from '../../components/schedule/schedule.vue'
-    
-    
+    import SignupList from '../../components/signup/list.vue'
+    import CreateSignup from '../../components/signup/create.vue'
+    import LessonList from '../../components/lesson/list.vue'
+
     
     export default {
         name: 'CourseDetails',
@@ -74,7 +100,10 @@
            'course' : CourseComponent,
            'signup-info' : SignupInfoComponent,
            'classtime' : ClasstimeComponent,
-           'schedule' : ScheduleComponent
+           'schedule' : ScheduleComponent,
+           'signup-list':SignupList,
+           'create-signup':CreateSignup,
+           'lesson-list':LessonList,
          
         },
         props: {
@@ -120,6 +149,21 @@
 
                backTuitionSettings:{
                   hide_create:false
+               },
+  
+               signupRecordSettings:{
+                   hide_create:false,
+                   version:0,
+                   can_select:false,
+                   creating:false
+
+               },
+               lessonSettings:{
+                   hide_create:false,
+                   version:0,
+                   can_select:false,
+                   creating:false
+
                }
             }
         },
@@ -175,7 +219,28 @@
             },
             onScheduleChanged(){
                  
-            }
+            },
+            onSignupRecordSelected(id){
+               this.$emit('signup-selected', id)
+            },
+            onBeginCreateSignupRecord(){
+                this.signupRecordSettings.creating=true
+            },
+            onCreateSignupCanceled(){
+                this.signupRecordSettings.creating=false
+                this.signupRecordSettings.version +=1
+            },
+            onSignupCreated(){
+                this.signupRecordSettings.creating=false
+                this.signupRecordSettings.version +=1
+            },
+            onLessonSelected(id){
+               this.$emit('lesson-selected', id)
+            },
+            onBeginCreateLesson(){
+                this.lessonSettings.creating=true
+            },
+             
             
         }, 
 

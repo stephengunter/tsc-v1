@@ -205,8 +205,8 @@
                 this.courseOptions=options
             },
             courseSelected(){
-                alert(this.selectedCourse)
-                //this.$emit('courseSelected',this.selectedId);
+                this.form.import.from_course=this.selectedCourse
+                this.submitImport()
             },
             changeMode() {
                 this.showFilter = !this.showFilter;
@@ -229,6 +229,17 @@
                 }).catch(error => {
                     Helper.BusEmitError(error)
                 })
+            },
+            submitImport(){
+
+                let url='/import-schedules'
+                this.form.post(url)
+                    .then(result => {
+                            this.$emit('success')
+                        })
+                        .catch(error => {        
+                             this.$emit('failed',error)
+                        })
             }
         }
      }

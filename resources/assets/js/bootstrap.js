@@ -65,6 +65,9 @@ Vue.component('course-index', require('./views/courses/index') )
 Vue.component('course-create', require('./views/courses/create') )
 Vue.component('course-details', require('./views/courses/details') )
 
+Vue.component('lesson-index', require('./views/lessons/index') )
+Vue.component('lesson-create', require('./views/lessons/create') )
+
 Vue.component('center-index', require('./views/centers/index') )
 Vue.component('center-create', require('./views/centers/create') )
 Vue.component('center-details', require('./views/centers/details') )
@@ -107,6 +110,7 @@ import Course from './models/course.js'
 import SignupInfo from './models/signupinfo.js'
 import Classtime from './models/classtime.js'
 import Schedule from './models/schedule.js'
+import Lesson from './models/lesson.js'
 
 import Signup from './models/signup.js'
 import Tuition from './models/tuition.js'
@@ -143,6 +147,7 @@ window.Course=Course
 window.SignupInfo=SignupInfo
 window.Classtime=Classtime
 window.Schedule=Schedule
+window.Lesson=Lesson
 
 window.Signup=Signup
 window.Tuition=Tuition

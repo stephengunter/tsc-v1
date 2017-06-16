@@ -12,6 +12,7 @@
                 </button>
          </div>
          
+         
          <template scope="props">
             <row :course="props.item" :more="viewMore"
                @selected="onRowSelected">

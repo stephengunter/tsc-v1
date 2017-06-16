@@ -3,16 +3,24 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Support\FilterPaginateOrder;
+
 use App\Teacher;
 use App\Course;
 use Carbon\Carbon;
 
 class Lesson extends Model
 {
-	// protected $fillable = ['course_id', 'classroom_id', 'order', 'status' ,
-	// 						'date','on', 'off' , 'title' , 'content', 'materials' ,'ps'	];
+    use FilterPaginateOrder;
+    
+	protected $fillable = [
+        'course_id', 'classroom_id', 'order', 'status' ,
+		'date','on', 'off' , 'title' , 'content', 
+        'materials' ,'ps'	];
 
-    protected $guarded = [];
+    
+    protected $filter =  ['order','date'];
+
 
 
 	public static function initialize($course)

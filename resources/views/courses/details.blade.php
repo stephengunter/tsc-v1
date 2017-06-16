@@ -3,7 +3,9 @@
 @section('content')
 
    <course-details   :id="id" :can_back="can_back" 
-     @btn-back-clicked="backToIndex" @course-deleted="onCourseDeleted">
+     @btn-back-clicked="backToIndex" @course-deleted="onCourseDeleted"
+     @signup-selected="onSignupSelected" >
+     
    </course-details>
 
    
@@ -35,6 +37,10 @@
             },
             backToIndex(){
                Helper.redirect('/courses')
+            },
+            onSignupSelected(id){
+               let url='/signups/' + id
+               Helper.newWindow(url)
             }
 
         },

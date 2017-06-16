@@ -12,23 +12,23 @@
         </div>
      </div>
      
-    <signup-list v-if="ready" :course_id="course_id" :hide_create="hide_create" 
+    <lesson-list v-if="ready" :course_id="course_id" :hide_create="hide_create" 
         :version="version" :can_select="can_select"
         @selected="onSelected" @begin-create="onBeginCreate">
-    </signup-list>
+    </lesson-list>
 
 </div>
 
 </template>
 
 <script>
-    import SignupList from '../../components/signup/list.vue'
+    import LessonList from '../../components/lesson/list.vue'
     
 
     export default {
-        name: 'SignupIndex',       
+        name: 'LessonIndex',       
         components: {
-            'signup-list':SignupList
+            'lesson-list':LessonList
         },
         props: {
             version: {

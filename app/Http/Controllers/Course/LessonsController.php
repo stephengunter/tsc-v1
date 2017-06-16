@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
-
+namespace App\Http\Controllers\Course;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use App\Lesson;
 use App\Course;
 use App\ClassTime;
 
-use App\Http\Requests\LessonRequest;
+use App\Http\Requests\Course\LessonRequest;
 
 
 use App\Repositories\Lessons;
@@ -22,14 +22,18 @@ use App\Repositories\LessonParticipants;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
-class LessonsController extends Controller
+class LessonsController extends BaseController
 {
+    protected $key='lessons';
     public function __construct(Lessons $lessons, Courses $courses,
                                 Teachers $teachers, Volunteers $volunteers,
                                 Classtimes $classtimes , Classrooms $classrooms,  
                                 LessonParticipants $lessonParticipants,CheckAdmin $checkAdmin)
     {
-         $this->middleware('admin');
+         $exceptAdmin=[];
+         $allowVisitors=[];
+         $this->setMiddleware( $exceptAdmin, $allowVisitors);
+        
 
 		 $this->lessons=$lessons;
          $this->courses=$courses;
@@ -39,21 +43,27 @@ class LessonsController extends Controller
          $this->classrooms=$classrooms;
          $this->lessonParticipants=$lessonParticipants;
 
-         $this->checkAdmin=$checkAdmin;
+         $this->setCheckAdmin($checkAdmin);
 	}
 
     public function index()
     {
-        
-       $course=request()->get('course');
-       if(!$course) abort(404);
-       
-       $lessonList=$this->lessons->index($course);
+        $request = request();
+          
+        if(!$request->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('lessons.index')
+                    ->with(['menus' => $menus]);
+        } 
 
-        return response()
-        ->json([
-            'lessonList' => $lessonList
-        ]);
+        $course=$request->get('course');
+        if(!$course) abort(404);
+       
+        $lessonList=$this->lessons->getByCourse($course)->filterPaginateOrder();;
+
+        
+         return response() ->json(['model' => $lessonList  ]);  
+       
        
     }
 
@@ -117,18 +127,18 @@ class LessonsController extends Controller
    
     public function create()
     {
-       
         $course=request()->get('course');
         if(!$course) abort(404);
 
         $course=$this->courses->findOrFail($course);  
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         
-         if(!$course->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
-         }
+        if(!$course->canEditBy($current_user)){
+             return  $this->unauthorized();   
+        }
 
         $lesson= Lesson::initialize($course);
+        return response()->json(['lesson' => $lesson ]);
         
         
         $teachers=$this->teachers->optionsConverting($course->teachers);

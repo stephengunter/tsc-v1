@@ -1,41 +1,243 @@
-class LessonScripts {
-    constructor(lesson) {
-       this.lesson = lesson;
+class Lesson {
+    constructor(data) {
+       
+        for (let property in data) {
+            this[property] = data[property];
+        }
+
     }
-    setLesson(lesson){
-       this.lesson = lesson;
+    static title(){
+       return 'Lessons'
     }
-    courseNameText() {
-       return this.lesson.course.number + ' ' + this.lesson.course.name
+    static source(){
+        return '/lessons'
     }
-    statusLabel() {
-       let status=parseInt(this.lesson.status)
+    static createUrl(){
+         return this.source() + '/create' 
+    }
+    static storeUrl(){
+         return this.source()
+    }
+    static showUrl(id){
+         return this.source() + '/' + id
+    }
+    static editUrl(id){
+         return this.showUrl(id) +  '/edit'
+    }
+    static updateUrl(id){
+        return this.showUrl(id)
+    }
+    static deleteUrl(id){
+         return this.source() + '/' + id
+    }
+    static create(course){
+        let url = this.createUrl() 
+        url += '?course=' + course
+      
+        return new Promise((resolve, reject) => {
+            axios.get(url)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
+    static store(form){
+        let url =this.storeUrl() 
+        let method='post'
+        return new Promise((resolve, reject) => {
+            form.submit(method,url)
+                .then(data => {
+                    resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+    }
+    static show(id){
+        return new Promise((resolve, reject) => {
+            let url = this.showUrl(id) 
+            axios.get(url)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
+    static edit(id){
+        let url = this.editUrl(id) 
+        return new Promise((resolve, reject) => {
+            axios.get(url)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
+    static update(form , id){
+         let url =this.updateUrl(id) 
+         let method='put'
+        return new Promise((resolve, reject) => {
+            form.submit(method,url)
+                .then(data => {
+                    resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+    }
+    static delete(id) {
+        return new Promise((resolve, reject) => {
+            let url =this.deleteUrl(id) 
+            let form = new Form()
+            form.delete(url)
+                .then(response => {
+                    resolve(true);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+    }
+
+    static getThead(){
+    let thead= [{
+                    title: '',
+                    key: '',                    
+                    sort: false,
+                    static:true,
+                    default:true,
+                    width:'5%'
+
+                },{
+                    title: '',
+                    key: 'order',
+                    sort: true,
+                    static:true,
+                    default:true,
+                    width:'3%'
+
+                },{
+                    title: '日期',
+                    key: 'date',
+                    sort: true,
+                    static:true,
+                    default:true,
+                    width:'12%'
+
+                }, {
+                    title: '狀態',
+                    key: 'status',
+                    sort: true,
+                    default:true,
+                     width:'8%'
+                }, {
+                    title: '時間',
+                    key: 'time',
+                    sort: false,
+                    default:true,
+                    width:'11%'
+                }, {
+                    title: '地點',
+                    key: 'position',
+                    sort: false,
+                    default:true,
+                    width:'11%'
+
+                }, {
+                    title: '授課老師',
+                    key: 'teachers',
+                    sort: false,
+                    default:true,
+                    width:'19%'
+                }, {
+                    title: '教育志工',
+                    key: 'volunteers',
+                    sort: false,
+                    default:true,
+                    width:'19%'
+                }, {
+                    title: '學生應到/實到',
+                    key: 'ps',
+                    sort: false,
+                    default:true,
+                    width:'11%'
+
+                }, 
+
+
+
+
+                {
+                    title: '課目標題',
+                    key: 'title',
+                    sort: false,
+                    default:false,
+                    width:'15%'
+                }, {
+                    title: '內容重點',
+                    key: 'content',
+                    sort: false,
+                    default:false,
+                    width:'15%'
+                },{
+                    title: '教材',
+                    key: 'materials',
+                    sort: false,
+                    default:false,
+                    width:'10%'
+                },{
+                    title: '備註',
+                    key: 'ps',
+                    sort: false,
+                    default:false,
+                    width:'10%'
+                }
+                ]
+            return thead
+    }
+  
+    static courseNameText(course) {
+       return course.number + ' ' + course.name
+    }
+    static statusLabel(status) {
+        status=parseInt(tstatus)
        if(status<0) return '<span class="label label-danger">停課</span>'
        if(status>0) return '<span class="label label-default">已結束</span>'
        return ''
     }
-    dateFormatted(){
-        let date=this.lesson.date
+    static dateFormatted(date){
         
         let formated=true
         let weekdayText= Helper.chineseDayofWeek(date ,formated)
         return date + ' ' + weekdayText 
     }
-    classTimeText(){
+    static lessonClassTimeText(lesson){
 
-        let on=Helper.timeString(this.lesson.on)
-        let off=Helper.timeString(this.lesson.off)
+        let on=Helper.timeString(lesson.on)
+        let off=Helper.timeString(lesson.off)
         if(on!='' && off!='') return on + ' - ' + off
         return ''
          
         
     }
-    positionText(){
-       if(!this.lesson.classroom)   return ''
-       return this.lesson.classroom.name
+    static positionText(lesson){
+       if(!lesson.classroom)   return ''
+       return lesson.classroom.name
     }
-    teacherNames(){
-        let teachers=this.lesson.teachers
+    static teacherNames(teachers){
+        
         if(teachers && teachers.length){
            let html=''
             for (let i = 0; i < teachers.length; i++) { 
@@ -46,8 +248,7 @@ class LessonScripts {
           return ''
         }
     }
-    volunteerNames(){
-        let volunteers=this.lesson.volunteers
+    static volunteerNames(volunteers){
         if(volunteers && volunteers.length){
            let html=''
             for (let i = 0; i < volunteers.length; i++) { 
@@ -64,4 +265,4 @@ class LessonScripts {
 }
 
 
-export default LessonScripts;
+export default Lesson;
