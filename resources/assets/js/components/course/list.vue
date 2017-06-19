@@ -1,7 +1,7 @@
 <template>
     <data-viewer  :default_search="defaultSearch" :default_order="defaultOrder"
       :source="source" :search_params="search_params"  :thead="thead" :no_search="can_select"  
-      :filter="filter"  :title="title" create_text="" 
+      :filter="filter"  :title="title" create_text="新增課程" 
       @refresh="init" :version="version"   @beginCreate="beginCreate"
        @dataLoaded="onDataLoaded">
          <div  class="form-inline" slot="header">
@@ -14,7 +14,7 @@
          
          
          <template scope="props">
-            <row :course="props.item" :more="viewMore"
+            <row :course="props.item" :more="viewMore" :select="can_select"
                @selected="onRowSelected">
                 
             </row>

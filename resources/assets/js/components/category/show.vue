@@ -24,13 +24,18 @@
                       <label class="label-title">分類名稱</label>
                       <p v-text="category.name"></p>                      
                  </div>
-                 <div class="col-sm-3">
+                 <div class="col-sm-2">
+                      <label class="label-title">類型</label>
+                      <p v-html="category.type">                       
+                      </p>
+                  </div>
+                 <div class="col-sm-2">
                       <label class="label-title">小圖</label>
                      
                       <p v-html="$options.filters.showIcon(category.icon)">                       
                       </p>                     
                  </div>
-                  <div class="col-sm-3">
+                  <div class="col-sm-2">
                       <label class="label-title">狀態</label>
                       <p v-html="$options.filters.activeLabel(category.active)">                       
                       </p>
@@ -119,7 +124,7 @@
             },
             btnDeleteClicked(){
                  let values={
-                    name: '確定要刪除此課程進度嗎？',
+                    name: this.category.name,
                     id:this.id
                 }
                this.$emit('btn-delete-clicked',values)

@@ -6,7 +6,7 @@
       @addCourse="onAddCourse" @deleted="onCourseDeleted">      
   </course-list>
 
-  <modal :showbtn="false" :width="1200" :show.sync="showImport"  @closed="showImport=false" 
+  <modal :sh owbtn="false" :width="1200" :show.sync="showImport"  @closed="showImport=false" 
         effect="fade">
           <div slot="modal-header" class="modal-header">
            

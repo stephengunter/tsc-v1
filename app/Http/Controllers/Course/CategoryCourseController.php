@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Course;
 
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
 use App\Repositories\Categories;
@@ -12,18 +13,21 @@ use App\Repositories\Centers;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
-class CategoryCourseController extends Controller
+class CategoryCourseController extends BaseController
 {
     public function __construct(Categories $categories,Courses $courses,
                            Centers $centers, Terms $terms,CheckAdmin $checkAdmin) 
     {
-		 $this->middleware('admin');
-         $this->checkAdmin=$checkAdmin;
-
+		 $exceptAdmin=[];
+         $allowVisitors=[];
+         $this->setMiddleware( $exceptAdmin, $allowVisitors);
+         
 		 $this->categories=$categories;
          $this->terms=$terms;
          $this->courses=$courses;
          $this->centers=$centers;
+
+         $this->setCheckAdmin($checkAdmin);
 	}
 
     public function indexOptions()
@@ -42,23 +46,30 @@ class CategoryCourseController extends Controller
     public function index()
     {
          $request = request();
-         $termId=(int)$request->term; 
-         $categoryId=(int)$request->category;       
-         $centerId=(int)$request->center;
-         $weekdayId=0;
-         
-         $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId)
-                                        ->where('active',true)->orderBy('open_date')->get();
-        
-         foreach ($courseList as $course) {
-            
-              foreach ($course->classTimes as $classTime) {
-                $classTime->weekday;
-             }
+         $category_id=(int)$request->category;       
+         $center_id=(int)$request->center;
+
+         $category=$this->categories->findOrFail($category_id);
+         $courseList=$category->validCourses();
+
+         $activeTerms=$this->terms->activeTerms()->get()->pluck('id');
+         $courseList=$courseList->whereIn('term_id' , $activeTerms)
+                                ->where('active',true);
+         if($center_id){
+            $courseList=$courseList->where('center_id',$center_id);
          }
+        //  $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId)
+        //                                 ->where('active',true)->orderBy('open_date')->get();
+        
+        //  foreach ($courseList as $course) {
+            
+        //       foreach ($course->classTimes as $classTime) {
+        //         $classTime->weekday;
+        //      }
+        //  }
            return response()
             ->json([
-                'courseList' => $courseList
+                'courseList' => $courseList->get()
             ]);
        
     }

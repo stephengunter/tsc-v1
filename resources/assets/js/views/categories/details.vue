@@ -6,6 +6,12 @@
 
   </category>
 
+  <category-courses v-if="loaded" :category="category"></category-courses>
+
+
+
+  
+
   
 
 
@@ -18,13 +24,14 @@
 
 <script>
     import Category from '../../components/category/category.vue'
+    import CategoryCourses from '../../components/category/courses.vue'
     
     
     export default {
         name: 'CategoryDetails',
         components: {
             Category,
-         
+           'category-courses':CategoryCourses
         },
         props: {
             id: {
@@ -47,26 +54,29 @@
         data() {
             return {
                loaded:false,
-               readonly:true,
                category:null,
                current_version:0,
 
-               activeIndex:0,
+               removeCourses:[],
+               addCourses:[],
 
-               refundSettings:{
-                  can_back:false
-               },
-               backTuitionSettings:{
-                  hide_create:false
+               courseListSettings:{
+                  title:Helper.getIcon(Course.title())  + '  此分類中的課程',
+                  hide_create:false,
+                  can_select:true,
+                  params:{
+                    category:this.id,
+                  },
                }
             }
         },
         computed:{
-           hasRefundRecord(){
-              if(!this.category) return false
-              if(!this.category.hasRefund) return false
-                  return true
-           }
+           hasAddCourses(){
+               return this.addCourses.length > 0
+           },
+           hasRemoveCourses(){
+               return this.removeCourses.length > 0
+           },
         },
         beforeMount(){
            this.init()
@@ -102,6 +112,15 @@
             onCategoryDeleted(){
                this.$emit('category-deleted')
             },
+            onCourseSelected(){
+
+            },
+            onAddCourse(){
+              
+            },
+            onRemoveCourse(){
+
+            }
         }, 
 
     }

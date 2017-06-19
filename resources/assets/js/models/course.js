@@ -179,7 +179,7 @@ class Course {
                 }) 
     }
 
-  static getThead(){
+  static getThead(canSelect){
     let thead= [{
                     title: '開課中心',
                     key: 'center',
@@ -268,6 +268,17 @@ class Course {
                     sort: false,
                     default:false
                 }]
+
+                if(canSelect){
+                   let selectColumn={
+                    title: '',
+                    key: '',
+                    sort: false,
+                    static:true,
+                    default:true
+                   }
+                   thead.splice(0, 0, selectColumn);
+                }
             return thead
     }
     static teachersText(teachers){

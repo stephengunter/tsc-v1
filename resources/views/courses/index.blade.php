@@ -3,9 +3,12 @@
 
 @section('content')
    
-       <course-index v-show="!selected" :hide_create="indexSettings.hide_create" :version="version"
-           @selected="onSelected"  >
+       <course-index v-show="!selected" :hide_create="indexSettings.hide_create" 
+           :version="version"
+         @begin-create="onBeginCreate"  @selected="onSelected"  >
        </course-index> 
+
+       
 
        <course-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
         @btn-back-clicked="backToIndex" @course-deleted="onDeleted">
@@ -49,7 +52,9 @@
             init(){
              
             },
-            
+            onBeginCreate(){
+                Helper.redirect('/courses/create')
+            },        
             onSelected(id){
                this.selected=id
             },

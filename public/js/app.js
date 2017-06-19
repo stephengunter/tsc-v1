@@ -33664,7 +33664,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         onSelected: function onSelected(id) {
-
             this.$emit('selected', id);
         },
         onBeginCreate: function onBeginCreate() {
@@ -39179,7 +39178,7 @@ var Course = function () {
         }
     }, {
         key: 'getThead',
-        value: function getThead() {
+        value: function getThead(canSelect) {
             var thead = [{
                 title: '開課中心',
                 key: 'center',
@@ -39268,6 +39267,17 @@ var Course = function () {
                 sort: false,
                 default: false
             }];
+
+            if (canSelect) {
+                var selectColumn = {
+                    title: '',
+                    key: '',
+                    sort: false,
+                    static: true,
+                    default: true
+                };
+                thead.splice(0, 0, selectColumn);
+            }
             return thead;
         }
     }, {
@@ -73793,7 +73803,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "no_search": _vm.can_select,
       "filter": _vm.filter,
       "title": _vm.title,
-      "create_text": "",
+      "create_text": "新增課程",
       "version": _vm.version
     },
     on: {
@@ -73806,7 +73816,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         return [_c('row', {
           attrs: {
             "course": props.item,
-            "more": _vm.viewMore
+            "more": _vm.viewMore,
+            "select": _vm.can_select
           },
           on: {
             "selected": _vm.onRowSelected
@@ -86099,6 +86110,8 @@ var Category = function () {
         for (var property in data) {
             this[property] = data[property];
         }
+
+        this.type = Category.getType(data);
     }
 
     _createClass(Category, null, [{
@@ -86238,6 +86251,19 @@ var Category = function () {
             });
         }
     }, {
+        key: 'activeCourses',
+        value: function activeCourses(category_id) {
+            return new Promise(function (resolve, reject) {
+                var url = 'category-courses';
+                url += '?category=' + category_id;
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
         key: 'options',
         value: function options(searchParams) {
             var url = this.source() + '/options';
@@ -86249,6 +86275,13 @@ var Category = function () {
                     reject(error);
                 });
             });
+        }
+    }, {
+        key: 'getType',
+        value: function getType(category) {
+            var isPublic = Helper.tryParseInt(category.public);
+            if (isPublic) return '<span class="label label-warning"> 置頂 </span>';
+            return '';
         }
     }]);
 
@@ -86469,12 +86502,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     methods: {
         getType: function getType(category) {
-            var isPublic = Helper.tryParseInt(category.public);
-            if (isPublic) return '<span class="label label-warning"> 置頂 </span>';
-            return '';
+            return Category.getType(category);
         },
         selected: function selected(id) {
-            alert(id);
+
             this.$emit('selected', id);
         },
         displayUp: function displayUp(id) {
@@ -86903,7 +86934,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.$emit('btn-back-clicked');
         },
         beginDelete: function beginDelete(values) {
-            this.deleteConfirm.msg = values.name;
+            this.deleteConfirm.msg = '確定要刪除分類 『' + values.name + '』嗎';
             this.deleteConfirm.id = values.id;
             this.deleteConfirm.show = true;
         },
@@ -87171,6 +87202,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
@@ -87237,7 +87273,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       },
       btnDeleteClicked: function btnDeleteClicked() {
          var values = {
-            name: '確定要刪除此課程進度嗎？',
+            name: this.category.name,
             id: this.id
          };
          this.$emit('btn-delete-clicked', values);
@@ -87253,6 +87289,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_category_vue__ = __webpack_require__(649);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_category_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_category_category_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_category_courses_vue__ = __webpack_require__(667);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_category_courses_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_category_courses_vue__);
 //
 //
 //
@@ -87271,14 +87309,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
    name: 'CategoryDetails',
    components: {
-      Category: __WEBPACK_IMPORTED_MODULE_0__components_category_category_vue___default.a
-
+      Category: __WEBPACK_IMPORTED_MODULE_0__components_category_category_vue___default.a,
+      'category-courses': __WEBPACK_IMPORTED_MODULE_1__components_category_courses_vue___default.a
    },
    props: {
       id: {
@@ -87301,26 +87346,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
    data: function data() {
       return {
          loaded: false,
-         readonly: true,
          category: null,
          current_version: 0,
 
-         activeIndex: 0,
+         removeCourses: [],
+         addCourses: [],
 
-         refundSettings: {
-            can_back: false
-         },
-         backTuitionSettings: {
-            hide_create: false
+         courseListSettings: {
+            title: Helper.getIcon(Course.title()) + '  此分類中的課程',
+            hide_create: false,
+            can_select: true,
+            params: {
+               category: this.id
+            }
          }
       };
    },
 
    computed: {
-      hasRefundRecord: function hasRefundRecord() {
-         if (!this.category) return false;
-         if (!this.category.hasRefund) return false;
-         return true;
+      hasAddCourses: function hasAddCourses() {
+         return this.addCourses.length > 0;
+      },
+      hasRemoveCourses: function hasRemoveCourses() {
+         return this.removeCourses.length > 0;
       }
    },
    beforeMount: function beforeMount() {
@@ -87357,7 +87405,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       },
       onCategoryDeleted: function onCategoryDeleted() {
          this.$emit('category-deleted');
-      }
+      },
+      onCourseSelected: function onCourseSelected() {},
+      onAddCourse: function onAddCourse() {},
+      onRemoveCourse: function onRemoveCourse() {}
    }
 
 };
@@ -87567,7 +87618,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "btn-back-clicked": _vm.onBtnBackClicked,
       "deleted": _vm.onCategoryDeleted
     }
-  })], 1)
+  }), _vm._v(" "), (_vm.loaded) ? _c('category-courses', {
+    attrs: {
+      "category": _vm.category
+    }
+  }) : _vm._e()], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -87647,7 +87702,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "textContent": _vm._s(_vm.category.name)
     }
   })]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-3"
+    staticClass: "col-sm-2"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("類型")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.category.type)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-2"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("小圖")]), _vm._v(" "), _c('p', {
@@ -87655,7 +87718,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "innerHTML": _vm._s(_vm.$options.filters.showIcon(_vm.category.icon))
     }
   })]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-3"
+    staticClass: "col-sm-2"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("狀態")]), _vm._v(" "), _c('p', {
@@ -87965,6 +88028,184 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
      require("vue-hot-reload-api").rerender("data-v-1a8e6b54", module.exports)
+  }
+}
+
+/***/ }),
+/* 660 */,
+/* 661 */,
+/* 662 */,
+/* 663 */,
+/* 664 */,
+/* 665 */,
+/* 666 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'CategoryCourses',
+    props: {
+        category: {
+            type: Object,
+            default: null
+        }
+
+    },
+    data: function data() {
+        return {
+            title: Helper.getIcon(Course.title()) + '  此分類中的課程',
+            loaded: false,
+
+            courseList: [],
+            removeCourses: [],
+            addCourses: []
+
+        };
+    },
+
+    computed: {
+        hasAddCourses: function hasAddCourses() {
+            return this.addCourses.length > 0;
+        },
+        hasRemoveCourses: function hasRemoveCourses() {
+            return this.removeCourses.length > 0;
+        }
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    methods: {
+        init: function init() {
+            this.fetchData();
+        },
+        fetchData: function fetchData() {
+            var _this = this;
+
+            var category_id = this.category.id;
+            var getData = Category.activeCourses(category_id);
+            getData.then(function (data) {
+                _this.courseList = data.courseList;
+                _this.loaded = true;
+            }).catch(function (error) {});
+        },
+        onAddCourse: function onAddCourse() {},
+        onRemoveCourse: function onRemoveCourse() {}
+    }
+
+};
+
+/***/ }),
+/* 667 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(666),
+  /* template */
+  __webpack_require__(668),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\category\\courses.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] courses.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-9e42f434", Component.options)
+  } else {
+    hotAPI.reload("data-v-9e42f434", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 668 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [(_vm.category) ? _c('div', {
+    staticClass: "panel panel-default show-data"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_c('span', {
+    staticClass: "panel-title"
+  }, [_c('h4', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.title)
+    }
+  })]), _vm._v(" "), (_vm.category.canEdit) ? _c('div', [_c('button', {
+    staticClass: "btn btn-primary btn-sm",
+    on: {
+      "click": _vm.onAddCourse
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-pencil"
+  }), _vm._v(" 新增\r\n              ")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-danger btn-sm",
+    attrs: {
+      "disabled": "!hasAddCourses"
+    },
+    on: {
+      "click": _vm.onRemoveCourse
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-trash"
+  }), _vm._v(" 移除\r\n              ")])]) : _vm._e()])]) : _vm._e()])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-9e42f434", module.exports)
   }
 }
 

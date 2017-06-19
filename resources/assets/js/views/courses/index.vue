@@ -110,7 +110,6 @@
              
             },
             onSelected(id){
-               
                 this.$emit('selected',id)
             },
             onBeginCreate(){

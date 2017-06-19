@@ -82,6 +82,7 @@ Route::resource('lessons', '\App\Http\Controllers\Course\LessonsController');
 Route::resource('lessons-initialize', '\App\Http\Controllers\Course\LessonsInitializeController', 
                                      ['only' => ['create','store']]);   
 Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController');                                                                  
+Route::resource('category-courses', '\App\Http\Controllers\Course\CategoryCourseController');                                                                  
 
 
 Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');

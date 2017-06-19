@@ -53,12 +53,10 @@
         
         methods: {
             getType(category){
-                let isPublic=Helper.tryParseInt(category.public)
-                if(isPublic) return '<span class="label label-warning"> 置頂 </span>'
-                    return ''
+               return Category.getType(category)
             },
             selected(id){
-                alert(id)
+             
                 this.$emit('selected',id)
             },
             displayUp(id){

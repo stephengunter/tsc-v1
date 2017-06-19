@@ -5,6 +5,8 @@ class Category {
             this[property] = data[property];
         }
 
+        this.type=Category.getType(data)
+
       
 
     }
@@ -127,6 +129,20 @@ class Category {
                 })
         })
     }
+    static activeCourses(category_id){
+        return new Promise((resolve, reject) => {
+            let url = 'category-courses'
+            url += '?category=' + category_id
+            axios.get(url)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
     
     static options(searchParams){
         let url =this.source() + '/options' 
@@ -140,6 +156,12 @@ class Category {
                         reject(error);
                     })
                 })  
+    }
+
+    static getType(category){
+        let isPublic=Helper.tryParseInt(category.public)
+                if(isPublic) return '<span class="label label-warning"> 置頂 </span>'
+                    return ''
     }
    
     
