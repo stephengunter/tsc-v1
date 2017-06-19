@@ -13,7 +13,7 @@
      </div>
      
     <lesson-list v-if="ready" :course_id="course_id" :hide_create="hide_create" 
-        :version="version" :can_select="can_select"
+        :version="currenVersion" :can_select="can_select"
         @selected="onSelected" @begin-create="onBeginCreate"
         @begin-initialize="onBeginInitialize" >
     </lesson-list>
@@ -30,6 +30,7 @@
         <div slot="modal-body" class="modal-body">
            
             <lesson-initialize v-if="initializeSettings.show" :course_id="course_id"
+               @canceled="initializeCanceled"
                @success="onInitializeSuccess" @failed="onInitializeFailed">
                 
             </lesson-initialize>
@@ -65,6 +66,7 @@
         data() {
             return {
                 ready:false,
+                currenVersion:0,
                 course_id:0,
                
                 can_edit:true,
@@ -84,11 +86,17 @@
              
             }
         },
+        watch:{
+            version: function () {
+               this.currenVersion+=1
+            },
+        },
         beforeMount() {
              this.init()
         },
         methods: {
             init(){
+
                 this.initializeSettings={
                     course_id:0,
                     show:false,
@@ -119,12 +127,14 @@
                 this.initializeSettings.show=false
             },
             onInitializeSuccess(){
+                this.currenVersion+=1
                 this.initializeSettings.show=false
+
                 Helper.BusEmitOK('初始化成功')
-                this.init()
+                
             },
             onInitializeFailed(error){
-                this.initializeSettings.show=false
+               
                 Helper.BusEmitError(error,'初始化失敗')
             }
             

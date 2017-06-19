@@ -31,20 +31,22 @@ class Lessons
 
         $params=$this->getParams($course);
 
+      
+
         $weekdays=$params['weekdays'];
         $classTimeList=$params['classTimeList'];
       
         if (!in_array($beginDate->dayOfWeek, $weekdays))
         {
-             return   response()->json([
-                    'begin_date' => ['起始日期與上課時間不符'] 
-                      ]  ,  422);   
+             return  [
+                        'begin_date' => ['起始日期與上課時間不符'] 
+                      ] ;   
         }
         
-         $weeks=intval($course->weeks);
-         $terms=$weeks * count($weekdays);
+        $weeks=intval($course->weeks);
+        $terms=$weeks * count($weekdays);
        
-         $allDays=$this->getClassDays($beginDate , $terms , $weekdays);
+        $allDays=$this->getClassDays($beginDate , $terms , $weekdays);
         
         
         $classDays=$allDays['classdays'];
@@ -67,7 +69,7 @@ class Lessons
              $withSchedules=false;
         }
 
-         for ($i = 0; $i < count($classDays); $i++) {
+        for ($i = 0; $i < count($classDays); $i++) {
             $classDay=$classDays[$i];
             $dayOfWeek=$classDay['dayOfWeek'];
             $classTime= $classTimeList[$dayOfWeek];
@@ -95,18 +97,15 @@ class Lessons
             
         }
 
+        return [];
+
          
         
      }
 
      private function getParams($course)
      {
-        $classTimes=$course->classTimes;
-        if(!$classTimes->count()){
-            return   response()->json([
-                    'classTimes' => ['缺少上課時間'] 
-                      ]  ,  422);   
-        }
+        $classTimes=$course->classTimes;        
         $weekdays=[];
         $classTimeList=[];
         foreach($classTimes as $classTime)
@@ -117,7 +116,7 @@ class Lessons
         }
 
          return [
-                'weekdays'=>$weekdays,
+                 'weekdays'=>$weekdays,
                  'classTimeList'=>$classTimeList
             ] ;
      }

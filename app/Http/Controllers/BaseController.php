@@ -137,7 +137,7 @@ class BaseController extends Controller
                
             );
         }
-        if($key =='courses' || 'lessons'){
+        if($key =='courses' || $key =='lessons'){
            return array(
                 [
                     'id' => 1,

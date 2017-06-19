@@ -32,7 +32,7 @@
                   <div class="form-group">
                     <label  class="col-sm-2 control-label">上課地點</label>
                     <div class="col-sm-6 form-inline">
-                       <select>
+                       <select class="form-control">
                             <option v-text="course.center.name"></option>
                        </select> &nbsp;&nbsp;&nbsp;
                        <select v-model="form.classroom_id" class="form-control" >
@@ -102,10 +102,7 @@
                 course:{},
                 classTimes:[],
                 courseName:'',
-                form: new Form({
-                    course_id: 0,
-                    classroom_id:0
-                }),
+                form:{},
                 classroomOptions:[],
             }
         },
@@ -137,8 +134,9 @@
                 this.classTimes=[]
                 this.classroomOptions=[]
                 this.form = new Form({
-                    course_id:this.course_id,
-                    classroom_id:0
+                   course_id:this.course_id,
+                   classroom_id:0
+                 
                 })
                 this.fetchData()  
             }, 
@@ -162,44 +160,18 @@
             },
             
             classTimeFullText(classTime){
-              
                return Helper.classTimeFullText(classTime) +   '&nbsp;&nbsp;&nbsp;'             
             },
             onSubmit() {
-                let refreshToken=this.$auth.refreshToken()
-                refreshToken.then(() => {
-                    this.submitForm()
-                }).catch(error => {
-                     this.$auth.logout()
-                     Bus.$emit('login')
-                })
+                this.submitForm()
             },
             submitForm() {
-                let url = '/api/lessons/initialize'
-                let method='post'
-
-                this.form.submit(method,url)
-                    .then(result => {
-                       this.$emit('saved')
-                       let msg={
-                          title:'資料已存檔',
-                          status: 200
-                       }
-                       
-                       Bus.$emit('okmsg',msg);       
+              let save=Lesson.submitInitialize(this.form)
+              save.then(center => {
+                       this.$emit('success')
                     })
                     .catch(error => {
-                        console.log(error)
-                        let msgtitle = '存檔失敗'
-                        if (error.data.msgtitle) {
-                            msgtitle = error.data.msgtitle;
-                        }
-
-                        Bus.$emit('errors', {
-                                title: msgtitle,
-                                status: error.status
-                        })
-                           
+                        this.$emit('failed')
                     })
             },
             clearErrorMsg(name) {
@@ -207,7 +179,7 @@
             },
             
             initializeCanceled(){
-                this.$emit('initializeCanceled')
+                this.$emit('canceled')
             }
 
 

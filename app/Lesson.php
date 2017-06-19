@@ -19,7 +19,7 @@ class Lesson extends Model
         'materials' ,'ps'	];
 
     
-    protected $filter =  ['order','date'];
+    protected $filter =  ['order','date','status'];
 
 
 

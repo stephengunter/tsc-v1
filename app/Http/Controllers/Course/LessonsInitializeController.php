@@ -7,9 +7,6 @@ use App\Lesson;
 use App\Course;
 use App\ClassTime;
 
-use App\Http\Requests\Course\LessonRequest;
-
-
 use App\Repositories\Lessons;
 use App\Repositories\Courses;
 use App\Repositories\Classtimes;
@@ -47,7 +44,7 @@ class LessonsInitializeController extends BaseController
 	}
 
     public function  create()
-    {
+    {        
         $request = request();
         $course=(int)$request->course;
         
@@ -65,7 +62,8 @@ class LessonsInitializeController extends BaseController
 
         $course->center;
         $course->schedules;
-        $classTimes =$this->classtimes->getByCourse($course->id);
+        $classTimes =$this->classtimes->getByCourse($course->id)->get();
+        
                     
             return response()
                     ->json([
@@ -74,8 +72,9 @@ class LessonsInitializeController extends BaseController
                         'classTimes' => $classTimes
                     ]);  
     }
-    public function store(LessonRequest $request)
+    public function store(Request $request)
     {
+        
         $classroom_id=$request['classroom_id'];
         $course_id=$request['course_id'];
 
@@ -85,13 +84,21 @@ class LessonsInitializeController extends BaseController
         if(!$course->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
+        $classTimes=$course->classTimes;
+        if(!$classTimes->count()){
+            return   response()->json([
+                         'classTimes' => ['缺少上課時間'] 
+                      ]  ,  422);   
+        }
         $updated_by=$current_user->id;
-        $this->lessons->initialize($course , $classroom_id,$updated_by);  
+        $error=$this->lessons->initialize($course , $classroom_id,$updated_by);  
+        if($error){
+            return   response()->json($error ,  422); 
+        }
 
         if(!$course->teachers){
              return response()->json([ 'saved' => true ]);       
         }
-
       
         $teacherIds=array_pluck( $course->teachers->toArray(), 'user_id');
         $withClassroom=false;

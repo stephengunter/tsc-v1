@@ -63,13 +63,21 @@
                 </div>
                 <div class="tab-pane fade" id="lesson">
                       <div  v-if="activeIndex==4" >
-                         <lesson-list v-show="!lessonSettings.creating" :course_id="id" 
+                         <lesson-list v-show="lessonSettings.listing" :course_id="id" 
                             :hide_create="lessonSettings.hide_create" 
                             :version="lessonSettings.version" 
                             :can_select="lessonSettings.can_select"
+                            @begin-initialize="onBeginLessonsInitialize" 
                             @selected="onLessonSelected" @begin-create="onBeginCreateLesson">
                          </lesson-list>
-
+                         <edit-lesson :course_id="id" v-show="lessonSettings.creating"
+                             @canceled="onCreateLessonCanceled" @saved="onLessonCreated">                              
+                         </edit-lesson>
+                         <lesson-initialize v-if="lessonSettings.initializing" 
+                             :course_id="id"
+                             @canceled="onLessonInitializeCanceled"
+                             @success="onLessonInitializeSuccess" @failed="onLessonInitializeFailed">
+                        </lesson-initialize>
                       </div>
                 </div>                   
             </div>
@@ -92,6 +100,8 @@
     import SignupList from '../../components/signup/list.vue'
     import CreateSignup from '../../components/signup/create.vue'
     import LessonList from '../../components/lesson/list.vue'
+    import EditLesson from '../../components/lesson/edit.vue'
+    import InitializeLessons from '../../components/lesson/initialize.vue'
 
     
     export default {
@@ -104,7 +114,8 @@
            'signup-list':SignupList,
            'create-signup':CreateSignup,
            'lesson-list':LessonList,
-         
+           'edit-lesson':EditLesson,
+           'lesson-initialize':InitializeLessons
         },
         props: {
             id: {
@@ -159,10 +170,12 @@
 
                },
                lessonSettings:{
+                   listing:true,
                    hide_create:false,
                    version:0,
                    can_select:false,
-                   creating:false
+                   creating:false,
+                   initializing:false,
 
                }
             }
@@ -235,14 +248,51 @@
                 this.signupRecordSettings.version +=1
             },
             onLessonSelected(id){
-               this.$emit('lesson-selected', id)
+               Helper.newWindow('/lessons/' + id)
             },
             onBeginCreateLesson(){
+                this.lessonSettings.listing=false
+                this.lessonSettings.initializing=false
                 this.lessonSettings.creating=true
             },
+            onCreateLessonCanceled(){
+                this.lessonSettings.listing=true
+                this.lessonSettings.creating=false
+                this.lessonSettings.initializing=false
+                this.lessonSettings.version +=1
+            },
+            onLessonCreated(){
+                this.lessonSettings.creating=false
+                this.lessonSettings.listing=true
+                this.lessonSettings.initializing=false
+                this.lessonSettings.version +=1
+            },
+            onBeginLessonsInitialize(){
+                this.lessonSettings.initializing=true
+                this.lessonSettings.listing=false
+                this.lessonSettings.creating=false
+            },
+            onLessonInitializeCanceled(){
+               this.lessonSettings.initializing=false
+               this.lessonSettings.listing=true
+               this.lessonSettings.creating=false
+               this.lessonSettings.version +=1
+               
+            },
+            onLessonInitializeSuccess(){
+               Helper.BusEmitOK('初始化成功')
+               this.onLessonInitializeCanceled()
+            },
+            onLessonInitializeFailed(){
+               Helper.BusEmitOK('初始化失敗')
+               this.onLessonInitializeCanceled()
+            }
              
             
-        }, 
+        }
+          
+           
+           
 
     }
 </script>

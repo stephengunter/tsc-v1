@@ -25051,9 +25051,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = {
     name: 'EditHoliday',
@@ -25197,12 +25194,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }).catch(function (error) {
                 Helper.BusEmitError(error, '存檔失敗');
             });
-        },
-        showUpdatedBy: function showUpdatedBy() {
-            var updated_by = Helper.tryParseInt(this.holiday.updated_by);
-            if (updated_by) {
-                Bus.$emit('onShowEditor', updated_by);
-            }
         }
     }
 
@@ -33272,6 +33263,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_signup_create_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__components_signup_create_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_lesson_list_vue__ = __webpack_require__(140);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_lesson_list_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6__components_lesson_list_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_lesson_edit_vue__ = __webpack_require__(410);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_lesson_edit_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7__components_lesson_edit_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_lesson_initialize_vue__ = __webpack_require__(623);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_lesson_initialize_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8__components_lesson_initialize_vue__);
 //
 //
 //
@@ -33358,6 +33353,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 
 
 
@@ -33376,8 +33381,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       'schedule': __WEBPACK_IMPORTED_MODULE_3__components_schedule_schedule_vue___default.a,
       'signup-list': __WEBPACK_IMPORTED_MODULE_4__components_signup_list_vue___default.a,
       'create-signup': __WEBPACK_IMPORTED_MODULE_5__components_signup_create_vue___default.a,
-      'lesson-list': __WEBPACK_IMPORTED_MODULE_6__components_lesson_list_vue___default.a
-
+      'lesson-list': __WEBPACK_IMPORTED_MODULE_6__components_lesson_list_vue___default.a,
+      'edit-lesson': __WEBPACK_IMPORTED_MODULE_7__components_lesson_edit_vue___default.a,
+      'lesson-initialize': __WEBPACK_IMPORTED_MODULE_8__components_lesson_initialize_vue___default.a
    },
    props: {
       id: {
@@ -33432,10 +33438,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
          },
          lessonSettings: {
+            listing: true,
             hide_create: false,
             version: 0,
             can_select: false,
-            creating: false
+            creating: false,
+            initializing: false
 
          }
       };
@@ -33504,10 +33512,43 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
          this.signupRecordSettings.version += 1;
       },
       onLessonSelected: function onLessonSelected(id) {
-         this.$emit('lesson-selected', id);
+         Helper.newWindow('/lessons/' + id);
       },
       onBeginCreateLesson: function onBeginCreateLesson() {
+         this.lessonSettings.listing = false;
+         this.lessonSettings.initializing = false;
          this.lessonSettings.creating = true;
+      },
+      onCreateLessonCanceled: function onCreateLessonCanceled() {
+         this.lessonSettings.listing = true;
+         this.lessonSettings.creating = false;
+         this.lessonSettings.initializing = false;
+         this.lessonSettings.version += 1;
+      },
+      onLessonCreated: function onLessonCreated() {
+         this.lessonSettings.creating = false;
+         this.lessonSettings.listing = true;
+         this.lessonSettings.initializing = false;
+         this.lessonSettings.version += 1;
+      },
+      onBeginLessonsInitialize: function onBeginLessonsInitialize() {
+         this.lessonSettings.initializing = true;
+         this.lessonSettings.listing = false;
+         this.lessonSettings.creating = false;
+      },
+      onLessonInitializeCanceled: function onLessonInitializeCanceled() {
+         this.lessonSettings.initializing = false;
+         this.lessonSettings.listing = true;
+         this.lessonSettings.creating = false;
+         this.lessonSettings.version += 1;
+      },
+      onLessonInitializeSuccess: function onLessonInitializeSuccess() {
+         Helper.BusEmitOK('初始化成功');
+         this.onLessonInitializeCanceled();
+      },
+      onLessonInitializeFailed: function onLessonInitializeFailed() {
+         Helper.BusEmitOK('初始化失敗');
+         this.onLessonInitializeCanceled();
       }
    }
 
@@ -34268,6 +34309,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 
@@ -34291,6 +34333,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     data: function data() {
         return {
             ready: false,
+            currenVersion: 0,
             course_id: 0,
 
             can_edit: true,
@@ -34309,12 +34352,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
         };
     },
+
+    watch: {
+        version: function version() {
+            this.currenVersion += 1;
+        }
+    },
     beforeMount: function beforeMount() {
         this.init();
     },
 
     methods: {
         init: function init() {
+
             this.initializeSettings = {
                 course_id: 0,
                 show: false,
@@ -34341,12 +34391,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.initializeSettings.show = false;
         },
         onInitializeSuccess: function onInitializeSuccess() {
+            this.currenVersion += 1;
             this.initializeSettings.show = false;
+
             Helper.BusEmitOK('初始化成功');
-            this.init();
         },
         onInitializeFailed: function onInitializeFailed(error) {
-            this.initializeSettings.show = false;
+
             Helper.BusEmitError(error, '初始化失敗');
         }
     }
@@ -39981,7 +40032,7 @@ var Lesson = function () {
         }
     }, {
         key: 'submitInitialize',
-        value: function submitInitialize() {
+        value: function submitInitialize(form) {
             var url = '/lessons-initialize';
             var method = 'post';
             return new Promise(function (resolve, reject) {
@@ -65886,7 +65937,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "course_id": _vm.course_id,
       "hide_create": _vm.hide_create,
-      "version": _vm.version,
+      "version": _vm.currenVersion,
       "can_select": _vm.can_select
     },
     on: {
@@ -65930,6 +65981,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "course_id": _vm.course_id
     },
     on: {
+      "canceled": _vm.initializeCanceled,
       "success": _vm.onInitializeSuccess,
       "failed": _vm.onInitializeFailed
     }
@@ -67800,8 +67852,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: (!_vm.lessonSettings.creating),
-      expression: "!lessonSettings.creating"
+      value: (_vm.lessonSettings.listing),
+      expression: "lessonSettings.listing"
     }],
     attrs: {
       "course_id": _vm.id,
@@ -67810,10 +67862,34 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "can_select": _vm.lessonSettings.can_select
     },
     on: {
+      "begin-initialize": _vm.onBeginLessonsInitialize,
       "selected": _vm.onLessonSelected,
       "begin-create": _vm.onBeginCreateLesson
     }
-  })], 1) : _vm._e()])])])]) : _vm._e()], 1)
+  }), _vm._v(" "), _c('edit-lesson', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.lessonSettings.creating),
+      expression: "lessonSettings.creating"
+    }],
+    attrs: {
+      "course_id": _vm.id
+    },
+    on: {
+      "canceled": _vm.onCreateLessonCanceled,
+      "saved": _vm.onLessonCreated
+    }
+  }), _vm._v(" "), (_vm.lessonSettings.initializing) ? _c('lesson-initialize', {
+    attrs: {
+      "course_id": _vm.id
+    },
+    on: {
+      "canceled": _vm.onLessonInitializeCanceled,
+      "success": _vm.onLessonInitializeSuccess,
+      "failed": _vm.onLessonInitializeFailed
+    }
+  }) : _vm._e()], 1) : _vm._e()])])])]) : _vm._e()], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -74205,17 +74281,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "textContent": _vm._s(_vm.holiday.date)
     }
-  }), _vm._v(" "), _c('td', [(_vm.holiday.updated_by) ? _c('a', {
+  }), _vm._v(" "), _c('td', [_c('updated', {
     attrs: {
-      "href": "#"
-    },
-    on: {
-      "click": function($event) {
-        $event.preventDefault();
-        _vm.showUpdatedBy($event)
-      }
+      "entity": _vm.holiday
     }
-  }, [_vm._v("\r\n          " + _vm._s(_vm._f("tpeTime")(_vm.holiday.updated_at)) + "\r\n        ")]) : _c('span', [_vm._v(_vm._s(_vm._f("tpeTime")(_vm.holiday.updated_at)))])]), _vm._v(" "), _c('td', [(_vm.can_edit) ? _c('button', {
+  })], 1), _vm._v(" "), _c('td', [(_vm.can_edit) ? _c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -84847,10 +84917,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             course: {},
             classTimes: [],
             courseName: '',
-            form: new Form({
-                course_id: 0,
-                classroom_id: 0
-            }),
+            form: {},
             classroomOptions: []
         };
     },
@@ -84884,6 +84951,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.form = new Form({
                 course_id: this.course_id,
                 classroom_id: 0
+
             });
             this.fetchData();
         },
@@ -84906,52 +84974,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         classTimeFullText: function classTimeFullText(classTime) {
-
             return Helper.classTimeFullText(classTime) + '&nbsp;&nbsp;&nbsp;';
         },
         onSubmit: function onSubmit() {
-            var _this2 = this;
-
-            var refreshToken = this.$auth.refreshToken();
-            refreshToken.then(function () {
-                _this2.submitForm();
-            }).catch(function (error) {
-                _this2.$auth.logout();
-                Bus.$emit('login');
-            });
+            this.submitForm();
         },
         submitForm: function submitForm() {
-            var _this3 = this;
+            var _this2 = this;
 
-            var url = '/api/lessons/initialize';
-            var method = 'post';
-
-            this.form.submit(method, url).then(function (result) {
-                _this3.$emit('saved');
-                var msg = {
-                    title: '資料已存檔',
-                    status: 200
-                };
-
-                Bus.$emit('okmsg', msg);
+            var save = Lesson.submitInitialize(this.form);
+            save.then(function (center) {
+                _this2.$emit('success');
             }).catch(function (error) {
-                console.log(error);
-                var msgtitle = '存檔失敗';
-                if (error.data.msgtitle) {
-                    msgtitle = error.data.msgtitle;
-                }
-
-                Bus.$emit('errors', {
-                    title: msgtitle,
-                    status: error.status
-                });
+                _this2.$emit('failed');
             });
         },
         clearErrorMsg: function clearErrorMsg(name) {
             this.form.errors.clear(name);
         },
         initializeCanceled: function initializeCanceled() {
-            this.$emit('initializeCanceled');
+            this.$emit('canceled');
         }
     }
 
@@ -85769,7 +85811,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "col-sm-2 control-label"
   }, [_vm._v("上課地點")]), _vm._v(" "), _c('div', {
     staticClass: "col-sm-6 form-inline"
-  }, [_c('select', [_c('option', {
+  }, [_c('select', {
+    staticClass: "form-control"
+  }, [_c('option', {
     domProps: {
       "textContent": _vm._s(_vm.course.center.name)
     }

@@ -132,7 +132,7 @@ class Lesson {
            
         })
     }
-    static submitInitialize(){
+    static submitInitialize(form){
         let url ='/lessons-initialize'
         let method='post'
         return new Promise((resolve, reject) => {

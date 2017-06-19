@@ -3,10 +3,7 @@
      <td  v-text="holiday.name"></td> 
      <td  v-text="holiday.date"></td>
      <td> 
-        <a v-if="holiday.updated_by"  href="#" @click.prevent="showUpdatedBy" >
-          {{   holiday.updated_at|tpeTime  }}
-        </a>
-        <span v-else>{{   holiday.updated_at|tpeTime  }}</span>
+         <updated :entity="holiday"></updated>
      </td>           
      <td>
          <button v-if="can_edit" v-show="holiday.canEdit"  class="btn btn-primary btn-xs" 
@@ -199,13 +196,7 @@
                     Helper.BusEmitError(error,'存檔失敗')
                 })
             },
-            showUpdatedBy(){
-               let updated_by=Helper.tryParseInt(this.holiday.updated_by)
-               if(updated_by){
-                  Bus.$emit('onShowEditor',updated_by)
-               }
-                
-            },
+           
             
             
             

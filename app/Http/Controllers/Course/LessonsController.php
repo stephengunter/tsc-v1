@@ -67,7 +67,7 @@ class LessonsController extends BaseController
         if(count($lessonList)){
            
             foreach ($lessonList as $lesson) {
-                
+
                 $lesson->teachers=$lesson->teachers();
                 foreach ($lesson->teachers as $teacher) {
                      $teacher->name=$teacher->getName();
