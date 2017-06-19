@@ -1,39 +1,50 @@
 <template>
-    <div> 
-        <edit-category  @endEditCategory="backToIndex" @saved="backToIndex"  ></edit-category>
-        
-    </div>
+    <edit-category :course_id="course_id" 
+      @canceled="onCanceled" @saved="onSaved">
+          
+    </edit-category>
 </template>
 
-
 <script>
-   
-     import EditCategory from '../../components/category/edit-category.vue'
+    import EditCategory from '../../components/category/edit.vue'
 
     export default {
-        components:{
-            EditCategory
+        name: 'CategoryCreate',
+        components: {
+            'edit-category':EditCategory
         },
-        name:'CreateCategory',
-        data()  {
-            return {    
-               
-                categoryLoaded:false,
+        props: {
+            course_id:{
+               type: Number,
+               default: 0
+            },
+        },   
+        data() {
+            return {
+                
+                
+             
             }
         },
-        beforeMount(){
-            this.init()
+        beforeMount() {
+             this.init()
         },
-        methods:{
+        methods: {
             init(){
-                this.isReadOnly=false
+                
+             
             },
-            backToIndex(){    
-                this.$router.push('/categories');
-            },           
+            onCanceled(){
+                this.$emit('canceled')
+            },
+            onSaved(){
+                this.$emit('saved')
+            },
+            
            
-
-        }
+            
+            
+        },
 
     }
 </script>

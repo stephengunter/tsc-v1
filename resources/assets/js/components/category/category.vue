@@ -1,52 +1,60 @@
 <template>
-<div v-if="categoryLoaded">
+<div>
+    
+    <show v-if="readOnly"  :id="id" can_edit="can_edit"  :can_back="can_back"  
+       :version="version"  @begin-edit="beginEdit" @loaded="onDataLoaded"
+       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" >                 
+    </show>
 
-    <show-category v-if="isReadOnly" :category="category" @beginDelete="beginDelete"
-    @beginEditCategory="beginEdit" :canEdit="true">        
-    </show-category>
+    <edit v-else :id="id" 
+       @saved="onSaved"   @canceled="onEditCanceled" >                 
+    </edit> 
+
+    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+      @close="closeConfirm" @confirmed="deleteCategory">        
+    </delete-confirm>
     
-    <edit-category v-if="!isReadOnly" :id="id"  @saved="onCategorySaved" 
-     @endEditcategory="endEdit"   :canEdit="true"></edit-category>
-    
-    <modal :showbtn="true"  :show.sync="showConfirm" @ok="deleteCategory"  @closed="closeConfirm" ok-text="確定"
-        effect="fade" width="800">
-      <div slot="modal-header" class="modal-header modal-header-danger">
-         
-          <button id="close-button" type="button" class="close" data-dismiss="modal" @click="closeConfirm">
-              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-          </button>
-           <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
-      </div>
-      <div slot="modal-body" class="modal-body">
-          <h3 v-text="confirmMsg"> </h3>
-      </div>
-   </modal>
+
 </div>
 </template>
 <script>
-    import ShowCategory from '../../components/category/show-category.vue'
-    import EditCategory from '../../components/category/edit-category.vue'
-    
+    import Show from '../../components/category/show.vue'
+    import Edit from '../../components/category/edit.vue'
+
 
     export default {
-        props:['id','version'],
+        name:'Category',
         components: {
-            ShowCategory,
-            EditCategory,
-            Modal
+            Show,
+            Edit,
         },
-       
-        name: 'Category',
+        props: {
+            id: {
+              type: Number,
+              default: 0
+            },
+            can_edit:{
+               type: Boolean,
+               default: true
+            },          
+            can_back:{
+              type: Boolean,
+              default: true
+            },
+            version: {
+              type: Number,
+              default: 0
+            },
+        },
         data() {
             return {
-                category:{
-                    id:0
-                },
-                isReadOnly:true,
-                categoryLoaded:false,
+                readOnly:true,
+                deleteConfirm:{
+                    id:0,
+                    show:false,
+                    msg:'',
 
-                showConfirm:false,
-                confirmMsg:''
+                }    
             }
         },
         beforeMount(){
@@ -54,81 +62,56 @@
         },
         watch: {
             'id': 'init',
-            'version': 'init'
+            'version':'init'
         },
         methods: {
             init() {
-               this.category={}
-               this.isReadOnly=true
-               this.categoryLoaded=false
-
-               this.showConfirm=false
-               this.confirmMsg=''
-
-               this.fetchData()
-            },
-            fetchData() {
-                let id=this.id
-                let url = '/api/categories/' + id;
-                
-                axios.get(url)
-                    .then(response => {
-                        this.category = response.data.category
-                        
-                        this.categoryLoaded=true
-                        this.$emit('loaded',this.category)
-                    })
-                    .catch(function(error) {
-                        console.log(error)
-                        this.ready=true
-                    })
-            },       
+               this.readOnly=true
+               this.deleteConfirm={
+                    id:0,
+                    show:false,
+                    msg:''
+               }
+            },      
+            onDataLoaded(category){
+                this.$emit('loaded',category)
+            },        
             beginEdit() {
-                 this.isReadOnly=false
+                this.readOnly=false
             },
-            endEdit(){
-                 this.isReadOnly=true
+            onEditCanceled(){
+                this.init()
             },
-            onCategorySaved(category){
-                if(this.id>0){
-                   this.init()
-                }
-                
+            onSaved(category){
+                this.init()
+                this.$emit('saved',category)
             },
-            beginDelete(){
-                let refreshToken=this.$auth.refreshToken()
-                refreshToken.then(() => {
-                    this.confirmMsg='確定要刪除此分類嗎？'
-                    this.showConfirm=true
-                }).catch(error => {
-                     this.$auth.logout()
-                     Bus.$emit('login')
-                })
-
+            
+            onBtnBackClicked(){
+                this.$emit('btn-back-clicked')
             },
-
+            beginDelete(values){
+                this.deleteConfirm.msg= values.name
+                this.deleteConfirm.id=values.id
+                this.deleteConfirm.show=true                
+            },
             closeConfirm(){
-                  this.showConfirm=false
+                this.deleteConfirm.show=false
             },
             deleteCategory(){
-                let url = '/api/categories/' + this.id 
-                let form=new Form()
-                form.delete(url)
-                .then(result => {
+                let id = this.deleteConfirm.id 
+                let remove= Category.delete(id)
+                remove.then(result => {
                     Helper.BusEmitOK('刪除成功')
-                   
+                    this.deleteConfirm.show=false
                     this.$emit('deleted')
-                    this.closeConfirm();
                 })
                 .catch(error => {
-                                           
-                    Helper.BusEmitError('刪除失敗')
-                    
-
-                    this.closeConfirm();
-                       
+                    Helper.BusEmitError(error,'刪除失敗')
+                    this.closeConfirm()   
                 })
             },
+            
         }
     }
 </script>

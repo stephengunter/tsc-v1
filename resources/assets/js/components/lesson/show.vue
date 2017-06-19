@@ -82,18 +82,12 @@
                  <div class="col-sm-3">
                       <label class="label-title">最後更新</label>
                       <updated :entity="lesson"></updated>
-                      <!-- <p v-if="!lesson.updated_by"> {{   lesson.updated_at|tpeTime  }}</p>
-                      <p v-else>
-                        <a  href="#" @click.prevent="showUpdatedBy" >
-                            {{   lesson.updated_at|tpeTime  }}
-                        </a>
-                        
-                      </p>   -->                    
+                                     
                  </div>
             </div>   <!-- End row-->
-    </div>
+      </div>  <!-- End panel-body-->
   
-
+   </div>
 
   
 

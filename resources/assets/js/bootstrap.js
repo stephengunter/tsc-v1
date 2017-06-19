@@ -62,6 +62,10 @@ Vue.component('teacher-index', require('./views/teachers/index') )
 Vue.component('teacher-create', require('./views/teachers/create') )
 Vue.component('teacher-details', require('./views/teachers/details') )
 
+Vue.component('category-index', require('./views/categories/index') )
+Vue.component('category-create', require('./views/categories/create') )
+Vue.component('category-details', require('./views/categories/details') )
+
 Vue.component('course-index', require('./views/courses/index') )
 Vue.component('course-create', require('./views/courses/create') )
 Vue.component('course-details', require('./views/courses/details') )
@@ -108,11 +112,15 @@ import Photo from './models/photo.js'
 import ContactInfo from './models/contactinfo.js'
 import UserCenters from './models/usercenters.js'
 import Address from './models/address.js'
+
+import Category from './models/category.js'
 import Course from './models/course.js'
 import SignupInfo from './models/signupinfo.js'
 import Classtime from './models/classtime.js'
 import Schedule from './models/schedule.js'
 import Lesson from './models/lesson.js'
+
+
 
 import Signup from './models/signup.js'
 import Tuition from './models/tuition.js'
@@ -145,6 +153,7 @@ window.ContactInfo=ContactInfo
 window.Address=Address
 window.UserCenters=UserCenters
 
+window.Category=Category
 window.Course=Course
 window.SignupInfo=SignupInfo
 window.Classtime=Classtime

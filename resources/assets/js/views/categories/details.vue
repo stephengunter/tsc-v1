@@ -1,28 +1,12 @@
 <template>
 <div>
-  <lesson v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
-     @saved="lessonUpdated" @loaded="onDataLoaded" :version="current_version"
-     @btn-back-clicked="onBtnBackClicked" @deleted="onLessonDeleted" > 
+  <category v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
+     @saved="categoryUpdated" @loaded="onDataLoaded" :version="current_version"
+     @btn-back-clicked="onBtnBackClicked" @deleted="onCategoryDeleted" > 
 
-  </lesson>
+  </category>
 
-  <div v-if="loaded" id="tabLesson" class="panel with-nav-tabs panel-default">
-        <div class="panel-heading">
-            <ul class="nav nav-tabs">
-                <li class="active">
-                     <a @click="activeIndex=0" href="#participant" data-toggle="tab">出席狀況</a>
-                </li>
-            </ul>
-        </div>
-        <div class="panel-body">
-            <div class="tab-content">
-                <div class="tab-pane fade active in" id="participant">
-                    
-                </div>
-                               
-            </div>
-        </div>
-  </div>
+  
 
 
 
@@ -33,13 +17,13 @@
 </template>
 
 <script>
-    import Lesson from '../../components/lesson/lesson.vue'
+    import Category from '../../components/category/category.vue'
     
     
     export default {
-        name: 'LessonDetails',
+        name: 'CategoryDetails',
         components: {
-            Lesson,
+            Category,
          
         },
         props: {
@@ -64,7 +48,7 @@
             return {
                loaded:false,
                readonly:true,
-               lesson:null,
+               category:null,
                current_version:0,
 
                activeIndex:0,
@@ -79,8 +63,8 @@
         },
         computed:{
            hasRefundRecord(){
-              if(!this.lesson) return false
-              if(!this.lesson.hasRefund) return false
+              if(!this.category) return false
+              if(!this.category.hasRefund) return false
                   return true
            }
         },
@@ -96,9 +80,9 @@
             toBoolean(val){
                return val=='true'
             },
-            onDataLoaded(lesson){
+            onDataLoaded(category){
                 this.loaded=true
-                this.lesson=lesson
+                this.category=category
             },
             btnEditClicked(){    
               this.beginEdit()
@@ -109,16 +93,15 @@
             editCanceled(){
                this.readonly=true
             },
-            lessonUpdated(){
+            categoryUpdated(){
                this.init()
             },
             onBtnBackClicked(){
                 this.$emit('btn-back-clicked')
             },
-            onLessonDeleted(){
-               this.$emit('lesson-deleted')
+            onCategoryDeleted(){
+               this.$emit('category-deleted')
             },
-           
         }, 
 
     }

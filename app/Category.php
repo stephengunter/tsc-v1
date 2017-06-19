@@ -53,6 +53,17 @@ class Category extends Model
         if(count($this->validCourses())) return false;
          return  true;
     }
+    public function canEditBy($user)
+	{
+		return $user->isAdmin();
+          
+	} 
+	public function canDeleteBy($user)
+	{
+        if(!$this->canDelete()) return  false;
+        
+        return $this->canEditBy($user);
+	}
 
 
 

@@ -16,7 +16,7 @@ class Lesson extends Model
 	protected $fillable = [
         'course_id', 'classroom_id', 'order', 'status' ,
 		'date','on', 'off' , 'title' , 'content', 
-        'materials' ,'ps'	];
+        'materials' ,'ps','updated_by'	];
 
     
     protected $filter =  ['order','date','status'];

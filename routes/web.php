@@ -34,6 +34,9 @@ Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsContr
 
 Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
 
+Route::put('categories/{id}/update-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
+
+
 Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
 Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
 Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
@@ -77,7 +80,8 @@ Route::resource('import-schedules', '\App\Http\Controllers\Course\ImportSchedule
                                      ['only' => ['create','store']]);
 Route::resource('lessons', '\App\Http\Controllers\Course\LessonsController');
 Route::resource('lessons-initialize', '\App\Http\Controllers\Course\LessonsInitializeController', 
-                                     ['only' => ['create','store']]);                                     
+                                     ['only' => ['create','store']]);   
+Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController');                                                                  
 
 
 Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');

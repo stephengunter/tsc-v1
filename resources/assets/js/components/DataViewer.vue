@@ -81,7 +81,7 @@
             </table>
         </div>
         <div class="panel-footer pagination-footer">
-            <div class="pagination-item">
+            <div v-show="!no_page" class="pagination-item">
                 <span>每頁: </span>
                     <select v-model="params.per_page" @change="fetchData()">
                         <option>10</option>
@@ -93,7 +93,7 @@
              <div class="pagination-item">
                 <small>Showing {{model.from }} - {{model.to}} of {{model.total}}</small>
             </div>
-            <div class="pagination-item">
+            <div v-show="!no_page" class="pagination-item">
                  <pager   :total-page="model.last_page"  :init-page="this.params.page"  @go-page="goPage"></pager>
                
             </div>
@@ -155,7 +155,11 @@
             no_search:{
                type: Boolean,
                default: false
-            }
+            },
+            no_page:{
+               type: Boolean,
+               default: false
+            },
         },
         
         data() {
@@ -203,10 +207,13 @@
                 this.model= {
                     data: []
                 }
+
+                let perPage=10
+                if(this.no_page) perPage=99
                 this.params={
                     column: this.default_order,  
                     direction: this.default_direction,
-                    per_page: 10,
+                    per_page: perPage,
                     page: 1,
                     search_column: this.default_search,
                     search_operator: 'like',
@@ -317,7 +324,7 @@
             },
             canSearch(){
                 if(this.no_search) return false;
-                if(this.filter) return true;
+                if(this.filter && this.filter.length > 0) return true;
                 return false 
             }
         },

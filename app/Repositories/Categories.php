@@ -76,10 +76,8 @@ class Categories
     {
        return $this->getAll()->where('public',false)->orderBy('order','desc');
     }
-    public function updateDisplayOrder($up, $id,$updated_by)
+    public function updateDisplayOrder($category ,$up,$updated_by)
     {
-            $category=Category::findOrFail($id); 
-          
             $num= rand(1, 10);
             if($up){
                 $category->order += $num;

@@ -312,7 +312,7 @@ class Lesson {
     }
     static statusOptions(){
         return [{
-                    text: '一般',
+                    text: '正常',
                     value: '0'
                 }, {
                     text: '已結束',

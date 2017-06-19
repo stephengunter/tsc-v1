@@ -291,23 +291,6 @@
                     store=Lesson.store(this.form)
                 }
 
-                // if(this.idDayOff()){
-                //    store=Lesson.submitDayoff(this.form)
-                // }else{
-                //     this.form.lesson.date=this.date.time
-                //     this.form.lesson.on=Helper.getTimeSelected(this.on)
-                //     this.form.lesson.off=Helper.getTimeSelected(this.off)
-
-                //     this.form.lesson.teachers=this.teachers
-                //     this.form.lesson.volunteers=this.volunteers
-
-                //     if(this.id){
-                //         store=Lesson.update(this.form , this.id)
-                //     }else{
-                //         store=Lesson.store(this.form)
-                //     }
-
-                // }
                 store.then(data => {
                    Helper.BusEmitOK()
                    this.$emit('saved',data)                            

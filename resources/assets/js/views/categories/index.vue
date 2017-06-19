@@ -1,109 +1,76 @@
 <template>
+     <category-list  :hide_create="hide_create" 
+        :version="currenVersion" :can_select="can_select"
+        @selected="onSelected" @begin-create="onBeginCreate">
+     </category-list>
 
-<div>
-     
-    <data-viewer :source="source" :defaultOrder="defaultOrder" :defaultSearch="defaultSearch"
-       :version="version"  :thead="thead" :filter="null" @beginCreate="beginCreate"
-        :title="title" showCreateBtn="false" createText="新增課程分類">
-       
-        <template scope="props">
-            <tr>    
-               
-                <td><a herf="#" @click="details(props.item.id)">{{props.item.name}}</a> </td>
-                <td v-html="$options.filters.showIcon(props.item.icon)"></td> 
-                <td v-html="$options.filters.activeLabel(props.item.active)"></td> 
-
-                <td>
-                    <button @click="displayUp(props.item.id)" class="btn btn-default btn-xs">
-                        <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
-                    </button>
-                    <button @click="displayDown(props.item.id)" class="btn btn-default btn-xs">
-                        <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
-                    </button>
-                </td>    
-            </tr>
-        </template>
-
-    </data-viewer>
-
-<div>
 </template>
-    <script>
-        
 
-        export default {
-            name: 'CenterIndex',
-            components: {
-                DataViewer,              
+<script>
+    import CategoryList from '../../components/category/list.vue'
+
+    export default {
+        name: 'CategoryIndex',       
+        components: {
+            'category-list':CategoryList,
+        },
+        props: {
+            version: {
+              type: Number,
+              default: 0
             },
-            data() {
-                return {
-                    title: 'Categories',
-                    source: '/api/categories',
-                    defaultOrder:'order',
-                    defaultSearch:'name',
-                    version:0,
-                    
-                    thead: [{
-                        title: '分類名稱',
-                        key: 'name',
-                        sort: false,
-                        default:true
-                    }, {
-                        title: '小圖',
-                        key: 'icon',
-                        sort: false,
-                        default:true
-                    }, 
-                    {
-                        title: '狀態',
-                        key: 'active',
-                        sort: false,
-                        default:true
-                    }, {
-                        title: '顯示順序',
-                        key: 'order',
-                        sort: false,
-                        default:true
-                    }],
+            hide_create:{
+               type: Boolean,
+               default: false
+            }
+        },
+        data() {
+            return {
+              
+                currenVersion:0,
+                course_id:0,
+               
+                can_edit:true,
+                can_back:true,
+                can_select:false,
 
-                   
-                   
-                   
+                combinationSettings:{
+                    withCourse:true,
+                },
+
+                initializeSettings:{
+                    course_id:0,
+                    show:false,
+                    width:1000,
                 }
-            },
-            methods: {
-                beginCreate(){
-                    this.$router.push('/categories/create')  
-                },
-                details(id){
-                    this.$router.push('/categories/' + id)
-                },
-                displayUp(id){
-                   this.updateDisplayOrder(id,true)
-                },
-                displayDown(id){
-                     this.updateDisplayOrder(id,false)
-                },
-                updateDisplayOrder(id,up){
-                    let form = new Form({                        
-                         up: up
-                    })
-                    
-                    let url = '/api/categories/' + id + '/displayOrder'
 
-                    form.put(url)
-                    .then(category => {
-                       this.version+=1
-                    })
-                    .catch(error => {
-                        Helper.BusEmitError(error,'更新排序失敗')
-                        
-                    })
-                },
-                
+             
+            }
+        },
+        watch:{
+            version: function () {
+               this.currenVersion+=1
+            },
+        },
+        beforeMount() {
+             this.init()
+        },
+        methods: {
+            init(){
+
+               
+             
+            },
+            onSelected(id){
+                this.$emit('selected',id)
+            },
+            onBeginCreate(){
+                this.$emit('begin-create',this.course_id)
             },
 
+           
             
-        }
-    </script>
+        },
+
+    }
+</script>

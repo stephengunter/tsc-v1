@@ -20603,6 +20603,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         no_search: {
             type: Boolean,
             default: false
+        },
+        no_page: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -20649,10 +20653,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.model = {
                 data: []
             };
+
+            var perPage = 10;
+            if (this.no_page) perPage = 99;
             this.params = {
                 column: this.default_order,
                 direction: this.default_direction,
-                per_page: 10,
+                per_page: perPage,
                 page: 1,
                 search_column: this.default_search,
                 search_operator: 'like',
@@ -20757,7 +20764,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         canSearch: function canSearch() {
             if (this.no_search) return false;
-            if (this.filter) return true;
+            if (this.filter && this.filter.length > 0) return true;
             return false;
         }
     }
@@ -25668,23 +25675,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 store = Lesson.store(this.form);
             }
 
-            // if(this.idDayOff()){
-            //    store=Lesson.submitDayoff(this.form)
-            // }else{
-            //     this.form.lesson.date=this.date.time
-            //     this.form.lesson.on=Helper.getTimeSelected(this.on)
-            //     this.form.lesson.off=Helper.getTimeSelected(this.off)
-
-            //     this.form.lesson.teachers=this.teachers
-            //     this.form.lesson.volunteers=this.volunteers
-
-            //     if(this.id){
-            //         store=Lesson.update(this.form , this.id)
-            //     }else{
-            //         store=Lesson.store(this.form)
-            //     }
-
-            // }
             store.then(function (data) {
                 Helper.BusEmitOK();
                 _this2.$emit('saved', data);
@@ -37465,24 +37455,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__models_contactinfo_js__ = __webpack_require__(292);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__models_usercenters_js__ = __webpack_require__(308);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__models_address_js__ = __webpack_require__(288);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__models_course_js__ = __webpack_require__(293);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__models_signupinfo_js__ = __webpack_require__(302);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__models_classtime_js__ = __webpack_require__(291);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__models_schedule_js__ = __webpack_require__(300);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__models_lesson_js__ = __webpack_require__(297);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__models_signup_js__ = __webpack_require__(301);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__models_tuition_js__ = __webpack_require__(306);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__models_refund_js__ = __webpack_require__(299);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__models_center_js__ = __webpack_require__(289);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__models_teacher_js__ = __webpack_require__(303);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__models_volunteer_js__ = __webpack_require__(309);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__models_discount_js__ = __webpack_require__(294);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__models_identity_js__ = __webpack_require__(296);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__models_term_js__ = __webpack_require__(304);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__models_holiday_js__ = __webpack_require__(295);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__models_classroom_js__ = __webpack_require__(290);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__models_title_js__ = __webpack_require__(305);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__packages_auth_Auth_js__ = __webpack_require__(310);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__models_category_js__ = __webpack_require__(635);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__models_course_js__ = __webpack_require__(293);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__models_signupinfo_js__ = __webpack_require__(302);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__models_classtime_js__ = __webpack_require__(291);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__models_schedule_js__ = __webpack_require__(300);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__models_lesson_js__ = __webpack_require__(297);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__models_signup_js__ = __webpack_require__(301);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__models_tuition_js__ = __webpack_require__(306);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__models_refund_js__ = __webpack_require__(299);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__models_center_js__ = __webpack_require__(289);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__models_teacher_js__ = __webpack_require__(303);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__models_volunteer_js__ = __webpack_require__(309);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__models_discount_js__ = __webpack_require__(294);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__models_identity_js__ = __webpack_require__(296);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__models_term_js__ = __webpack_require__(304);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__models_holiday_js__ = __webpack_require__(295);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__models_classroom_js__ = __webpack_require__(290);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__models_title_js__ = __webpack_require__(305);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__packages_auth_Auth_js__ = __webpack_require__(310);
 __webpack_require__(370);
 __webpack_require__(371);
 __webpack_require__(372);
@@ -37542,6 +37533,10 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('volunteer-details', __web
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('teacher-index', __webpack_require__(463));
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('teacher-create', __webpack_require__(461));
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('teacher-details', __webpack_require__(462));
+
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('category-index', __webpack_require__(641));
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('category-create', __webpack_require__(658));
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('category-details', __webpack_require__(652));
 
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('course-index', __webpack_require__(445));
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.component('course-create', __webpack_require__(443));
@@ -37607,7 +37602,9 @@ window.MomentTimeZone = __WEBPACK_IMPORTED_MODULE_4_moment_timezone___default.a;
 
 
 
-__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_32__packages_auth_Auth_js__["a" /* default */]);
+
+
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_33__packages_auth_Auth_js__["a" /* default */]);
 
 window.Form = __WEBPACK_IMPORTED_MODULE_5__utilities_Form__["a" /* default */];
 window.Helper = __WEBPACK_IMPORTED_MODULE_6__helper_js__["a" /* default */];
@@ -37622,25 +37619,26 @@ window.ContactInfo = __WEBPACK_IMPORTED_MODULE_12__models_contactinfo_js__["a" /
 window.Address = __WEBPACK_IMPORTED_MODULE_14__models_address_js__["a" /* default */];
 window.UserCenters = __WEBPACK_IMPORTED_MODULE_13__models_usercenters_js__["a" /* default */];
 
-window.Course = __WEBPACK_IMPORTED_MODULE_15__models_course_js__["a" /* default */];
-window.SignupInfo = __WEBPACK_IMPORTED_MODULE_16__models_signupinfo_js__["a" /* default */];
-window.Classtime = __WEBPACK_IMPORTED_MODULE_17__models_classtime_js__["a" /* default */];
-window.Schedule = __WEBPACK_IMPORTED_MODULE_18__models_schedule_js__["a" /* default */];
-window.Lesson = __WEBPACK_IMPORTED_MODULE_19__models_lesson_js__["a" /* default */];
+window.Category = __WEBPACK_IMPORTED_MODULE_15__models_category_js__["a" /* default */];
+window.Course = __WEBPACK_IMPORTED_MODULE_16__models_course_js__["a" /* default */];
+window.SignupInfo = __WEBPACK_IMPORTED_MODULE_17__models_signupinfo_js__["a" /* default */];
+window.Classtime = __WEBPACK_IMPORTED_MODULE_18__models_classtime_js__["a" /* default */];
+window.Schedule = __WEBPACK_IMPORTED_MODULE_19__models_schedule_js__["a" /* default */];
+window.Lesson = __WEBPACK_IMPORTED_MODULE_20__models_lesson_js__["a" /* default */];
 
-window.Signup = __WEBPACK_IMPORTED_MODULE_20__models_signup_js__["a" /* default */];
-window.Tuition = __WEBPACK_IMPORTED_MODULE_21__models_tuition_js__["a" /* default */];
-window.Refund = __WEBPACK_IMPORTED_MODULE_22__models_refund_js__["a" /* default */];
-window.Teacher = __WEBPACK_IMPORTED_MODULE_24__models_teacher_js__["a" /* default */];
-window.Volunteer = __WEBPACK_IMPORTED_MODULE_25__models_volunteer_js__["a" /* default */];
-window.Center = __WEBPACK_IMPORTED_MODULE_23__models_center_js__["a" /* default */];
-window.Discount = __WEBPACK_IMPORTED_MODULE_26__models_discount_js__["a" /* default */];
-window.Identity = __WEBPACK_IMPORTED_MODULE_27__models_identity_js__["a" /* default */];
+window.Signup = __WEBPACK_IMPORTED_MODULE_21__models_signup_js__["a" /* default */];
+window.Tuition = __WEBPACK_IMPORTED_MODULE_22__models_tuition_js__["a" /* default */];
+window.Refund = __WEBPACK_IMPORTED_MODULE_23__models_refund_js__["a" /* default */];
+window.Teacher = __WEBPACK_IMPORTED_MODULE_25__models_teacher_js__["a" /* default */];
+window.Volunteer = __WEBPACK_IMPORTED_MODULE_26__models_volunteer_js__["a" /* default */];
+window.Center = __WEBPACK_IMPORTED_MODULE_24__models_center_js__["a" /* default */];
+window.Discount = __WEBPACK_IMPORTED_MODULE_27__models_discount_js__["a" /* default */];
+window.Identity = __WEBPACK_IMPORTED_MODULE_28__models_identity_js__["a" /* default */];
 
-window.Term = __WEBPACK_IMPORTED_MODULE_28__models_term_js__["a" /* default */];
-window.Holiday = __WEBPACK_IMPORTED_MODULE_29__models_holiday_js__["a" /* default */];
-window.Classroom = __WEBPACK_IMPORTED_MODULE_30__models_classroom_js__["a" /* default */];
-window.Title = __WEBPACK_IMPORTED_MODULE_31__models_title_js__["a" /* default */];
+window.Term = __WEBPACK_IMPORTED_MODULE_29__models_term_js__["a" /* default */];
+window.Holiday = __WEBPACK_IMPORTED_MODULE_30__models_holiday_js__["a" /* default */];
+window.Classroom = __WEBPACK_IMPORTED_MODULE_31__models_classroom_js__["a" /* default */];
+window.Title = __WEBPACK_IMPORTED_MODULE_32__models_title_js__["a" /* default */];
 
 window.Vue = __WEBPACK_IMPORTED_MODULE_0_vue___default.a;
 
@@ -40220,7 +40218,7 @@ var Lesson = function () {
         key: 'statusOptions',
         value: function statusOptions() {
             return [{
-                text: '一般',
+                text: '正常',
                 value: '0'
             }, {
                 text: '已結束',
@@ -63592,6 +63590,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   })], 2)])]), _vm._v(" "), _c('div', {
     staticClass: "panel-footer pagination-footer"
   }, [_c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.no_page),
+      expression: "!no_page"
+    }],
     staticClass: "pagination-item"
   }, [_c('span', [_vm._v("每頁: ")]), _vm._v(" "), _c('select', {
     directives: [{
@@ -63615,6 +63619,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('option', [_vm._v("10")]), _vm._v(" "), _c('option', [_vm._v("25")]), _vm._v(" "), _c('option', [_vm._v("50")])]), _vm._v(" "), _c('span', [_vm._v("筆資料")])]), _vm._v(" "), _c('div', {
     staticClass: "pagination-item"
   }, [_c('small', [_vm._v("Showing " + _vm._s(_vm.model.from) + " - " + _vm._s(_vm.model.to) + " of " + _vm._s(_vm.model.total))])]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.no_page),
+      expression: "!no_page"
+    }],
     staticClass: "pagination-item"
   }, [_c('pager', {
     attrs: {
@@ -85228,12 +85238,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
@@ -85436,15 +85440,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       },
       onLessonDeleted: function onLessonDeleted() {
          this.$emit('lesson-deleted');
-      },
-      showUpdatedBy: function showUpdatedBy() {
-         Bus.$emit('onShowEditor', this.lesson.updated_by);
-      },
-      onTuitionChanged: function onTuitionChanged() {
-         this.current_version += 1;
-      },
-      onRefundChanged: function onRefundChanged() {
-         this.current_version += 1;
       }
    }
 
@@ -85620,7 +85615,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "aria-hidden": "true"
     }
-  }), _vm._v("\n             返回\n          ")]), _vm._v(" "), (_vm.lesson.canEdit) ? _c('button', {
+  }), _vm._v("\n              返回\n           ")]), _vm._v(" "), (_vm.lesson.canEdit) ? _c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -85633,7 +85628,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('span', {
     staticClass: "glyphicon glyphicon-pencil"
-  }), _vm._v(" 編輯\n          ")]) : _vm._e(), _vm._v(" "), (_vm.lesson.canDelete) ? _c('button', {
+  }), _vm._v(" 編輯\n           ")]) : _vm._e(), _vm._v(" "), (_vm.lesson.canDelete) ? _c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -85646,7 +85641,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('span', {
     staticClass: "glyphicon glyphicon-trash"
-  }), _vm._v(" 刪除\n          ")]) : _vm._e()])]), _vm._v(" "), (_vm.loaded) ? _c('div', {
+  }), _vm._v(" 刪除\n           ")]) : _vm._e()])]), _vm._v(" "), (_vm.loaded) ? _c('div', {
     staticClass: "panel-body"
   }, [_c('div', {
     staticClass: "row"
@@ -86083,6 +86078,1893 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
      require("vue-hot-reload-api").rerender("data-v-39b11f40", module.exports)
+  }
+}
+
+/***/ }),
+/* 633 */,
+/* 634 */,
+/* 635 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Category = function () {
+    function Category(data) {
+        _classCallCheck(this, Category);
+
+        for (var property in data) {
+            this[property] = data[property];
+        }
+    }
+
+    _createClass(Category, null, [{
+        key: 'title',
+        value: function title() {
+            return 'Categories';
+        }
+    }, {
+        key: 'source',
+        value: function source() {
+            return '/categories';
+        }
+    }, {
+        key: 'createUrl',
+        value: function createUrl() {
+            return this.source() + '/create';
+        }
+    }, {
+        key: 'storeUrl',
+        value: function storeUrl() {
+            return this.source();
+        }
+    }, {
+        key: 'showUrl',
+        value: function showUrl(id) {
+            return this.source() + '/' + id;
+        }
+    }, {
+        key: 'editUrl',
+        value: function editUrl(id) {
+            return this.showUrl(id) + '/edit';
+        }
+    }, {
+        key: 'updateUrl',
+        value: function updateUrl(id) {
+            return this.showUrl(id);
+        }
+    }, {
+        key: 'deleteUrl',
+        value: function deleteUrl(id) {
+            return this.source() + '/' + id;
+        }
+    }, {
+        key: 'create',
+        value: function create() {
+            var url = this.createUrl();
+
+            return new Promise(function (resolve, reject) {
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'store',
+        value: function store(form) {
+            var url = this.storeUrl();
+            var method = 'post';
+            return new Promise(function (resolve, reject) {
+                form.submit(method, url).then(function (data) {
+                    resolve(data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'show',
+        value: function show(id) {
+            var _this = this;
+
+            return new Promise(function (resolve, reject) {
+                var url = _this.showUrl(id);
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'edit',
+        value: function edit(id) {
+            var url = this.editUrl(id);
+            return new Promise(function (resolve, reject) {
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'update',
+        value: function update(form, id) {
+            var url = this.updateUrl(id);
+            var method = 'put';
+            return new Promise(function (resolve, reject) {
+                form.submit(method, url).then(function (data) {
+                    resolve(data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'updateDisplayOrder',
+        value: function updateDisplayOrder(id, up) {
+            var url = this.updateUrl(id) + '/update-order';
+            var method = 'put';
+            var form = new Form({
+                up: up
+            });
+            return new Promise(function (resolve, reject) {
+                form.submit(method, url).then(function (data) {
+                    resolve(data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'delete',
+        value: function _delete(id) {
+            var _this2 = this;
+
+            return new Promise(function (resolve, reject) {
+                var url = _this2.deleteUrl(id);
+                var form = new Form();
+                form.delete(url).then(function (response) {
+                    resolve(true);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'options',
+        value: function options(searchParams) {
+            var url = this.source() + '/options';
+            url = Helper.buildQuery(url, searchParams);
+            return new Promise(function (resolve, reject) {
+                axios.get(url).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }]);
+
+    return Category;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = Category;
+
+/***/ }),
+/* 636 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__row_vue__ = __webpack_require__(640);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__row_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__row_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'CategoryList',
+    components: {
+        Row: __WEBPACK_IMPORTED_MODULE_0__row_vue___default.a
+    },
+    props: {
+        hide_create: {
+            type: Boolean,
+            default: false
+        },
+        version: {
+            type: Number,
+            default: 0
+        },
+        can_select: {
+            type: Boolean,
+            default: true
+        },
+        no_page: {
+            type: Boolean,
+            default: true
+        }
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+    data: function data() {
+        return {
+            title: Helper.getIcon(Category.title()) + '  課程分類',
+            loaded: false,
+            source: Category.source(),
+
+            defaultSearch: 'name',
+            defaultOrder: 'order',
+            defaultDirection: 'desc',
+
+            create: Category.createUrl(),
+
+            thead: [{
+                title: '分類名稱',
+                key: 'name',
+                sort: false,
+                default: true
+            }, {
+                title: '類型',
+                key: 'type',
+                sort: false,
+                default: true
+            }, {
+                title: '小圖',
+                key: 'icon',
+                sort: false,
+                default: true
+            }, {
+                title: '狀態',
+                key: 'active',
+                sort: false,
+                default: true
+            }, {
+                title: '顯示順序',
+                key: 'order',
+                sort: false,
+                default: true
+            }],
+
+            filter: [],
+
+            current_version: 0,
+
+            hasData: false
+
+        };
+    },
+
+    watch: {
+        version: function version() {
+            this.current_version += 1;
+        }
+    },
+    computed: {
+        createText: function createText() {
+            if (this.hide_create) return '';
+            return '新增分類';
+        }
+    },
+    methods: {
+        init: function init() {
+            this.loaded = true;
+        },
+        onDataLoaded: function onDataLoaded(data) {
+            this.hasData = data.model.total;
+        },
+        onRowSelected: function onRowSelected(id) {
+            this.$emit('selected', id);
+        },
+        beginCreate: function beginCreate() {
+            this.$emit('begin-create');
+        },
+        onDisplayUp: function onDisplayUp(id) {
+            this.updateDisplayOrder(id, true);
+        },
+        onDisplayDown: function onDisplayDown(id) {
+            this.updateDisplayOrder(id, false);
+        },
+        updateDisplayOrder: function updateDisplayOrder(id, up) {
+            var _this = this;
+
+            var update = Category.updateDisplayOrder(id, up);
+
+            update.then(function (data) {
+                _this.current_version += 1;
+            }).catch(function (error) {
+                Helper.BusEmitError(error);
+            });
+        }
+    }
+
+};
+
+/***/ }),
+/* 637 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'CategoryRow',
+    props: {
+        category: {
+            type: Object,
+            default: null
+        },
+        more: {
+            type: Boolean,
+            default: false
+        },
+        remove: {
+            type: Boolean,
+            default: false
+        },
+        select: {
+            type: Boolean,
+            default: false
+        }
+
+    },
+    data: function data() {
+        return {
+            thead: []
+        };
+    },
+    beforeMount: function beforeMount() {},
+
+
+    methods: {
+        getType: function getType(category) {
+            var isPublic = Helper.tryParseInt(category.public);
+            if (isPublic) return '<span class="label label-warning"> 置頂 </span>';
+            return '';
+        },
+        selected: function selected(id) {
+            alert(id);
+            this.$emit('selected', id);
+        },
+        displayUp: function displayUp(id) {
+            this.$emit('display-up', id);
+        },
+        displayDown: function displayDown(id) {
+            this.$emit('display-down', id);
+        }
+    }
+
+};
+
+/***/ }),
+/* 638 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_list_vue__ = __webpack_require__(639);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_list_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_category_list_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'CategoryIndex',
+    components: {
+        'category-list': __WEBPACK_IMPORTED_MODULE_0__components_category_list_vue___default.a
+    },
+    props: {
+        version: {
+            type: Number,
+            default: 0
+        },
+        hide_create: {
+            type: Boolean,
+            default: false
+        }
+    },
+    data: function data() {
+        return {
+
+            currenVersion: 0,
+            course_id: 0,
+
+            can_edit: true,
+            can_back: true,
+            can_select: false,
+
+            combinationSettings: {
+                withCourse: true
+            },
+
+            initializeSettings: {
+                course_id: 0,
+                show: false,
+                width: 1000
+            }
+
+        };
+    },
+
+    watch: {
+        version: function version() {
+            this.currenVersion += 1;
+        }
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    methods: {
+        init: function init() {},
+        onSelected: function onSelected(id) {
+            this.$emit('selected', id);
+        },
+        onBeginCreate: function onBeginCreate() {
+            this.$emit('begin-create', this.course_id);
+        }
+    }
+
+};
+
+/***/ }),
+/* 639 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(636),
+  /* template */
+  __webpack_require__(643),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\category\\list.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] list.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-ae279f40", Component.options)
+  } else {
+    hotAPI.reload("data-v-ae279f40", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 640 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(637),
+  /* template */
+  __webpack_require__(642),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\category\\row.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] row.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-02dc7608", Component.options)
+  } else {
+    hotAPI.reload("data-v-02dc7608", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 641 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(638),
+  /* template */
+  __webpack_require__(644),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\views\\categories\\index.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] index.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-f89716ac", Component.options)
+  } else {
+    hotAPI.reload("data-v-f89716ac", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 642 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('tr', [_c('td', [_c('a', {
+    attrs: {
+      "herf": "#"
+    },
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.selected(_vm.category.id)
+      }
+    }
+  }, [_vm._v(_vm._s(_vm.category.name))])]), _vm._v(" "), _c('td', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.getType(_vm.category))
+    }
+  }), _vm._v(" "), _c('td', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.$options.filters.showIcon(_vm.category.icon))
+    }
+  }), _vm._v(" "), _c('td', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.$options.filters.activeLabel(_vm.category.active))
+    }
+  }), _vm._v(" "), _c('td', [_c('button', {
+    staticClass: "btn btn-default btn-xs",
+    on: {
+      "click": function($event) {
+        _vm.displayUp(_vm.category.id)
+      }
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-arrow-up",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  })]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default btn-xs",
+    on: {
+      "click": function($event) {
+        _vm.displayDown(_vm.category.id)
+      }
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-arrow-down",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  })])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-02dc7608", module.exports)
+  }
+}
+
+/***/ }),
+/* 643 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return (_vm.loaded) ? _c('data-viewer', {
+    attrs: {
+      "default_search": _vm.defaultSearch,
+      "default_order": _vm.defaultOrder,
+      "default_direction": _vm.defaultDirection,
+      "source": _vm.source,
+      "thead": _vm.thead,
+      "no_search": _vm.can_select,
+      "filter": _vm.filter,
+      "title": _vm.title,
+      "create_text": _vm.createText,
+      "no_page": _vm.no_page,
+      "version": _vm.current_version
+    },
+    on: {
+      "refresh": _vm.init,
+      "beginCreate": _vm.beginCreate,
+      "dataLoaded": _vm.onDataLoaded
+    },
+    scopedSlots: {
+      default: function(props) {
+        return [_c('row', {
+          attrs: {
+            "category": props.item
+          },
+          on: {
+            "selected": _vm.onRowSelected,
+            "display-up": _vm.onDisplayUp,
+            "display-down": _vm.onDisplayDown
+          }
+        })]
+      }
+    }
+  }) : _vm._e()
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-ae279f40", module.exports)
+  }
+}
+
+/***/ }),
+/* 644 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('category-list', {
+    attrs: {
+      "hide_create": _vm.hide_create,
+      "version": _vm.currenVersion,
+      "can_select": _vm.can_select
+    },
+    on: {
+      "selected": _vm.onSelected,
+      "begin-create": _vm.onBeginCreate
+    }
+  })
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-f89716ac", module.exports)
+  }
+}
+
+/***/ }),
+/* 645 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_show_vue__ = __webpack_require__(651);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_show_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_category_show_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_category_edit_vue__ = __webpack_require__(650);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_category_edit_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_category_edit_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'Category',
+    components: {
+        Show: __WEBPACK_IMPORTED_MODULE_0__components_category_show_vue___default.a,
+        Edit: __WEBPACK_IMPORTED_MODULE_1__components_category_edit_vue___default.a
+    },
+    props: {
+        id: {
+            type: Number,
+            default: 0
+        },
+        can_edit: {
+            type: Boolean,
+            default: true
+        },
+        can_back: {
+            type: Boolean,
+            default: true
+        },
+        version: {
+            type: Number,
+            default: 0
+        }
+    },
+    data: function data() {
+        return {
+            readOnly: true,
+            deleteConfirm: {
+                id: 0,
+                show: false,
+                msg: ''
+
+            }
+        };
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    watch: {
+        'id': 'init',
+        'version': 'init'
+    },
+    methods: {
+        init: function init() {
+            this.readOnly = true;
+            this.deleteConfirm = {
+                id: 0,
+                show: false,
+                msg: ''
+            };
+        },
+        onDataLoaded: function onDataLoaded(category) {
+            this.$emit('loaded', category);
+        },
+        beginEdit: function beginEdit() {
+            this.readOnly = false;
+        },
+        onEditCanceled: function onEditCanceled() {
+            this.init();
+        },
+        onSaved: function onSaved(category) {
+            this.init();
+            this.$emit('saved', category);
+        },
+        onBtnBackClicked: function onBtnBackClicked() {
+            this.$emit('btn-back-clicked');
+        },
+        beginDelete: function beginDelete(values) {
+            this.deleteConfirm.msg = values.name;
+            this.deleteConfirm.id = values.id;
+            this.deleteConfirm.show = true;
+        },
+        closeConfirm: function closeConfirm() {
+            this.deleteConfirm.show = false;
+        },
+        deleteCategory: function deleteCategory() {
+            var _this = this;
+
+            var id = this.deleteConfirm.id;
+            var remove = Category.delete(id);
+            remove.then(function (result) {
+                Helper.BusEmitOK('刪除成功');
+                _this.deleteConfirm.show = false;
+                _this.$emit('deleted');
+            }).catch(function (error) {
+                Helper.BusEmitError(error, '刪除失敗');
+                _this.closeConfirm();
+            });
+        }
+    }
+};
+
+/***/ }),
+/* 646 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'EditCategory',
+    props: {
+        id: {
+            type: Number,
+            default: 0
+        },
+        course_id: {
+            type: Number,
+            default: 0
+        }
+    },
+    data: function data() {
+        return {
+            title: '',
+            loaded: false,
+            course: {},
+            form: new Form({
+                category: {}
+            }),
+
+            activeOptions: Helper.activeOptions(),
+
+            publicOptions: Helper.boolOptions()
+        };
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    methods: {
+        init: function init() {
+            this.loaded = false;
+            this.form = new Form({
+                category: {}
+
+            });
+            if (this.id) {
+                this.title = '  編輯課程分類';
+            } else {
+                this.title = '  新增課程分類';
+            }
+            this.fetchData();
+        },
+        fetchData: function fetchData() {
+            var _this = this;
+
+            var getData = null;
+            if (this.id) {
+                getData = Category.edit(this.id);
+            } else {
+                getData = Category.create(this.course_id);
+            }
+            getData.then(function (data) {
+                var category = data.category;
+                _this.form.category = data.category;
+
+                _this.loaded = true;
+            }).catch(function (error) {
+                Helper.BusEmitError(error);
+                _this.loaded = false;
+            });
+        },
+        setPublic: function setPublic(val) {
+            this.form.category.public = val;
+        },
+        setActive: function setActive(val) {
+            this.form.category.active = val;
+        },
+        setStatus: function setStatus(val) {
+            this.form.category.status = val;
+        },
+        clearErrorMsg: function clearErrorMsg(name) {
+            this.form.errors.clear(name);
+        },
+        onSubmit: function onSubmit() {
+            this.submitForm();
+        },
+        submitForm: function submitForm() {
+            var _this2 = this;
+
+            var store = null;
+
+            if (this.id) {
+                store = Category.update(this.form, this.id);
+            } else {
+                store = Category.store(this.form);
+            }
+
+            store.then(function (data) {
+                Helper.BusEmitOK();
+                _this2.$emit('saved', data);
+            }).catch(function (error) {
+                Helper.BusEmitError(error);
+            });
+        },
+        onCanceled: function onCanceled() {
+            this.$emit('canceled');
+        }
+    }
+
+};
+
+/***/ }),
+/* 647 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+   name: 'ShowSignup',
+   props: {
+      id: {
+         type: Number,
+         default: 0
+      },
+      version: {
+         type: Number,
+         default: 0
+      },
+      can_edit: {
+         type: Boolean,
+         default: true
+      },
+      can_back: {
+         type: Boolean,
+         default: true
+      }
+   },
+   data: function data() {
+      return {
+         title: Helper.getIcon(Category.title()) + '  課程分類',
+         loaded: false,
+         category: null
+      };
+   },
+
+   watch: {
+      'version': 'init'
+   },
+   beforeMount: function beforeMount() {
+      this.init();
+   },
+
+   methods: {
+      init: function init() {
+
+         this.loaded = false;
+         this.category = null;
+         if (this.id) this.fetchData();
+      },
+      fetchData: function fetchData() {
+         var _this = this;
+
+         var getData = Category.show(this.id);
+
+         getData.then(function (data) {
+            var category = data.category;
+            _this.category = new Category(category);
+            _this.$emit('loaded', category);
+            _this.loaded = true;
+         }).catch(function (error) {
+            Helper.BusEmitError(error);
+         });
+      },
+      btnEditClicked: function btnEditClicked() {
+         this.$emit('begin-edit');
+      },
+      onBtnBackClick: function onBtnBackClick() {
+         this.$emit('btn-back-clicked');
+      },
+      btnDeleteClicked: function btnDeleteClicked() {
+         var values = {
+            name: '確定要刪除此課程進度嗎？',
+            id: this.id
+         };
+         this.$emit('btn-delete-clicked', values);
+      }
+   }
+};
+
+/***/ }),
+/* 648 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_category_vue__ = __webpack_require__(649);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_category_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_category_category_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+   name: 'CategoryDetails',
+   components: {
+      Category: __WEBPACK_IMPORTED_MODULE_0__components_category_category_vue___default.a
+
+   },
+   props: {
+      id: {
+         type: Number,
+         default: 0
+      },
+      version: {
+         type: Number,
+         default: 0
+      },
+      can_edit: {
+         type: Boolean,
+         default: true
+      },
+      can_back: {
+         type: Boolean,
+         default: true
+      }
+   },
+   data: function data() {
+      return {
+         loaded: false,
+         readonly: true,
+         category: null,
+         current_version: 0,
+
+         activeIndex: 0,
+
+         refundSettings: {
+            can_back: false
+         },
+         backTuitionSettings: {
+            hide_create: false
+         }
+      };
+   },
+
+   computed: {
+      hasRefundRecord: function hasRefundRecord() {
+         if (!this.category) return false;
+         if (!this.category.hasRefund) return false;
+         return true;
+      }
+   },
+   beforeMount: function beforeMount() {
+      this.init();
+   },
+
+   methods: {
+      init: function init() {
+         this.loaded = false;
+         this.readonly = true;
+         this.activeIndex = 0;
+      },
+      toBoolean: function toBoolean(val) {
+         return val == 'true';
+      },
+      onDataLoaded: function onDataLoaded(category) {
+         this.loaded = true;
+         this.category = category;
+      },
+      btnEditClicked: function btnEditClicked() {
+         this.beginEdit();
+      },
+      beginEdit: function beginEdit() {
+         this.readonly = false;
+      },
+      editCanceled: function editCanceled() {
+         this.readonly = true;
+      },
+      categoryUpdated: function categoryUpdated() {
+         this.init();
+      },
+      onBtnBackClicked: function onBtnBackClicked() {
+         this.$emit('btn-back-clicked');
+      },
+      onCategoryDeleted: function onCategoryDeleted() {
+         this.$emit('category-deleted');
+      }
+   }
+
+};
+
+/***/ }),
+/* 649 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(645),
+  /* template */
+  __webpack_require__(653),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\category\\category.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] category.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-012e3080", Component.options)
+  } else {
+    hotAPI.reload("data-v-012e3080", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 650 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(646),
+  /* template */
+  __webpack_require__(656),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\category\\edit.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] edit.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-8f975068", Component.options)
+  } else {
+    hotAPI.reload("data-v-8f975068", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 651 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(647),
+  /* template */
+  __webpack_require__(655),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\category\\show.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] show.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-4485133f", Component.options)
+  } else {
+    hotAPI.reload("data-v-4485133f", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 652 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(648),
+  /* template */
+  __webpack_require__(654),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\views\\categories\\details.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] details.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-43b713cc", Component.options)
+  } else {
+    hotAPI.reload("data-v-43b713cc", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 653 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [(_vm.readOnly) ? _c('show', {
+    attrs: {
+      "id": _vm.id,
+      "can_edit": "can_edit",
+      "can_back": _vm.can_back,
+      "version": _vm.version
+    },
+    on: {
+      "begin-edit": _vm.beginEdit,
+      "loaded": _vm.onDataLoaded,
+      "btn-back-clicked": _vm.onBtnBackClicked,
+      "btn-delete-clicked": _vm.beginDelete
+    }
+  }) : _c('edit', {
+    attrs: {
+      "id": _vm.id
+    },
+    on: {
+      "saved": _vm.onSaved,
+      "canceled": _vm.onEditCanceled
+    }
+  }), _vm._v(" "), _c('delete-confirm', {
+    attrs: {
+      "showing": _vm.deleteConfirm.show,
+      "message": _vm.deleteConfirm.msg
+    },
+    on: {
+      "close": _vm.closeConfirm,
+      "confirmed": _vm.deleteCategory
+    }
+  })], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-012e3080", module.exports)
+  }
+}
+
+/***/ }),
+/* 654 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('category', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.loaded),
+      expression: "loaded"
+    }],
+    attrs: {
+      "id": _vm.id,
+      "can_edit": _vm.can_edit,
+      "can_back": _vm.can_back,
+      "version": _vm.current_version
+    },
+    on: {
+      "saved": _vm.categoryUpdated,
+      "loaded": _vm.onDataLoaded,
+      "btn-back-clicked": _vm.onBtnBackClicked,
+      "deleted": _vm.onCategoryDeleted
+    }
+  })], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-43b713cc", module.exports)
+  }
+}
+
+/***/ }),
+/* 655 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return (_vm.loaded) ? _c('div', {
+    staticClass: "panel panel-default show-data"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_c('span', {
+    staticClass: "panel-title"
+  }, [_c('h4', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.title)
+    }
+  })]), _vm._v(" "), _c('div', [_c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.can_back),
+      expression: "can_back"
+    }],
+    staticClass: "btn btn-default btn-sm",
+    on: {
+      "click": _vm.onBtnBackClick
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-arrow-left",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v("\n             返回\n          ")]), _vm._v(" "), (_vm.category.canEdit) ? _c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.can_edit),
+      expression: "can_edit"
+    }],
+    staticClass: "btn btn-primary btn-sm",
+    on: {
+      "click": _vm.btnEditClicked
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-pencil"
+  }), _vm._v(" 編輯\n          ")]) : _vm._e(), _vm._v(" "), (_vm.category.canDelete) ? _c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.can_edit),
+      expression: "can_edit"
+    }],
+    staticClass: "btn btn-danger btn-sm",
+    on: {
+      "click": _vm.btnDeleteClicked
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-trash"
+  }), _vm._v(" 刪除\n          ")]) : _vm._e()])]), _vm._v(" "), (_vm.loaded) ? _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("分類名稱")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "textContent": _vm._s(_vm.category.name)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("小圖")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.$options.filters.showIcon(_vm.category.icon))
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("狀態")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.$options.filters.activeLabel(_vm.category.active))
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("最後更新")]), _vm._v(" "), _c('updated', {
+    attrs: {
+      "entity": _vm.category
+    }
+  })], 1)])]) : _vm._e()]) : _vm._e()
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-4485133f", module.exports)
+  }
+}
+
+/***/ }),
+/* 656 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_c('span', {
+    staticClass: "panel-title"
+  }, [_c('h4', [_c('span', {
+    staticClass: "glyphicon glyphicon-th-list",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v("\n\n                   " + _vm._s(_vm.title) + "\n               ")])])]), _vm._v(" "), (_vm.loaded) ? _c('div', {
+    staticClass: "panel-body"
+  }, [_c('form', {
+    staticClass: "form",
+    on: {
+      "submit": function($event) {
+        $event.preventDefault();
+        _vm.onSubmit($event)
+      },
+      "keydown": function($event) {
+        _vm.clearErrorMsg($event.target.name)
+      }
+    }
+  }, [_c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("分類名稱")]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.category.name),
+      expression: "form.category.name"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "name": "category.name"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.category.name)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.category.name = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.form.errors.has('category.name')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('category.name'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("小圖樣式")]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.category.icon),
+      expression: "form.category.icon"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "name": "category.icon"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.category.icon)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.category.icon = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.form.errors.has('category.icon')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('category.icon'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("置頂")]), _vm._v(" "), _c('div', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.category.public),
+      expression: "form.category.public"
+    }],
+    attrs: {
+      "type": "hidden"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.category.public)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.category.public = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('toggle', {
+    attrs: {
+      "items": _vm.publicOptions,
+      "default_val": _vm.form.category.public
+    },
+    on: {
+      "selected": _vm.setPublic
+    }
+  })], 1)])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("狀態")]), _vm._v(" "), _c('div', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.category.active),
+      expression: "form.category.active"
+    }],
+    attrs: {
+      "type": "hidden"
+    },
+    domProps: {
+      "value": _vm._s(_vm.form.category.active)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.category.active = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('toggle', {
+    attrs: {
+      "items": _vm.activeOptions,
+      "default_val": _vm.form.category.active
+    },
+    on: {
+      "selected": _vm.setActive
+    }
+  })], 1)])])]), _vm._v(" "), _c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-4"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('button', {
+    staticClass: "btn btn-success",
+    attrs: {
+      "type": "submit",
+      "disabled": _vm.form.errors.any()
+    }
+  }, [_vm._v("確認送出")]), _vm._v("\n                              \n                         "), _c('button', {
+    staticClass: "btn btn-default",
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.onCanceled($event)
+      }
+    }
+  }, [_vm._v("取消")])])])])])]) : _vm._e()])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-8f975068", module.exports)
+  }
+}
+
+/***/ }),
+/* 657 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_edit_vue__ = __webpack_require__(650);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_category_edit_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_category_edit_vue__);
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'CategoryCreate',
+    components: {
+        'edit-category': __WEBPACK_IMPORTED_MODULE_0__components_category_edit_vue___default.a
+    },
+    props: {
+        course_id: {
+            type: Number,
+            default: 0
+        }
+    },
+    data: function data() {
+        return {};
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    methods: {
+        init: function init() {},
+        onCanceled: function onCanceled() {
+            this.$emit('canceled');
+        },
+        onSaved: function onSaved() {
+            this.$emit('saved');
+        }
+    }
+
+};
+
+/***/ }),
+/* 658 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(657),
+  /* template */
+  __webpack_require__(659),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\views\\categories\\create.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] create.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1a8e6b54", Component.options)
+  } else {
+    hotAPI.reload("data-v-1a8e6b54", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 659 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('edit-category', {
+    attrs: {
+      "course_id": _vm.course_id
+    },
+    on: {
+      "canceled": _vm.onCanceled,
+      "saved": _vm.onSaved
+    }
+  })
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1a8e6b54", module.exports)
   }
 }
 
