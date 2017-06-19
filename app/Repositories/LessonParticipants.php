@@ -3,42 +3,50 @@
 namespace App\Repositories;
 
 use App\Lesson;
+use App\Role;
 use App\LessonParticipant;
 class LessonParticipants 
 {
-     public function addTeacher($values)
+     public function addTeacher($lesson_id, $teacher_id,$updated_by)
      {
-         $teacher=$values['user_id'];
-         $lesson_id=$values['lesson_id'];
-        
-         $lesson=Lesson::findOrFail($lesson_id);
-         if($lesson->hasTeacher($teacher)){
-          
-             return $this->getByUser($lesson_id,$teacher);
-         }
+        $lesson=Lesson::findOrFail($lesson_id);
+        if($lesson->hasTeacher($teacher_id)){
+             return $this->getByUser($lesson_id,$teacher_id);
+        }
+
+        $values=[
+                    'lesson_id' => $lesson_id,
+                    'user_id' => $teacher_id,
+                    'status' => 0,  
+                    'updated_by' => $updated_by           
+                ];
 
          $teacher=new LessonParticipant($values);
         
-         $teacher->role='Teacher';
+         $teacher->role= Role::teacherRoleName();
          $teacher->save();
          return $teacher;
      }
      
-     public function addVolunteer($values)
+     public function addVolunteer($lesson_id, $volunteer_id,$updated_by)
      {
-         $volunteer=$values['user_id'];
-         $lesson_id=$values['lesson_id'];
-        
-         $lesson=Lesson::findOrFail($lesson_id);
-         if($lesson->hasVolunteer($volunteer)){
-             return $this->getByUser($lesson_id,$volunteer);
-         }
+        $lesson=Lesson::findOrFail($lesson_id);
+        if($lesson->hasVolunteer($volunteer_id)){
+             return $this->getByUser($lesson_id,$volunteer_id);
+        }
 
-         $volunteer=new LessonParticipant($values);
+        $values=[
+                    'lesson_id' => $lesson_id,
+                    'user_id' => $volunteer_id,
+                    'status' => 0,  
+                    'updated_by' => $updated_by           
+                ];
+
+        $volunteer=new LessonParticipant($values);
         
-         $volunteer->role='Volunteer';
-         $volunteer->save();
-         return $volunteer;
+        $volunteer->role= Role::volunteerRoleName();
+        $volunteer->save();
+        return $volunteer;
      }
 
      public function remove($id)

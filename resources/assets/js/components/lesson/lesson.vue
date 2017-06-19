@@ -1,74 +1,117 @@
 <template>
 <div>
-    <lesson-index v-if="indexMode" :course_id="course_id" :canEdit="canEdit"
-      @beginCreate="beginCreate" @onBeginShow="beginShow">
-    </lesson-index>
-    <show v-if="detailsMode" :id="id" @endShow="endShow" @deleted="onDeleted"></show>
-    <edit-lesson v-if="creating"  :course_id="course_id"
-       @saved="lessonCreated"   @canceled="endCreate" >                 
-    </edit-lesson>
-</div>
-
-</template>
-
-<script>
     
-    import LessonIndex from '../../components/lesson/index.vue'
-    import EditLesson from '../../components/lesson/edit-lesson.vue'
+    <show v-if="readOnly"  :id="id" can_edit="can_edit"  :can_back="can_back"  
+       :version="version"  @begin-edit="beginEdit" @loaded="onDataLoaded"
+       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" >                 
+    </show>
+
+    <edit v-else :id="id" 
+       @saved="onSaved"   @canceled="onEditCanceled" >                 
+    </edit> 
+
+    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+      @close="closeConfirm" @confirmed="deleteLesson">        
+    </delete-confirm>
+    
+
+</div>
+</template>
+<script>
     import Show from '../../components/lesson/show.vue'
+    import Edit from '../../components/lesson/edit.vue'
+
+
     export default {
-        name: 'Lesson',
+        name:'Lesson',
         components: {
-            'lesson-index':LessonIndex,
-             'edit-lesson':EditLesson,
-             Show
+            Show,
+            Edit,
         },
-        props: ['course_id','canEdit'],
-        beforeMount() {
-           this.init()
+        props: {
+            id: {
+              type: Number,
+              default: 0
+            },
+            can_edit:{
+               type: Boolean,
+               default: true
+            },          
+            can_back:{
+              type: Boolean,
+              default: true
+            },
+            version: {
+              type: Number,
+              default: 0
+            },
         },
         data() {
             return {
-                mode:'index',
-                id:0,
+                readOnly:true,
+                deleteConfirm:{
+                    id:0,
+                    show:false,
+                    msg:'',
+
+                }    
             }
         },
-        computed:{
-            creating(){
-                return this.mode=='create'    
-            },
-            indexMode(){
-                return this.mode=='index'    
-            },
-            detailsMode(){
-                return this.mode=='details' 
-            }
+        beforeMount(){
+            this.init()
+        },
+        watch: {
+            'id': 'init',
+            'version':'init'
         },
         methods: {
             init() {
-                this.mode='index'       
-            },  
-            beginCreate(){
-                this.mode ='create'  
+               this.readOnly=true
+               this.deleteConfirm={
+                    id:0,
+                    show:false,
+                    msg:''
+               }
+            },      
+            onDataLoaded(lesson){
+                this.$emit('loaded',lesson)
+            },        
+            beginEdit() {
+                this.readOnly=false
             },
-            endCreate(){
-                 this.mode='index'    
+            onEditCanceled(){
+                this.init()
             },
-            lessonCreated(lesson){    
-                 this.init()
+            onSaved(lesson){
+                this.init()
+                this.$emit('saved',lesson)
             },
-            beginShow(id){
-                this.id=id
-                this.mode='details'
+            
+            onBtnBackClicked(){
+                this.$emit('btn-back-clicked')
             },
-            endShow(){
-                this.mode='index'   
+            beginDelete(values){
+                this.deleteConfirm.msg= values.name
+                this.deleteConfirm.id=values.id
+                this.deleteConfirm.show=true                
             },
-            onDeleted(){
-                 this.init()
-            }
-
-        },
-
+            closeConfirm(){
+                this.deleteConfirm.show=false
+            },
+            deleteLesson(){
+                let id = this.deleteConfirm.id 
+                let remove= Lesson.delete(id)
+                remove.then(result => {
+                    Helper.BusEmitOK('刪除成功')
+                    this.deleteConfirm.show=false
+                    this.$emit('deleted')
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error,'刪除失敗')
+                    this.closeConfirm()   
+                })
+            },
+            
+        }
     }
 </script>

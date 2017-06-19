@@ -6,9 +6,9 @@
     @selected="onLessonSelected" @begin-create="beginCreate">
    </lesson-index> 
 
-   {{-- <lesson-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
+   <lesson-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
      @btn-back-clicked="backToIndex" @lesson-deleted="onLessonDeleted">
-  </lesson-details> --}}
+  </lesson-details>
 
    <lesson-create v-if="creating"   :course_id="course_id"
     @canceled="createCanceled" @saved="lessonCreated">

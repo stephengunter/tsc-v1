@@ -26,15 +26,13 @@
                   <div class="form-group">
                     <label  class="col-sm-2 control-label">課程名稱</label>
                     <div class="col-sm-6">
-                        <select v-model="form.course_id"  class="form-control" >
-                            <option :value="course.id" v-text="courseNameText">課程名稱</option>
-                        </select>
+                        <input type="text" name="course" :value="courseName"  class="form-control"  disabled>
                     </div>
                   </div>
                   <div class="form-group">
                     <label  class="col-sm-2 control-label">上課地點</label>
                     <div class="col-sm-6 form-inline">
-                       <select class="form-control" >
+                       <select>
                             <option v-text="course.center.name"></option>
                        </select> &nbsp;&nbsp;&nbsp;
                        <select v-model="form.classroom_id" class="form-control" >
@@ -92,15 +90,18 @@
 <script>
     export default {
         name: 'InitializeLessons',
-        props: ['course_id'],
-        components: {
-            
+        props: {
+            course_id: {
+              type: Number,
+              default: 0
+            }
         },
         data() {
             return {
                 loaded:false,
                 course:{},
                 classTimes:[],
+                courseName:'',
                 form: new Form({
                     course_id: 0,
                     classroom_id:0
@@ -109,9 +110,6 @@
             }
         },
         computed: {
-            courseNameText() {
-                return this.course.number + ' ' + this.course.name
-            },
             classCount(){
                 if(!this.classTimes.length) return 0
                   return this.classTimes.length * this.course.weeks
@@ -139,44 +137,30 @@
                 this.classTimes=[]
                 this.classroomOptions=[]
                 this.form = new Form({
-                    course_id:0,
+                    course_id:this.course_id,
                     classroom_id:0
                 })
                 this.fetchData()  
             }, 
             fetchData() {
-                let url = '/api/lessons/initialize/' + this.course_id
-                      
-                axios.get(url)
-                    .then(response => {
-                       this.classTimes=response.data.classTimes
-                        let course = response.data.course
-                        this.form = new Form({
-                            course_id:course.id,
-                            classroom_id:0
-                        })
-                        this.course=course
+                let create=Lesson.createInitialize(this.course_id)
+              
+                create.then(data => {
+                    this.classTimes=data.classTimes
+                    let course = data.course
+                    this.classroomOptions=data.classroomOptions
+                    this.form.classroom_id=data.classroomOptions[0].value
+                    this.course=course
+                    this.courseName=Course.getFormatedCourseName(course,true)
 
-
-                        this.loadClassroomOptions()
-                       
-                    })
-                    .catch(function(error) {
-                        console.log(error)                            
-                    })
+                    this.loaded=true
+                   
+                })
+                .catch(error => {
+                       Helper.BusEmitError(error)
+                })
             },
-            loadClassroomOptions(){
-                let url='/api/classrooms/options/' + this.course.center_id
-                 axios.get(url)
-                    .then(response => {
-                        this.classroomOptions = response.data.options
-                        this.form.classroom_id=this.classroomOptions[0].value
-                        this.loaded=true
-                    })
-                    .catch(function(error) {
-                        console.log(error)                            
-                    })
-            },
+            
             classTimeFullText(classTime){
               
                return Helper.classTimeFullText(classTime) +   '&nbsp;&nbsp;&nbsp;'             

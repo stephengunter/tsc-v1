@@ -137,7 +137,7 @@ class BaseController extends Controller
                
             );
         }
-        if($key=='courses'){
+        if($key =='courses' || 'lessons'){
            return array(
                 [
                     'id' => 1,
@@ -150,6 +150,12 @@ class BaseController extends Controller
                     'text' => '新增課程',
                     'path' => '/courses/create',
                     'active' => $current=='courses/create'
+                ],
+                [
+                    'id' => 2,
+                    'text' => '課堂紀錄表',
+                    'path' => '/lessons',
+                    'active' => $current=='lessons'
                 ],
             );
         }

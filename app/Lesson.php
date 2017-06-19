@@ -63,11 +63,9 @@ class Lesson extends Model
     public function teachers() 
     {
 		$ids =$this->teacherIds();
-        if(empty($ids))  return null;
+        if(empty($ids))  return [];
         $teachers=Teacher::whereIn('user_id', $ids)->get();
-        foreach ($teachers as $teacher) {
-                $teacher->name=$teacher->getName();
-        }
+       
         return $teachers;
 	}
     public function teacherIds() 
@@ -85,8 +83,10 @@ class Lesson extends Model
     public function volunteers() 
     {
         $ids =$this->volunteerIds();
-        if(empty($ids))  return null;
-        return User::with('profile')->whereIn('id', $ids)->get();
+        if(empty($ids))  return [];
+        $volunteers=Volunteer::whereIn('user_id', $ids)->get();
+       
+        return  $volunteers;
 	}
     public function volunteerIds() 
     {

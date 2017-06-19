@@ -67,6 +67,7 @@ Vue.component('course-create', require('./views/courses/create') )
 Vue.component('course-details', require('./views/courses/details') )
 
 Vue.component('lesson-index', require('./views/lessons/index') )
+Vue.component('lesson-details', require('./views/lessons/details') )
 Vue.component('lesson-create', require('./views/lessons/create') )
 
 Vue.component('center-index', require('./views/centers/index') )

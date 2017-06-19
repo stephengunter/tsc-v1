@@ -14,21 +14,43 @@
      
     <lesson-list v-if="ready" :course_id="course_id" :hide_create="hide_create" 
         :version="version" :can_select="can_select"
-        @selected="onSelected" @begin-create="onBeginCreate">
+        @selected="onSelected" @begin-create="onBeginCreate"
+        @begin-initialize="onBeginInitialize" >
     </lesson-list>
 
+    <modal :showbtn="false" :width="initializeSettings.width" :show.sync="initializeSettings.show"  @closed="initializeCanceled" 
+        effect="fade">
+          <div slot="modal-header" class="modal-header">
+           
+            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="initializeCanceled">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </button>
+           
+          </div>
+        <div slot="modal-body" class="modal-body">
+           
+            <lesson-initialize v-if="initializeSettings.show" :course_id="course_id"
+               @success="onInitializeSuccess" @failed="onInitializeFailed">
+                
+            </lesson-initialize>
+
+      
+        </div>
+    </modal>  
+    
 </div>
 
 </template>
 
 <script>
     import LessonList from '../../components/lesson/list.vue'
-    
+    import InitializeLessons from '../../components/lesson/initialize.vue'
 
     export default {
         name: 'LessonIndex',       
         components: {
-            'lesson-list':LessonList
+            'lesson-list':LessonList,
+            'lesson-initialize':InitializeLessons
         },
         props: {
             version: {
@@ -51,6 +73,12 @@
 
                 combinationSettings:{
                     withCourse:true,
+                },
+
+                initializeSettings:{
+                    course_id:0,
+                    show:false,
+                    width:1000,
                 }
 
              
@@ -61,7 +89,11 @@
         },
         methods: {
             init(){
-                
+                this.initializeSettings={
+                    course_id:0,
+                    show:false,
+                    width:1000,
+                }
              
             },
             
@@ -78,6 +110,22 @@
             },
             onBeginCreate(){
                 this.$emit('begin-create',this.course_id)
+            },
+
+            onBeginInitialize(){
+                 this.initializeSettings.show=true
+            },
+            initializeCanceled(){
+                this.initializeSettings.show=false
+            },
+            onInitializeSuccess(){
+                this.initializeSettings.show=false
+                Helper.BusEmitOK('初始化成功')
+                this.init()
+            },
+            onInitializeFailed(error){
+                this.initializeSettings.show=false
+                Helper.BusEmitError(error,'初始化失敗')
             }
             
             

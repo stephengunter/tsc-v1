@@ -55,7 +55,8 @@ class LessonsController extends BaseController
             return view('lessons.index')
                     ->with(['menus' => $menus]);
         } 
-        $course=$request->get('course');
+        $course=(int)$request->course;
+        
         if(!$course) abort(404);
        
         $lessonList=$this->lessons->getAll()   
@@ -66,8 +67,16 @@ class LessonsController extends BaseController
         if(count($lessonList)){
            
             foreach ($lessonList as $lesson) {
+                
                 $lesson->teachers=$lesson->teachers();
+                foreach ($lesson->teachers as $teacher) {
+                     $teacher->name=$teacher->getName();
+                }
+
                 $lesson->volunteers=$lesson->volunteers();
+                foreach ($lesson->volunteers as $volunteer) {
+                     $volunteer->name=$volunteer->getName();
+                }
             }
         }
         
@@ -76,63 +85,7 @@ class LessonsController extends BaseController
        
     }
 
-    public function  initializeForm($course)
-    {
-         $course=$this->courses->findOrFail($course);   
-         $current_user=$this->checkAdmin->getAdmin();
-        
-         if(!$course->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
-         }
-
-         $course->center;
-         $course->schedules;
-         $classTimes =$this->classtimes->getByCourse($course->id);
-                    
-           return response()
-                    ->json([
-                        'course' => $course ,
-                        'classTimes' => $classTimes
-                    ]);  
-    }
-    public function  initialize(Request $request)
-    {
-         $classroom_id=$request['classroom_id'];
-         $course_id=$request['course_id'];
-
-         $course=$this->courses->findOrFail($course_id);
-         $current_user=$this->checkAdmin->getAdmin();
-        
-         if(!$course->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
-         }
-         $updated_by=$current_user->id;
-         $this->lessons->initialize($course , $classroom_id,$updated_by);  
-
-         if(!$course->teachers){
-             return response()
-                    ->json([
-                        'saved' => true 
-                    ]); 
-         }
-
-      
-         $teacherIds=array_pluck( $course->teachers->toArray(), 'user_id');
-         $withClassroom=false;
-         $classLessons=$this->lessons->getByCourse($course_id,$withClassroom)
-                                        ->where('status','>', -1)->get();
-         foreach($classLessons as $lesson)
-         {
-             $this->addTeachers($lesson->id,$teacherIds,$updated_by);    
-         }
-
-
-          return response()
-            ->json([
-                'saved' => true 
-            ]); 
-
-    }
+    
    
     public function create()
     {
@@ -207,83 +160,83 @@ class LessonsController extends BaseController
     {
        if(empty($teacherIds)) return false;
         for($i = 0; $i < count($teacherIds); $i++) {
-                $values=[
-                    'lesson_id' => $lesson,
-                    'user_id' => $teacherIds[$i],
-                    'status' => 0,  
-                    'updated_by' => $updated_by           
-                ];
-
-            $this->lessonParticipants->addTeacher($values);
+            $this->lessonParticipants->addTeacher($lesson , $teacherIds[$i] ,$updated_by);
         }
     }
     private function addVolunteers($lesson,$volunteerIds,$updated_by)
     {
         if(empty($volunteerIds)) return false;
         for($i = 0; $i < count($volunteerIds); $i++) {
-                $values=[
-                    'lesson_id' => $lesson,
-                    'user_id' => $volunteerIds[$i],
-                    'status' => 0,     
-                    'updated_by' => $updated_by               
-                ];
-
-            $this->lessonParticipants->addVolunteer($values);
+            $this->lessonParticipants->addVolunteer($lesson , $volunteerIds[$i] ,$updated_by);
         }
     }
 
    
 
-    public function dayOff(Request $request)
-    {
+    // public function dayOff(Request $request)
+    // {
        
-        $current_user=$this->checkAdmin->getAdmin();
-        $removed=false;
-        $updated_by=$current_user->id;
+    //     $current_user=$this->checkAdmin->getAdmin();
+    //     $removed=false;
+    //     $updated_by=$current_user->id;
        
-        $lessonValues = $request['lesson'];
-        if (array_key_exists('id', $lessonValues)){
-            $id=$lessonValues['id'];
-            $lesson=Lesson::findOrFail($id); 
-            if(!$lesson->canEditBy($current_user)){
-                return   response()->json(['msg' => '權限不足' ]  ,  401);      
-            }
+    //     $lessonValues = $request['lesson'];
+    //     if (array_key_exists('id', $lessonValues)){
+    //         $id=$lessonValues['id'];
+    //         $lesson=Lesson::findOrFail($id); 
+    //         if(!$lesson->canEditBy($current_user)){
+    //             return   response()->json(['msg' => '權限不足' ]  ,  401);      
+    //         }
 
-            $lesson=$this->lessons->dayOff($id, $updated_by);
-            return response()->json($lesson);
-        }else{
-             $values= array_only($lessonValues, ['course_id','date', 'status']);
-             $course_id=$values['course_id']; 
-             $course=Course::findOrFail($course_id);
-             if(!$course->canEditBy($current_user)){
-                return   response()->json(['msg' => '權限不足' ]  ,  401);    
-             }
+    //         $lesson=$this->lessons->dayOff($id, $updated_by);
+    //         return response()->json($lesson);
+    //     }else{
+    //          $values= array_only($lessonValues, ['course_id','date', 'status']);
+    //          $course_id=$values['course_id']; 
+    //          $course=Course::findOrFail($course_id);
+    //          if(!$course->canEditBy($current_user)){
+    //             return   response()->json(['msg' => '權限不足' ]  ,  401);    
+    //          }
 
-             $values=Helper::setUpdatedBy($values,$updated_by);
-             $values=Helper::setRemoved($values,$removed);
+    //          $values=Helper::setUpdatedBy($values,$updated_by);
+    //          $values=Helper::setRemoved($values,$removed);
 
-             $lesson=$this->lessons->store($values);
+    //          $lesson=$this->lessons->store($values);
 
-              return response()->json($lesson);
+    //           return response()->json($lesson);
             
-        }
+    //     }
         
        
       
-    }
+    // }
 
     public function show($id)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        if(!request()->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('lessons.details')
+                    ->with([ 'menus' => $menus,
+                              'id' => $id     
+                        ]);
+        }  
+        $current_user=$this->currentUser();
 
         $lesson=Lesson::with('course','classroom')->findOrFail($id);
         $lesson->teachers=$lesson->teachers();
+        foreach ($lesson->teachers as $teacher) {
+                $teacher->name=$teacher->getName();
+        }
         $lesson->volunteers=$lesson->volunteers();
+        
+        foreach ($lesson->volunteers as $volunteer) {
+                $volunteer->name=$volunteer->getName();
+        }
 
-         $lesson->canEdit=$lesson->canEditBy($current_user);
-         $lesson->canDelete=$lesson->canDeleteBy($current_user);
+        $lesson->canEdit=$lesson->canEditBy($current_user);
+        $lesson->canDelete=$lesson->canDeleteBy($current_user);
 
-         return response()
+        return response()
                 ->json([
                     'lesson' => $lesson
                 ]);
@@ -293,9 +246,9 @@ class LessonsController extends BaseController
     {
         $lesson=Lesson::findOrFail($id); 
         
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         if(!$lesson->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);      
+            return  $this->unauthorized();   
         }
 
         $course=$this->courses->findOrFail($lesson->course_id);
@@ -308,6 +261,7 @@ class LessonsController extends BaseController
         }
 
         $volunteers=$lesson->volunteers();
+       
         if($volunteers){
             $volunteers=$this->volunteers->optionsConverting($volunteers);
         }else{
@@ -336,11 +290,11 @@ class LessonsController extends BaseController
     public function update(LessonRequest $request, $id)
     {
         $lesson=Lesson::findOrFail($id); 
-        
-        $current_user=$this->checkAdmin->getAdmin();
+
+        $current_user=$this->currentUser();
         if(!$lesson->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);      
-        }
+            return  $this->unauthorized();         
+        }        
 
         $removed=false;
         $updated_by=$current_user->id;
@@ -361,16 +315,17 @@ class LessonsController extends BaseController
     public function destroy($id)
     {
         $lesson=Lesson::findOrFail($id); 
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         if(!$lesson->canDeleteBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized();  
         }
-        $this->lessons->delete($id,$current_user->id);
 
-        return response()
-            ->json([
-                'deleted' => true
-            ]);
+        $lesson->removed=1;
+        $lesson->updated_by=$current_user->id;
+        $lesson->save();
+
+        return response()->json(['deleted' => true]);
+            
     }
 
 

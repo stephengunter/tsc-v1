@@ -9,10 +9,10 @@
                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
                  返回
               </button>
-              <button  v-if="signup.canEdit" v-show="can_edit" @click="btnEditClicked" class="btn btn-primary btn-sm" >
+              <button  v-if="lesson.canEdit" v-show="can_edit" @click="btnEditClicked" class="btn btn-primary btn-sm" >
                   <span class="glyphicon glyphicon-pencil"></span> 編輯
               </button>
-              <button v-if="signup.canDelete" v-show="can_edit" @click="btnDeleteClicked" class="btn btn-danger btn-sm" >
+              <button v-if="lesson.canDelete" v-show="can_edit" @click="btnDeleteClicked" class="btn btn-danger btn-sm" >
                   <span class="glyphicon glyphicon-trash"></span> 刪除
               </button>
           </div>
@@ -22,15 +22,15 @@
             <div class="row">
                  <div class="col-sm-3">
                       <label class="label-title">課程名稱</label>
-                      <p v-text="courseNameText"></p>                      
+                      <p v-text="lesson.courseNameText"></p>                      
                  </div>
                  <div class="col-sm-3">
                       <label class="label-title">日期</label>
-                      <p v-text="dateFormatted"></p>                   
+                      <p v-text="lesson.dateFormatted"></p>                   
                  </div>
                   <div class="col-sm-3">
                       <label class="label-title">狀態</label>
-                      <p v-html="statusLabel"></p>
+                      <p v-html="lesson.statusLabel"></p>
                   </div>
                   <div class="col-sm-3">
                       <label class="label-title">順序</label>
@@ -40,7 +40,7 @@
             <div class="row">
                  <div class="col-sm-3">
                       <label class="label-title">上課時間</label>
-                      <p v-text="classTimeText"></p>                      
+                      <p v-text="lesson.classTimeText"></p>                      
                  </div>
                  <div class="col-sm-3">
                       <label class="label-title">教室</label>
@@ -49,11 +49,11 @@
                  </div>
                   <div class="col-sm-3">
                       <label class="label-title">授課老師</label>
-                      <p v-html="teacherNames"></p>
+                      <p v-html="lesson.teacherNames"></p>
                   </div>
                   <div class="col-sm-3">
                       <label class="label-title">教育志工</label>
-                       <p v-html="volunteerNames"></p>    
+                       <p v-html="lesson.volunteerNames"></p>    
                   </div>
             </div>   <!-- End row-->
             <div class="row">
@@ -81,13 +81,14 @@
             <div class="row">
                  <div class="col-sm-3">
                       <label class="label-title">最後更新</label>
-                      <p v-if="!lesson.updated_by"> {{   lesson.updated_at|tpeTime  }}</p>
+                      <updated :entity="lesson"></updated>
+                      <!-- <p v-if="!lesson.updated_by"> {{   lesson.updated_at|tpeTime  }}</p>
                       <p v-else>
                         <a  href="#" @click.prevent="showUpdatedBy" >
                             {{   lesson.updated_at|tpeTime  }}
                         </a>
                         
-                      </p>                      
+                      </p>   -->                    
                  </div>
             </div>   <!-- End row-->
     </div>
@@ -125,7 +126,7 @@
             return {
                title:Helper.getIcon(Lesson.title())  + '  課堂紀錄表',
                loaded:false,
-               signup:null,
+               lesson:null,
             }
         },
         watch:{
@@ -138,25 +139,22 @@
            init(){
             
               this.loaded=false
-              this.signup=null
+              this.lesson=null
               if(this.id) this.fetchData()
               
            },
            fetchData() {
-                let getData = Signup.show(this.id)             
+                let getData = Lesson.show(this.id)             
              
                 getData.then(data => {
-                   let signup= data.signup
-                   this.signup=new Signup(signup)
-                   this.$emit('dataLoaded',signup)
+                   let lesson= data.lesson
+                   this.lesson=new Lesson(lesson)
+                   this.$emit('loaded',lesson)
                    this.loaded = true                        
                 })
                 .catch(error=> {
                     Helper.BusEmitError(error)
                 })
-            },
-            signupDate(date){
-                 return Helper.tpeDate(date)
             },
             btnEditClicked(){   
               this.$emit('begin-edit') 
@@ -166,15 +164,13 @@
             },
             btnDeleteClicked(){
                  let values={
-                    name: this.signup.user.profile.fullname,
+                    name: '確定要刪除此課程進度嗎？',
                     id:this.id
                 }
                this.$emit('btn-delete-clicked',values)
             
             },
-            showUpdatedBy(){
-                Bus.$emit('onShowEditor',this.signup.updated_by)
-            },
+          
         }, 
     }
 </script>

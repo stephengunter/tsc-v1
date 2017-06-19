@@ -5,6 +5,13 @@ class Lesson {
             this[property] = data[property];
         }
 
+        this.courseNameText=Lesson.courseNameText(data.course)
+        this.dateFormatted=Lesson.dateFormatted(data.date)
+        this.classTimeText=Lesson.lessonClassTimeText(data)
+        this.statusLabel=Lesson.statusLabel(data.status)
+        this.teacherNames=Lesson.teacherNames(data.teachers)
+        this.volunteerNames=Lesson.volunteerNames(data.volunteers)
+
     }
     static title(){
        return 'Lessons'
@@ -99,6 +106,34 @@ class Lesson {
     }
     static submitDayoff(){
         let url =this.storeUrl() + '/dayOff'
+        let method='post'
+        return new Promise((resolve, reject) => {
+            form.submit(method,url)
+                .then(data => {
+                    resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+    }
+    static createInitialize(course){
+        let url ='/lessons-initialize/create'
+        url += '?course=' + course
+      
+        return new Promise((resolve, reject) => {
+            axios.get(url)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
+    static submitInitialize(){
+        let url ='/lessons-initialize'
         let method='post'
         return new Promise((resolve, reject) => {
             form.submit(method,url)
@@ -231,7 +266,7 @@ class Lesson {
         status=parseInt(status)
        if(status<0) return '<span class="label label-danger">停課</span>'
        if(status>0) return '<span class="label label-default">已結束</span>'
-       return ''
+       return '<span class="label label-success">正常</span>'
     }
     static dateFormatted(date){
         
@@ -268,7 +303,7 @@ class Lesson {
         if(volunteers && volunteers.length){
            let html=''
             for (let i = 0; i < volunteers.length; i++) { 
-                html += volunteers[i].profile.fullname + '&nbsp;';
+                html += volunteers[i].name + '&nbsp;';
             }
             return html
         }else{

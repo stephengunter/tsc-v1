@@ -1,8 +1,8 @@
 <template>
 <div>
   <lesson v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
-     @saved="lessonUpdated" @data-loaded="onDataLoaded" :version="current_version"
-     @btn-back-clicked="onBtnBackClicked" @lesson-deleted="onLessonDeleted" > 
+     @saved="lessonUpdated" @loaded="onDataLoaded" :version="current_version"
+     @btn-back-clicked="onBtnBackClicked" @deleted="onLessonDeleted" > 
 
   </lesson>
 

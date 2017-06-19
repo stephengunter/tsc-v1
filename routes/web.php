@@ -75,7 +75,9 @@ Route::resource('classtimes', '\App\Http\Controllers\Course\ClassTimesController
 Route::resource('schedules', '\App\Http\Controllers\Course\SchedulesController');
 Route::resource('import-schedules', '\App\Http\Controllers\Course\ImportSchedulesController', 
                                      ['only' => ['create','store']]);
-Route::resource('lessons', '\App\Http\Controllers\Course\LessonsController');                                     
+Route::resource('lessons', '\App\Http\Controllers\Course\LessonsController');
+Route::resource('lessons-initialize', '\App\Http\Controllers\Course\LessonsInitializeController', 
+                                     ['only' => ['create','store']]);                                     
 
 
 Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');

@@ -14,7 +14,7 @@
                 </button>
         </div>
         <span slot="btn">
-            <button class="btn btn-warning btn-sm" >
+            <button @click.prevent="beginInitialize" class="btn btn-warning btn-sm" >
                 <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 初始化
             </button>
         </span>
@@ -106,38 +106,8 @@
                            
                         }
                 this.loaded=true
-
-                // if(this.course_id){
-                //     let options = this.loadStatusOptions()
-                //     options.then((value) => {
-                //         this.searchParams={
-                //             course : this.course_id,
-                //             status : value
-                //         }
-
-                //        this.loaded=true
-                //     })
-                // }else{
-                //     this.searchParams={
-                //             user : this.user_id,
-                //         }
-                //     this.loaded=true
-                // }
-                
             },
-            loadStatusOptions(){
-                 return new Promise((resolve, reject) => {
-                    let options=Lesson.statusOptions()
-                    options.then(data => {
-                        this.statusOptions = data.options
-                        resolve(this.statusOptions[0].value);
-                    })
-                    .catch(error => {
-                        console.log(error)
-                        reject(error.response);
-                    })
-                })   //End Promise
-            },
+            
             onBtnViewMoreClicked(){
                 this.viewMore=!this.viewMore
                 for (var i = this.thead.length - 1; i >= 0; i--) {
@@ -158,6 +128,9 @@
             beginCreate(){
                  this.$emit('begin-create')
             },
+            beginInitialize(){
+                 this.$emit('begin-initialize')
+            }
             
            
         },
