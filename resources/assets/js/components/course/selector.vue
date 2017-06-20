@@ -3,7 +3,8 @@
         <div class="panel-heading">
             <span  class="panel-title">
                  <span  class="panel-title">
-                    <h4><i class="fa fa-calendar-o" aria-hidden="true"></i> 請選擇課程</h4>
+                    <h4 v-html="title">
+                    </h4>
                   
                   </span>
             </span>
@@ -19,10 +20,23 @@
             </div>
         </div>
         <div class="panel-body" v-if="hasData">
-          <course-table :courses="courseList" :more="viewMore" :select="true"
-            @selected="courseSelected" @unselected="courseUnselected">
-              
-          </course-table>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th v-for="item in thead" v-if="item.default" v-bind:style="{ width: item.width }" >
+                            {{item.title}}
+                        </th>
+                       
+                    </tr>
+                </thead>
+                <tbody>
+                    <row v-for="course in courses" :course="course" 
+                      :more="viewMore" :select="canSelect"
+                       @selected="onRowSelected" @unselected="courseUnselected">
+                        
+                    </row>            
+                </tbody>
+            </table>
            
         </div>
        
@@ -32,19 +46,25 @@
 
 
 <script>
-    import CourseTable from '../../components/course/course-table.vue'
+    import Row from '../../components/course/row.vue'
     export default {
-        props:['params'],
         name: 'CourseSelector',
+        props: {
+            courses: {
+              type: Array,
+              default: null
+            },
+            
+        },
         components: {
-             CourseTable
+             Row
         },
         beforeMount() {
            this.init()
         },
         computed:{
             hasData(){
-                if(this.courseList.length) return true
+                if(this.courses.length) return true
                 return false    
             },
             hasSelected(){
@@ -54,10 +74,11 @@
         }, 
         data() {
             return {
+                title:Helper.getIcon(Course.title()) + '  請選擇課程' ,
                 loaded:false,
                 
-                courseList:[],
-
+                canSelect:true,
+                thead:Course.getThead(true),
                 viewMore:false,               
                 selectedIds:[],
              
@@ -68,34 +89,20 @@
                 this.loaded=false  
                 this.viewMore=false
                 this.selectedIds=[]
-                this.courseList=[]  
-                this.fetchData()
             },
-            fetchData(){
-                let url= Helper.buildQuery('/api/category-course/courses-not-in-Category',this.params)
-              
-                axios.get(url)
-                    .then(response => {
-                       this.courseList=response.data.courseList
-                       this.loaded = true
-                        
-                    })
-                    .catch(function(error) {
-                        console.log(error)
-                    })
-            },
+            
             btnViewMoreClicked(){
                 this.viewMore=!this.viewMore
             },
            
-            courseSelected(id){
+            onRowSelected(id){
                 this.selectedIds.push(id)
             },
             courseUnselected(id){
                 Helper.removeItem(this.selectedIds , id)
             },
             submitCourses(){
-                this.$emit('submitCourses',this.selectedIds);               
+                this.$emit('submit-courses',this.selectedIds);               
             }
         }
      }

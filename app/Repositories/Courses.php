@@ -28,6 +28,11 @@ class Courses
 
 
     }
+    public function activeCourses()
+    {
+        $courseList=$this->getAll();
+        return $courseList->where('active',true);
+    }
     public function getActiveCourses($categoryId)
     {
         $courseList=$this->getAll()->with(['center','categories','teachers','classTimes']);

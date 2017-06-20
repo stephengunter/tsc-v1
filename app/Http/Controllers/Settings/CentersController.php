@@ -199,12 +199,12 @@ class CentersController extends BaseController
 
     public function options()
     {
-        $current_admin=$this->currentAdmin();
-        if($current_admin){
-            $centers=$current_admin->validCenters();
-            $options=$this->centers->optionsConverting($centers);
-            return response()->json([ 'options' => $options]);
-        }
+        // $current_admin=$this->currentAdmin();
+        // if($current_admin){
+        //     $centers=$current_admin->validCenters();
+        //     $options=$this->centers->optionsConverting($centers);
+        //     return response()->json([ 'options' => $options]);
+        // }
         $options=$this->centers->options();
             return response()
             ->json([

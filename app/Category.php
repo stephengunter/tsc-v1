@@ -47,6 +47,10 @@ class Category extends Model
         if(!$this->courses()->count()) return null;
         return $this->courses()->where('removed',false);
     }
+    public function activeCourses()
+    {
+        return $this->validCourses()->where('active',true);
+    }
 
     public function canDelete()
     {

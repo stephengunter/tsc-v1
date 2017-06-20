@@ -30,96 +30,119 @@ class CategoryCourseController extends BaseController
          $this->setCheckAdmin($checkAdmin);
 	}
 
-    public function indexOptions()
-    {
-        $activeTerms=$this->terms->activeTerms()->get();
-        $termOptions=$this->terms->optionsConverting($activeTerms);
+    // public function indexOptions()
+    // {
+    //     $activeTerms=$this->terms->activeTerms()->get();
+    //     $termOptions=$this->terms->optionsConverting($activeTerms);
 
-        $centerOptions=$this->centers->options();
+    //     $centerOptions=$this->centers->options();
 
-        return response()
-            ->json([
-                'termOptions' => $termOptions,
-                'centerOptions' => $centerOptions
-            ]);
-    }
+    //     return response()
+    //         ->json([
+    //             'termOptions' => $termOptions,
+    //             'centerOptions' => $centerOptions
+    //         ]);
+    // }
     public function index()
     {
-         $request = request();
-         $category_id=(int)$request->category;       
-         $center_id=(int)$request->center;
+        $request = request();
+        $category_id=(int)$request->category;       
+        $center_id=(int)$request->center;
 
-         $category=$this->categories->findOrFail($category_id);
-         $courseList=$category->validCourses();
+        $category=$this->categories->findOrFail($category_id);
+        $courseList=$category->activeCourses();
 
-         $activeTerms=$this->terms->activeTerms()->get()->pluck('id');
-         $courseList=$courseList->whereIn('term_id' , $activeTerms)
-                                ->where('active',true);
-         if($center_id){
+        $activeTerms=$this->terms->activeTerms()->get()->pluck('id');
+        $courseList=$courseList->whereIn('term_id' , $activeTerms);
+                               
+        if($center_id){
             $courseList=$courseList->where('center_id',$center_id);
-         }
-        //  $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId)
-        //                                 ->where('active',true)->orderBy('open_date')->get();
+        }
+
+        $courseList = $courseList->with(['center','categories','teachers'])->get();
+       
+        if(count($courseList)){
+            foreach ($courseList as $course) {
+                foreach ($course->teachers as $teacher) {
+                  $teacher->name=$teacher->getName();
+                }
+            }
+        }
         
-        //  foreach ($courseList as $course) {
-            
-        //       foreach ($course->classTimes as $classTime) {
-        //         $classTime->weekday;
-        //      }
-        //  }
-           return response()
-            ->json([
-                'courseList' => $courseList->get()
-            ]);
+        return response()->json(['courseList' => $courseList  ]); 
        
     }
-    public function courseNotInCategory()
+    public function create()
     {
-         $request = request();
-         $termId=(int)$request->term; 
-         $categoryId=(int)$request->category;       
-         $centerId=(int)$request->center;
-         $active=(int)$request->active;
+        $request = request();
+        $category_id=(int)$request->category;
+        $category=$this->categories->findOrFail($category_id);
+        $except_ids=$category->courses->pluck('id'); 
 
-         $courseList=$this->courses->courseNotInCategory($termId,$categoryId,$centerId,$active)->get();
+        $courseList=$this->courses->activeCourses();
+        $activeTerms=$this->terms->activeTerms()->get()->pluck('id');
+        $courseList=$courseList->whereIn('term_id' , $activeTerms);
+        $courseList=$courseList->whereNotIn('id' , $except_ids);
+
+        $courseList = $courseList->with(['center','categories','teachers'])->get();
+       
+        if(count($courseList)){
+            foreach ($courseList as $course) {
+                foreach ($course->classTimes as $classTime) {
+                  $classTime->weekday;
+                }
+                foreach ($course->teachers as $teacher) {
+                  $teacher->name=$teacher->getName();
+                }
+            }
+        }                       
+        return response()->json(['courseList' => $courseList  ]);
+    }
+    // public function courseNotInCategory()
+    // {
+    //      $request = request();
+    //      $termId=(int)$request->term; 
+    //      $categoryId=(int)$request->category;       
+    //      $centerId=(int)$request->center;
+    //      $active=(int)$request->active;
+
+    //      $courseList=$this->courses->courseNotInCategory($termId,$categoryId,$centerId,$active)->get();
                                         
         
-         foreach ($courseList as $course) {
+    //      foreach ($courseList as $course) {
             
-              foreach ($course->classTimes as $classTime) {
-                $classTime->weekday;
-             }
-         }
-           return response()
-            ->json([
-                'courseList' => $courseList
-            ]);
-    }
+    //           foreach ($course->classTimes as $classTime) {
+    //             $classTime->weekday;
+    //          }
+    //      }
+    //        return response()
+    //         ->json([
+    //             'courseList' => $courseList
+    //         ]);
+    // }
 
-    public function import(Request $request)
+    public function store(Request $request)
     {
-         $category= $this->categories->findOrFail($request['category']);
-         $courseIds=$request['courseIds'];
-         for($i = 0; $i < count($courseIds); ++$i) {
+        $category= $this->categories->findOrFail($request['category']);
+        $courseIds=$request['courses'];
+        for($i = 0; $i < count($courseIds); ++$i) {
             $category->attachCourse($courseIds[$i]);
-         }
-          return response()
-            ->json([
-                'saved' => true
-            ]);
+        }
+        return response()->json([ 'saved' => true ]);   
         
     }
 
-    public function remove(Request $request)
+    public function destroy($id)
     {
-         $category= $this->categories->findOrFail($request['category']);
+        $request = request();
+        $course_id = $request->course;
+
+        $category= $this->categories->findOrFail($id);
        
-         $category->detachCourse($request['course']);
+        $category->detachCourse($request['course']);
         
-            return response()
-                    ->json([
-                        'saved' => true
-                    ]);
+        return response()->json(['saved' => true ]);            
+                   
     }
 
     

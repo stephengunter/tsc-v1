@@ -114,6 +114,7 @@ import UserCenters from './models/usercenters.js'
 import Address from './models/address.js'
 
 import Category from './models/category.js'
+import CategoryCourses from './models/category-courses.js'
 import Course from './models/course.js'
 import SignupInfo from './models/signupinfo.js'
 import Classtime from './models/classtime.js'
@@ -154,6 +155,7 @@ window.Address=Address
 window.UserCenters=UserCenters
 
 window.Category=Category
+window.CategoryCourses=CategoryCourses
 window.Course=Course
 window.SignupInfo=SignupInfo
 window.Classtime=Classtime

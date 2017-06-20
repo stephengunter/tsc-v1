@@ -1,20 +1,13 @@
-class Category {
+class CategoryCourses {
     constructor(data) {
        
         for (let property in data) {
             this[property] = data[property];
         }
 
-        this.type=Category.getType(data)
-
-      
-
-    }
-    static title(){
-       return 'Categories'
     }
     static source(){
-        return '/categories'
+        return '/category-courses'
     }
     static createUrl(){
          return this.source() + '/create' 
@@ -34,10 +27,28 @@ class Category {
     static deleteUrl(id){
          return this.source() + '/' + id
     }
-    static create(){
-        let url = this.createUrl() 
-      
+    static index(category,center){
         return new Promise((resolve, reject) => {
+            let url = '/category-courses'
+            let params={
+                category:category,
+                center:center
+            }
+           let query=Helper.buildQuery(url,params)
+            axios.get(query)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
+    static create(category){
+        return new Promise((resolve, reject) => {
+            let url = '/category-courses'
+            url+= '/create?category=' + category
             axios.get(url)
                 .then(response => {
                    resolve(response.data)
@@ -48,9 +59,13 @@ class Category {
            
         })
     }
-    static store(form){
+    static store(category,courses){
         let url =this.storeUrl() 
         let method='post'
+        let form=new Form({
+            category:category,
+            courses:courses
+        })
         return new Promise((resolve, reject) => {
             form.submit(method,url)
                 .then(data => {
@@ -100,25 +115,11 @@ class Category {
                 })
         })
     }
-    static updateDisplayOrder(id,up){
-        let url =this.updateUrl(id) + '/update-order'
-        let method='put'
-        let form = new Form({                        
-                         up: up
-                    })
+    
+    static delete(category,course) {
         return new Promise((resolve, reject) => {
-            form.submit(method,url)
-                .then(data => {
-                    resolve(data);
-                })
-                .catch(error => {
-                    reject(error);
-                })
-        })
-    }
-    static delete(id) {
-        return new Promise((resolve, reject) => {
-            let url =this.deleteUrl(id) 
+            let url =this.deleteUrl(category) 
+            url += '?course=' +  course
             let form = new Form()
             form.delete(url)
                 .then(response => {
@@ -129,32 +130,14 @@ class Category {
                 })
         })
     }
-    
    
     
-    static options(searchParams){
-        let url =this.source() + '/options' 
-        url = Helper.buildQuery(url, searchParams)
-        return new Promise((resolve, reject) => {
-                     axios.get(url)
-                    .then(response => {
-                        resolve(response.data);
-                    })
-                    .catch(error => {
-                        reject(error);
-                    })
-                })  
-    }
 
-    static getType(category){
-        let isPublic=Helper.tryParseInt(category.public)
-                if(isPublic) return '<span class="label label-warning"> 置頂 </span>'
-                    return ''
-    }
+    
    
     
 
 }
 
 
-export default Category;
+export default CategoryCourses;

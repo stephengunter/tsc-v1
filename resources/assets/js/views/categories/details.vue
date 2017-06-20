@@ -6,12 +6,35 @@
 
   </category>
 
-  <category-courses v-if="loaded" :category="category"></category-courses>
+  <category-courses v-if="loaded" :category="category"
+     :version="current_version"
+     @add-course="onAddCourse" >
+    
+  </category-courses>
 
-
-
+ 
   
-
+  
+  <modal :showbtn="false" :width="courseSelector.width" :show.sync="courseSelector.show" 
+        @closed="onAddCourseCanceled"   effect="fade">
+       
+          <div slot="modal-header" class="modal-header">
+           
+            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="onAddCourseCanceled">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </button>
+           <h3>選擇要加入此分類的課程</h3>
+          </div>
+        <div slot="modal-body" class="modal-body">
+           
+           <course-selector v-if="courseSelector.show"
+             :courses="courseSelector.list"  
+             @submit-courses="submitAddCourses">
+                
+            </course-selector>
+      
+        </div>
+ </modal> 
   
 
 
@@ -23,15 +46,17 @@
 </template>
 
 <script>
-    import Category from '../../components/category/category.vue'
-    import CategoryCourses from '../../components/category/courses.vue'
+    import CategoryComponent from '../../components/category/category.vue'
+    import CategoryCoursesComponent from '../../components/category/courses.vue'
+    import CourseSelector from '../../components/course/selector.vue'
     
     
     export default {
         name: 'CategoryDetails',
         components: {
-            Category,
-           'category-courses':CategoryCourses
+            'category':CategoryComponent,
+           'category-courses':CategoryCoursesComponent,
+           'course-selector':CourseSelector
         },
         props: {
             id: {
@@ -59,6 +84,13 @@
 
                removeCourses:[],
                addCourses:[],
+
+               courseSelector:{
+                  list:[],
+                  show:false,
+                  width:1200,
+               },
+              
 
                courseListSettings:{
                   title:Helper.getIcon(Course.title())  + '  此分類中的課程',
@@ -112,14 +144,41 @@
             onCategoryDeleted(){
                this.$emit('category-deleted')
             },
+            getCoursesCanAdd(){
+               let getData=CategoryCourses.create(this.id)
+               getData.then(data=>{
+                    this.courseSelector.list=data.courseList
+                    this.courseSelector.show=true
+                }).catch(error=>{
+                    Helper.BusEmitError(error)
+                })
+
+            },
             onCourseSelected(){
 
             },
             onAddCourse(){
-              
+                this.getCoursesCanAdd()
+            },
+            onAddCourseCanceled(){
+                this.courseSelector.show=false
             },
             onRemoveCourse(){
 
+            },
+            submitAddCourses(selectedIds){
+              let category=this.id
+              let courses=selectedIds
+              let store=CategoryCourses.store(category,courses)
+              store.then(data => {
+                 this.courseSelector.show=false
+                 this.current_version += 1
+                 Helper.BusEmitOK()
+                                          
+              })
+              .catch(error => {
+                    Helper.BusEmitError(error) 
+              })
             }
         }, 
 
