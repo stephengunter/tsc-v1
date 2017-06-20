@@ -155,7 +155,7 @@ class CoursesController extends BaseController
                         ]);
         }  
         $current_user=$this->currentUser();
-        $course = Course::with('center','categories','teachers','classTimes')->findOrFail($id);
+        $course = Course::with('center','term','categories','teachers','classTimes')->findOrFail($id);
         
         $course->canEdit=$course->canEditBy($current_user);
         $course->canDelete=$course->canDeleteBy($current_user);

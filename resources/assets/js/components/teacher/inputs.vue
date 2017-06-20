@@ -187,8 +187,8 @@
                 dobError:false,
                 genderOptions:Helper.genderOptions(),
                 datePickerOption: Helper.datetimePickerOption(),
-                activeOptions:CommonService.activeOptions(),
-                reviewedOptions:CommonService.reviewedOptions()
+                activeOptions:Helper.activeOptions(),
+                reviewedOptions:Helper.reviewedOptions()
             }
       },
       computed:{

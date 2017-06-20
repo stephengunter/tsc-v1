@@ -125,21 +125,21 @@ class Helper {
           return MomentTimeZone.utc(datetime).tz("Asia/Taipei").format('YYYY-MM-DD')
     }
     static activeText(active) {
-        if (parseInt(active)) return '上架中'
-        return '已下架'
+         return CommonService.activeText(active)
     }
     static activeLabel(active) {
-        if (parseInt(active)) return 'label label-info'
-        return 'label label-default'
+        return CommonService.activeLabel(active)
     }
 
     static reviewedText(reviewed) {
-        if (parseInt(reviewed)) return '已審核'
-        return '未審核'
+         return CommonService.reviewedText(reviewed)
+       
+    }
+    static reviewedOptions(){
+        return CommonService.reviewedOptions()
     }
     static reviewedLabel(reviewed) {
-        if (parseInt(reviewed)) return 'label label-success'
-        return 'label label-danger'
+       return CommonService.reviewedLabel(reviewed)
     }
     static activeOptions(){
         return CommonService.activeOptions()
@@ -190,15 +190,7 @@ class Helper {
         
         return Classtime.classTimeFullText(data) 
     }
-
-    static statusHtml(active) {
-        if (active && parseInt(active) > 0) {
-            return '<span class="label label-success">上架中</span>'
-        } else {
-            return '<span class="label label-default">已下架</span>'
-        }
-
-    }
+    
     static formatMoney(money,wantInt) {
         if (!money){
             if(wantInt) return 0

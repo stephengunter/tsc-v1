@@ -68,14 +68,24 @@ class StatusesController extends BaseController
         if(!$status->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
+
         $updated_by=$current_user->id;
-        $removed=false;
-        $values=$request->getValues($updated_by,$removed);
+        $values=$request->getValues();
+
+        $status->ps=$values['ps'];
+        $status->updated_by=$updated_by;
 
         $signup=(int)$values['signup'];
         $class=(int)$values['class'];
 
-        $status->update($values);
+        if($class==0){
+            $status->class=0;
+            $status->signup=0;           
+        }else if($signup==0){
+            $status->signup=0;
+        } 
+
+        $status->updateStatus();
 
         return response()->json(['status' => $status ]);   
     }

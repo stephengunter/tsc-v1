@@ -10,7 +10,7 @@ class Status extends Model
     protected $primaryKey = 'course_id';
 
     protected $fillable = [
-	   'signup', 'register', 'class', 
+	   'ps',
        'updated_by'
 	];
 
@@ -51,8 +51,22 @@ class Status extends Model
         }
         if((int)$this->class!=0 ){
             $this->class=Status::getClassStatus($course);
+        }else{
+            //停止開課
+            if($course->active){
+                $course->active=false;
+                $course->save();
+            }
         }
 
+        if(!$course->reviewed){
+            if($course->active){
+                $course->active=false;
+                $course->save();
+            }
+        } 
+
+        
         $this->save();
 
     }

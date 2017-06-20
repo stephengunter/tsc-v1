@@ -59,52 +59,9 @@
                             </select>
                          </div>
                         <div class="form-group">
-                            <label>狀態</label>
-                            <div>
-                            <input type="hidden" v-model="form.course.active"  >
-                             <toggle :items="activeOptions"   :default_val="form.course.active" @selected="setActive"></toggle>
-                            </div>
+                           
                         </div>
                        
-                        
-                    </div>
-                </div>
-             
-
-                <div class="row">
-                    <div v-if="id" class="col-sm-3">
-                       
-                    </div>
-                    <div class="col-sm-3">
-                     <div class="form-group">  
-                            <label>學分數</label>
-                             <select  v-model="form.course.credit_count"  name="course.credit_count" class="form-control" >
-                                <option v-for="item in creditCountOptions" :value="item.value" v-text="item.text"></option>
-                            </select>
-                        </div>
-                       
-                    </div>
-                    <div class="col-sm-3">
-                     <div class="form-group">  
-                            <label>週數</label>
-                             <select  v-model="form.course.weeks"  name="course.weeks" class="form-control" >
-                                <option v-for="item in weeksOptions" :value="item.value" v-text="item.text"></option>
-                            </select>
-                        </div>
-                       
-                    </div>
-                    <div class="col-sm-3">
-                       <div class="form-group">  
-                            <label>時數</label>
-                            <input type="text" name="course.hours" class="form-control" v-model="form.course.hours">
-                            <small class="text-danger" v-if="form.errors.has('course.hours')" v-text="form.errors.get('course.hours')"></small>
-                        </div>
-                       
-                      
-                    </div>
-                     <div class="col-sm-3">
-                       
-                        
                         
                     </div>
                 </div>
@@ -133,11 +90,77 @@
                         </div>
                     </div>
                     <div class="col-sm-3">
+                        <div class="form-group">  
+                            <label>學分數</label>
+                             <select  v-model="form.course.credit_count"  name="course.credit_count" class="form-control" >
+                                <option v-for="item in creditCountOptions" :value="item.value" v-text="item.text"></option>
+                            </select>
+                        </div>
+                           
+                    </div>
+                </div>
+                 <div class="row">
+                    <div v-if="id" class="col-sm-3">
+                       
+                    </div>
+                    
+                    <div class="col-sm-3">
+                     <div class="form-group">  
+                            <label>週數</label>
+                             <select  v-model="form.course.weeks"  name="course.weeks" class="form-control" >
+                                <option v-for="item in weeksOptions" :value="item.value" v-text="item.text"></option>
+                            </select>
+                        </div>
+                       
+                    </div>
+                    <div class="col-sm-3">
+                       <div class="form-group">  
+                            <label>時數</label>
+                            <input type="text" name="course.hours" class="form-control" v-model="form.course.hours">
+                            <small class="text-danger" v-if="form.errors.has('course.hours')" v-text="form.errors.get('course.hours')"></small>
+                        </div>
+                       
+                      
+                    </div>
+                     <div class="col-sm-3">
+                       
+                        
+                        
+                    </div>
+                </div>
+                 <div v-if="id" class="row">
+                    <div class="col-sm-3">
+                       
+                    </div>
+                    <div class="col-sm-3">
+                        
+                        <div class="form-group">  
+                            <label>上架狀態</label>
+                            <div>
+                            <input type="hidden" v-model="form.course.active"  >
+                                <toggle :items="activeOptions"   :default_val="form.course.active" @selected="setActive"></toggle>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        
+                        <div class="form-group">  
+                            <label>審核</label>
+                            <div>
+                            <input type="hidden" v-model="form.course.reviewed"  >
+                                <toggle :items="reviewedOptions"   :default_val="form.course.reviewed" @selected="setReviewed"></toggle>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
                        
                       
                     </div>
                 </div>
                 <div class="row">
+
                     <div v-if="id" class="col-sm-3">
                       
                     </div>
@@ -212,6 +235,7 @@
                 creditCountOptions:Helper.numberOptions(0,15),
                 weeksOptions:Course.weeksOptions(),
                 activeOptions:Helper.activeOptions(),
+                reviewedOptions:Helper.reviewedOptions(),
 
                 photo_id: 0,
                 imageUpload:{
@@ -331,6 +355,9 @@
             },     
             setActive(val) {
                 this.form.course.active = val
+            },
+            setReviewed(val) {
+                this.form.course.reviewed = val
             },
             clearErrorMsg(name) {
                 this.form.errors.clear(name)

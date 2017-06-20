@@ -30,9 +30,9 @@
                    
                     <label class="label-title">名稱</label>
                     <p>{{course.name}}</p>
-                   
-                    <label class="label-title">課程分類</label>
-                    <p v-html="course.categoriesText"></p>
+
+                    <label class="label-title">課程編號</label>
+                    <p>{{course.number}}</p>
 
                      <label class="label-title">起始日期</label>
                     <p>{{course.begin_date}}</p>
@@ -44,8 +44,8 @@
                     <label class="label-title">開課中心</label>
                     <p> {{ course.center.name }}</p>
 
-                    <label class="label-title">教師</label>
-                     <p v-html="course.teachersText"></p>
+                    <label class="label-title">課程分類</label>
+                    <p v-html="course.categoriesText"></p>
 
                    
 
@@ -56,16 +56,18 @@
 
                 </div>
                  <div class="col-sm-3">
-                    <label class="label-title">狀態</label>
-                    <p v-html="$options.filters.activeLabel(course.active)">                       
+                    <label class="label-title">學期</label>
+                    <p v-text="course.term.name">                       
                     </p>
+                    
+                     <label class="label-title">教師</label>
+                     <p v-html="course.teachersText"></p>
 
-                     <label class="label-title">週數</label>
-                     <p>{{  course.weeks }}</p>
-
-                     <label class="label-title">時數</label>
-                     <p>{{  course.hours }}</p>
-
+                   
+                    <label class="label-title">學分數</label>
+                    <p>
+                         {{ course.credit_count }}
+                    </p> 
                     
                 </div>
             </div>  <!-- End row-->
@@ -74,16 +76,17 @@
                 <div class="col-sm-3">
                 </div>
                 <div class="col-sm-3">
-                   
-                    <label class="label-title">課程編號</label>
-                    <p>{{course.number}}</p>
+                     <label class="label-title">週數</label>
+                     <p>{{  course.weeks }}</p>
+
+                
+                  
                     
                 </div>
                 <div class="col-sm-3">
-                    <label class="label-title">學分數</label>
-                    <p>
-                         {{ course.credit_count }}
-                    </p> 
+                     <label class="label-title">時數</label>
+                     <p>{{  course.hours }}</p>
+                   
                     
                 </div>
                
@@ -95,21 +98,24 @@
             <div class="row">
                 <div class="col-sm-3">
                 </div>
-                <div class="col-sm-6">
-                   <label class="label-title">上課時間</label>
+                <div class="col-sm-3">
+                   <label class="label-title">上架狀態</label>
+                    <p v-html="$options.filters.activeLabel(course.active)">                       
+                    </p>
+                   <!-- <label class="label-title">上課時間</label>
                    <p v-html="course.classTimesText">
                        
-                   </p>
+                   </p> -->
+                </div>
+                <div class="col-sm-3">
+                   <label class="label-title">審核</label>
+                    <p v-html="$options.filters.reviewedLabel(course.reviewed)">                       
+                    </p>
                 </div>
                 <div class="col-sm-3">
                    <label class="label-title">最後更新</label>
-                      <p v-if="!course.updated_by"> {{   course.updated_at|tpeTime  }}</p>
-                      <p v-else>
-                        <a  href="#" @click.prevent="showUpdatedBy" >
-                            {{   course.updated_at|tpeTime  }}
-                        </a>
-                        
-                      </p>
+                   <updated :entity="course"></updated>
+               
                 </div>
                
             </div> 
@@ -184,13 +190,7 @@
                     Helper.BusEmitError(error)
                 })
             },   
-            showUpdatedBy(){
-               let updated_by=Helper.tryParseInt(this.course.updated_by)
-               if(updated_by){
-                  Bus.$emit('onShowEditor',updated_by)
-               }
-                
-            },
+            
             btnEditCilcked(){
                this.$emit('begin-edit');
             },

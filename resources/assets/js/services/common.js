@@ -4,8 +4,11 @@ class CommonService {
         return '已下架'
     }
     static activeLabel(active) {
-        if (parseInt(active)) return 'label label-info'
-        return 'label label-default'
+        let style='label label-default'
+        if (parseInt(active)) style= 'label label-info'
+         let text=this.activeText(active)
+
+        return `<span class="${style}" > ${text} </span>`
     }
 
     static reviewedText(reviewed) {
@@ -13,8 +16,12 @@ class CommonService {
         return '未審核'
     }
     static reviewedLabel(reviewed) {
-        if (parseInt(reviewed)) return 'label label-success'
-        return 'label label-danger'
+        let style='label label-danger'
+        if (parseInt(reviewed)) style = 'label label-success'
+        let text=this.reviewedText(reviewed)
+        return `<span class="${style}" > ${text} </span>`
+        // if (parseInt(reviewed)) return 'label label-success'
+        // return 'label label-danger'
     }
     static reviewedOptions(){
         return [{

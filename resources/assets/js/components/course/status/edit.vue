@@ -128,10 +128,10 @@
                 
             },
             setSignupStatus(val){
-                this.form.signup = val
+                this.form.status.signup = val
             },
             setClassStatus(val){
-                 this.form.class = val
+                 this.form.status.class = val
             },
             clearErrorMsg(name) {
                 this.form.errors.clear(name)
@@ -140,7 +140,7 @@
                this.submitForm()
             },
             submitForm() {
-                let id=this.id
+                let id=this.course_id
                 let update=CourseStatus.update(this.form, id)
                 
                 update.then(data => {

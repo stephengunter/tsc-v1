@@ -31,11 +31,8 @@ class StatusRequest extends FormRequest
             
         ];
     }
-    public function getValues($updated_by,$removed)
+    public function getValues()
     {
-        $values=$this->get('status');
-        
-        $values= Helper::setUpdatedBy($values,$updated_by);
-        return Helper::setRemoved($values,$removed);
+        return $this->get('status');
     }
 }

@@ -194,22 +194,11 @@ Vue.filter('genderText', function (gender) {
         return '女'
 })
 Vue.filter('activeLabel', function (active) {
-    let text='已下架'
-    let style='label label-default'
-    if(parseInt(active)){
-        text = '上架中'
-        style='label label-info'
-    } 
-    return `<span class="${style}" > ${text} </span>`
+   return   Helper.activeLabel(active)
+   
 })
 Vue.filter('reviewedLabel', function (reviewed) {
-    let text='未審核'
-    let style='label label-danger'
-    if(parseInt(reviewed)){
-        text = '已審核'
-        style='label label-success'
-    } 
-    return `<span class="${style}" > ${text} </span>`
+    return Helper.reviewedLabel(reviewed)
 })
 Vue.filter('showIcon', function (icon) {
     if(!icon)  return ''

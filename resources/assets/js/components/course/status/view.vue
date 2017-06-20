@@ -41,7 +41,9 @@
         },
         
         methods: {
-             
+            init(){
+                this.readOnly=true
+            }, 
             beginEdit() {
                 this.readOnly=false
             },

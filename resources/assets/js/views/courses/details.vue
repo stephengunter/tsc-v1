@@ -47,8 +47,8 @@
                 <div class="tab-pane fade" id="status">
                     <course-status v-if="activeIndex==2"  
                       :course_id="id"   :canEdit="course.canEdit" 
-                    
-                      >             
+                      @saved="onStatusSaved" >     
+                              
                     </course-status>
                 </div>
                 <div class="tab-pane fade" id="schedule">
@@ -298,10 +298,14 @@
             onLessonInitializeFailed(){
                Helper.BusEmitOK('初始化失敗')
                this.onLessonInitializeCanceled()
+            },
+            onStatusSaved(status){
+               this.version += 1
             }
              
             
         }
+            
           
            
            

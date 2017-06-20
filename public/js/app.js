@@ -24672,6 +24672,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = {
     name: 'EditCourse',
@@ -24708,6 +24731,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             creditCountOptions: Helper.numberOptions(0, 15),
             weeksOptions: Course.weeksOptions(),
             activeOptions: Helper.activeOptions(),
+            reviewedOptions: Helper.reviewedOptions(),
 
             photo_id: 0,
             imageUpload: {
@@ -24825,6 +24849,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         setActive: function setActive(val) {
             this.form.course.active = val;
+        },
+        setReviewed: function setReviewed(val) {
+            this.form.course.reviewed = val;
         },
         clearErrorMsg: function clearErrorMsg(name) {
             this.form.errors.clear(name);
@@ -25375,6 +25402,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = {
     name: 'ShowCourse',
@@ -25436,12 +25469,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 _this.loaded = false;
                 Helper.BusEmitError(error);
             });
-        },
-        showUpdatedBy: function showUpdatedBy() {
-            var updated_by = Helper.tryParseInt(this.course.updated_by);
-            if (updated_by) {
-                Bus.$emit('onShowEditor', updated_by);
-            }
         },
         btnEditCilcked: function btnEditCilcked() {
             this.$emit('begin-edit');
@@ -26023,10 +26050,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         setSignupStatus: function setSignupStatus(val) {
-            this.form.signup = val;
+            this.form.status.signup = val;
         },
         setClassStatus: function setClassStatus(val) {
-            this.form.class = val;
+            this.form.status.class = val;
         },
         clearErrorMsg: function clearErrorMsg(name) {
             this.form.errors.clear(name);
@@ -26037,7 +26064,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         submitForm: function submitForm() {
             var _this2 = this;
 
-            var id = this.id;
+            var id = this.course_id;
             var update = CourseStatus.update(this.form, id);
 
             update.then(function (data) {
@@ -26221,6 +26248,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
     methods: {
+        init: function init() {
+            this.readOnly = true;
+        },
         beginEdit: function beginEdit() {
             this.readOnly = false;
         },
@@ -30803,8 +30833,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
          dobError: false,
          genderOptions: Helper.genderOptions(),
          datePickerOption: Helper.datetimePickerOption(),
-         activeOptions: CommonService.activeOptions(),
-         reviewedOptions: CommonService.reviewedOptions()
+         activeOptions: Helper.activeOptions(),
+         reviewedOptions: Helper.reviewedOptions()
       };
    },
 
@@ -35830,6 +35860,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       onLessonInitializeFailed: function onLessonInitializeFailed() {
          Helper.BusEmitOK('初始化失敗');
          this.onLessonInitializeCanceled();
+      },
+      onStatusSaved: function onStatusSaved(status) {
+         this.version += 1;
       }
    }
 
@@ -40079,22 +40112,10 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.filter('genderText', function (gende
     return '女';
 });
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.filter('activeLabel', function (active) {
-    var text = '已下架';
-    var style = 'label label-default';
-    if (parseInt(active)) {
-        text = '上架中';
-        style = 'label label-info';
-    }
-    return '<span class="' + style + '" > ' + text + ' </span>';
+    return __WEBPACK_IMPORTED_MODULE_6__helper_js__["a" /* default */].activeLabel(active);
 });
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.filter('reviewedLabel', function (reviewed) {
-    var text = '未審核';
-    var style = 'label label-danger';
-    if (parseInt(reviewed)) {
-        text = '已審核';
-        style = 'label label-success';
-    }
-    return '<span class="' + style + '" > ' + text + ' </span>';
+    return __WEBPACK_IMPORTED_MODULE_6__helper_js__["a" /* default */].reviewedLabel(reviewed);
 });
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.filter('showIcon', function (icon) {
     if (!icon) return '';
@@ -40319,26 +40340,27 @@ var Helper = function () {
     }, {
         key: 'activeText',
         value: function activeText(active) {
-            if (parseInt(active)) return '上架中';
-            return '已下架';
+            return CommonService.activeText(active);
         }
     }, {
         key: 'activeLabel',
         value: function activeLabel(active) {
-            if (parseInt(active)) return 'label label-info';
-            return 'label label-default';
+            return CommonService.activeLabel(active);
         }
     }, {
         key: 'reviewedText',
         value: function reviewedText(reviewed) {
-            if (parseInt(reviewed)) return '已審核';
-            return '未審核';
+            return CommonService.reviewedText(reviewed);
+        }
+    }, {
+        key: 'reviewedOptions',
+        value: function reviewedOptions() {
+            return CommonService.reviewedOptions();
         }
     }, {
         key: 'reviewedLabel',
         value: function reviewedLabel(reviewed) {
-            if (parseInt(reviewed)) return 'label label-success';
-            return 'label label-danger';
+            return CommonService.reviewedLabel(reviewed);
         }
     }, {
         key: 'activeOptions',
@@ -40411,15 +40433,6 @@ var Helper = function () {
         value: function classTimeFullText(data) {
 
             return Classtime.classTimeFullText(data);
-        }
-    }, {
-        key: 'statusHtml',
-        value: function statusHtml(active) {
-            if (active && parseInt(active) > 0) {
-                return '<span class="label label-success">上架中</span>';
-            } else {
-                return '<span class="label label-default">已下架</span>';
-            }
         }
     }, {
         key: 'formatMoney',
@@ -45685,8 +45698,11 @@ var CommonService = function () {
     }, {
         key: 'activeLabel',
         value: function activeLabel(active) {
-            if (parseInt(active)) return 'label label-info';
-            return 'label label-default';
+            var style = 'label label-default';
+            if (parseInt(active)) style = 'label label-info';
+            var text = this.activeText(active);
+
+            return '<span class="' + style + '" > ' + text + ' </span>';
         }
     }, {
         key: 'reviewedText',
@@ -45697,8 +45713,12 @@ var CommonService = function () {
     }, {
         key: 'reviewedLabel',
         value: function reviewedLabel(reviewed) {
-            if (parseInt(reviewed)) return 'label label-success';
-            return 'label label-danger';
+            var style = 'label label-danger';
+            if (parseInt(reviewed)) style = 'label label-success';
+            var text = this.reviewedText(reviewed);
+            return '<span class="' + style + '" > ' + text + ' </span>';
+            // if (parseInt(reviewed)) return 'label label-success'
+            // return 'label label-danger'
         }
     }, {
         key: 'reviewedOptions',
@@ -69949,11 +69969,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "label-title"
   }, [_vm._v("名稱")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.course.name))]), _vm._v(" "), _c('label', {
     staticClass: "label-title"
-  }, [_vm._v("課程分類")]), _vm._v(" "), _c('p', {
-    domProps: {
-      "innerHTML": _vm._s(_vm.course.categoriesText)
-    }
-  }), _vm._v(" "), _c('label', {
+  }, [_vm._v("課程編號")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.course.number))]), _vm._v(" "), _c('label', {
     staticClass: "label-title"
   }, [_vm._v("起始日期")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.course.begin_date))])]), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
@@ -69961,9 +69977,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "label-title"
   }, [_vm._v("開課中心")]), _vm._v(" "), _c('p', [_vm._v(" " + _vm._s(_vm.course.center.name))]), _vm._v(" "), _c('label', {
     staticClass: "label-title"
-  }, [_vm._v("教師")]), _vm._v(" "), _c('p', {
+  }, [_vm._v("課程分類")]), _vm._v(" "), _c('p', {
     domProps: {
-      "innerHTML": _vm._s(_vm.course.teachersText)
+      "innerHTML": _vm._s(_vm.course.categoriesText)
     }
   }), _vm._v(" "), _c('label', {
     staticClass: "label-title"
@@ -69971,55 +69987,61 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
-  }, [_vm._v("狀態")]), _vm._v(" "), _c('p', {
+  }, [_vm._v("學期")]), _vm._v(" "), _c('p', {
     domProps: {
-      "innerHTML": _vm._s(_vm.$options.filters.activeLabel(_vm.course.active))
+      "textContent": _vm._s(_vm.course.term.name)
     }
   }), _vm._v(" "), _c('label', {
     staticClass: "label-title"
-  }, [_vm._v("週數")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.course.weeks))]), _vm._v(" "), _c('label', {
-    staticClass: "label-title"
-  }, [_vm._v("時數")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.course.hours))])])]), _vm._v(" "), _c('div', {
-    staticClass: "row"
-  }, [_c('div', {
-    staticClass: "col-sm-3"
-  }), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-3"
-  }, [_c('label', {
-    staticClass: "label-title"
-  }, [_vm._v("課程編號")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.course.number))])]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-3"
-  }, [_c('label', {
-    staticClass: "label-title"
-  }, [_vm._v("學分數")]), _vm._v(" "), _c('p', [_vm._v("\n                         " + _vm._s(_vm.course.credit_count) + "\n                    ")])]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-3"
-  })]), _vm._v(" "), _c('div', {
-    staticClass: "row"
-  }, [_c('div', {
-    staticClass: "col-sm-3"
-  }), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-6"
-  }, [_c('label', {
-    staticClass: "label-title"
-  }, [_vm._v("上課時間")]), _vm._v(" "), _c('p', {
+  }, [_vm._v("教師")]), _vm._v(" "), _c('p', {
     domProps: {
-      "innerHTML": _vm._s(_vm.course.classTimesText)
+      "innerHTML": _vm._s(_vm.course.teachersText)
+    }
+  }), _vm._v(" "), _c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("學分數")]), _vm._v(" "), _c('p', [_vm._v("\n                         " + _vm._s(_vm.course.credit_count) + "\n                    ")])])]), _vm._v(" "), _c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("週數")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.course.weeks))])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("時數")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.course.hours))])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-3"
+  }), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("上架狀態")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.$options.filters.activeLabel(_vm.course.active))
     }
   })]), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
-  }, [_vm._v("最後更新")]), _vm._v(" "), (!_vm.course.updated_by) ? _c('p', [_vm._v(" " + _vm._s(_vm._f("tpeTime")(_vm.course.updated_at)))]) : _c('p', [_c('a', {
-    attrs: {
-      "href": "#"
-    },
-    on: {
-      "click": function($event) {
-        $event.preventDefault();
-        _vm.showUpdatedBy($event)
-      }
+  }, [_vm._v("審核")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.$options.filters.reviewedLabel(_vm.course.reviewed))
     }
-  }, [_vm._v("\n                            " + _vm._s(_vm._f("tpeTime")(_vm.course.updated_at)) + "\n                        ")])])])])])]) : _vm._e()
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("最後更新")]), _vm._v(" "), _c('updated', {
+    attrs: {
+      "entity": _vm.course
+    }
+  })], 1)])])]) : _vm._e()
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -72201,6 +72223,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "course_id": _vm.id,
       "canEdit": _vm.course.canEdit
+    },
+    on: {
+      "saved": _vm.onStatusSaved
     }
   }) : _vm._e()], 1), _vm._v(" "), _c('div', {
     staticClass: "tab-pane fade",
@@ -76444,38 +76469,39 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     })
   }))]), _vm._v(" "), _c('div', {
     staticClass: "form-group"
-  }, [_c('label', [_vm._v("狀態")]), _vm._v(" "), _c('div', [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.form.course.active),
-      expression: "form.course.active"
-    }],
-    attrs: {
-      "type": "hidden"
-    },
-    domProps: {
-      "value": _vm._s(_vm.form.course.active)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.form.course.active = $event.target.value
-      }
-    }
-  }), _vm._v(" "), _c('toggle', {
-    attrs: {
-      "items": _vm.activeOptions,
-      "default_val": _vm.form.course.active
-    },
-    on: {
-      "selected": _vm.setActive
-    }
-  })], 1)])])]), _vm._v(" "), _c('div', {
+  })])]), _vm._v(" "), _c('div', {
     staticClass: "row"
   }, [(_vm.id) ? _c('div', {
     staticClass: "col-sm-3"
   }) : _vm._e(), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("起始日期")]), _vm._v(" "), _c('div', [_c('date-picker', {
+    attrs: {
+      "option": _vm.datePickerOption,
+      "date": _vm.begin_date
+    }
+  })], 1), _vm._v(" "), (_vm.form.errors.has('course.begin_date')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('course.begin_date'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("結束日期")]), _vm._v(" "), _c('div', [_c('date-picker', {
+    attrs: {
+      "option": _vm.datePickerOption,
+      "date": _vm.end_date
+    }
+  })], 1), _vm._v(" "), (_vm.form.errors.has('course.end_date')) ? _c('small', {
+    staticClass: "text-danger",
+    domProps: {
+      "textContent": _vm._s(_vm.form.errors.get('course.end_date'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
   }, [_c('div', {
     staticClass: "form-group"
@@ -76507,7 +76533,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         "textContent": _vm._s(item.text)
       }
     })
-  }))])]), _vm._v(" "), _c('div', {
+  }))])])]), _vm._v(" "), _c('div', {
+    staticClass: "row"
+  }, [(_vm.id) ? _c('div', {
+    staticClass: "col-sm-3"
+  }) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
   }, [_c('div', {
     staticClass: "form-group"
@@ -76571,41 +76601,75 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }) : _vm._e()])]), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
-  })]), _vm._v(" "), _c('div', {
+  })]), _vm._v(" "), (_vm.id) ? _c('div', {
     staticClass: "row"
-  }, [(_vm.id) ? _c('div', {
+  }, [_c('div', {
     staticClass: "col-sm-3"
-  }) : _vm._e(), _vm._v(" "), _c('div', {
+  }), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
   }, [_c('div', {
     staticClass: "form-group"
-  }, [_c('label', [_vm._v("起始日期")]), _vm._v(" "), _c('div', [_c('date-picker', {
+  }, [_c('label', [_vm._v("上架狀態")]), _vm._v(" "), _c('div', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.course.active),
+      expression: "form.course.active"
+    }],
     attrs: {
-      "option": _vm.datePickerOption,
-      "date": _vm.begin_date
-    }
-  })], 1), _vm._v(" "), (_vm.form.errors.has('course.begin_date')) ? _c('small', {
-    staticClass: "text-danger",
+      "type": "hidden"
+    },
     domProps: {
-      "textContent": _vm._s(_vm.form.errors.get('course.begin_date'))
+      "value": _vm._s(_vm.form.course.active)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.course.active = $event.target.value
+      }
     }
-  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+  }), _vm._v(" "), _c('toggle', {
+    attrs: {
+      "items": _vm.activeOptions,
+      "default_val": _vm.form.course.active
+    },
+    on: {
+      "selected": _vm.setActive
+    }
+  })], 1)])]), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
   }, [_c('div', {
     staticClass: "form-group"
-  }, [_c('label', [_vm._v("結束日期")]), _vm._v(" "), _c('div', [_c('date-picker', {
+  }, [_c('label', [_vm._v("審核")]), _vm._v(" "), _c('div', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.course.reviewed),
+      expression: "form.course.reviewed"
+    }],
     attrs: {
-      "option": _vm.datePickerOption,
-      "date": _vm.end_date
-    }
-  })], 1), _vm._v(" "), (_vm.form.errors.has('course.end_date')) ? _c('small', {
-    staticClass: "text-danger",
+      "type": "hidden"
+    },
     domProps: {
-      "textContent": _vm._s(_vm.form.errors.get('course.end_date'))
+      "value": _vm._s(_vm.form.course.reviewed)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.course.reviewed = $event.target.value
+      }
     }
-  }) : _vm._e()])]), _vm._v(" "), _c('div', {
+  }), _vm._v(" "), _c('toggle', {
+    attrs: {
+      "items": _vm.reviewedOptions,
+      "default_val": _vm.form.course.reviewed
+    },
+    on: {
+      "selected": _vm.setReviewed
+    }
+  })], 1)])]), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
-  })]), _vm._v(" "), _c('div', {
+  })]) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "row"
   }, [(_vm.id) ? _c('div', {
     staticClass: "col-sm-3"
