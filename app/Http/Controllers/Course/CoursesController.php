@@ -18,6 +18,9 @@ use App\Http\Requests\Course\CourseRequest;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
+use App\Events\CourseUpdated;
+
+
 class CoursesController extends BaseController
 {
     protected $key='courses';
@@ -216,11 +219,13 @@ class CoursesController extends BaseController
         $teacherIds = $request->getTeacherIds();   
        
         $course = $this->courses->update($courseValues , $categoryIds, $teacherIds ,$id);
-       
-          return response()
-                ->json([
-                    'course' => $course
-                ]);
+        
+        event(new CourseUpdated($course, $current_user));
+        
+        return response()->json(['course' => $course ]);
+                
+                    
+               
     }
     // public function updateDisplayOrder(Request $request, $id)
     // {
@@ -287,19 +292,14 @@ class CoursesController extends BaseController
         
               
         $request = request();
-         $term_id=(int)$request->term; 
-         $center_id=(int)$request->center;
+        $term_id=(int)$request->term; 
+        $center_id=(int)$request->center;
 
-         $courseList=$this->courses->getAll()->where('term_id',$term_id)
+        $courseList=$this->courses->getAll()->where('term_id',$term_id)
                                      ->where('center_id',$center_id)
                                      ->get();
-         $options=$this->courses->optionsConverting($courseList);    
-         return response()
-                ->json([
-                    'options' => $options
-                ]);                       
-               
-        
+        $options=$this->courses->optionsConverting($courseList);    
+        return response()->json(['options' => $options ]);     
     }
 
     // public function optionsByTeacher($teacher)

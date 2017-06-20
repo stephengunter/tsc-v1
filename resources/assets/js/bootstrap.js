@@ -116,6 +116,7 @@ import Address from './models/address.js'
 import Category from './models/category.js'
 import CategoryCourses from './models/category-courses.js'
 import Course from './models/course.js'
+import CourseStatus from './models/course-status.js'
 import SignupInfo from './models/signupinfo.js'
 import Classtime from './models/classtime.js'
 import Schedule from './models/schedule.js'
@@ -157,6 +158,7 @@ window.UserCenters=UserCenters
 window.Category=Category
 window.CategoryCourses=CategoryCourses
 window.Course=Course
+window.CourseStatus=CourseStatus
 window.SignupInfo=SignupInfo
 window.Classtime=Classtime
 window.Schedule=Schedule

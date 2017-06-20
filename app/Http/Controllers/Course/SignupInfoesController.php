@@ -18,6 +18,8 @@ use App\Http\Requests\Course\SignupInfoRequest;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
+use App\Events\CourseUpdated;
+
 class SignupInfoesController extends BaseController
 {
     
@@ -69,7 +71,8 @@ class SignupInfoesController extends BaseController
         $values=$request->getValues($updated_by,$removed);
 
         $course->update($values);
-           
+        event(new CourseUpdated($course, $current_user));
+
         return response()->json(['signupinfo' => $course]); 
     }
     

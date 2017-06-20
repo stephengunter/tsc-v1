@@ -68,6 +68,10 @@ class Helper {
             case 'admins':
                 html = '<i class="fa fa-key" aria-hidden="true"></i>'
             break;
+            case 'statuses':
+                html = '<i class="fa fa-check-circle" aria-hidden="true"></i>'
+            break;
+               
         }
 
         return html

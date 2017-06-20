@@ -34,7 +34,11 @@
                 <tbody>
                    <tr v-for="course in courseList">
                       <td>
-                          <checkbox @selected="remove(course.id)" @unselected="unRemove(course.id)" ></checkbox>
+                          <button class="btn btn-danger btn-xs"
+                            @click.prevent="btnDeleteClicked(course.id,course.name)">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                          </button>
+                         
                       </td>
                       <td v-text="course.center.name"></td>
                       <td v-text="course.name"></td>
@@ -139,8 +143,14 @@
             onAddCourse(){
                this.$emit('add-course')
             },
-            onRemoveCourse(){
+            btnDeleteClicked(id, name){
 
+               let values={
+                   id:id,
+                   name:name
+               }
+               this.$emit('remove',values)            
+         
             }
         }, 
 

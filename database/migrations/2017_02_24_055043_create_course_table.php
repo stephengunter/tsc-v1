@@ -23,7 +23,6 @@ class CreateCourseTable extends Migration
             $table->string('number');
 
             $table->integer('credit_count')->default(0);   //學分數
-            // $table->boolean('child')->default(false);
             $table->boolean('net_signup')->default(true);
 
 		
@@ -44,11 +43,12 @@ class CreateCourseTable extends Migration
             $table->integer('limit')->nullable();    //人數上限 
             $table->integer('min')->default(0);    //人數下限
 
-            $table->boolean('active')->default(false);
+            
             $table->integer('display_order')->default(0);
             $table->integer('photo_id')->unsigned()->nullable();
 
-
+            $table->boolean('reviewed')->default(false);
+            $table->boolean('active')->default(false);            
             $table->boolean('removed')->default(false);
             $table->integer('updated_by')->unsigned()->nullable();
 			$table->timestamps();

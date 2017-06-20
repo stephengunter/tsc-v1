@@ -72,6 +72,8 @@ Route::resource('back-tuitions', '\App\Http\Controllers\Signups\BackTuitionsCont
 Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
 
 Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
+Route::resource('statuses', '\App\Http\Controllers\Course\StatusesController',
+                                 ['only' => ['show','edit','update']]);
 Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
                                         ['only' => ['show','edit','update']]);
 Route::resource('classtimes', '\App\Http\Controllers\Course\ClassTimesController');

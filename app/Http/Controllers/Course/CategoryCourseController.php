@@ -139,7 +139,7 @@ class CategoryCourseController extends BaseController
 
         $category= $this->categories->findOrFail($id);
        
-        $category->detachCourse($request['course']);
+        $category->detachCourse($course_id);
         
         return response()->json(['saved' => true ]);            
                    

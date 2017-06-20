@@ -3,11 +3,14 @@
 namespace App\Repositories;
 
 use App\Course;
+use App\Status;
 use App\Category;
 use App\Center;
 use App\Teacher;
 use App\Term;
 use Carbon\Carbon;
+
+use DB;
 
 class Courses 
 {
@@ -107,15 +110,27 @@ class Courses
    
      public function store($courseValues , $categoryIds, $teacherIds)
      {
-         $course=new Course($courseValues);
-         $course->number=$this->generateNumber($course->term_id);       
-         $course->save();
-        
-         $this->syncCategories($categoryIds , $course);
-        
-         $this->syncTeachers($teacherIds , $course);
+        $term_id=$courseValues['term_id'];
+        $number=$this->generateNumber($term_id); 
+        $course= DB::transaction(function() 
+        use($courseValues,$number){
+              $course=new Course($courseValues);
+              $course->number=$number;
+              $course->save();
 
-         return $course;
+              $statusValues=Status::initialize($course);
+              $status=new Status($statusValues);
+              $course->status()->save($status);
+
+              return $course;
+              
+        });
+        
+        $this->syncCategories($categoryIds , $course);
+        
+        $this->syncTeachers($teacherIds , $course);
+
+        return $course;
      }
      public function update($courseValues , $categoryIds, $teacherIds, $id)
      {

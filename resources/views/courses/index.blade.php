@@ -2,7 +2,7 @@
 
 
 @section('content')
-   
+        
        <course-index v-show="!selected" :hide_create="indexSettings.hide_create" 
            :version="version"
          @begin-create="onBeginCreate"  @selected="onSelected"  >

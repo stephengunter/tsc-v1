@@ -6,7 +6,7 @@
                 </h4>
             </span> 
         </div>  <!-- End panel-heading-->
-        <div class="panel-body" style="font-size: 0.85em;">
+        <div class="panel-body" >
             <div class="row">
                 <div v-for="item in items" class="col-md-6">
                     <ul style="list-style-type: square;">

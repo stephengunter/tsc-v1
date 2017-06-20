@@ -108,13 +108,7 @@
         },
          
         methods: {  
-            showUpdatedBy(){
-               let updated_by=Helper.tryParseInt(this.signupinfo.updated_by)
-               if(updated_by){
-                  Bus.$emit('onShowEditor',updated_by)
-               }
-                
-            },
+            
             btnEditCilcked(){
                this.$emit('begin-edit');
             },

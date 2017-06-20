@@ -1,18 +1,20 @@
 <template>
 <div>
   <category v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
-     @saved="categoryUpdated" @loaded="onDataLoaded" :version="current_version"
+     @saved="categoryUpdated" @loaded="onDataLoaded" 
      @btn-back-clicked="onBtnBackClicked" @deleted="onCategoryDeleted" > 
 
   </category>
 
   <category-courses v-if="loaded" :category="category"
      :version="current_version"
-     @add-course="onAddCourse" >
+     @add-course="onAddCourse" @remove="beginRemove">
     
   </category-courses>
 
- 
+  <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+      @close="deleteConfirm.show=false" @confirmed="submitRemove">        
+  </delete-confirm>
   
   
   <modal :showbtn="false" :width="courseSelector.width" :show.sync="courseSelector.show" 
@@ -90,7 +92,13 @@
                   show:false,
                   width:1200,
                },
-              
+               
+               deleteConfirm:{
+                    id:0,
+                    show:false,
+                    msg:'',
+
+                }, 
 
                courseListSettings:{
                   title:Helper.getIcon(Course.title())  + '  此分類中的課程',
@@ -100,6 +108,7 @@
                     category:this.id,
                   },
                }
+
             }
         },
         computed:{
@@ -154,17 +163,11 @@
                 })
 
             },
-            onCourseSelected(){
-
-            },
             onAddCourse(){
                 this.getCoursesCanAdd()
             },
             onAddCourseCanceled(){
                 this.courseSelector.show=false
-            },
-            onRemoveCourse(){
-
             },
             submitAddCourses(selectedIds){
               let category=this.id
@@ -179,7 +182,28 @@
               .catch(error => {
                     Helper.BusEmitError(error) 
               })
-            }
+            },
+            beginRemove(values){
+                this.deleteConfirm.msg= '確定要將 『' + values.name + '』從分類中移除嗎' 
+                this.deleteConfirm.id=values.id
+                this.deleteConfirm.show=true                
+            },
+            submitRemove(){
+                let course = this.deleteConfirm.id 
+                let category=this.id
+                let remove= CategoryCourses.delete(category, course)
+                remove.then(result => {
+                    Helper.BusEmitOK('移除成功')
+                    this.current_version += 1
+                    this.deleteConfirm.show=false
+                    Helper.BusEmitOK()
+                   
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error,'移除失敗')
+                    this.closeConfirm()   
+                })
+            },
         }, 
 
     }

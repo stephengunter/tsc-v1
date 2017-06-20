@@ -11,11 +11,17 @@ class Course extends Model
 {
     use FilterPaginateOrder;
    
-    protected $guarded = [];
-	// protected $fillable = ['name', 'center_id', 'weeks', 'hours','photo_id', 'term_id' , 'number',
-    //                         'net_signup' , 'credit_count' ,
-    //                        'begin_date' ,  'end_date' , 'tuition' , 'cost' , 'materials',
-    //                        'open_date' , 'close_date',  'limit' , 'active'	];
+    
+	protected $fillable = [ 'term_id', 'center_id', 'name', 
+                            'credit_count' ,'net_signup' , 
+                            'begin_date' ,  'end_date' , 'weeks', 'hours',
+                            'tuition', 'cost' , 'materials',
+                            'description','target',
+                            'open_date' , 'close_date', 'limit','min',
+                            'display_order' , 'reviewed', 'active'	,       
+                            'removed' , 'updated_by'   
+                            
+                            ];
 	
     protected $filter =  ['name',  'weeks', 'hours', 'number',
                              'net_signup' , 'credit_count' ,
@@ -42,6 +48,11 @@ class Course extends Model
            
         ];
     }
+
+    public function status() 
+	{
+		return $this->hasOne('App\Status');
+	}
 
     public function term() {
 		return $this->belongsTo('App\Term');

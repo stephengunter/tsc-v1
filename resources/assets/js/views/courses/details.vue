@@ -16,8 +16,11 @@
                     <a @click="activeIndex=1" href="#classtime" data-toggle="tab">上課時間</a>
                 </li>
                 <li>
-                     <a @click="activeIndex=2" href="#schedule" data-toggle="tab">預定進度</a>
+                     <a @click="activeIndex=2" href="#status" data-toggle="tab">預定進度</a>
                 </li>
+               <!--  <li>
+                     <a @click="activeIndex=2" href="#schedule" data-toggle="tab">預定進度</a>
+                </li> -->
                 <li>
                      <a @click="activeIndex=3" href="#signupRecord" data-toggle="tab">報名紀錄</a>
                 </li>
@@ -41,13 +44,20 @@
                      @updated="onClasstimeChanged"   >             
                     </classtime>
                 </div>
-                <div class="tab-pane fade" id="schedule">
+                <div class="tab-pane fade" id="status">
+                    <course-status v-if="activeIndex==2"  
+                      :course_id="id"   :canEdit="course.canEdit" 
+                    
+                      >             
+                    </course-status>
+                </div>
+                <!-- <div class="tab-pane fade" id="schedule">
                     <schedule v-if="activeIndex==2"  
                       :course_id="id"   :canEdit="course.canEdit" 
                      @created="onScheduleChanged" @deleted="onScheduleChanged"
                      @updated="onScheduleChanged"   >             
                     </schedule>
-                </div>
+                </div> -->
                 <div class="tab-pane fade" id="signupRecord">
                     <div  v-if="activeIndex==3"  >
                        <signup-list v-show="!signupRecordSettings.creating" :course_id="id" 
@@ -96,6 +106,7 @@
     import CourseComponent from '../../components/course/course.vue'
     import SignupInfoComponent from '../../components/course/signupinfo/view.vue'
     import ClasstimeComponent from '../../components/classtime/classtime.vue'
+    import CourseStatusComponent from '../../components/course/status/view.vue'
     import ScheduleComponent from '../../components/schedule/schedule.vue'
     import SignupList from '../../components/signup/list.vue'
     import CreateSignup from '../../components/signup/create.vue'
@@ -109,6 +120,7 @@
         components: {
            'course' : CourseComponent,
            'signup-info' : SignupInfoComponent,
+           'course-status':CourseStatusComponent,
            'classtime' : ClasstimeComponent,
            'schedule' : ScheduleComponent,
            'signup-list':SignupList,
