@@ -32,7 +32,8 @@
                        
                     </div>
                     <div class="col-sm-3">
-                        
+                        <label class="label-title">開課狀態</label>
+                          <p v-text="status.ps"></p>  
                     </div>
             </div>
            

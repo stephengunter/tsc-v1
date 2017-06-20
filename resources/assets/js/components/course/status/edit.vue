@@ -28,6 +28,16 @@
                          </div>
                        
                     </div>
+                    <div class="col-sm-6">
+                         <div class="form-group">                           
+                            <label>備註</label>
+                            <div>
+                                <textarea rows="3" cols="50" class="form-control" name="status.ps"   v-model="form.status.ps" >
+                                </textarea>
+                            </div>
+                         </div>
+                       
+                    </div>
                     
                 </div>
               

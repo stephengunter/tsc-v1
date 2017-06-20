@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Course;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
+use App\Http\Requests\Course\StatusRequest;
+
 use App\Status;
 use App\Course;
 
@@ -40,33 +42,42 @@ class StatusesController extends BaseController
     }
     public function edit($id)
     {
-        $category=$this->categories->findOrFail($id);    
         $current_user=$this->currentUser();
-        if(!$category->canEditBy($current_user)){
+        $status=Status::findOrFail($id);
+        if($status->hasRemoved()) {
+            abort(404);
+        }
+        if(!$status->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
-        return response()
-                ->json([
-                    'category' => $category
-                ]);        
+        if($status->signupStopped()) $status->signup=0;
+        else   $status->signup=1;
+        
+        if($status->classStopped()) $status->class=0;
+        else   $status->class=1;
+        
+        return response()->json(['status' => $status ]);        
     }
-    public function update(CategoryRequest $request, $id)
+    public function update(StatusRequest $request, $id)
     {
-        $category=$this->categories->findOrFail($id); 
         $current_user=$this->currentUser();
-        if(!$category->canEditBy($current_user)){
-            return  $this->unauthorized();         
+        $status=Status::findOrFail($id);
+        if($status->hasRemoved()) {
+            abort(404);
+        }
+        if(!$status->canEditBy($current_user)){
+            return  $this->unauthorized(); 
         }
         $updated_by=$current_user->id;
         $removed=false;
         $values=$request->getValues($updated_by,$removed);
 
-        $category->update($values);
+        $signup=(int)$values['signup'];
+        $class=(int)$values['class'];
 
-         return response()
-                ->json([
-                    'category' => $category
-                ]);   
+        $status->update($values);
+
+        return response()->json(['status' => $status ]);   
     }
     
    

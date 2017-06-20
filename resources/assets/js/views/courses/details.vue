@@ -18,14 +18,14 @@
                 <li>
                      <a @click="activeIndex=2" href="#status" data-toggle="tab">課程狀態</a>
                 </li>
-               <!--  <li>
-                     <a @click="activeIndex=2" href="#schedule" data-toggle="tab">預定進度</a>
-                </li> -->
                 <li>
-                     <a @click="activeIndex=3" href="#signupRecord" data-toggle="tab">報名紀錄</a>
+                     <a @click="activeIndex=3" href="#schedule" data-toggle="tab">預定進度</a>
                 </li>
                 <li>
-                     <a @click="activeIndex=4" href="#lesson" data-toggle="tab">課堂紀錄表</a>
+                     <a @click="activeIndex=4" href="#signupRecord" data-toggle="tab">報名紀錄</a>
+                </li>
+                <li>
+                     <a @click="activeIndex=5" href="#lesson" data-toggle="tab">課堂紀錄表</a>
                 </li>
                 
             </ul>
@@ -51,15 +51,15 @@
                       >             
                     </course-status>
                 </div>
-                <!-- <div class="tab-pane fade" id="schedule">
-                    <schedule v-if="activeIndex==2"  
+                <div class="tab-pane fade" id="schedule">
+                    <schedule v-if="activeIndex==3"  
                       :course_id="id"   :canEdit="course.canEdit" 
                      @created="onScheduleChanged" @deleted="onScheduleChanged"
                      @updated="onScheduleChanged"   >             
                     </schedule>
-                </div> -->
+                </div>
                 <div class="tab-pane fade" id="signupRecord">
-                    <div  v-if="activeIndex==3"  >
+                    <div  v-if="activeIndex==4"  >
                        <signup-list v-show="!signupRecordSettings.creating" :course_id="id" 
                             :hide_create="signupRecordSettings.hide_create" 
                             :version="signupRecordSettings.version" 
@@ -72,7 +72,7 @@
                      </div>  
                 </div>
                 <div class="tab-pane fade" id="lesson">
-                      <div  v-if="activeIndex==4" >
+                      <div  v-if="activeIndex==5" >
                          <lesson-list v-show="lessonSettings.listing" :course_id="id" 
                             :hide_create="lessonSettings.hide_create" 
                             :version="lessonSettings.version" 

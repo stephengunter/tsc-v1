@@ -21,7 +21,8 @@ class CreateStatusesTable extends Migration
 			$table->integer('signup')->default(-1);
             $table->boolean('register')->default(false);
             $table->integer('class')->default(0);
-			
+
+			$table->text('ps')->nullable();
 			$table->integer('updated_by')->unsigned()->nullable();
 			$table->timestamps();
         });

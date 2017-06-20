@@ -86,6 +86,16 @@ class Status extends Model
     {
         return $this->course->removed;
     }
+    public function signupStopped()
+    {
+        $status=(int)$this->signup;
+        return ($status==0);
+    }
+    public function classStopped()
+    {
+        $status=(int)$this->class;
+        return ($status==0);
+    }
 
     public function canEditBy($user)
 	{
