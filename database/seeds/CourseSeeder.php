@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\Status;
 use App\Center;
 use App\Term;
 use App\Course;
@@ -46,6 +47,10 @@ class CourseSeeder extends Seeder
             'active' => true,
         ]);
 
+        $statusValues=Status::initialize($course);
+        $status=new Status($statusValues);
+        $course->status()->save($status);
+
         $category=Category::where('name','社會科學')->first();
         $course->categories()->save($category);
 
@@ -87,6 +92,10 @@ class CourseSeeder extends Seeder
             'min' => 10,
             'active' => true,
         ]);
+
+        $statusValues=Status::initialize($course);
+        $status=new Status($statusValues);
+        $course->status()->save($status);
 
         $category=Category::where('name','最新課程')->first();
         $course->categories()->save($category);
@@ -141,6 +150,10 @@ class CourseSeeder extends Seeder
             'min' => 10,
             'active' => true,
         ]);
+
+        $statusValues=Status::initialize($course);
+        $status=new Status($statusValues);
+        $course->status()->save($status);
 
         $category=Category::where('name','社會科學')->first();
         $course->categories()->save($category);

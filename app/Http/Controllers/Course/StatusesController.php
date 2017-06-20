@@ -27,14 +27,15 @@ class StatusesController extends BaseController
     
     public function show($id)
     {
-        $category=$this->categories->findOrFail($id);
-        $category->canEdit=true;
-        $category->canDelete=$category->canDelete();
+        $current_user=$this->currentUser();
+        $status=Status::findOrFail($id);
+        if($status->hasRemoved()) {
+            abort(404);
+        }
+        $status->canEdit=$status->canEditBy($current_user);
+        $status->canDelete=$status->canDeleteBy($current_user);
 
-         return response()
-                ->json([
-                    'category' => $category
-                ]);
+        return response()->json(['status' => $status ]);   
        
     }
     public function edit($id)

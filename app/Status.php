@@ -81,4 +81,22 @@ class Status extends Model
         if($today->gt($end)) return 2;
         return 1;
 	}
+
+    public function hasRemoved()
+    {
+        return $this->course->removed;
+    }
+
+    public function canEditBy($user)
+	{
+        
+		return $this->course->canEditBy($user);
+          
+	} 
+	public function canDeleteBy($user)
+	{
+        return $this->course->canDeleteBy($user);
+        
+	}
+
 }

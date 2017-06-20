@@ -66,7 +66,7 @@
         data() {
             return {
                 loaded:false,
-                title:Helper.getIcon(CourseStatus.title()) + '  編輯課程狀態' 
+                title:Helper.getIcon(CourseStatus.title()) + '  編輯課程狀態' ,
                 form: {},
                
                 signupOptions:[{

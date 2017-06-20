@@ -16,7 +16,7 @@
                     <a @click="activeIndex=1" href="#classtime" data-toggle="tab">上課時間</a>
                 </li>
                 <li>
-                     <a @click="activeIndex=2" href="#status" data-toggle="tab">預定進度</a>
+                     <a @click="activeIndex=2" href="#status" data-toggle="tab">課程狀態</a>
                 </li>
                <!--  <li>
                      <a @click="activeIndex=2" href="#schedule" data-toggle="tab">預定進度</a>

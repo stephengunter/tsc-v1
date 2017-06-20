@@ -17,18 +17,18 @@
             <div class="row">
                     <div class="col-sm-3">
                         <label class="label-title">報名狀態</label>
-                        <p v-html="status.signupLabel"></p>  
+                        <p v-html="signupLabel()"></p>  
                       
                     </div>
                     <div class="col-sm-3">
                         <label class="label-title">註冊狀態</label>
-                        <p v-html="status.registerLabel"></p> 
+                          <p v-html="registerLabel()"></p>  
                       
                     </div>
                     <div class="col-sm-3">
                                               
                         <label class="label-title">開課狀態</label>
-                         <p v-html="status.classLabel"></p> 
+                          <p v-html="classLabel()"></p>  
                        
                     </div>
                     <div class="col-sm-3">
@@ -54,6 +54,10 @@
               type: Number,
               default: 0
             },
+            can_edit:{
+               type: Boolean,
+               default: true
+            },  
            
         },
         data() {
@@ -76,7 +80,9 @@
                 let id=this.course_id
                 let getData =CourseStatus.show(id)
                 getData.then(data => {
-                    this.status = new  CourseStatus(data.status) 
+
+                    this.status =data.status
+       
                     this.loaded = true 
                                      
                 })
@@ -84,6 +90,15 @@
                     Helper.BusEmitError(error)
                 })
               
+            },
+            signupLabel(){
+                return CourseStatus.getSignupLabel(this.status)
+            },
+            registerLabel(){
+                return CourseStatus.getRegisterLabel(this.status)
+            },
+            classLabel(){
+                return CourseStatus.getClassLabel(this.status)
             },
             btnEditCilcked(){
                this.$emit('begin-edit');

@@ -5,9 +5,7 @@ class CourseStatus {
             this[property] = data[property];
         }
 
-        this.signupLabel=CourseStatus.getSignupLabel(data)
-        this.registerLabel=CourseStatus.getRegisterLabel(data)
-        this.classLabel=CourseStatus.getClassLabel(data)
+        
 
     }
     static title(){
@@ -69,10 +67,9 @@ class CourseStatus {
         })
     }
    
-    static signupLabel(data){
-        status=Helper.tryParseInt(data.signup)
-        label=''
-        switch (status) {
+    static getSignupLabel(data){
+        let label=''
+        switch (Number(data.signup)) {
             case -1 :
                 label = '<span class="label label-default">未開始</span>'
             break
@@ -89,26 +86,19 @@ class CourseStatus {
         }
         return label
     }
-    static registerLabel(data){       
-        status=Helper.tryParseInt(data.register)
-        label=''
-        switch (status) {
-           
-            case 0 :
-                label = '<span class="label label-default">未完成</span>'
-            break
-            case 1 :
-                label = '<span class="label label-success">已完成</span>'
-            break
-           
+    static getRegisterLabel(data){       
+      
+        if(Number(data.register)){
+             return '<span class="label label-success">已完成</span>'
+        }else{
+            return '<span class="label label-default">未完成</span>'
         }
-        return label
+        
     }
     
-    static classLabel(data){
-        status=Helper.tryParseInt(data.class)
-        label=''
-        switch (status) {
+    static getClassLabel(data){
+        let label=''
+        switch (Number(data.class)) {
             case -1 :
                 label = '<span class="label label-default">尚未開課</span>'
             break
