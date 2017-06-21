@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests\Course\AdmissionRequest;
 
+use App\Repositories\Courses;
+
 use App\Admission;
 use App\Course;
 use App\Admit;
@@ -17,13 +19,15 @@ use App\Http\Middleware\CheckAdmin;
 class AdmissionsController extends BaseController
 {
     protected $key='admissions';
-    public function __construct(CheckAdmin $checkAdmin) 
+    public function __construct(Courses $courses,CheckAdmin $checkAdmin) 
     {
        
 		$exceptAdmin=[];
         $allowVisitors=[];
         $this->setMiddleware( $exceptAdmin, $allowVisitors);
-         
+        
+        $this->courses=$courses;
+
         $this->setCheckAdmin($checkAdmin);
 		
 	}
@@ -57,6 +61,34 @@ class AdmissionsController extends BaseController
                                        'course' => $course
                                  ]); 
        
+    }
+    public function create()
+    {
+        $request = request();
+       
+        $course_id=(int)$request->course; 
+       
+        $course= $this->courses->findOrFail($course_id);
+
+        if(!$course->canCreateAdmit()) abort(404);
+
+        $current_user=$this->currentUser();
+        if(!$course->canEditBy($current_user)){
+            return  $this->unauthorized();  
+        }  
+
+        $signupList=$course->validSignups()->where('status','>',-1)
+                                            ->orderBy('status','desc')
+                                            ->orderBy('date','desc')
+                                            ->with('user.profile')
+                                            ->get();  
+        
+                                                                        
+        $course->status;
+
+        return response() ->json([ 'model' => $admitList,
+                                       'course' => $course
+                                 ]); 
     }
     public function edit($id)
     {

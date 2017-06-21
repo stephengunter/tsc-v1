@@ -12,6 +12,9 @@
     static source(){
         return '/admissions'
     }
+    static createUrl(course){
+         return this.source() + '/create?course=' + course
+    }
     static storeUrl(){
          return this.source()
     }

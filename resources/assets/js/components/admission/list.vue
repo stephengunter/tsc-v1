@@ -15,12 +15,12 @@
               </select>
                
          </div>
-         <button  slot="btn" class="btn btn-danger btn-sm" >
+         <button  slot="btn"  v-if="canDelete" v-show="can_edit" @click="btnDeleteClicked" class="btn btn-danger btn-sm" >
               <span class="glyphicon glyphicon-trash"></span> 刪除
          </button>
          
          <template scope="props">
-            <tr>
+            <!-- <tr>
                 <td v-if="can_select">
                     <button @click.prevent="selected(props.item.signup_id)"  type="button" class="btn-xs btn btn-primary">
                         選取
@@ -46,21 +46,29 @@
                 <td>
                     <updated :entity="props.item"></updated>
                 </td>
-            </tr>
-        </template>
+            </tr> -->
+            <row :admit="props.item"></row>
+         </template>
 
     </data-viewer>
 
 </template>
 
 <script>
-     
+    import Row from './row.vue'
     export default {
         name: 'AdmitList',
+        components: {
+            Row,
+        },
         props: {
             course_id: {
               type: Number,
               default: 0
+            },
+            creating:{
+              type: Boolean,
+              default: false
             },
             hide_create: {
               type: Boolean,
@@ -94,7 +102,7 @@
             return {
                 title:Helper.getIcon(Admission.title())  + '  錄取名單',
                 loaded:false,
-                source: Admission.showUrl(this.course_id),
+                source: '',
                 
                              
                 createText: '',
@@ -109,18 +117,31 @@
                 searchParams:{   },
              
                 hasData:false,
-                viewMore:false
+                viewMore:false,
+
+                course:null,
              
             }
         },
-        
+        computed: {
+            canDelete: function () {
+                if(!this.course) return false
+                if(!this.course.admission) return false
+                return this.course.admission.canDelete
+            }
+        },
         methods: {
             init() {
                 this.loaded=false
-               
-                this.thead=Admission.getThead(this.can_select)
 
-                 let options = this.loadStatusOptions()
+                if(this.creating){
+                    this.source= Admission.createUrl(this.course_id)
+                    this.thead=Admission.getThead(true)
+                    this.loaded=true
+                }else{
+                    this.source= Admission.showUrl(this.course_id)
+                    this.thead=Admission.getThead(this.can_select)
+                    let options = this.loadStatusOptions()
                     options.then((value) => {
                         this.searchParams={
                             status : value
@@ -128,6 +149,11 @@
 
                        this.loaded=true
                     })
+                }
+               
+                
+
+                 
                 
             },
             loadStatusOptions(){
@@ -146,6 +172,7 @@
                 })   //End Promise
             },
             onDataLoaded(data){
+                this.course=data.course
                 this.$emit('loaded',data)
                 // if(data.summary)  this.summary=data.summary
                 // else this.summary=null
@@ -171,7 +198,15 @@
             },
             remove(id){
               alert(id)
-            }
+            },
+            btnDeleteClicked(){
+                 let values={
+                    // name: this.category.name,
+                    // id:this.id
+                }
+               this.$emit('btn-delete-clicked',values)
+            
+            },
            
         },
 

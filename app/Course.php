@@ -132,7 +132,7 @@ class Course extends Model
     }
     public function privateCategories()
     {
-         if(!$this->categories()->count()) return null;
+        if(!$this->categories()->count()) return null;
         return $this->categories()->where('removed',false)
                     ->where('active',true)
                     ->where('public',false)->get();

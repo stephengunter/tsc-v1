@@ -5,35 +5,33 @@
        
   </admit-list>
   <div v-show="!hasData"  class="panel panel-default">
-      <div v-if="admission" class="panel-heading">
+      <!-- <div v-if="admission" class="panel-heading">
           <div class="panel-title">
              <h4 v-html="title"></h4>
-              <!-- 報名數：{{ summary.total }} 筆 &nbsp; 
+              報名數：{{ summary.total }} 筆 &nbsp; 
               正取：{{ summary.in }} 筆 &nbsp; 
-              備取：{{ summary.out }} 筆 &nbsp;  -->
+              備取：{{ summary.out }} 筆 &nbsp; 
             
           </div>    
           <div>
-              <button v-if="course.admission.canDelete" v-show="can_edit" @click="btnDeleteClicked" class="btn btn-danger btn-sm" >
-                  <span class="glyphicon glyphicon-trash"></span> 刪除
-              </button>
+             
           </div>
-      </div>  <!-- End panel-heading--> 
-      <div v-else class="panel-heading">
+      </div>   -->
+      <div v-if="course" class="panel-heading">
           <div class="panel-title">
               <h4 v-html="title"></h4>
               
             
           </div>
-          <div>
-              <!-- 報名數：{{ summary.total }} 筆 &nbsp; 
+          <!-- <div>
+              報名數：{{ summary.total }} 筆 &nbsp; 
               人數上限：{{ summary.in }} 筆 &nbsp; 
-              最低人數：：{{ summary.out }} 筆 &nbsp;  -->
-          </div>
+              最低人數：：{{ summary.out }} 筆 &nbsp; 
+          </div> -->
           <div>
-              <!-- <button v-if="course.canCreateAdmit"  v-show="can_edit" @click="btnCreateClicked" class="btn btn-primary btn-sm" >
+              <button v-if="course.canCreateAdmit"  v-show="can_edit" @click="btnCreateClicked" class="btn btn-primary btn-sm" >
                   <span class="glyphicon glyphicon-plus"></span> 新增
-              </button> -->
+              </button>
           </div>
       </div>  <!-- End panel-heading-->   
       
@@ -104,28 +102,12 @@
            this.init()
         },
         methods: {
-           init(){
-            
+            init(){
               this.loaded=false
               this.admission=null
-              if(this.course_id) this.fetchData()
-              
-           },
-           fetchData() {
-                // let getData = Admission.show(this.course_id)             
-             
-                // getData.then(data => {
-                //    this.course=data.course
-                //    this.$emit('loaded', this.course)
-                //    this.loaded = true                        
-                // })
-                // .catch(error=> {
-                //     this.loaded = false  
-                //     Helper.BusEmitError(error)
-                // })
             },
             onDataLoaded(data){
-                
+                this.course=data.course
             },
             btnCreateClicked(){
                this.$emit('begin-create') 
