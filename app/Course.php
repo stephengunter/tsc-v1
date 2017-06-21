@@ -62,6 +62,11 @@ class Course extends Model
 		return $this->belongsTo('App\Center');
 	}
 
+    public function admission() 
+	{
+		return $this->hasOne('App\Admission');
+	}
+
 	public function categories()
     {
         return $this->belongsToMany('App\Category','course_category');

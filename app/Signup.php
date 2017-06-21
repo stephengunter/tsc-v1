@@ -17,7 +17,7 @@ class Signup extends Model
     use FilterPaginateOrder;
     protected $fillable =  ['course_id',  'user_id', 'date',
                               'tuition','cost' ,'points' ,   'discount' ,
-                             'identity' , 'discount_id',
+                             'identity' , 'discount_id', 'net_signup',
                              'status' ,  'removed' , 'updated_by'
                         	];
 
@@ -31,6 +31,8 @@ class Signup extends Model
             'course_id' => $course_id,
             'discount_id' => 0,
             'status' => 0,
+            'net_signup' => 1,
+            
         ];
     }                         
 

@@ -51,36 +51,37 @@ class SignupsController extends BaseController
 
     public function index()
     {
-         $request = request();
+        $request = request();
           
-         if(!$request->ajax()){
+        if(!$request->ajax()){
             $menus=$this->menus($this->key);            
             return view('signups.index')
                     ->with(['menus' => $menus]);
-         }  
+        }  
 
-         $signupList=[];
-         $course_id=(int)$request->course; 
-         if($course_id > 0){
-              $status=(int)$request->status;
-              $summary=$this->signups->getSummary($course_id); 
+        $signupList=[];
+        $course_id=(int)$request->course; 
+        if($course_id > 0){
+            $signupList= $this->signups->getByCourse($course_id);
+            $status=(int)$request->status;
+            if( $status >= -1  && $status <=1 ){
+                $signupList=$signupList->where('status',$status);
+            }
+            $signupList=$signupList->with(['course','user.profile'])
+                                    ->filterPaginateOrder();
+            $summary=$this->signups->getSummary($course_id);   
 
-              $signupList= $this->signups->getByCourse($course_id)
-                                            ->with(['course','user.profile'])
-                                              ->where('status',$status);
-              
-
-              return response() ->json(['model' => $signupList->filterPaginateOrder(),
-                                         'summary' => $summary
+            return response() ->json([ 'model' => $signupList,
+                                       'summary' => $summary
                                       ]); 
-         }
+        }
 
 
-         $user_id=(int)$request->user;
-         $signupList= $this->signups->getByUser($user_id)
+        $user_id=(int)$request->user;
+        $signupList= $this->signups->getByUser($user_id)
                                             ->with(['course','user.profile']);
 
-         return response() ->json(['model' => $signupList->filterPaginateOrder()  ]); 
+        return response() ->json(['model' => $signupList->filterPaginateOrder()  ]); 
        
     }
 

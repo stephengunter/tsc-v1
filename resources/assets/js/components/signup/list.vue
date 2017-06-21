@@ -24,7 +24,9 @@
                 </td> 
                 <td v-text="props.item.user.profile.fullname"></td> 
                 <td v-text="props.item.date"></td> 
-                
+                <td>
+                  <span v-if="props.item.net_signup" class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                </td> 
                 <td>
                    <button @click.prevent="selected(props.item.id)" type="button" :class="statusStyle(props.item.status)">
                    {{ statusText(props.item.status) }}
@@ -138,6 +140,8 @@
                     let options=Signup.statusOptions()
                     options.then(data => {
                         this.statusOptions = data.options
+                        let allStatuses={ text:'總數' , value:'-9' }
+                        this.statusOptions.splice(0, 0, allStatuses);
                         resolve(this.statusOptions[0].value);
                     })
                     .catch(error => {

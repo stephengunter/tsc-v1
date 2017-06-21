@@ -28,8 +28,9 @@ class CreateSignupsTable extends Migration
             $table->integer('discount_id')->unsigned()->nullable();
             $table->integer('points')->unsigned()->nullable();
             $table->string('discount')->nullable();  
-            $table->string('identity')->nullable();   
-            
+            $table->string('identity')->nullable();  
+
+            $table->boolean('net_signup')->default(false);           
             $table->integer('status')->default(0);
 
             $table->boolean('removed')->default(false);

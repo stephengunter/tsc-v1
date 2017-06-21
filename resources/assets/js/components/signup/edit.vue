@@ -22,6 +22,12 @@
                          </div>
                          
                       </div>
+                      <label  class="col-sm-2 control-label">網路報名</label>
+                       <div class="col-sm-4">
+                           <div>
+                               <toggle :items="boolOptions"   :default_val="signup.net_signup" @selected=setNetSignup></toggle>
+                           </div>
+                       </div>
                     
                   </div>
                   <div class="form-group">
@@ -72,7 +78,7 @@
                       </div>
                   </div>
                   <div class="form-group" >
-                    <label  class="col-sm-2 control-label">折扣優惠</label>
+                       <label  class="col-sm-2 control-label">折扣優惠</label>
                        <div class="col-sm-10">
                            <div>
                                <toggle :items="discountOptions"   :default_val="discount_id" @selected=setDiscount></toggle>
@@ -114,7 +120,7 @@
                 form: new Form({
                    signup:{}
                 }),
-
+                 boolOptions:Helper.boolOptions(),
                 datePickerOption:{},
                 date: {
                     time: ''

@@ -50,6 +50,14 @@
 
                          </div>  
                    </div>
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>網路報名</label>
+                           <div>
+                               <toggle :items="boolOptions"   :default_val="signup.net_signup" @selected=setNetSignup></toggle>
+                           </div>
+                        </div>
+                   </div>
                </div>
                <div v-if="user" class="row">
                    <div class="col-sm-3">
@@ -141,6 +149,7 @@
 
                 userOptions:[],
                 courseOptions:[],
+                boolOptions:Helper.boolOptions(),
                 discountOptions:[],
 
                 datePickerOption:{},
@@ -227,6 +236,7 @@
                     }
                }
             },
+
             onCombinationReady(params){
                 this.onCourseSelected(params.course)
             },
@@ -242,7 +252,10 @@
                 this.discountOptions=options
                 let noDiscount={ text:'無' , value:'0' }
                 this.discountOptions.splice(0, 0, noDiscount);
-            },       
+            },  
+            setNetSignup(val){
+                this.signup.net_signup=val
+            },     
             setDiscount(val) {
                 this.signup.discount_id = val;
             },  

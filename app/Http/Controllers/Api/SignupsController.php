@@ -47,30 +47,41 @@ class SignupsController extends Controller
 
     public function index()
     {
-         if(!request()->ajax()){
+        if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('signups.index')
                     ->with(['menus' => $menus]);
-         }  
+        }  
 
-         $request = request();
+        $request = request();
 
-         $course_id=(int)$request->course; 
-         $user_id=(int)$request->user;
-         $status=(int)$request->status; 
+        $course_id=(int)$request->course; 
+        $user_id=(int)$request->user;
+        $status=(int)$request->status; 
+       
 
-         $summary=null;
-         if($course_id > 0 ){
+        $signupList=$this->signups->getAll();        
+        if($course_id) $signupList=$signupList->where('course_id',$course_id);
+        if($user_id) $signupList=$signupList->where('user_id',$user_id);
+        if( $status >= -1  && $status <=1){
+            $signupList=$signupList->where('status',$status);
+        }else{
+
+        }
+
+        $signupList=$signupList->with(['course','user.profile'])->filterPaginateOrder();
+
+
+        $summary=null;
+        if($course_id > 0 ){
              $summary=$this->signups->getSummary($course_id);            
-         }
-         
-         $signupList=$this->signups->index($course_id,$user_id,$status)->filterPaginateOrder();
+        }
 
-           return response()
-            ->json([
-                'model' => $signupList,
-                'summary' => $summary
-            ]);
+        return response()
+                ->json([
+                    'model' => $signupList,
+                    'summary' => $summary
+                ]);
        
     }
 

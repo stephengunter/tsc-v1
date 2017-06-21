@@ -192,6 +192,13 @@ class Signup {
                     default:true
 
                 },{
+                    title: '網路報名',
+                    key: 'net_signup',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
                     title: '狀態',
                     key: 'status',
                     sort: true,

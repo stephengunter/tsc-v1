@@ -29595,6 +29595,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = {
     name: 'CreateSignup',
@@ -29625,6 +29633,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             userOptions: [],
             courseOptions: [],
+            boolOptions: Helper.boolOptions(),
             discountOptions: [],
 
             datePickerOption: {},
@@ -29723,6 +29732,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.discountOptions = options;
             var noDiscount = { text: '無', value: '0' };
             this.discountOptions.splice(0, 0, noDiscount);
+        },
+        setNetSignup: function setNetSignup(val) {
+            this.signup.net_signup = val;
         },
         setDiscount: function setDiscount(val) {
             this.signup.discount_id = val;
@@ -29879,6 +29891,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = {
     name: 'EditSignup',
@@ -29902,7 +29920,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             form: new Form({
                 signup: {}
             }),
-
+            boolOptions: Helper.boolOptions(),
             datePickerOption: {},
             date: {
                 time: ''
@@ -30002,6 +30020,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
 //
 //
 //
@@ -30147,6 +30167,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 var options = Signup.statusOptions();
                 options.then(function (data) {
                     _this2.statusOptions = data.options;
+                    var allStatuses = { text: '總數', value: '-9' };
+                    _this2.statusOptions.splice(0, 0, allStatuses);
                     resolve(_this2.statusOptions[0].value);
                 }).catch(function (error) {
                     console.log(error);
@@ -43955,6 +43977,13 @@ var Signup = function () {
                 title: '報名日期',
                 key: 'date',
                 sort: true,
+                static: true,
+                default: true
+
+            }, {
+                title: '網路報名',
+                key: 'net_signup',
+                sort: false,
                 static: true,
                 default: true
 
@@ -73488,7 +73517,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           domProps: {
             "textContent": _vm._s(props.item.date)
           }
-        }), _vm._v(" "), _c('td', [_c('button', {
+        }), _vm._v(" "), _c('td', [(props.item.net_signup) ? _c('span', {
+          staticClass: "glyphicon glyphicon-ok",
+          attrs: {
+            "aria-hidden": "true"
+          }
+        }) : _vm._e()]), _vm._v(" "), _c('td', [_c('button', {
           class: _vm.statusStyle(props.item.status),
           attrs: {
             "type": "button"
@@ -74952,7 +74986,19 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "textContent": _vm._s(_vm.form.errors.get('signup.date'))
     }
-  }) : _vm._e()])])]), _vm._v(" "), _c('div', {
+  }) : _vm._e()])]), _vm._v(" "), _c('label', {
+    staticClass: "col-sm-2 control-label"
+  }, [_vm._v("網路報名")]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-4"
+  }, [_c('div', [_c('toggle', {
+    attrs: {
+      "items": _vm.boolOptions,
+      "default_val": _vm.signup.net_signup
+    },
+    on: {
+      "selected": _vm.setNetSignup
+    }
+  })], 1)])]), _vm._v(" "), _c('div', {
     staticClass: "form-group"
   }, [_c('label', {
     staticClass: "col-sm-2 control-label"
@@ -79556,7 +79602,19 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "textContent": _vm._s(_vm.form.errors.get('signup.user_id'))
     }
-  }) : _vm._e()], 1)])]), _vm._v(" "), (_vm.user) ? _c('div', {
+  }) : _vm._e()], 1)]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('label', [_vm._v("網路報名")]), _vm._v(" "), _c('div', [_c('toggle', {
+    attrs: {
+      "items": _vm.boolOptions,
+      "default_val": _vm.signup.net_signup
+    },
+    on: {
+      "selected": _vm.setNetSignup
+    }
+  })], 1)])])]), _vm._v(" "), (_vm.user) ? _c('div', {
     staticClass: "row"
   }, [_c('div', {
     staticClass: "col-sm-3"
