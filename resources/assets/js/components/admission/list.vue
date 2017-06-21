@@ -18,24 +18,30 @@
          <template scope="props">
             <tr>
                 <td v-if="can_select">
-                    <button @click.prevent="selected(props.item.id)"  type="button" class="btn-xs btn btn-primary">
+                    <button @click.prevent="selected(props.item.signup_id)"  type="button" class="btn-xs btn btn-primary">
                         選取
                     </button>
-                </td> 
-                
-                <td v-text="props.item.user.profile.fullname"></td> 
-                <td v-text="props.item.date"></td> 
-                <td>
-                  <span v-if="props.item.net_signup" class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                </td> 
+                </td>
+                <td v-if="can_edit">
+                    <button class="btn btn-danger btn-xs"
+                        @click.prevent="remove(props.item.id)">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                </td>
+                <td v-text="props.item.display_order"></td> 
+                <td v-text="props.item.signup.user.profile.fullname"></td> 
+               
                 <td>
                    <button @click.prevent="selected(props.item.id)" type="button" :class="statusStyle(props.item.status)">
-                   {{ statusText(props.item.status) }}
+                   {{ statusText(props.item.signup.status) }}
                    </button>
                 </td>
-                <td v-html="getFormatedCourseName(props.item.course)"></td>    
-                <td>{{ props.item.tuition | formatMoney }}</td>  
-                <td v-html="discountText(props.item)"></td>
+                <td v-text="props.item.signup.date"></td> 
+                <td>{{ props.item.signup.tuition | formatMoney }}</td>  
+                <td v-html="discountText(props.item.signup)"></td>
+                <td>
+                    <updated :entity="props.item"></updated>
+                </td>
             </tr>
         </template>
 
@@ -46,13 +52,9 @@
 <script>
      
     export default {
-        name: 'SignupList',
+        name: 'AdmitList',
         props: {
             course_id: {
-              type: Number,
-              default: 0
-            },
-            user_id: {
               type: Number,
               default: 0
             },
@@ -64,9 +66,13 @@
                type: Number,
                default: 0
             },
-            can_select:{
+            can_edit:{
                type: Boolean,
                default: true
+            },
+            can_select:{
+               type: Boolean,
+               default: false
             },
         },
         beforeMount() {
@@ -79,19 +85,16 @@
         },
         data() {
             return {
-                title:Helper.getIcon('Signups')  + '  報名紀錄',
+                title:Helper.getIcon(Admission.title())  + '  錄取名單',
                 loaded:false,
-                source: Signup.source(),
+                source: Admission.source(),
                 
                 defaultSearch:'date',
                 defaultOrder:'date',                
-                create: Signup.createUrl(),
+                create: Admission.createUrl(),
                 
                 thead:[],
-                filter: [{
-                    title: '報名日期',
-                    key: 'date',
-                }],
+                filter: [],
 
                 summary:null,
 
@@ -116,7 +119,7 @@
             init() {
                 this.loaded=false
                
-                this.thead=Signup.getThead(this.can_select)
+                this.thead=Admission.getThead(this.can_select)
 
                 if(this.course_id){
                     let options = this.loadStatusOptions()
@@ -161,10 +164,6 @@
             statusText(status){
                 return Signup.getStatusText(status)
             },
-           
-            getFormatedCourseName(course){
-                return Signup.getFormatedCourseName(course)
-            },
             discountText(signup){
                 if(!signup.discount) return ''
                 return Signup.formatDiscountText(signup.discount, signup.points)
@@ -176,7 +175,9 @@
             beginCreate(){
                  this.$emit('begin-create')
             },
-            
+            remove(id){
+              alert(id)
+            }
            
         },
 

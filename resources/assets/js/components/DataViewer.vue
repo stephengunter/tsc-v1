@@ -68,15 +68,10 @@
                             </div>
                         </th>
                     </tr>
-                     <!-- <tr v-else>
-                         <th>
-                             <h4 class="text-danger">查無資料</h4>
-                             
-                         </th>
-                     </tr> -->
+                    
                 </thead>
                 <tbody>
-                    <slot v-for="item in model.data" :item="item"></slot>                    
+                    <slot v-for="item in model.data"  :item="item"></slot>                    
                 </tbody>
             </table>
         </div>
@@ -160,6 +155,7 @@
                type: Boolean,
                default: false
             },
+           
         },
         
         data() {

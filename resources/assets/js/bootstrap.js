@@ -70,6 +70,8 @@ Vue.component('course-index', require('./views/courses/index') )
 Vue.component('course-create', require('./views/courses/create') )
 Vue.component('course-details', require('./views/courses/details') )
 
+Vue.component('admission-index', require('./views/admissions/index') )
+
 Vue.component('lesson-index', require('./views/lessons/index') )
 Vue.component('lesson-details', require('./views/lessons/details') )
 Vue.component('lesson-create', require('./views/lessons/create') )
@@ -117,6 +119,8 @@ import Category from './models/category.js'
 import CategoryCourses from './models/category-courses.js'
 import Course from './models/course.js'
 import CourseStatus from './models/course-status.js'
+import Admit from './models/admit.js'
+import Admission from './models/admission.js'
 import SignupInfo from './models/signupinfo.js'
 import Classtime from './models/classtime.js'
 import Schedule from './models/schedule.js'
@@ -159,6 +163,8 @@ window.Category=Category
 window.CategoryCourses=CategoryCourses
 window.Course=Course
 window.CourseStatus=CourseStatus
+window.Admit=Admit
+window.Admission=Admission
 window.SignupInfo=SignupInfo
 window.Classtime=Classtime
 window.Schedule=Schedule

@@ -15,5 +15,9 @@ class Admission extends Model
     public function course() {
 		return $this->belongsTo('App\Course');
 	}
+    public function admits()
+	{
+		return $this->hasMany('App\Admit');
+	}
     
 }

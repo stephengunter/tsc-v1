@@ -153,12 +153,18 @@ class BaseController extends Controller
                 ],
                 [
                     'id' => 3,
+                    'text' => '錄取名單',
+                    'path' => '/admissions',
+                    'active' => $current=='admissions'
+                ],
+                [
+                    'id' => 4,
                     'text' => '課堂紀錄表',
                     'path' => '/lessons',
                     'active' => $current=='lessons'
                 ],
                 [
-                    'id' => 4,
+                    'id' => 5,
                     'text' => '課程分類',
                     'path' => '/categories',
                     'active' => $current=='categories'

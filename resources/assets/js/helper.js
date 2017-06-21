@@ -68,6 +68,9 @@ class Helper {
             case 'admins':
                 html = '<i class="fa fa-key" aria-hidden="true"></i>'
             break;
+            case 'admissions':
+                html = '<i class="fa fa-list-alt" aria-hidden="true"></i>'
+            break;
             case 'statuses':
                 html = '<i class="fa fa-check-circle" aria-hidden="true"></i>'
             break;
@@ -107,6 +110,7 @@ class Helper {
             case 'refunds':
             html = '<i class="fa fa-arrow-circle-left" aria-hidden="true"></i> 退費申請'
             break;
+
             case 'admins':
                 html = '<i class="fa fa-key" aria-hidden="true"></i> 權限管理'
                 break;
