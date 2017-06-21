@@ -91,7 +91,7 @@ class Status extends Model
         $begin = Carbon::parse($course->begin_date);
         $end = Carbon::parse($course->end_date);
 
-        if($today->lt($begin)) return 0;
+        if($today->lt($begin)) return -1;
         if($today->gt($end)) return 2;
         return 1;
 	}

@@ -20682,6 +20682,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 
@@ -20738,6 +20739,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         no_page: {
             type: Boolean,
             default: false
+        },
+        show_title: {
+            type: Boolean,
+            default: true
         }
 
     },
@@ -67350,11 +67355,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   return _c('div', {
     staticClass: "panel panel-default"
   }, [_c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.show_title),
+      expression: "show_title"
+    }],
     staticClass: "panel-heading"
-  }, [_c('span', {
+  }, [_c('div', {
     staticClass: "panel-title"
-  }, [_c('span', {
-    staticClass: "panel-title",
+  }, [_c('h4', {
     domProps: {
       "innerHTML": _vm._s(_vm.title)
     }
@@ -90180,6 +90190,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -90203,6 +90226,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             ready: false,
             course_id: 0,
 
+            course: null,
+
             can_edit: true,
             can_back: true,
             can_select: false,
@@ -90213,18 +90238,41 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
         };
     },
+
+    computed: {
+        canCreate: function canCreate() {
+            if (!this.course) return false;
+            return this.course.canCreateAdmit;
+        }
+    },
     beforeMount: function beforeMount() {
         this.init();
     },
 
     methods: {
         init: function init() {},
+        test: function test() {
+            return '<span class="label label-default">未完成</span>';
+        },
         onCombinationReady: function onCombinationReady(params) {
             this.setCourse(params.course);
             this.ready = true;
         },
         setCourse: function setCourse(val) {
             this.course_id = val;
+        },
+        onDataLoaded: function onDataLoaded(course) {
+
+            this.course = course;
+        },
+        signupLabel: function signupLabel() {
+            return CourseStatus.getSignupLabel(this.course.status);
+        },
+        registerLabel: function registerLabel() {
+            return CourseStatus.getRegisterLabel(this.course.status);
+        },
+        classLabel: function classLabel() {
+            return CourseStatus.getClassLabel(this.course.status);
         },
         onSelected: function onSelected(id) {
             this.$emit('selected', id);
@@ -90255,9 +90303,22 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "ready": _vm.onCombinationReady,
       "course-changed": _vm.setCourse
     }
-  })], 1)])]), _vm._v(" "), (_vm.ready) ? _c('admission-view', {
+  })], 1), _vm._v(" "), (_vm.course) ? _c('div', {
+    staticClass: "panel-title"
+  }, [_vm._v("\r\n                人數上限： " + _vm._s(_vm.course.limit) + "\r\n                  \r\n                最低人數： " + _vm._s(_vm.course.min) + "\r\n                  \r\n                報名狀態："), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.signupLabel())
+    }
+  }), _vm._v("\r\n                  \r\n                開課狀態："), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.classLabel())
+    }
+  })]) : _vm._e()])]), _vm._v(" "), (_vm.ready) ? _c('admission-view', {
     attrs: {
       "course_id": _vm.course_id
+    },
+    on: {
+      "loaded": _vm.onDataLoaded
     }
   }) : _vm._e()], 1)
 },staticRenderFns: []}
@@ -90270,9 +90331,355 @@ if (false) {
 }
 
 /***/ }),
-/* 673 */,
-/* 674 */,
-/* 675 */,
+/* 673 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'AdmitList',
+    props: {
+        course_id: {
+            type: Number,
+            default: 0
+        },
+        hide_create: {
+            type: Boolean,
+            default: false
+        },
+        version: {
+            type: Number,
+            default: 0
+        },
+        can_edit: {
+            type: Boolean,
+            default: true
+        },
+        can_select: {
+            type: Boolean,
+            default: false
+        },
+        no_page: {
+            type: Boolean,
+            default: false
+        },
+        show_title: {
+            type: Boolean,
+            default: true
+        }
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+    data: function data() {
+        return {
+            title: Helper.getIcon(Admission.title()) + '  錄取名單',
+            loaded: false,
+            source: Admission.showUrl(this.course_id),
+
+            createText: '',
+            thead: Admission.getThead(),
+            filter: [],
+            defaultSearch: 'id',
+            defaultOrder: 'id',
+
+            summary: null,
+
+            statusOptions: [],
+            searchParams: {},
+
+            hasData: false,
+            viewMore: false
+
+        };
+    },
+
+
+    methods: {
+        init: function init() {
+            var _this = this;
+
+            this.loaded = false;
+
+            this.thead = Admission.getThead(this.can_select);
+
+            var options = this.loadStatusOptions();
+            options.then(function (value) {
+                _this.searchParams = {
+                    status: value
+                };
+
+                _this.loaded = true;
+            });
+        },
+        loadStatusOptions: function loadStatusOptions() {
+            var _this2 = this;
+
+            return new Promise(function (resolve, reject) {
+                var options = Signup.statusOptions();
+                options.then(function (data) {
+                    _this2.statusOptions = data.options;
+                    var allStatuses = { text: '總數', value: '-9' };
+                    _this2.statusOptions.splice(0, 0, allStatuses);
+                    resolve(_this2.statusOptions[0].value);
+                }).catch(function (error) {
+                    console.log(error);
+                    reject(error.response);
+                });
+            }); //End Promise
+        },
+        onDataLoaded: function onDataLoaded(data) {
+            this.$emit('loaded', data);
+            // if(data.summary)  this.summary=data.summary
+            // else this.summary=null
+
+        },
+        statusStyle: function statusStyle(status) {
+            return 'btn-xs btn btn-' + Signup.getStatusStyle(status);
+        },
+        statusText: function statusText(status) {
+            return Signup.getStatusText(status);
+        },
+        discountText: function discountText(signup) {
+            if (!signup.discount) return '';
+            return Signup.formatDiscountText(signup.discount, signup.points);
+        },
+        selected: function selected(id) {
+            this.$emit('selected', id);
+        },
+        beginCreate: function beginCreate() {
+            this.$emit('begin-create');
+        },
+        remove: function remove(id) {
+            alert(id);
+        }
+    }
+
+};
+
+/***/ }),
+/* 674 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(673),
+  /* template */
+  __webpack_require__(675),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\admission\\list.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] list.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-46968463", Component.options)
+  } else {
+    hotAPI.reload("data-v-46968463", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 675 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return (_vm.loaded) ? _c('data-viewer', {
+    attrs: {
+      "default_search": _vm.defaultSearch,
+      "default_order": _vm.defaultOrder,
+      "source": _vm.source,
+      "search_params": _vm.searchParams,
+      "thead": _vm.thead,
+      "no_search": _vm.can_select,
+      "no_page": _vm.no_page,
+      "show_title": _vm.show_title,
+      "filter": _vm.filter,
+      "title": _vm.title,
+      "create_text": _vm.createText,
+      "version": _vm.version
+    },
+    on: {
+      "refresh": _vm.init,
+      "beginCreate": _vm.beginCreate,
+      "dataLoaded": _vm.onDataLoaded
+    },
+    scopedSlots: {
+      default: function(props) {
+        return [_c('tr', [(_vm.can_select) ? _c('td', [_c('button', {
+          staticClass: "btn-xs btn btn-primary",
+          attrs: {
+            "type": "button"
+          },
+          on: {
+            "click": function($event) {
+              $event.preventDefault();
+              _vm.selected(props.item.signup_id)
+            }
+          }
+        }, [_vm._v("\n                    選取\n                ")])]) : _vm._e(), _vm._v(" "), (_vm.can_edit) ? _c('td', [_c('button', {
+          staticClass: "btn btn-danger btn-xs",
+          on: {
+            "click": function($event) {
+              $event.preventDefault();
+              _vm.remove(props.item.id)
+            }
+          }
+        }, [_c('span', {
+          staticClass: "glyphicon glyphicon-remove",
+          attrs: {
+            "aria-hidden": "true"
+          }
+        })])]) : _vm._e(), _vm._v(" "), _c('td', {
+          domProps: {
+            "textContent": _vm._s(props.item.display_order)
+          }
+        }), _vm._v(" "), _c('td', {
+          domProps: {
+            "textContent": _vm._s(props.item.signup.user.profile.fullname)
+          }
+        }), _vm._v(" "), _c('td', [_c('button', {
+          class: _vm.statusStyle(props.item.status),
+          attrs: {
+            "type": "button"
+          },
+          on: {
+            "click": function($event) {
+              $event.preventDefault();
+              _vm.selected(props.item.id)
+            }
+          }
+        }, [_vm._v("\n               " + _vm._s(_vm.statusText(props.item.signup.status)) + "\n               ")])]), _vm._v(" "), _c('td', {
+          domProps: {
+            "textContent": _vm._s(props.item.signup.date)
+          }
+        }), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm._f("formatMoney")(props.item.signup.tuition)))]), _vm._v(" "), _c('td', {
+          domProps: {
+            "innerHTML": _vm._s(_vm.discountText(props.item.signup))
+          }
+        }), _vm._v(" "), _c('td', [_c('updated', {
+          attrs: {
+            "entity": props.item
+          }
+        })], 1)])]
+      }
+    }
+  }, [(_vm.course_id) ? _c('div', {
+    staticClass: "form-inline",
+    slot: "header"
+  }, [(_vm.summary) ? _c('span', [_vm._v("\n          總數：" + _vm._s(_vm.summary.total) + " 筆   已繳費：" + _vm._s(_vm.summary.success) + " 筆   待繳費：" + _vm._s(_vm.summary.default) + " 筆   已取消：" + _vm._s(_vm.summary.canceled) + " 筆\n              \n          ")]) : _vm._e(), _vm._v(" "), _c('select', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.searchParams.status),
+      expression: "searchParams.status"
+    }],
+    staticClass: "form-control selectWidth",
+    staticStyle: {
+      "width": "auto"
+    },
+    on: {
+      "change": function($event) {
+        _vm.searchParams.status = Array.prototype.filter.call($event.target.options, function(o) {
+          return o.selected
+        }).map(function(o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val
+        })[0]
+      }
+    }
+  }, _vm._l((_vm.statusOptions), function(item) {
+    return _c('option', {
+      domProps: {
+        "value": item.value,
+        "textContent": _vm._s(item.text)
+      }
+    })
+  }))]) : _vm._e(), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-danger btn-sm",
+    slot: "btn"
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-trash"
+  }), _vm._v(" 刪除\n     ")])]) : _vm._e()
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-46968463", module.exports)
+  }
+}
+
+/***/ }),
 /* 676 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -90301,6 +90708,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__list_vue__ = __webpack_require__(674);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__list_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__list_vue__);
 //
 //
 //
@@ -90335,10 +90744,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
    name: 'ShowAdmission',
+   components: {
+      'admit-list': __WEBPACK_IMPORTED_MODULE_0__list_vue___default.a
+   },
    props: {
       course_id: {
          type: Number,
@@ -90359,9 +90789,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
    },
    data: function data() {
       return {
-         title: Helper.getIcon(Category.title()) + '  課程分類',
+         title: Helper.getIcon(Admission.title()) + '  錄取名單',
+
          loaded: false,
-         admission: null,
+         course: null,
+
          summary: {
             total: 31,
             in: 20,
@@ -90370,7 +90802,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       };
    },
 
+   computed: {
+      hasData: function hasData() {
+         if (!this.course) return false;
+         if (!this.course.admission) return false;
+         return true;
+      }
+   },
    watch: {
+      'course_id': 'init',
       'version': 'init'
    },
    beforeMount: function beforeMount() {
@@ -90385,27 +90825,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
          if (this.course_id) this.fetchData();
       },
       fetchData: function fetchData() {
-         this.admission = {
-            canDelete: true
-         };
-         this.loaded = true;
-         // let getData = Category.show(this.id)             
+         // let getData = Admission.show(this.course_id)             
 
          // getData.then(data => {
-         //    let category= data.category
-         //    this.category=new Category(category)
-         //    this.$emit('loaded',category)
+         //    this.course=data.course
+         //    this.$emit('loaded', this.course)
          //    this.loaded = true                        
          // })
          // .catch(error=> {
+         //     this.loaded = false  
          //     Helper.BusEmitError(error)
          // })
       },
-      btnEditClicked: function btnEditClicked() {
-         this.$emit('begin-edit');
-      },
-      onBtnBackClick: function onBtnBackClick() {
-         this.$emit('btn-back-clicked');
+      onDataLoaded: function onDataLoaded(data) {},
+      btnCreateClicked: function btnCreateClicked() {
+         this.$emit('begin-create');
       },
       btnDeleteClicked: function btnDeleteClicked() {
          var values = {
@@ -90473,7 +90907,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         init: function init() {
             this.readOnly = true;
         },
-        beginEdit: function beginEdit() {
+        onDataLoaded: function onDataLoaded(course) {
+            this.$emit('loaded', course);
+        },
+        onBeginCreate: function onBeginCreate() {
             this.readOnly = false;
         },
         onEditCanceled: function onEditCanceled() {
@@ -90593,13 +91030,36 @@ module.exports = Component.exports
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.loaded) ? _c('div', {
-    staticClass: "panel panel-default show-data"
+  return _c('div', [_c('admit-list', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.hasData),
+      expression: "hasData"
+    }],
+    attrs: {
+      "course_id": _vm.course_id
+    },
+    on: {
+      "loaded": _vm.onDataLoaded
+    }
+  }), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.hasData),
+      expression: "!hasData"
+    }],
+    staticClass: "panel panel-default"
   }, [(_vm.admission) ? _c('div', {
     staticClass: "panel-heading"
-  }, [_c('span', {
+  }, [_c('div', {
     staticClass: "panel-title"
-  }, [_vm._v("\r\n            報名數：" + _vm._s(_vm.summary.total) + " 筆   \r\n            正取：" + _vm._s(_vm.summary.in) + " 筆   \r\n            備取：" + _vm._s(_vm.summary.out) + " 筆   \r\n          \r\n        ")]), _vm._v(" "), _c('div', [(_vm.admission.canDelete) ? _c('button', {
+  }, [_c('h4', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.title)
+    }
+  })]), _vm._v(" "), _c('div', [(_vm.course.admission.canDelete) ? _c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -90612,22 +91072,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('span', {
     staticClass: "glyphicon glyphicon-trash"
-  }), _vm._v(" 刪除\r\n            ")]) : _vm._e()])]) : _c('div', {
+  }), _vm._v(" 刪除\r\n              ")]) : _vm._e()])]) : _c('div', {
     staticClass: "panel-heading"
-  }, [_c('div', [_c('button', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.can_edit),
-      expression: "can_edit"
-    }],
-    staticClass: "btn btn-danger btn-sm",
-    on: {
-      "click": _vm.btnDeleteClicked
+  }, [_c('div', {
+    staticClass: "panel-title"
+  }, [_c('h4', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.title)
     }
-  }, [_c('span', {
-    staticClass: "glyphicon glyphicon-trash"
-  }), _vm._v(" 刪除\r\n            ")])])])]) : _vm._e()
+  })]), _vm._v(" "), _c('div'), _vm._v(" "), _c('div')])])], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -90648,7 +91101,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "can_edit": "can_edit"
     },
     on: {
-      "begin-edit": _vm.beginEdit
+      "begin-create": _vm.onBeginCreate,
+      "loaded": _vm.onDataLoaded
     }
   }) : _c('edit', {
     attrs: {

@@ -1,7 +1,7 @@
 <template>
     <data-viewer v-if="loaded"  :default_search="defaultSearch" :default_order="defaultOrder"
       :source="source" :search_params="searchParams"  :thead="thead" :no_search="can_select"  
-      :filter="filter"  :title="title" :create_text="createText" 
+      :no_page="no_page" :show_title="show_title"  :filter="filter"  :title="title" :create_text="createText" 
       @refresh="init" :version="version"   @beginCreate="beginCreate"
        @dataLoaded="onDataLoaded">
      
@@ -15,6 +15,10 @@
               </select>
                
          </div>
+         <button  slot="btn" class="btn btn-danger btn-sm" >
+              <span class="glyphicon glyphicon-trash"></span> 刪除
+         </button>
+         
          <template scope="props">
             <tr>
                 <td v-if="can_select">
@@ -74,69 +78,56 @@
                type: Boolean,
                default: false
             },
+            no_page:{
+               type: Boolean,
+               default: false
+            },
+            show_title:{
+               type: Boolean,
+               default: true
+            },
         },
         beforeMount() {
            this.init()
-        },
-        watch: {
-            course_id: function (value) {
-               this.searchParams.course=value
-            }
         },
         data() {
             return {
                 title:Helper.getIcon(Admission.title())  + '  錄取名單',
                 loaded:false,
-                source: Admission.source(),
+                source: Admission.showUrl(this.course_id),
                 
-                defaultSearch:'date',
-                defaultOrder:'date',                
-                create: Admission.createUrl(),
-                
-                thead:[],
+                             
+                createText: '',
+                thead:Admission.getThead(),
                 filter: [],
+                defaultSearch:'id',
+                defaultOrder:'id',
 
                 summary:null,
 
                 statusOptions:[],
-                searchParams:{
-                    user : this.user_id,
-                    course : this.course_id,
-                    status : 0
-                },
+                searchParams:{   },
+             
                 hasData:false,
                 viewMore:false
              
             }
         },
-        computed: {
-            createText(){
-                if(this.hide_create) return ''
-                return '新增報名'
-            },
-        },
+        
         methods: {
             init() {
                 this.loaded=false
                
                 this.thead=Admission.getThead(this.can_select)
 
-                if(this.course_id){
-                    let options = this.loadStatusOptions()
+                 let options = this.loadStatusOptions()
                     options.then((value) => {
                         this.searchParams={
-                            course : this.course_id,
                             status : value
                         }
 
                        this.loaded=true
                     })
-                }else{
-                    this.searchParams={
-                            user : this.user_id,
-                        }
-                    this.loaded=true
-                }
                 
             },
             loadStatusOptions(){
@@ -155,8 +146,11 @@
                 })   //End Promise
             },
             onDataLoaded(data){
-                if(data.summary)  this.summary=data.summary
-                else this.summary=null
+                this.$emit('loaded',data)
+                // if(data.summary)  this.summary=data.summary
+                // else this.summary=null
+
+
             }, 
             statusStyle(status){
                 return 'btn-xs btn btn-' + Signup.getStatusStyle(status)

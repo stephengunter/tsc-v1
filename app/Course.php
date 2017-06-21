@@ -141,10 +141,20 @@ class Course extends Model
     {
         return $this->signups()->where('removed',false);
     }
+    public function canCreateAdmit()
+    {
+        if($this->admission) return false;
+        if($this->classStopped()) return false;
+        return true;
+    }
     public function getClasstimes()
     {
         return $this->classTimes()->orderBy('weekday_id')
                                          ->orderBy('on')->get();
+    }
+    public function classStopped()
+    {
+        return $this->status->classStopped();
     }
 
     public function canViewBy($user)

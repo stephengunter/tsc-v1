@@ -77,13 +77,12 @@ class StatusesController extends BaseController
 
         $signup=(int)$values['signup'];
         $class=(int)$values['class'];
+        
+        $status->class = $class;
+        $status->signup=$signup;
 
-        if($class==0){
-            $status->class=0;
-            $status->signup=0;           
-        }else if($signup==0){
-            $status->signup=0;
-        } 
+        
+        if($class==0) $status->signup=0; 
 
         $status->updateStatus();
 

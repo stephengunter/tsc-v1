@@ -9,6 +9,7 @@ use App\Http\Requests\Course\AdmissionRequest;
 
 use App\Admission;
 use App\Course;
+use App\Admit;
 
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
@@ -37,14 +38,24 @@ class AdmissionsController extends BaseController
     public function show($id)
     {
         $current_user=$this->currentUser();
-        $admission=Admission::findOrFail($id);
-        if($admission->hasRemoved()) {
-            abort(404);
+        $course=Course::findOrFail($id);
+        $course->status;
+        $admission=$course->admission;
+        $admitList=Admit::where('course_id',$id);
+        if($admission){
+            $admission->canEdit=$admission->canEditBy($current_user);
+            $admission->canDelete=$admission->canDeleteBy($current_user);
+            $admitList=$admission->admits;
+           
+        }else{
+            $course->canCreateAdmit=$course->canCreateAdmit();           
         }
-        $admission->canEdit=$admission->canEditBy($current_user);
-        $admission->canDelete=$admission->canDeleteBy($current_user);
 
-        return response()->json(['admission' => $admission ]);   
+        $admitList=$admitList->with(['signup.user.profile'])->filterPaginateOrder();
+
+        return response() ->json([ 'model' => $admitList,
+                                       'course' => $course
+                                 ]); 
        
     }
     public function edit($id)

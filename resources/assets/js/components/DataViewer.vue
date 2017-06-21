@@ -1,11 +1,11 @@
 <template>
 
     <div class="panel panel-default">
-        <div class="panel-heading">
-             <span  class="panel-title">
-                 <span  class="panel-title"  v-html="title">
-                 </span>
-             </span>
+        <div v-show="show_title" class="panel-heading">
+             <div class="panel-title">
+                 <h4 v-html="title">
+                 </h4>
+             </div>
            
              <slot name="header"></slot>
               
@@ -16,6 +16,7 @@
                 </a>
                 
                 <slot name="btn"></slot>
+               
                 
                
                 <button v-if="!showFilter"  class="btn btn-default btn-sm" @click="fetchData()">
@@ -155,6 +156,10 @@
                type: Boolean,
                default: false
             },
+            show_title:{
+               type: Boolean,
+               default: true
+            }
            
         },
         

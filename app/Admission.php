@@ -19,5 +19,17 @@ class Admission extends Model
 	{
 		return $this->hasMany('App\Admit');
 	}
+
+	public function canDeleteBy($user)
+	{
+         return $this->course->canDeleteBy($user);
+        
+	}
+
+    public function canEditBy()
+    {
+        return $this->course->canEditBy($user);
+        
+    }
     
 }

@@ -2,7 +2,7 @@
 <div>
     
     <show v-if="readOnly"  :course_id="course_id" can_edit="can_edit"  
-         @begin-edit="beginEdit"  >       
+         @begin-create="onBeginCreate"  @loaded="onDataLoaded">       
                
     </show>
 
@@ -44,7 +44,10 @@
             init(){
                 this.readOnly=true
             }, 
-            beginEdit() {
+            onDataLoaded(course){
+                 this.$emit('loaded', course)
+            },
+            onBeginCreate() {
                 this.readOnly=false
             },
             onEditCanceled(){
