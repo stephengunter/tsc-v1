@@ -20,8 +20,7 @@ class CommonService {
         if (parseInt(reviewed)) style = 'label label-success'
         let text=this.reviewedText(reviewed)
         return `<span class="${style}" > ${text} </span>`
-        // if (parseInt(reviewed)) return 'label label-success'
-        // return 'label label-danger'
+      
     }
     static reviewedOptions(){
         return [{
@@ -101,14 +100,14 @@ class CommonService {
     }
     
 
-    static statusHtml(active) {
-        if (active && parseInt(active) > 0) {
-            return '<span class="label label-success">上架中</span>'
-        } else {
-            return '<span class="label label-default">已下架</span>'
-        }
+    // static statusHtml(active) {
+    //     if (active && parseInt(active) > 0) {
+    //         return '<span class="label label-success">上架中</span>'
+    //     } else {
+    //         return '<span class="label label-default">已下架</span>'
+    //     }
 
-    }
+    // }
     
     
 

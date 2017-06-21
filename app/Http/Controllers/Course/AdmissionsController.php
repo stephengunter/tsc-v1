@@ -83,10 +83,18 @@ class AdmissionsController extends BaseController
                                             ->with('user.profile')
                                             ->get();  
         
-                                                                        
+        $admitList=[];
+        
+        foreach ($signupList as $signup) {
+             $admit=new Admit();
+             $admit->signup=$signup;
+             array_push($admitList,  $admit);
+        }
+
+                                                                     
         $course->status;
 
-        return response() ->json([ 'model' => $admitList,
+        return response() ->json([ 'admitList' => $admitList,
                                        'course' => $course
                                  ]); 
     }

@@ -206,6 +206,9 @@ Vue.filter('activeLabel', function (active) {
 Vue.filter('reviewedLabel', function (reviewed) {
     return Helper.reviewedLabel(reviewed)
 })
+Vue.filter('statusLabel', function (status) {
+    return Helper.reviewedLabel(reviewed)
+})
 Vue.filter('showIcon', function (icon) {
     if(!icon)  return ''
     return '<i class="' + icon + '"  aria-hidden="true"></i>'

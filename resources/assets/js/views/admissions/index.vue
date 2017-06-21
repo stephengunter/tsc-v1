@@ -39,7 +39,7 @@
     
 
     export default {
-        name: 'SignupIndex',       
+        name: 'AdmissionIndex',       
         components: {
             'admission-view':AdmissionView
         },

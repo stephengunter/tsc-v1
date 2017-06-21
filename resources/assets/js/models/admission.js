@@ -27,7 +27,19 @@
     static updateUrl(id){
         return this.showUrl(id)
     }
-    
+    static create(course){
+        return new Promise((resolve, reject) => {
+            let url = this.createUrl(course) 
+            axios.get(url)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
     static show(id){
         return new Promise((resolve, reject) => {
             let url = this.showUrl(id) 

@@ -1,9 +1,7 @@
 <template>
     <tr>
         <td v-if="can_select">
-            <button @click.prevent="selected(admit.signup_id)"  type="button" class="btn-xs btn btn-primary">
-                選取
-            </button>
+            <checkbox :value="admit.signup.id"></checkbox>
         </td>
         <td v-if="can_edit">
             <button class="btn btn-danger btn-xs"
@@ -15,14 +13,21 @@
         <td v-text="admit.signup.user.profile.fullname"></td> 
        
         <td>
-           <button @click.prevent="selected(admit.id)" type="button" :class="statusStyle(admit.status)">
+           
+           <span  v-if="can_select" :class="statusStyle(admit.signup.status)">
+           {{ statusText(admit.signup.status) }}
+           </span>
+
+           <button v-else @click.prevent="selected(admit.id)" type="button" :class="statusStyle(admit.status)">
            {{ statusText(admit.signup.status) }}
            </button>
+
+
         </td>
         <td v-text="admit.signup.date"></td> 
         <td>{{ admit.signup.tuition | formatMoney }}</td>  
         <td v-html="discountText(admit.signup)"></td>
-        <td>
+        <td v-if="show_updated">
             <updated :entity="admit"></updated>
         </td>
     </tr>
@@ -36,6 +41,10 @@
             admit: {
               type: Object,
               default: null
+            },
+            show_updated: {
+              type: Boolean,
+               default: true
             },
             hide_create: {
               type: Boolean,
@@ -58,9 +67,13 @@
         },
         
         methods: {
-            
             statusStyle(status){
+              if(this.can_select){
+                 return 'label label-' + Signup.getStatusStyle(status)
+              }else{
                 return 'btn-xs btn btn-' + Signup.getStatusStyle(status)
+              }
+             
             },
             statusText(status){
                 return Signup.getStatusText(status)

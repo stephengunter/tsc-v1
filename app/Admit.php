@@ -14,13 +14,7 @@ class Admit extends Model
 		'course_id'	, 'signup_id' , 'updated_by'	
 	];
 
-	public static function initialize($signup)
-	{
-        return [
-			'course_id' => $signup->course_id,
-			'signup_id' => $signup->id,
-		];
-	}
+	
 
     public function admission() 
 	{

@@ -13,3 +13,9 @@ html * {
 .profile-img {
     max-width: 200px;
 }
+
+.center-block {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+}
