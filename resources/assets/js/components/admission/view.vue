@@ -2,13 +2,15 @@
 <div>
     
     <show v-if="readOnly"  :course_id="course_id" can_edit="can_edit"  
-         @begin-create="onBeginCreate"  @loaded="onDataLoaded"
+         @begin-create="onBeginCreate"  @begin-edit="onBeginEdit"
+         @loaded="onDataLoaded"
          @selected="onSelected"
          >       
                
     </show>
-
-    <edit v-else :course_id="course_id"
+    
+    <edit v-else="editting" :course_id="course_id"
+       :creating="creating"
        @saved="onSaved"   @canceled="onEditCanceled" >                 
     </edit> 
 
@@ -17,6 +19,7 @@
 </template>
 <script>
     import Show from './show.vue'
+    import Create from './create.vue'
     import Edit from './edit.vue'
 
 
@@ -39,17 +42,29 @@
         data() {
             return {
                 readOnly:true,
+                creating:true
             }
         },
-        
+        watch: {
+            course_id: function () {
+                this.init()
+            },
+            
+        },
         methods: {
             init(){
                 this.readOnly=true
+                this.creating=true
             }, 
             onDataLoaded(course){
                  this.$emit('loaded', course)
             },
             onBeginCreate() {
+                this.creating=true
+                this.readOnly=false
+            },
+            onBeginEdit(){
+                this.creating=false
                 this.readOnly=false
             },
             onEditCanceled(){

@@ -37,13 +37,6 @@ class AdmissionsController extends BaseController
 
     public function index()
     {
-        // $course_id=1;
-        // $signup_id=5;
-        // $admission=Admission::findOrFail($course_id);
-        //  $admit=new Admit();
-        //     $admit->signup_id=$signup_id;
-        //     $admit->updated_by=$current_user->id;
-
         $menus=$this->menus($this->key);            
             return view('admissions.index')
                     ->with(['menus' => $menus]); 
@@ -55,17 +48,24 @@ class AdmissionsController extends BaseController
         $course=Course::findOrFail($id);
         $course->status;
         $admission=$course->admission;
-       
-        $admitList=Admit::where('course_id',$id);
+        
         if($admission){
             $admission->canEdit=$admission->canEditBy($current_user);
-            $admission->canDelete=$admission->canDeleteBy($current_user);
-           
         }else{
             $course->canCreateAdmit=$course->canCreateAdmit();           
         }
 
-        $admitList=$admitList->with(['signup.user.profile'])->filterPaginateOrder();
+        $admitList=Admit::where('course_id',$id)->with(['signup.user.profile']);
+        $request = request();
+        $status=(int)$request->status;
+        if( $status >= -1  && $status <=1 ){
+             $admitList=$admitList->whereHas('signup', function($query)
+                use ($status) {
+                $query->where('status',$status);
+            });
+        }
+
+        $admitList=$admitList->filterPaginateOrder();
 
         $signup_ids=Admit::where('course_id',$id)->get()->pluck('signup_id');
         $info = DB::table('signups')
@@ -138,69 +138,116 @@ class AdmissionsController extends BaseController
         $rows=count($selected_signups);
         if(!$rows) abort(404);
 
-        $admission= new Admission();
-        $admission->updated_by=$current_user->id;
-        $course->admission()->save($admission);
-       
+        $admitList=[];
         for($i = 0; $i < $rows; ++$i) {
             $admit=new Admit();
             $admit->course_id=$course_id;
             $admit->signup_id=$selected_signups[$i];
             $admit->updated_by=$current_user->id;
-            $admit->save();
-           
+            
+            array_push($admitList,  $admit);
         }
+
+
+        $admission= DB::transaction(function() 
+            use($admitList,$course,$current_user){
+                $admission= new Admission();
+                $admission->updated_by=$current_user->id;
+                $course->admission()->save($admission);
+
+                $admission=Admission::find($course->id);
+                $admission->admits()->saveMany($admitList);
+
+                return $admission;
+              
+        });
         
         return response() ->json([ 'admission' => $admission ]);
     }
     public function edit($id)
     {
         $current_user=$this->currentUser();
-        $admission=Admission::findOrFail($id);
-        if($admission->hasRemoved()) {
-            abort(404);
-        }
-        if(!$admission->canEditBy($current_user)){
+        $course= $this->courses->findOrFail($id);
+
+        if(!$course->admission) abort(404);
+      
+        if(!$course->admission->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
-        if($admission->signupStopped()) $admission->signup=0;
-        else   $admission->signup=1;
+
+        $except_signups=$course->admission->admits->pluck('signup_id');
+
+        $signupList=$course->validSignups()->whereNotIn('id',$except_signups)
+                                            ->where('status','>',-1)
+                                            ->orderBy('status','desc')
+                                            ->orderBy('date','desc')
+                                            ->with('user.profile')
+                                            ->get();  
         
-        if($admission->classStopped()) $admission->class=0;
-        else   $admission->class=1;
+       
+        $admitList=[];
+      
+        for($i = 0; $i < count($signupList); ++$i) {
+            $signup=$signupList[$i];
+            $admit=new Admit();
+            $admit->signup_id=$signup->id;
+            $admit->signup=$signup;
+            array_push($admitList,  $admit);
+            
+        }
+        return response() ->json([ 'admitList' => $admitList,
+                                    'course' => $course
+                                 ]); 
+        
         
         return response()->json(['admission' => $admission ]);        
     }
-    public function update(AdmissionRequest $request, $id)
+    public function update(Request $request, $id)
     {
         $current_user=$this->currentUser();
         $admission=Admission::findOrFail($id);
-        if($admission->hasRemoved()) {
-            abort(404);
-        }
+       
         if(!$admission->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
 
-        $updated_by=$current_user->id;
-        $values=$request->getValues();
+        $selected_signups=$request->selected;
+        $rows=count($selected_signups);
+        if(!$rows) abort(404);
 
-        $admission->ps=$values['ps'];
-        $admission->updated_by=$updated_by;
+        $course_id=$id;
+        $admitList=[];
+        for($i = 0; $i < $rows; ++$i) {
+            $admit=new Admit();
+            $admit->course_id=$course_id;
+            $admit->signup_id=$selected_signups[$i];
+            $admit->updated_by=$current_user->id;
+            
+            array_push($admitList,  $admit);
+        }
 
-        $signup=(int)$values['signup'];
-        $class=(int)$values['class'];
+        $admission->admits()->saveMany($admitList);
+        
+        return response() ->json([ 'admission' => $admission ]);   
+    }
 
-        if($class==0){
-            $admission->class=0;
-            $admission->signup=0;           
-        }else if($signup==0){
-            $admission->signup=0;
-        } 
+    public function destroy($id)
+    {
+        $admit=Admit::findOrFail($id); 
+        $admission=Admission::findOrFail($admit->course_id);
+        $current_user=$this->currentUser();
 
-        $admission->updateAdmission();
+        if(!$admit->canDeleteBy($current_user)){
+            return  $this->unauthorized();
+        }    
 
-        return response()->json(['admission' => $admission ]);   
+        $admit->delete();
+
+        if(!count($admission->admits)){
+             $admission->delete();
+        }
+
+        return response()->json(['deleted' => true ]);     
     }
 
 

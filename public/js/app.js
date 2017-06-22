@@ -21361,6 +21361,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
@@ -21372,11 +21386,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         course_id: {
             type: Number,
             default: 0
+        },
+        creating: {
+            type: Boolean,
+            default: true
         }
     },
     data: function data() {
         return {
-            title: Helper.getIcon(Admission.title()) + '  建立錄取名單',
+            title: Helper.getIcon(Admission.title()),
             rowSettings: {
                 can_select: true,
                 show_updated: false,
@@ -21407,6 +21425,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     methods: {
         init: function init() {
+            if (this.creating) this.title += '  建立錄取名單';else this.title += '  新增錄取學員';
             this.fetchData();
             this.thead = Admission.getThead(this.rowSettings.show_updated);
 
@@ -21428,14 +21447,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         fetchData: function fetchData() {
             var _this = this;
 
-            var getData = Admission.create(this.course_id);
+            var getData = null;
+            if (this.creating) getData = Admission.create(this.course_id);else getData = Admission.edit(this.course_id);
+
             getData.then(function (data) {
                 _this.admitList = data.admitList;
                 _this.course = data.course;
-                _this.selectedSignups = data.selected;
+
+                if (data.selected) {
+                    _this.selectedSignups = data.selected;
+                }
             }).catch(function (error) {
                 Helper.BusEmitError(error);
             });
+        },
+        onCancel: function onCancel() {
+            this.$emit('canceled');
         },
         beenSelected: function beenSelected(signup_id) {
             return this.selectedSignups.indexOf(signup_id) >= 0;
@@ -21460,12 +21487,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 selected: this.selectedSignups
             });
 
-            var store = Admission.store(this.form);
-            store.then(function (data) {
+            var save = null;
+            if (this.creating) save = Admission.store(this.form);else save = Admission.update(this.form, this.course_id);
+
+            save.then(function (data) {
                 Helper.BusEmitOK();
                 _this2.$emit('saved', data);
             }).catch(function (error) {
-
                 Helper.BusEmitError(error);
             });
         }
@@ -21481,6 +21509,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__row_vue__ = __webpack_require__(139);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__row_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__row_vue__);
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -21566,7 +21600,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         return {
             title: Helper.getIcon(Admission.title()) + '  錄取名單',
             loaded: false,
-            source: Admission.showUrl(this.course_id),
+
+            current_version: 0,
 
             createText: '',
             thead: [],
@@ -21588,16 +21623,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 can_select: false,
                 show_updated: true,
                 can_edit: true
+            },
+
+            deleteConfirm: {
+                id: 0,
+                show: false,
+                msg: ''
+
             }
 
         };
     },
 
     computed: {
-        canDelete: function canDelete() {
-            if (!this.course) return false;
-            if (!this.course.admission) return false;
-            return this.course.admission.canDelete;
+        source: function source() {
+            return Admission.showUrl(this.course_id);
+        }
+    },
+    watch: {
+        version: function version() {
+            this.current_version += 1;
+        },
+        course_id: function course_id() {
+            this.current_version += 1;
         }
     },
     methods: {
@@ -21664,15 +21712,28 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         beginCreate: function beginCreate() {
             this.$emit('begin-create');
         },
-        onRemove: function onRemove(id) {
-            alert(id);
+        btnAddClicked: function btnAddClicked() {
+            this.$emit('edit');
         },
-        btnDeleteClicked: function btnDeleteClicked() {
-            var values = {
-                // name: this.category.name,
-                // id:this.id
-            };
-            this.$emit('btn-delete-clicked', values);
+        onRemove: function onRemove(values) {
+            this.deleteConfirm.msg = '確定要將 ' + values.name + ' 從錄取名單刪除嗎';
+            this.deleteConfirm.id = values.id;
+            this.deleteConfirm.show = true;
+        },
+        submitDelete: function submitDelete() {
+            var _this3 = this;
+
+            var id = this.deleteConfirm.id;
+            var remove = Admission.delete(id);
+            remove.then(function (result) {
+                _this3.current_version += 1;
+                Helper.BusEmitOK('刪除成功');
+                _this3.deleteConfirm.show = false;
+                _this3.$emit('admit-deleted');
+            }).catch(function (error) {
+                Helper.BusEmitError(error, '刪除失敗');
+                _this3.deleteConfirm.show = false;
+            });
         }
     }
 
@@ -21788,14 +21849,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.$emit('unselected', signup_id);
         },
         remove: function remove(id) {
-            this.$emit('remove', id);
-        },
-        btnDeleteClicked: function btnDeleteClicked() {
             var values = {
-                // name: this.category.name,
-                // id:this.id
+                name: this.admit.signup.user.profile.fullname,
+                id: this.admit.id
             };
-            this.$emit('btn-delete-clicked', values);
+            this.$emit('remove', values);
         }
     }
 
@@ -21809,6 +21867,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__list_vue__ = __webpack_require__(422);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__list_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__list_vue__);
+var _name$components$prop;
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
 //
 //
 //
@@ -21861,7 +21924,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-/* harmony default export */ __webpack_exports__["default"] = {
+/* harmony default export */ __webpack_exports__["default"] = _name$components$prop = {
     name: 'ShowAdmission',
     components: {
         'admit-list': __WEBPACK_IMPORTED_MODULE_0__list_vue___default.a
@@ -21904,39 +21967,48 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             if (!this.course) return false;
             if (!this.course.admission) return false;
             return true;
+        },
+        canEdit: function canEdit() {
+            if (this.hasData) {
+                return this.course.admission.canEdit;
+            } else return false;
         }
     },
     watch: {
         'course_id': 'init',
         'version': 'init'
-    },
-    beforeMount: function beforeMount() {
-        this.init();
-    },
-
-    methods: {
-        init: function init() {
-            this.loaded = false;
-            this.admission = null;
-        },
-        onDataLoaded: function onDataLoaded(data) {
-            this.course = data.course;
-        },
-        onSelected: function onSelected(signup_id) {
-            this.$emit('selected', signup_id);
-        },
-        btnCreateClicked: function btnCreateClicked() {
-            this.$emit('begin-create');
-        },
-        btnDeleteClicked: function btnDeleteClicked() {
-            var values = {
-                name: this.category.name,
-                id: this.id
-            };
-            this.$emit('btn-delete-clicked', values);
-        }
     }
-};
+}, _defineProperty(_name$components$prop, 'watch', {
+    course_id: function course_id() {
+        this.init();
+    }
+}), _defineProperty(_name$components$prop, 'beforeMount', function beforeMount() {
+    this.init();
+}), _defineProperty(_name$components$prop, 'methods', {
+    init: function init() {
+        this.loaded = false;
+        this.admission = null;
+    },
+    onDataLoaded: function onDataLoaded(data) {
+        this.course = data.course;
+    },
+    onSelected: function onSelected(signup_id) {
+        this.$emit('selected', signup_id);
+    },
+    btnCreateClicked: function btnCreateClicked() {
+        this.$emit('begin-create');
+    },
+    btnDeleteClicked: function btnDeleteClicked() {
+        var values = {
+            name: this.category.name,
+            id: this.id
+        };
+        this.$emit('btn-delete-clicked', values);
+    },
+    onEdit: function onEdit() {
+        this.$emit('begin-edit');
+    }
+}), _name$components$prop;
 
 /***/ }),
 /* 194 */
@@ -21946,8 +22018,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__show_vue__ = __webpack_require__(423);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__show_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__show_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__edit_vue__ = __webpack_require__(421);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__edit_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__edit_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__create_vue__ = __webpack_require__(689);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__create_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__create_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__edit_vue__ = __webpack_require__(421);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__edit_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__edit_vue__);
 //
 //
 //
@@ -21965,6 +22039,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+
 
 
 
@@ -21973,7 +22050,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     name: 'AdmissionView',
     components: {
         Show: __WEBPACK_IMPORTED_MODULE_0__show_vue___default.a,
-        Edit: __WEBPACK_IMPORTED_MODULE_1__edit_vue___default.a
+        Edit: __WEBPACK_IMPORTED_MODULE_2__edit_vue___default.a
     },
     props: {
         course_id: {
@@ -21987,19 +22064,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
     data: function data() {
         return {
-            readOnly: true
+            readOnly: true,
+            creating: true
         };
     },
 
+    watch: {
+        course_id: function course_id() {
+            this.init();
+        }
 
+    },
     methods: {
         init: function init() {
             this.readOnly = true;
+            this.creating = true;
         },
         onDataLoaded: function onDataLoaded(course) {
             this.$emit('loaded', course);
         },
         onBeginCreate: function onBeginCreate() {
+            this.creating = true;
+            this.readOnly = false;
+        },
+        onBeginEdit: function onBeginEdit() {
+            this.creating = false;
             this.readOnly = false;
         },
         onEditCanceled: function onEditCanceled() {
@@ -35472,17 +35561,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -41689,6 +41767,11 @@ var Admission = function () {
             return this.showUrl(id);
         }
     }, {
+        key: 'deleteUrl',
+        value: function deleteUrl(id) {
+            return this.source() + '/' + id;
+        }
+    }, {
         key: 'create',
         value: function create(course) {
             var _this = this;
@@ -41749,6 +41832,21 @@ var Admission = function () {
             return new Promise(function (resolve, reject) {
                 form.submit(method, url).then(function (data) {
                     resolve(data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+    }, {
+        key: 'delete',
+        value: function _delete(id) {
+            var _this3 = this;
+
+            return new Promise(function (resolve, reject) {
+                var url = _this3.deleteUrl(id);
+                var form = new Form();
+                form.delete(url).then(function (response) {
+                    resolve(true);
                 }).catch(function (error) {
                     reject(error);
                 });
@@ -71606,7 +71704,7 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('admit-list', {
+  return _c('div', [(_vm.course_id > 0) ? _c('admit-list', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -71614,13 +71712,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       expression: "hasData"
     }],
     attrs: {
-      "course_id": _vm.course_id
+      "course_id": _vm.course_id,
+      "can_edit": _vm.canEdit
     },
     on: {
+      "edit": _vm.onEdit,
       "loaded": _vm.onDataLoaded,
       "selected": _vm.onSelected
     }
-  }), _vm._v(" "), _c('div', {
+  }) : _vm._e(), _vm._v(" "), _c('div', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -71671,12 +71771,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     },
     on: {
       "begin-create": _vm.onBeginCreate,
+      "begin-edit": _vm.onBeginEdit,
       "loaded": _vm.onDataLoaded,
       "selected": _vm.onSelected
     }
   }) : _c('edit', {
     attrs: {
-      "course_id": _vm.course_id
+      "course_id": _vm.course_id,
+      "creating": _vm.creating
     },
     on: {
       "saved": _vm.onSaved,
@@ -72419,7 +72521,7 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.loaded) ? _c('data-viewer', {
+  return _c('div', [(_vm.loaded) ? _c('data-viewer', {
     attrs: {
       "default_search": _vm.defaultSearch,
       "default_order": _vm.defaultOrder,
@@ -72432,7 +72534,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "filter": _vm.filter,
       "title": _vm.title,
       "create_text": _vm.createText,
-      "version": _vm.version
+      "version": _vm.current_version
     },
     on: {
       "refresh": _vm.init,
@@ -72458,7 +72560,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [(_vm.course_id) ? _c('div', {
     staticClass: "form-inline",
     slot: "header"
-  }, [(_vm.summary) ? _c('span', [_vm._v("\n          總數：" + _vm._s(_vm.summary.total) + " 筆   已繳費：" + _vm._s(_vm.summary.success) + " 筆   待繳費：" + _vm._s(_vm.summary.default) + " 筆   已取消：" + _vm._s(_vm.summary.canceled) + " 筆\n              \n          ")]) : _vm._e(), _vm._v(" "), _c('select', {
+  }, [(_vm.summary) ? _c('span', [_vm._v("\r\n              總數：" + _vm._s(_vm.summary.total) + " 筆   已繳費：" + _vm._s(_vm.summary.success) + " 筆   待繳費：" + _vm._s(_vm.summary.default) + " 筆   已取消：" + _vm._s(_vm.summary.canceled) + " 筆\r\n                  \r\n              ")]) : _vm._e(), _vm._v(" "), _c('select', {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -72486,21 +72588,32 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         "textContent": _vm._s(item.text)
       }
     })
-  }))]) : _vm._e(), _vm._v(" "), (_vm.canDelete) ? _c('button', {
+  }))]) : _vm._e(), _vm._v(" "), _c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
       value: (_vm.can_edit),
       expression: "can_edit"
     }],
-    staticClass: "btn btn-danger btn-sm",
+    staticClass: "btn btn-primary btn-sm",
     on: {
-      "click": _vm.btnDeleteClicked
+      "click": _vm.btnAddClicked
     },
     slot: "btn"
   }, [_c('span', {
-    staticClass: "glyphicon glyphicon-trash"
-  }), _vm._v(" 刪除\n     ")]) : _vm._e()]) : _vm._e()
+    staticClass: "glyphicon glyphicon-plus"
+  }), _vm._v(" 新增學員\r\n         ")])]) : _vm._e(), _vm._v(" "), _c('delete-confirm', {
+    attrs: {
+      "showing": _vm.deleteConfirm.show,
+      "message": _vm.deleteConfirm.msg
+    },
+    on: {
+      "close": function($event) {
+        _vm.deleteConfirm.show = false
+      },
+      "confirmed": _vm.submitDelete
+    }
+  })], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -72935,7 +73048,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.remove(_vm.admit.id)
+        _vm.remove($event)
       }
     }
   }, [_c('span', {
@@ -72997,9 +73110,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(_vm.title)
     }
-  })]), _vm._v(" "), _c('div', {
+  })]), _vm._v(" "), (_vm.creating) ? _c('div', {
     staticClass: "center-block"
-  }, [_vm._v("\r\n              以下是有效的報名紀錄     順序：1.已繳費  2.報名日期\r\n            ")]), _vm._v(" "), _c('div', [_vm._v("\r\n              人數上限：" + _vm._s(_vm.course.limit) + "  \r\n              最低：" + _vm._s(_vm.course.min) + "  \r\n              已選擇："), _c('strong', {
+  }, [_vm._v("\r\n                以下是有效的報名紀錄     順序：1.已繳費  2.報名日期\r\n\r\n            ")]) : _c('div', {
+    staticClass: "center-block"
+  }, [_vm._v("\r\n              請選擇要加入的報名學員  \r\n            ")]), _vm._v(" "), (_vm.creating) ? _c('div', [_vm._v("\r\n              人數上限：" + _vm._s(_vm.course.limit) + "  \r\n              最低：" + _vm._s(_vm.course.min) + "  \r\n              已選擇："), _c('strong', {
+    staticClass: "text-primary",
+    domProps: {
+      "textContent": _vm._s(_vm.selectedSignups.length)
+    }
+  }), _vm._v("      \r\n                \r\n            ")]) : _c('div', [_vm._v("\r\n               人數上限：" + _vm._s(_vm.course.limit) + "  \r\n               現有人數：" + _vm._s(_vm.course.admission.admits.length) + "  \r\n               已選擇："), _c('strong', {
     staticClass: "text-primary",
     domProps: {
       "textContent": _vm._s(_vm.selectedSignups.length)
@@ -73017,7 +73137,18 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "type": "submit",
       "disabled": !_vm.canSubmit
     }
-  }, [_vm._v("確認送出\r\n                    ")])])])]), _vm._v(" "), _c('div', {
+  }, [_vm._v("確認送出\r\n                    ")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default btn-sm",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.onCancel($event)
+      }
+    }
+  }, [_vm._v("\r\n                     取消\r\n                    ")])])])]), _vm._v(" "), _c('div', {
     staticClass: "panel-body"
   }, [_c('table', {
     staticClass: "table table-striped",
@@ -91544,6 +91675,290 @@ module.exports = function(module) {
 __webpack_require__(153);
 module.exports = __webpack_require__(154);
 
+
+/***/ }),
+/* 682 */,
+/* 683 */,
+/* 684 */,
+/* 685 */,
+/* 686 */,
+/* 687 */,
+/* 688 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__row_vue__ = __webpack_require__(139);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__row_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__row_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = {
+    name: 'CreateAdmission',
+    components: {
+        Row: __WEBPACK_IMPORTED_MODULE_0__row_vue___default.a
+    },
+    props: {
+        course_id: {
+            type: Number,
+            default: 0
+        }
+    },
+    data: function data() {
+        return {
+            title: Helper.getIcon(Admission.title()) + '  建立錄取名單',
+            rowSettings: {
+                can_select: true,
+                show_updated: false,
+                can_edit: false
+            },
+
+            course: null,
+            admitList: [],
+
+            thead: [],
+
+            form: {},
+            submitting: false,
+            selectedSignups: []
+
+        };
+    },
+
+    computed: {
+        canSubmit: function canSubmit() {
+            if (this.selectedSignups.length < 1) return false;
+            return !this.submitting;
+        }
+    },
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    methods: {
+        init: function init() {
+            this.fetchData();
+            this.thead = Admission.getThead(this.rowSettings.show_updated);
+
+            var thSelect = {
+                title: '',
+                key: 'select',
+                sort: false,
+                default: true
+            };
+            this.thead.splice(0, 0, thSelect);
+            var thOrder = {
+                title: '',
+                key: 'order',
+                sort: false,
+                default: true
+            };
+            this.thead.splice(0, 0, thOrder);
+        },
+        fetchData: function fetchData() {
+            var _this = this;
+
+            var getData = Admission.create(this.course_id);
+            getData.then(function (data) {
+                _this.admitList = data.admitList;
+                _this.course = data.course;
+                _this.selectedSignups = data.selected;
+            }).catch(function (error) {
+                Helper.BusEmitError(error);
+            });
+        },
+        beenSelected: function beenSelected(signup_id) {
+            return this.selectedSignups.indexOf(signup_id) >= 0;
+        },
+        onSelected: function onSelected(signup_id) {
+            if (!this.beenSelected(signup_id)) {
+                this.selectedSignups.push(signup_id);
+            }
+        },
+        onUnselected: function onUnselected(signup_id) {
+            var index = this.selectedSignups.indexOf(signup_id);
+            if (index >= 0) this.selectedSignups.splice(index, 1);
+        },
+        onSubmit: function onSubmit() {
+            var _this2 = this;
+
+            if (this.selectedSignups.length < 1) return false;
+            this.submitting = true;
+
+            this.form = new Form({
+                course_id: this.course_id,
+                selected: this.selectedSignups
+            });
+
+            var store = Admission.store(this.form);
+            store.then(function (data) {
+                Helper.BusEmitOK();
+                _this2.$emit('saved', data);
+            }).catch(function (error) {
+
+                Helper.BusEmitError(error);
+            });
+        }
+    }
+
+};
+
+/***/ }),
+/* 689 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(688),
+  /* template */
+  __webpack_require__(690),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\Stephen\\Desktop\\www\\tsc-master\\resources\\assets\\js\\components\\admission\\create.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] create.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-75d6be81", Component.options)
+  } else {
+    hotAPI.reload("data-v-75d6be81", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 690 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [(_vm.course) ? _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_c('div', {
+    staticClass: "panel-title"
+  }, [_c('h4', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.title)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "center-block"
+  }, [_vm._v("\r\n              以下是有效的報名紀錄     順序：1.已繳費  2.報名日期\r\n            ")]), _vm._v(" "), _c('div', [_vm._v("\r\n              人數上限：" + _vm._s(_vm.course.limit) + "  \r\n              最低：" + _vm._s(_vm.course.min) + "  \r\n              已選擇："), _c('strong', {
+    staticClass: "text-primary",
+    domProps: {
+      "textContent": _vm._s(_vm.selectedSignups.length)
+    }
+  }), _vm._v("      \r\n                \r\n            ")]), _vm._v(" "), _c('div', [_c('form', {
+    on: {
+      "submit": function($event) {
+        $event.preventDefault();
+        _vm.onSubmit($event)
+      }
+    }
+  }, [_c('button', {
+    staticClass: "btn btn-success btn-sm",
+    attrs: {
+      "type": "submit",
+      "disabled": !_vm.canSubmit
+    }
+  }, [_vm._v("確認送出\r\n                    ")])])])]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('table', {
+    staticClass: "table table-striped",
+    staticStyle: {
+      "width": "99%"
+    }
+  }, [_c('thead', [_c('tr', _vm._l((_vm.thead), function(item) {
+    return _c('th', [_vm._v(_vm._s(item.title))])
+  }))]), _vm._v(" "), _c('tbody', _vm._l((_vm.admitList), function(item, index) {
+    return _c('row', {
+      attrs: {
+        "admit": item,
+        "index": index + 1,
+        "selected": _vm.beenSelected(item.signup_id),
+        "can_select": _vm.rowSettings.can_select,
+        "show_updated": _vm.rowSettings.show_updated,
+        "can_edit": _vm.rowSettings.can_edit
+      },
+      on: {
+        "selected": _vm.onSelected,
+        "unselected": _vm.onUnselected
+      }
+    })
+  }))])])]) : _vm._e()])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-75d6be81", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

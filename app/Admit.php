@@ -23,4 +23,9 @@ class Admit extends Model
 	{
 		 return $this->belongsTo('App\Signup');
 	}
+
+	public function canDeleteBy($user)
+	{
+       return $this->admission->course->canEditBy($user) ;
+	}
 }

@@ -1,8 +1,9 @@
 <template>
+<div>
     <data-viewer v-if="loaded"  :default_search="defaultSearch" :default_order="defaultOrder"
       :source="source" :search_params="searchParams"  :thead="thead" :no_search="can_select"  
       :no_page="no_page" :show_title="show_title"  :filter="filter"  :title="title" :create_text="createText" 
-      @refresh="init" :version="version"   @beginCreate="beginCreate"
+      @refresh="init" :version="current_version"   @beginCreate="beginCreate"
        @dataLoaded="onDataLoaded">
      
          <div v-if="course_id"  class="form-inline" slot="header">
@@ -15,8 +16,8 @@
               </select>
                
          </div>
-         <button  slot="btn"  v-if="canDelete" v-show="can_edit" @click="btnDeleteClicked" class="btn btn-danger btn-sm" >
-              <span class="glyphicon glyphicon-trash"></span> 刪除
+         <button  slot="btn"   v-show="can_edit" @click="btnAddClicked" class="btn btn-primary btn-sm" >
+              <span class="glyphicon glyphicon-plus"></span> 新增學員
          </button>
          
          <template scope="props">
@@ -33,6 +34,11 @@
 
     </data-viewer>
 
+     <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+      @close="deleteConfirm.show=false" @confirmed="submitDelete">        
+    </delete-confirm>
+
+</div>
 </template>
 
 <script>
@@ -83,8 +89,9 @@
             return {
                 title:Helper.getIcon(Admission.title())  + '  錄取名單',
                 loaded:false,
-                source: Admission.showUrl(this.course_id),
                 
+                
+                current_version:0,
                              
                 createText: '',
                 thead:[],
@@ -107,15 +114,29 @@
                     show_updated:true,
                     can_edit:true
                 },
+
+                deleteConfirm:{
+                    id:0,
+                    show:false,
+                    msg:'',
+
+                }  
              
             }
         },
         computed: {
-            canDelete: function () {
-                if(!this.course) return false
-                if(!this.course.admission) return false
-                return this.course.admission.canDelete
-            }
+            source() {
+               return  Admission.showUrl(this.course_id)
+            },
+            
+        },
+        watch: {
+          version() {
+             this.current_version+=1
+          },
+          course_id() {
+             this.current_version+=1
+          }
         },
         methods: {
             init() {
@@ -177,24 +198,39 @@
                 if(!signup.discount) return ''
                 return Signup.formatDiscountText(signup.discount, signup.points)
             },
-            onSelected(signup_id){this.$emit('selected',signup_id)
-                
+            onSelected(signup_id){
+                this.$emit('selected',signup_id)                
             },
             
             beginCreate(){
                  this.$emit('begin-create')
             },
-            onRemove(id){
-              alert(id)
+            btnAddClicked(){
+               this.$emit('edit')   
             },
-            btnDeleteClicked(){
-                 let values={
-                    // name: this.category.name,
-                    // id:this.id
-                }
-               this.$emit('btn-delete-clicked',values)
+            onRemove(values){
+                this.deleteConfirm.msg= '確定要將 ' + values.name + ' 從錄取名單刪除嗎' 
+                this.deleteConfirm.id=values.id
+                this.deleteConfirm.show=true 
+                
+            },
+            submitDelete(){
+                let id = this.deleteConfirm.id 
+                let remove= Admission.delete(id)
+                remove.then(result => {
+                    this.current_version+=1
+                    Helper.BusEmitOK('刪除成功')
+                    this.deleteConfirm.show=false
+                    this.$emit('admit-deleted')
+                    
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error,'刪除失敗')
+                    this.deleteConfirm.show=false   
+                })
+               
+            }
             
-            },
            
         },
 

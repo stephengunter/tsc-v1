@@ -1,6 +1,7 @@
 <template>
 <div>
-  <admit-list v-show="hasData" :course_id="course_id" 
+  <admit-list v-if="course_id > 0" v-show="hasData" :course_id="course_id" 
+     :can_edit="canEdit" @edit="onEdit"
      @loaded="onDataLoaded" @selected="onSelected">
        
   </admit-list>
@@ -92,11 +93,22 @@
                 if(!this.course) return false
                 if(!this.course.admission) return false
                 return true
+            },
+            canEdit(){
+               if(this.hasData){
+                   return this.course.admission.canEdit
+               }else return false
             }
         },
         watch:{
           'course_id' : 'init',
           'version' : 'init'
+        },
+        watch: {
+            course_id(){
+               this.init()
+            },
+            
         },
         beforeMount(){
            this.init()
@@ -123,6 +135,9 @@
                this.$emit('btn-delete-clicked',values)
             
             },
+            onEdit(){
+                this.$emit('begin-edit')
+            }
           
         }, 
     }

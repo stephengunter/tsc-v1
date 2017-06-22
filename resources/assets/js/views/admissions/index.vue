@@ -10,17 +10,6 @@
 
             </div>
             
-            <!-- <div v-if="course" class="panel-title">
-                人數上限： {{ course.limit }}
-                &nbsp;&nbsp;
-                最低人數： {{ course.min }}
-                &nbsp;&nbsp;
-                報名狀態：<span v-html="signupLabel()"></span>
-                &nbsp;&nbsp;
-                開課狀態：<span v-html="classLabel()"></span>
-                
-            </div> -->
-            
         </div>
      </div>
      

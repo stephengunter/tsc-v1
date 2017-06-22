@@ -27,6 +27,9 @@
     static updateUrl(id){
         return this.showUrl(id)
     }
+    static deleteUrl(id){
+         return this.source() + '/' + id
+    }
     static create(course){
         return new Promise((resolve, reject) => {
             let url = this.createUrl(course) 
@@ -86,6 +89,19 @@
             form.submit(method,url)
                 .then(data => {
                     resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+    }
+    static delete(id) {
+        return new Promise((resolve, reject) => {
+            let url =this.deleteUrl(id) 
+            let form = new Form()
+            form.delete(url)
+                .then(response => {
+                    resolve(true);
                 })
                 .catch(error => {
                     reject(error);

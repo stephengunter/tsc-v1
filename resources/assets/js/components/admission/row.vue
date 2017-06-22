@@ -11,7 +11,7 @@
         </td>
         <td v-if="can_edit">
             <button class="btn btn-danger btn-xs"
-                @click.prevent="remove(admit.id)">
+                @click.prevent="remove">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
             </button>
         </td>
@@ -106,17 +106,13 @@
             },
             
             remove(id){
-               this.$emit('remove',id)
-            },
-            btnDeleteClicked(){
-                 let values={
-                    // name: this.category.name,
-                    // id:this.id
+               let values={
+                    name: this.admit.signup.user.profile.fullname,
+                    id:this.admit.id
                 }
-               this.$emit('btn-delete-clicked',values)
-            
+               this.$emit('remove',values)
             },
-           
+          
         },
 
     }
