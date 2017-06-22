@@ -137,7 +137,8 @@ class BaseController extends Controller
                
             );
         }
-        if($key =='courses' || $key =='lessons' || $key =='categories'){
+        if($key =='courses' || $key =='lessons' 
+           || $key =='categories' || $key =='admissions'){
            return array(
                 [
                     'id' => 1,

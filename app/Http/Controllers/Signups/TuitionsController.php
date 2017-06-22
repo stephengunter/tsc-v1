@@ -66,9 +66,9 @@ class TuitionsController extends BaseController
 
          $signup=Signup::with('course','user')->findOrFail($signup_id);
 
-         $current_user=$this->checkAdmin->getAdmin();
+         $current_user=$this->currentUser();
          if(!$signup->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);      
+            return  $this->unauthorized(); 
          }
 
          $payOptions=$this->payways->getAll();
@@ -87,16 +87,16 @@ class TuitionsController extends BaseController
     public function show($id)
     {
         $tuition=$this->tuitions->findOrFail($id);  
-        $current_user=$this->checkAdmin->getAdmin();
-        
+        $current_user=$this->currentUser();
+       
         if(!$tuition->canViewBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized();    
         }  
-         $tuition->textPayBy=$this->payways->textPayBy($tuition->pay_by);
-         $tuition->canEdit=$tuition->canEditBy($current_user);
-         $tuition->canDelete=$tuition->canDeleteBy($current_user);
+        $tuition->textPayBy=$this->payways->textPayBy($tuition->pay_by);
+        $tuition->canEdit=$tuition->canEditBy($current_user);
+        $tuition->canDelete=$tuition->canDeleteBy($current_user);
 
-         return response()
+        return response()
                 ->json([
                     'tuition' => $tuition
                 ]);
@@ -104,15 +104,17 @@ class TuitionsController extends BaseController
     }
     public function store(TuitionRequest $request)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         $removed=false;
         $updated_by=$current_user->id;
         $values=$request->getValues($updated_by,$removed);
 
         $signup_id=$values['signup_id']; 
         $signup=$this->signups->findOrFail($signup_id);
+
+        
         if(!$signup->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+             return  $this->unauthorized();      
         }
 
         $pay_by=$values['pay_by'];
@@ -138,10 +140,10 @@ class TuitionsController extends BaseController
     public function edit($id)
     {
         $tuition=$this->tuitions->findOrFail($id);  
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         
         if(!$tuition->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized();    
         } 
 
         $tuition->canDelete=$tuition->canDeleteBy($current_user); 
@@ -163,10 +165,11 @@ class TuitionsController extends BaseController
     public function update(TuitionRequest $request, $id)
     {
         $tuition=$this->tuitions->findOrFail($id);  
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
+       
         
         if(!$tuition->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized();     
         }  
        
         $removed=false;
@@ -192,9 +195,10 @@ class TuitionsController extends BaseController
         $tuition=$this->tuitions->findOrFail($id);  
         $signup_id=$tuition->signup_id;
 
-        $current_user=$this->checkAdmin->getAdmin();        
+        $current_user=$this->currentUser();
+            
         if(!$tuition->canDeleteBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+           return  $this->unauthorized();    
         }        
       
 

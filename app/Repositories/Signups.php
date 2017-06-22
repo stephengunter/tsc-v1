@@ -139,6 +139,12 @@ class Signups
                         ->where('course_id',$course_id)
                         ->select('status', DB::raw('count(*) as total'))
                         ->groupBy('status')->get();
+
+            return $this->printSignupSummary($info);
+            
+     }
+     public function printSignupSummary($info)
+     {
             $success=0;
             $successItem = $info->filter(function($item) {
                 return $item->status == 1;
@@ -167,6 +173,7 @@ class Signups
             ];
             return $summary;
      }
+
      private function getTuitionValues($course,$discount)
      {
           $tuition=$course->tuition;

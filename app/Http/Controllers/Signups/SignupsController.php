@@ -18,7 +18,6 @@ use App\Signup;
 use App\User;
 use App\Course;
 
-
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 

@@ -1,7 +1,13 @@
 <template>
     <tr>
+        <td v-if="index>=0">
+            {{ index }}
+        </td>
         <td v-if="can_select">
-            <checkbox :value="admit.signup.id"></checkbox>
+            <checkbox :value="admit.signup.id" :default="selected"
+              @selected="onSelected"   @unselected="onUnselected">
+               
+            </checkbox>
         </td>
         <td v-if="can_edit">
             <button class="btn btn-danger btn-xs"
@@ -9,7 +15,7 @@
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
             </button>
         </td>
-        <td v-text="admit.display_order"></td> 
+        
         <td v-text="admit.signup.user.profile.fullname"></td> 
        
         <td>
@@ -18,7 +24,7 @@
            {{ statusText(admit.signup.status) }}
            </span>
 
-           <button v-else @click.prevent="selected(admit.id)" type="button" :class="statusStyle(admit.status)">
+           <button v-else @click.prevent="onSelected" type="button" :class="statusStyle(admit.signup.status)">
            {{ statusText(admit.signup.status) }}
            </button>
 
@@ -58,6 +64,14 @@
                type: Boolean,
                default: false
             },
+            index: {
+               type: Number,
+               default: -1
+            },
+            selected:{
+               type: Boolean,
+               default: false
+            }
         },
         data() {
             return {
@@ -71,7 +85,7 @@
               if(this.can_select){
                  return 'label label-' + Signup.getStatusStyle(status)
               }else{
-                return 'btn-xs btn btn-' + Signup.getStatusStyle(status)
+                return 'btn-xs btn btn-' +  Signup.getStatusStyle(status)
               }
              
             },
@@ -82,13 +96,17 @@
                 if(!signup.discount) return ''
                 return Signup.formatDiscountText(signup.discount, signup.points)
             },
-            selected(id){
-                this.$emit('selected',id)
+            onSelected(){
+                let signup_id=this.admit.signup_id
+                this.$emit('selected',signup_id)
+            },
+            onUnselected(){
+                let signup_id=this.admit.signup_id
+                this.$emit('unselected',signup_id)
             },
             
-            
             remove(id){
-              alert(id)
+               this.$emit('remove',id)
             },
             btnDeleteClicked(){
                  let values={

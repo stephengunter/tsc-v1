@@ -10,7 +10,7 @@
 
             </div>
             
-            <div v-if="course" class="panel-title">
+            <!-- <div v-if="course" class="panel-title">
                 人數上限： {{ course.limit }}
                 &nbsp;&nbsp;
                 最低人數： {{ course.min }}
@@ -19,13 +19,13 @@
                 &nbsp;&nbsp;
                 開課狀態：<span v-html="classLabel()"></span>
                 
-            </div>
+            </div> -->
             
         </div>
      </div>
      
     <admission-view v-if="ready" :course_id="course_id" 
-       @loaded="onDataLoaded">
+       @loaded="onDataLoaded" @signup-selected="onSignupSelected">
        
        
     </admission-view>
@@ -108,8 +108,8 @@
             classLabel(){
                 return CourseStatus.getClassLabel(this.course.status)
             },
-            onSelected(id){
-                this.$emit('selected',id)
+            onSignupSelected(signup_id){
+                this.$emit('signup-selected',signup_id)
             },
             onBeginCreate(){
                 this.$emit('begin-create',this.course_id)

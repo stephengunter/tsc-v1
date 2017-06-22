@@ -40,6 +40,19 @@
            
         })
     }
+    static store(form){
+         let url =this.storeUrl()
+         let method='post'
+        return new Promise((resolve, reject) => {
+            form.submit(method,url)
+                .then(data => {
+                    resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+    }
     static show(id){
         return new Promise((resolve, reject) => {
             let url = this.showUrl(id) 
@@ -79,16 +92,9 @@
                 })
         })
     }
-    static getThead(canSelect){
+    static getThead(show_updated){
          let thead= [
-                {
-                    title: '',
-                    key: '',
-                    sort: false,
-                    static:true,
-                    default:true
-
-                },
+               
                 {
                     title: '姓名',
                     key: 'signup.user.profile.fullname',
@@ -119,24 +125,20 @@
                     key: 'signup.discount',
                     sort: false,
                     default:true
-                 },{
+                 },
+                ]
+
+
+                if(show_updated){
+                    thead.push({
                     title: '最後更新',
                     key: 'updated_by',
                     sort: false,
                     default:true
-                 }
-                ]
-
-                if(canSelect){
-                   let selectColumn={
-                    title: '',
-                    key: '',
-                    sort: false,
-                    static:true,
-                    default:true
-                   }
-                   thead.splice(0, 0, selectColumn);
+                 })
                 }
+
+               
 
           
             return thead

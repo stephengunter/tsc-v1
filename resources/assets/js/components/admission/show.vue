@@ -1,10 +1,10 @@
 <template>
 <div>
   <admit-list v-show="hasData" :course_id="course_id" 
-     @loaded="onDataLoaded">
+     @loaded="onDataLoaded" @selected="onSelected">
        
   </admit-list>
-  <div v-show="!hasData"  class="panel panel-default">
+  <div v-show="!hasData"   class="panel panel-default">
       <!-- <div v-if="admission" class="panel-heading">
           <div class="panel-title">
              <h4 v-html="title"></h4>
@@ -108,6 +108,9 @@
             },
             onDataLoaded(data){
                 this.course=data.course
+            },
+            onSelected(signup_id){
+                this.$emit('selected',signup_id)
             },
             btnCreateClicked(){
                this.$emit('begin-create') 

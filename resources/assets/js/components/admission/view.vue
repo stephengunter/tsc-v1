@@ -2,7 +2,9 @@
 <div>
     
     <show v-if="readOnly"  :course_id="course_id" can_edit="can_edit"  
-         @begin-create="onBeginCreate"  @loaded="onDataLoaded">       
+         @begin-create="onBeginCreate"  @loaded="onDataLoaded"
+         @selected="onSelected"
+         >       
                
     </show>
 
@@ -56,6 +58,9 @@
             onSaved(admission){
                 this.init()
                 this.$emit('saved',admission)
+            },
+            onSelected(signup_id){
+                this.$emit('signup-selected',signup_id)
             },
             
            

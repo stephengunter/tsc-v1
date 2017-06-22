@@ -17,16 +17,17 @@ class Admission extends Model
 	}
     public function admits()
 	{
-		return $this->hasMany('App\Admit');
+		return $this->hasMany('App\Admit','course_id');
 	}
 
 	public function canDeleteBy($user)
 	{
-         return $this->course->canDeleteBy($user);
+		if($this->admits) return false;
+        return $this->course->canDeleteBy($user);
         
 	}
 
-    public function canEditBy()
+    public function canEditBy($user)
     {
         return $this->course->canEditBy($user);
         

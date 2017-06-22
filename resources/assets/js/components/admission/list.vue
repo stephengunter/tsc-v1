@@ -20,34 +20,15 @@
          </button>
          
          <template scope="props">
-            <!-- <tr>
-                <td v-if="can_select">
-                    <button @click.prevent="selected(props.item.signup_id)"  type="button" class="btn-xs btn btn-primary">
-                        選取
-                    </button>
-                </td>
-                <td v-if="can_edit">
-                    <button class="btn btn-danger btn-xs"
-                        @click.prevent="remove(props.item.id)">
-                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                    </button>
-                </td>
-                <td v-text="props.item.display_order"></td> 
-                <td v-text="props.item.signup.user.profile.fullname"></td> 
+            <row  :admit="props.item"
+                :can_select="rowSettings.can_select" 
+                :show_updated="rowSettings.show_updated"
+                :can_edit="rowSettings.can_edit"  
+                @selected="onSelected"
+                @remove="onRemove"
+                >
                
-                <td>
-                   <button @click.prevent="selected(props.item.id)" type="button" :class="statusStyle(props.item.status)">
-                   {{ statusText(props.item.signup.status) }}
-                   </button>
-                </td>
-                <td v-text="props.item.signup.date"></td> 
-                <td>{{ props.item.signup.tuition | formatMoney }}</td>  
-                <td v-html="discountText(props.item.signup)"></td>
-                <td>
-                    <updated :entity="props.item"></updated>
-                </td>
-            </tr> -->
-            <row :admit="props.item"></row>
+            </row>
          </template>
 
     </data-viewer>
@@ -102,11 +83,11 @@
             return {
                 title:Helper.getIcon(Admission.title())  + '  錄取名單',
                 loaded:false,
-                source: '',
+                source: Admission.showUrl(this.course_id),
                 
                              
                 createText: '',
-                thead:Admission.getThead(),
+                thead:[],
                 filter: [],
                 defaultSearch:'id',
                 defaultOrder:'id',
@@ -120,6 +101,12 @@
                 viewMore:false,
 
                 course:null,
+
+                rowSettings:{
+                    can_select:false,
+                    show_updated:true,
+                    can_edit:true
+                },
              
             }
         },
@@ -132,29 +119,25 @@
         },
         methods: {
             init() {
-                this.loaded=false
+                
+                let options = this.loadStatusOptions()
+                options.then((value) => {
+                    this.searchParams={
+                        status : value
+                    }
 
-                if(this.creating){
-                    this.source= Admission.createUrl(this.course_id)
-                    this.thead=Admission.getThead(true)
-                    this.loaded=true
-                }else{
-                    this.source= Admission.showUrl(this.course_id)
-                    this.thead=Admission.getThead(this.can_select)
-                    let options = this.loadStatusOptions()
-                    options.then((value) => {
-                        this.searchParams={
-                            status : value
-                        }
-
-                       this.loaded=true
-                    })
-                }
+                   this.loaded=true
+                })
                
-                
+                this.thead=Admission.getThead(this.rowSettings.show_updated)
+                let thRemove={
+                    title: '',
+                    key: 'remove',
+                    sort: false,
+                    default:true
+                 }
+                this.thead.splice(0, 0, thRemove)
 
-                 
-                
             },
             loadStatusOptions(){
                  return new Promise((resolve, reject) => {
@@ -174,8 +157,13 @@
             onDataLoaded(data){
                 this.course=data.course
                 this.$emit('loaded',data)
-                // if(data.summary)  this.summary=data.summary
-                // else this.summary=null
+
+                if(data.summary) {
+                    this.summary=data.summary
+                }else{
+                    this.summary=null
+                } 
+
 
 
             }, 
@@ -189,14 +177,14 @@
                 if(!signup.discount) return ''
                 return Signup.formatDiscountText(signup.discount, signup.points)
             },
-            selected(id){
-                this.$emit('selected',id)
+            onSelected(signup_id){this.$emit('selected',signup_id)
+                
             },
             
             beginCreate(){
                  this.$emit('begin-create')
             },
-            remove(id){
+            onRemove(id){
               alert(id)
             },
             btnDeleteClicked(){

@@ -15,10 +15,9 @@ class Admit extends Model
 	];
 
 	
-
     public function admission() 
 	{
-		 return $this->belongsTo('App\Admission');
+		 return $this->belongsTo('App\Admission','course_id');
 	}
     public function signup()
 	{

@@ -3,6 +3,7 @@
 @section('content')
   
    <admission-index v-show="indexMode"  :hide_create="indexSettings.hide_create" :version="version"
+    @signup-selected="onSignupSelected"
     @selected="onCategorySelected" @begin-create="beginCreate">
    </admission-index> 
 
@@ -71,7 +72,10 @@
                  this.selected=0
                  this.creating=false
                  this.version +=1
-            }
+            },
+            onSignupSelected(signup_id){
+                Helper.newWindow('/signups/' + signup_id)
+            },
 
         },
     
