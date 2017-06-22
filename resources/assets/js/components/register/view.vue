@@ -24,7 +24,7 @@
 
 
     export default {
-        name:'RegisterView',
+        name:'AdmissionView',
         components: {
             Show,
             Edit,
@@ -70,9 +70,9 @@
             onEditCanceled(){
                 this.init()
             },
-            onSaved(register){
+            onSaved(admission){
                 this.init()
-                this.$emit('saved',register)
+                this.$emit('saved',admission)
             },
             onSelected(signup_id){
                 this.$emit('signup-selected',signup_id)

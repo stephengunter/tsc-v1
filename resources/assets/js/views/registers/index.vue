@@ -13,24 +13,22 @@
         </div>
      </div>
      
-    <admission-view v-if="ready" :course_id="course_id" 
+    <register-view v-if="ready" :course_id="course_id" 
        @loaded="onDataLoaded" @signup-selected="onSignupSelected">
-       
-       
-    </admission-view>
+    </register-view>
 
 </div>
 
 </template>
 
 <script>
-    import AdmissionView from '../../components/admission/view.vue'
+    import RegisterView from '../../components/register/view.vue'
     
 
     export default {
-        name: 'AdmissionIndex',       
+        name: 'RegisterIndex',       
         components: {
-            'admission-view':AdmissionView
+            'register-view':RegisterView
         },
         props: {
             version: {
@@ -74,7 +72,6 @@
                 
              
             },
-            
             onCombinationReady(params){
                 this.setCourse(params.course)
                 this.ready=true

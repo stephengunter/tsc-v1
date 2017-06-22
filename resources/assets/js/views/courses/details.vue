@@ -25,7 +25,13 @@
                      <a @click="activeIndex=4" href="#signupRecord" data-toggle="tab">報名紀錄</a>
                 </li>
                 <li>
-                     <a @click="activeIndex=5" href="#lesson" data-toggle="tab">課堂紀錄表</a>
+                     <a @click="activeIndex=5" href="#admits" data-toggle="tab">錄取名單</a>
+                </li>
+                <li>
+                     <a @click="activeIndex=6" href="#registers" data-toggle="tab">註冊名單</a>
+                </li>
+                <li>
+                     <a @click="activeIndex=7" href="#lesson" data-toggle="tab">課堂紀錄表</a>
                 </li>
                 
             </ul>
@@ -71,8 +77,20 @@
                        </create-signup>
                      </div>  
                 </div>
+                <div class="tab-pane fade" id="admits">
+                    <div  v-if="activeIndex==5"  >
+                       <admission-view :course_id="id" 
+                          @signup-selected="onSignupSelected">
+                      </admission-view>
+                     </div>  
+                </div>
+                <div class="tab-pane fade" id="registers">
+                    <div  v-if="activeIndex==6"  >
+                      registers
+                     </div>  
+                </div>
                 <div class="tab-pane fade" id="lesson">
-                      <div  v-if="activeIndex==5" >
+                      <div  v-if="activeIndex==7" >
                          <lesson-list v-show="lessonSettings.listing" :course_id="id" 
                             :hide_create="lessonSettings.hide_create" 
                             :version="lessonSettings.version" 
@@ -113,7 +131,8 @@
     import LessonList from '../../components/lesson/list.vue'
     import EditLesson from '../../components/lesson/edit.vue'
     import InitializeLessons from '../../components/lesson/initialize.vue'
-
+    import AdmissionView from '../../components/admission/view.vue'
+    
     
     export default {
         name: 'CourseDetails',
@@ -127,7 +146,8 @@
            'create-signup':CreateSignup,
            'lesson-list':LessonList,
            'edit-lesson':EditLesson,
-           'lesson-initialize':InitializeLessons
+           'lesson-initialize':InitializeLessons,
+           'admission-view':AdmissionView
         },
         props: {
             id: {
@@ -301,6 +321,9 @@
             },
             onStatusSaved(status){
                this.version += 1
+            },
+            onSignupSelected(signup_id){
+                this.$emit('signup-selected',signup_id)
             }
              
             

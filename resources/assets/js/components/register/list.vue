@@ -21,7 +21,7 @@
          </button>
          
          <template scope="props">
-            <row  :student="props.item"
+            <row  :admit="props.item"
                 :can_select="rowSettings.can_select" 
                 :show_updated="rowSettings.show_updated"
                 :can_edit="rowSettings.can_edit"  
@@ -44,7 +44,7 @@
 <script>
     import Row from './row.vue'
     export default {
-        name: 'StudentList',
+        name: 'AdmitList',
         components: {
             Row,
         },
@@ -87,7 +87,7 @@
         },
         data() {
             return {
-                title:Helper.getIcon(Register.title())  + '  錄取名單',
+                title:Helper.getIcon(Admission.title())  + '  錄取名單',
                 loaded:false,
                 
                 
@@ -126,7 +126,7 @@
         },
         computed: {
             source() {
-               return  Register.showUrl(this.course_id)
+               return  Admission.showUrl(this.course_id)
             },
             
         },
@@ -150,7 +150,7 @@
                    this.loaded=true
                 })
                
-                this.thead=Register.getThead(this.rowSettings.show_updated)
+                this.thead=Admission.getThead(this.rowSettings.show_updated)
                 let thRemove={
                     title: '',
                     key: 'remove',
@@ -216,12 +216,12 @@
             },
             submitDelete(){
                 let id = this.deleteConfirm.id 
-                let remove= Register.delete(id)
+                let remove= Admission.delete(id)
                 remove.then(result => {
                     this.current_version+=1
                     Helper.BusEmitOK('刪除成功')
                     this.deleteConfirm.show=false
-                    this.$emit('student-deleted')
+                    this.$emit('admit-deleted')
                     
                 })
                 .catch(error => {

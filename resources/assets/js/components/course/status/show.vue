@@ -32,7 +32,7 @@
                        
                     </div>
                     <div class="col-sm-3">
-                        <label class="label-title">開課狀態</label>
+                        <label class="label-title">備註</label>
                           <p v-text="status.ps"></p>  
                     </div>
             </div>

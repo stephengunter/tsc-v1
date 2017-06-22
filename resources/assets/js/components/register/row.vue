@@ -4,7 +4,7 @@
             {{ index }}
         </td>
         <td v-if="can_select">
-            <checkbox :value="student.signup.id" :default="selected"
+            <checkbox :value="admit.signup.id" :default="selected"
               @selected="onSelected"   @unselected="onUnselected">
                
             </checkbox>
@@ -16,25 +16,25 @@
             </button>
         </td>
         
-        <td v-text="student.signup.user.profile.fullname"></td> 
+        <td v-text="admit.signup.user.profile.fullname"></td> 
        
         <td>
            
-           <span  v-if="can_select" :class="statusStyle(student.signup.status)">
-           {{ statusText(student.signup.status) }}
+           <span  v-if="can_select" :class="statusStyle(admit.signup.status)">
+           {{ statusText(admit.signup.status) }}
            </span>
 
-           <button v-else @click.prevent="onSelected" type="button" :class="statusStyle(student.signup.status)">
-           {{ statusText(student.signup.status) }}
+           <button v-else @click.prevent="onSelected" type="button" :class="statusStyle(admit.signup.status)">
+           {{ statusText(admit.signup.status) }}
            </button>
 
 
         </td>
-        <td v-text="student.signup.date"></td> 
-        <td>{{ student.signup.tuition | formatMoney }}</td>  
-        <td v-html="discountText(student.signup)"></td>
+        <td v-text="admit.signup.date"></td> 
+        <td>{{ admit.signup.tuition | formatMoney }}</td>  
+        <td v-html="discountText(admit.signup)"></td>
         <td v-if="show_updated">
-            <updated :entity="student"></updated>
+            <updated :entity="admit"></updated>
         </td>
     </tr>
 </template>
@@ -42,9 +42,9 @@
 <script>
      
     export default {
-        name: 'StudentRow',
+        name: 'AdmitRow',
         props: {
-            student: {
+            admit: {
               type: Object,
               default: null
             },
@@ -97,18 +97,18 @@
                 return Signup.formatDiscountText(signup.discount, signup.points)
             },
             onSelected(){
-                let signup_id=this.student.signup_id
+                let signup_id=this.admit.signup_id
                 this.$emit('selected',signup_id)
             },
             onUnselected(){
-                let signup_id=this.student.signup_id
+                let signup_id=this.admit.signup_id
                 this.$emit('unselected',signup_id)
             },
             
             remove(id){
                let values={
-                    name: this.student.signup.user.profile.fullname,
-                    id:this.student.id
+                    name: this.admit.signup.user.profile.fullname,
+                    id:this.admit.id
                 }
                this.$emit('remove',values)
             },

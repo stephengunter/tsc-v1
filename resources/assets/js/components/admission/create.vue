@@ -30,7 +30,7 @@
                     </tr> 
                 </thead>
                 <tbody> 
-                    <row v-for="(item, index) in admitList" :admit="item"
+                    <row v-for="(item, index) in studentList" :student="item"
                           :index="index+1"
                           :selected="beenSelected(item.signup_id)"
                           :can_select="rowSettings.can_select" 
@@ -56,7 +56,7 @@
 <script>
     import Row from './row.vue'
     export default {
-        name: 'CreateAdmission',
+        name: 'CreateRegister',
         components: {
             Row,
         },
@@ -68,7 +68,7 @@
         },
         data() {
             return {
-                title:Helper.getIcon(Admission.title()) + '  建立錄取名單',
+                title:Helper.getIcon(Register.title()) + '  建立註冊學生名單',
                 rowSettings:{
                     can_select:true,
                     show_updated:false,
@@ -77,7 +77,7 @@
                 
                
                 course:null,
-                admitList:[],
+                studentList:[],
 
                 thead:[],
 
@@ -99,7 +99,7 @@
         methods: {
             init(){
                 this.fetchData()
-                this.thead=Admission.getThead(this.rowSettings.show_updated)
+                this.thead=Register.getThead(this.rowSettings.show_updated)
 
                 let thSelect={
                     title: '',
@@ -118,9 +118,9 @@
 
             },
             fetchData(){
-                let getData=Admission.create(this.course_id)
+                let getData=Register.create(this.course_id)
                 getData.then(data => {
-                    this.admitList=data.admitList
+                    this.studentList=data.studentList
                     this.course=data.course
                     this.selectedSignups=data.selected
                 })
@@ -150,7 +150,7 @@
                     selected:this.selectedSignups
                 })
 
-                let store = Admission.store(this.form)
+                let store = Register.store(this.form)
                 store.then(data => {
                     Helper.BusEmitOK()
                     this.$emit('saved',data)

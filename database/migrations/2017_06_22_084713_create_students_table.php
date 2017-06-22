@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCourseStudentsTable extends Migration
+class CreateStudentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateCourseStudentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('course_students', function (Blueprint $table) {
+        Schema::create('students', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('course_id')->unsigned();
-            $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
+			$table->foreign('course_id')->references('course_id')->on('registers')->onDelete('cascade');
 
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -24,13 +24,10 @@ class CreateCourseStudentsTable extends Migration
             $table->string('number')->nullable();
             $table->boolean('removed')->default(false);
             $table->boolean('active')->default(true);
+            $table->text('ps')->nullable();
 
-            $table->integer('updated_by')->unsigned()->nullable();
-
-            $table->string('ps')->nullable();
-
-
-            $table->timestamps();
+			$table->integer('updated_by')->unsigned()->nullable();
+			$table->timestamps();
         });
     }
 
@@ -41,6 +38,6 @@ class CreateCourseStudentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('course_students');
+        Schema::dropIfExists('students');
     }
 }

@@ -6,14 +6,12 @@
        
   </student-list>
   <div v-show="!hasData"   class="panel panel-default">
-     
+      
       <div v-if="course" class="panel-heading">
           <div class="panel-title">
               <h4 v-html="title"></h4>
-              
-            
           </div>
-          
+        
           <div>
               <button v-if="course.canCreateStudent"  v-show="can_edit" @click="btnCreateClicked" class="btn btn-primary btn-sm" >
                   <span class="glyphicon glyphicon-plus"></span> 新增
@@ -61,7 +59,7 @@
         },
         data() {
             return {
-               title:Helper.getIcon(Register.title())  + '  錄取名單', 
+               title:Helper.getIcon(Register.title())  + '  註冊學生名單', 
 
                loaded:false,
                course:null,
