@@ -13,9 +13,19 @@
         </div>
      </div>
      
-    <register-view v-if="ready" :course_id="course_id" 
-       @loaded="onDataLoaded" @signup-selected="onSignupSelected">
+    <register-view v-if="ready" v-show="!student_id"
+       :version="version" :course_id="course_id" 
+       @loaded="onDataLoaded" @signup-selected="onSignupSelected"
+       @student-selected="onStudentSelected" >
     </register-view>
+
+
+    <student-view v-if="student_id" :id="student_id"
+       @edit-user="onEditUser"
+       @btn-back-clicked="onEndStudentView"
+     >
+       
+    </student-view>
 
 </div>
 
@@ -23,18 +33,17 @@
 
 <script>
     import RegisterView from '../../components/register/view.vue'
+    import StudentView from '../../components/student/view.vue'
     
 
     export default {
         name: 'RegisterIndex',       
         components: {
-            'register-view':RegisterView
+            'register-view':RegisterView,
+            'student-view':StudentView
         },
         props: {
-            version: {
-              type: Number,
-              default: 0
-            },
+           
             hide_create:{
                type: Boolean,
                default: false
@@ -42,6 +51,7 @@
         },
         data() {
             return {
+                version:0,
                 ready:false,
                 course_id:0,
 
@@ -53,7 +63,9 @@
 
                 combinationSettings:{
                     withCourse:true,
-                }
+                },
+
+                student_id:0
 
              
             }
@@ -87,8 +99,18 @@
             onSignupSelected(signup_id){
                 this.$emit('signup-selected',signup_id)
             },
+            onEditUser(user_id){
+                this.$emit('edit-user',user_id)
+            },
             onBeginCreate(){
                 this.$emit('begin-create',this.course_id)
+            },
+            onStudentSelected(id){
+                this.student_id=id
+            },
+            onEndStudentView(){
+                 this.student_id=0
+                 this.version+=1
             }
             
             

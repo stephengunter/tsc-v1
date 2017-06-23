@@ -2,10 +2,12 @@
 <div>
     
     <show v-if="readOnly"  :course_id="course_id" can_edit="can_edit"  
+         :version="version"
          @begin-create="onBeginCreate"  @begin-edit="onBeginEdit"
          @loaded="onDataLoaded"
-         @selected="onSelected"
-         >       
+       
+         @student-selected="onStudentSelected" >    
+           
                
     </show>
     
@@ -19,12 +21,12 @@
 </template>
 <script>
     import Show from './show.vue'
-    import Create from './create.vue'
+    
     import Edit from './edit.vue'
 
 
     export default {
-        name:'AdmissionView',
+        name:'RegisterView',
         components: {
             Show,
             Edit,
@@ -37,6 +39,10 @@
             can_edit:{
                type: Boolean,
                default: true
+            },
+            version: {
+              type: Number,
+              default: 0
             },   
         },
         data() {
@@ -70,12 +76,12 @@
             onEditCanceled(){
                 this.init()
             },
-            onSaved(admission){
+            onSaved(register){
                 this.init()
-                this.$emit('saved',admission)
+                this.$emit('saved',register)
             },
-            onSelected(signup_id){
-                this.$emit('signup-selected',signup_id)
+            onStudentSelected(id){
+               this.$emit('student-selected',id)
             },
             
            

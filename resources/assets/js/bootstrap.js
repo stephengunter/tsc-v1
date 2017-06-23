@@ -123,6 +123,7 @@ import CourseStatus from './models/course-status.js'
 import Admit from './models/admit.js'
 import Admission from './models/admission.js'
 import Register from './models/register.js'
+import Student from './models/student.js'
 import SignupInfo from './models/signupinfo.js'
 import Classtime from './models/classtime.js'
 import Schedule from './models/schedule.js'
@@ -168,6 +169,7 @@ window.CourseStatus=CourseStatus
 window.Admit=Admit
 window.Admission=Admission
 window.Register=Register
+window.Student=Student
 window.SignupInfo=SignupInfo
 window.Classtime=Classtime
 window.Schedule=Schedule
@@ -197,6 +199,9 @@ window.Vue = Vue;
 
 Vue.filter('tpeTime', function (datetime) {
     return Helper.tpeTime(datetime)
+})
+Vue.filter('boolText', function (val) {
+      return Helper.boolText(val)
 })
 Vue.filter('genderText', function (gender) {
         if (parseInt(gender)) return '男'

@@ -1,19 +1,22 @@
 <template>
 <div>
   <student-list v-if="course_id > 0" v-show="hasData" :course_id="course_id" 
-     :can_edit="canEdit" @edit="onEdit"
-     @loaded="onDataLoaded" @selected="onSelected">
+     :can_edit="canEdit" :version="version" @edit="onEdit"
+     @loaded="onDataLoaded" @selected="onSelected"
+     @student-selected="onStudentSelected" >
        
   </student-list>
   <div v-show="!hasData"   class="panel panel-default">
-      
+     
       <div v-if="course" class="panel-heading">
           <div class="panel-title">
               <h4 v-html="title"></h4>
+              
+            
           </div>
-        
+          
           <div>
-              <button v-if="course.canCreateStudent"  v-show="can_edit" @click="btnCreateClicked" class="btn btn-primary btn-sm" >
+              <button v-if="course.canCreateRegister"  v-show="can_edit" @click="btnCreateClicked" class="btn btn-primary btn-sm" >
                   <span class="glyphicon glyphicon-plus"></span> 新增
               </button>
           </div>
@@ -59,7 +62,7 @@
         },
         data() {
             return {
-               title:Helper.getIcon(Register.title())  + '  註冊學生名單', 
+               title:Helper.getIcon(Register.title())  + '  註冊學員名單', 
 
                loaded:false,
                course:null,
@@ -104,19 +107,14 @@
             onDataLoaded(data){
                 this.course=data.course
             },
-            onSelected(signup_id){
-                this.$emit('selected',signup_id)
+            onSelected(user_id){
+                this.$emit('selected',user_id)
             },
             btnCreateClicked(){
                this.$emit('begin-create') 
             },
-            btnDeleteClicked(){
-                 let values={
-                    name: this.category.name,
-                    id:this.id
-                }
-               this.$emit('btn-delete-clicked',values)
-            
+            onStudentSelected(id){
+               this.$emit('student-selected',id)
             },
             onEdit(){
                 this.$emit('begin-edit')

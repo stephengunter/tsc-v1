@@ -176,6 +176,9 @@
 
                this.signup=signup
             },
+            setNetSignup(val){
+                this.signup.net_signup=val
+            }, 
             loadDiscountOptions(options){
                 this.discountOptions=options
                 let noDiscount={ text:'無' , value:'0' }

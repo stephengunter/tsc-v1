@@ -6,11 +6,11 @@
                  <h4 v-html="title"></h4>                  
             </div>
             <div v-if="creating" class="center-block">
-                以下是有效的報名紀錄&nbsp;&nbsp;&nbsp;  順序：1.已繳費&nbsp;&nbsp;2.報名日期
+                以下是繳費完成的錄取學員&nbsp;&nbsp;&nbsp;
 
             </div> 
             <div v-else class="center-block">
-              請選擇要加入的報名學員&nbsp;&nbsp;
+                請選擇要加入註冊名單的學員&nbsp;&nbsp;
             </div>  
             <div  v-if="creating">
               人數上限：{{ course.limit }}&nbsp;&nbsp;
@@ -20,7 +20,7 @@
             </div>
             <div v-else >
                人數上限：{{ course.limit }}&nbsp;&nbsp;
-               現有人數：{{ course.admission.admits.length }}&nbsp;&nbsp;
+               現有人數：{{ course.register.students.length }}&nbsp;&nbsp;
                已選擇：<strong class="text-primary" v-text="selectedSignups.length"></strong>    &nbsp;&nbsp;
                 
             </div>
@@ -44,9 +44,9 @@
                     </tr> 
                 </thead>
                 <tbody> 
-                    <row v-for="(item, index) in admitList" :admit="item"
+                    <row v-for="(item, index) in studentList" :student="item"
                           :index="index+1"
-                          :selected="beenSelected(item.signup_id)"
+                          :selected="beenSelected(item.user_id)"
                           :can_select="rowSettings.can_select" 
                           :show_updated="rowSettings.show_updated"
                           :can_edit="rowSettings.can_edit"
@@ -70,7 +70,7 @@
 <script>
     import Row from './row.vue'
     export default {
-        name: 'EditAdmission',
+        name: 'EditRegister',
         components: {
             Row,
         },
@@ -86,7 +86,7 @@
         },
         data() {
             return {
-                title:Helper.getIcon(Admission.title()),
+                title:Helper.getIcon(Register.title()),
                 rowSettings:{
                     can_select:true,
                     show_updated:false,
@@ -95,7 +95,7 @@
                 
                
                 course:null,
-                admitList:[],
+                studentList:[],
 
                 thead:[],
 
@@ -116,10 +116,10 @@
         },
         methods: {
             init(){
-                if(this.creating) this.title += '  建立錄取名單'
-                else  this.title += '  新增錄取學員'
+                if(this.creating) this.title += '  建立註冊學員名單'
+                else  this.title += '  新增註冊學員'
                 this.fetchData()
-                this.thead=Admission.getThead(this.rowSettings.show_updated)
+                this.thead=Register.getThead(this.rowSettings.show_updated)
 
                 let thSelect={
                     title: '',
@@ -139,11 +139,11 @@
             },
             fetchData(){
                 let getData=null
-                if(this.creating) getData=Admission.create(this.course_id)
-                else getData=Admission.edit(this.course_id)
+                if(this.creating) getData=Register.create(this.course_id)
+                else getData=Register.edit(this.course_id)
 
                 getData.then(data => {
-                    this.admitList=data.admitList
+                    this.studentList=data.studentList
                     this.course=data.course
 
                     if(data.selected){
@@ -158,16 +158,16 @@
             onCancel(){
                 this.$emit('canceled')
             },
-            beenSelected(signup_id){
-               return this.selectedSignups.indexOf(signup_id) >= 0
+            beenSelected(user_id){
+               return this.selectedSignups.indexOf(user_id) >= 0
             },
-            onSelected(signup_id){
-               if ( ! this.beenSelected(signup_id) ){
-                    this.selectedSignups.push(signup_id)
+            onSelected(user_id){
+               if ( ! this.beenSelected(user_id) ){
+                    this.selectedSignups.push(user_id)
                }
             },
-            onUnselected(signup_id){
-               let index= this.selectedSignups.indexOf(signup_id)
+            onUnselected(user_id){
+               let index= this.selectedSignups.indexOf(user_id)
                if(index >= 0)  this.selectedSignups.splice(index, 1);
                
             },
@@ -181,8 +181,8 @@
                 })
 
                 let save=null
-                if(this.creating) save=Admission.store(this.form)
-                else save=Admission.update(this.form, this.course_id)
+                if(this.creating) save=Register.store(this.form)
+                else save=Register.update(this.form, this.course_id)
                 
                 save.then(data => {
                     Helper.BusEmitOK()

@@ -6,7 +6,7 @@
                  <h4 v-html="title"></h4>                  
             </div> 
             <div class="center-block">
-              以下是有效的報名紀錄&nbsp;&nbsp;&nbsp;  順序：1.已繳費&nbsp;&nbsp;2.報名日期
+              以下是繳費完成的錄取者&nbsp;&nbsp;&nbsp;  
             </div>  
             <div>
               人數上限：{{ course.limit }}&nbsp;&nbsp;
@@ -30,9 +30,9 @@
                     </tr> 
                 </thead>
                 <tbody> 
-                    <row v-for="(item, index) in admitList" :admit="item"
+                    <row v-for="(item, index) in studentList" :student="item"
                           :index="index+1"
-                          :selected="beenSelected(item.signup_id)"
+                          :selected="beenSelected(item.user_id)"
                           :can_select="rowSettings.can_select" 
                           :show_updated="rowSettings.show_updated"
                           :can_edit="rowSettings.can_edit"
@@ -56,7 +56,7 @@
 <script>
     import Row from './row.vue'
     export default {
-        name: 'CreateAdmission',
+        name: 'CreateRegister',
         components: {
             Row,
         },
@@ -68,7 +68,7 @@
         },
         data() {
             return {
-                title:Helper.getIcon(Admission.title()) + '  建立錄取名單',
+                title:Helper.getIcon(Register.title()) + '  建立註冊學生名單',
                 rowSettings:{
                     can_select:true,
                     show_updated:false,
@@ -77,7 +77,7 @@
                 
                
                 course:null,
-                admitList:[],
+                studentList:[],
 
                 thead:[],
 
@@ -99,7 +99,7 @@
         methods: {
             init(){
                 this.fetchData()
-                this.thead=Admission.getThead(this.rowSettings.show_updated)
+                this.thead=Register.getThead(this.rowSettings.show_updated)
 
                 let thSelect={
                     title: '',
@@ -118,9 +118,9 @@
 
             },
             fetchData(){
-                let getData=Admission.create(this.course_id)
+                let getData=Register.create(this.course_id)
                 getData.then(data => {
-                    this.admitList=data.admitList
+                    this.studentList=data.studentList
                     this.course=data.course
                     this.selectedSignups=data.selected
                 })
@@ -128,15 +128,15 @@
                     Helper.BusEmitError(error)
                 })
             },
-            beenSelected(signup_id){
-               return this.selectedSignups.indexOf(signup_id) >= 0
+            beenSelected(user_id){
+               return this.selectedSignups.indexOf(user_id) >= 0
             },
-            onSelected(signup_id){
+            onSelected(user_id){
                if ( ! this.beenSelected(signup_id) ){
                     this.selectedSignups.push(signup_id)
                }
             },
-            onUnselected(signup_id){
+            onUnselected(user_id){
                let index= this.selectedSignups.indexOf(signup_id)
                if(index >= 0)  this.selectedSignups.splice(index, 1);
                
@@ -150,7 +150,7 @@
                     selected:this.selectedSignups
                 })
 
-                let store = Admission.store(this.form)
+                let store = Register.store(this.form)
                 store.then(data => {
                     Helper.BusEmitOK()
                     this.$emit('saved',data)

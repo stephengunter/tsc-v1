@@ -20,6 +20,14 @@ class Admission extends Model
 		return $this->hasMany('App\Admit','course_id');
 	}
 
+	public function validAdmits()
+	{
+		return $this->admits()->whereHas('signup', function ($query) {
+			$query->where('status', 1);
+		})->get();
+	
+	}
+
 	public function canDeleteBy($user)
 	{
 		if($this->admits) return false;

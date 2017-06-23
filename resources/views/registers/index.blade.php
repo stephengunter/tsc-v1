@@ -2,11 +2,13 @@
 
 @section('content')
   
-   <admission-index 
+   <register-index 
     :hide_create="indexSettings.hide_create" :version="version"
-    @signup-selected="onSignupSelected" >
+    @signup-selected="onSignupSelected" 
+    @edit-user="onEditUser"
+    >
     
-   </admission-index> 
+   </register-index> 
 
    
 @endsection
@@ -36,6 +38,9 @@
             onSignupSelected(signup_id){
                 Helper.newWindow('/signups/' + signup_id)
             },
+            onEditUser(user_id){
+               Helper.newWindow('/users/' + user_id)
+            }
 
         },
     

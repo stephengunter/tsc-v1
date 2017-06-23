@@ -26,7 +26,7 @@
                 <td v-text="props.item.user.profile.fullname"></td> 
                 <td v-text="props.item.date"></td> 
                 <td>
-                  <span v-if="props.item.net_signup" class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                  <span v-if="isTrue(props.item.net_signup)" class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                 </td> 
                 <td>
                    <button @click.prevent="selected(props.item.id)" type="button" :class="statusStyle(props.item.status)">
@@ -155,6 +155,9 @@
                 if(data.summary)  this.summary=data.summary
                 else this.summary=null
             }, 
+            isTrue(val){
+               return Helper.isTrue(val)
+            },
             statusStyle(status){
                 return 'btn-xs btn btn-' + Signup.getStatusStyle(status)
             },

@@ -226,9 +226,13 @@ class SignupsController extends BaseController
          }
 
          $date=$values['date'];
+         $net_signup= $values['net_signup'];
+         
+         $signup=$this->signups->update($signup,$course,$discount,
+                                        $user_id,$updated_by,$date,$net_signup);
          
          
-         $signup=$this->signups->update($signup,$course,$discount,$user_id,$updated_by,$date);
+         
          
          event(new SignupChanged($signup));
          

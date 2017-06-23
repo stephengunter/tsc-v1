@@ -31,11 +31,14 @@
                       <label class="label-title">報名日期</label>
                       <p v-text="signup.date"></p>                   
                  </div>
-                  <div class="col-sm-3">
+                 <div class="col-sm-3">
                       <label class="label-title">狀態</label>
                       <p v-html="signup.statusLabel()"></p>
-
-                  </div>
+                 </div>
+                 <div class="col-sm-3">
+                      <label class="label-title">網路報名</label>
+                      <p>{{ signup.net_signup | boolText }}</p>
+                 </div>
           </div>   <!-- End row-->
           <div class="row">
                 <div class="col-sm-3">

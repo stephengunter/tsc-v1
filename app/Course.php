@@ -66,6 +66,10 @@ class Course extends Model
 	{
 		return $this->hasOne('App\Admission');
 	}
+    public function register() 
+	{
+		return $this->hasOne('App\Register');
+	}
 
 	public function categories()
     {
@@ -144,6 +148,13 @@ class Course extends Model
     public function canCreateAdmit()
     {
         if($this->admission) return false;
+        if($this->classStopped()) return false;
+        return true;
+    }
+    public function canCreateRegister()
+    {
+        if(!$this->admission) return false;
+        if($this->register) return false;
         if($this->classStopped()) return false;
         return true;
     }

@@ -10,10 +10,6 @@ class Student extends Model
     use FilterPaginateOrder;
 	protected $filter =  ['id'];
 
-	protected $fillable = [
-		'course_id'	, 'user_id' , 'updated_by'	
-	];
-
 	
     public function register() 
 	{

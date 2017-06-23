@@ -204,15 +204,13 @@ class SignupsController extends Controller
     public function update(Request $request, $id)
     {
          $signup=$this->signups->findOrFail($id);  
-         $current_user=$this->checkAdmin->getAdmin();
+         $current_user=$this->currentUser();
          if(!$signup->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized();    
          } 
 
          $values=$request->get('signup');
          $updated_by=$current_user->id;
-          
-
         
          $course_id=$values['course_id'];
          $course=$this->courses->findOrFail($course_id);
@@ -236,10 +234,11 @@ class SignupsController extends Controller
              return   response()->json(['msg' => $errMsg ]  ,  422);
          }
 
-          $date=$values['date'];
+        $date=$values['date'];
+        $net_signup= $values['net_signup'];
          
-         
-         $signup=$this->signups->update($signup,$course,$discount,$user_id,$updated_by,$date);
+        $signup=$this->signups->update($signup,$course,$discount,
+                                        $user_id,$updated_by,$date,$net_signup);
          
          
          return response()->json($signup);

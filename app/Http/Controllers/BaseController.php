@@ -137,8 +137,8 @@ class BaseController extends Controller
                
             );
         }
-        if($key =='courses' || $key =='lessons' 
-           || $key =='categories' || $key =='admissions'){
+        if($key =='courses' || $key =='lessons' || $key =='categories'
+            || $key =='admissions'|| $key =='registers'){
            return array(
                 [
                     'id' => 1,
@@ -160,12 +160,18 @@ class BaseController extends Controller
                 ],
                 [
                     'id' => 4,
+                    'text' => '註冊學員名單',
+                    'path' => '/course-registers',
+                    'active' => $current=='course-registers'
+                ],
+                [
+                    'id' => 5,
                     'text' => '課堂紀錄表',
                     'path' => '/lessons',
                     'active' => $current=='lessons'
                 ],
                 [
-                    'id' => 5,
+                    'id' => 6,
                     'text' => '課程分類',
                     'path' => '/categories',
                     'active' => $current=='categories'

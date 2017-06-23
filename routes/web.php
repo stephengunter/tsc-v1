@@ -74,7 +74,10 @@ Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
 Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
 Route::resource('statuses', '\App\Http\Controllers\Course\StatusesController',
                                  ['only' => ['show','edit','update']]);
-Route::resource('admissions', '\App\Http\Controllers\Course\AdmissionsController');                          
+Route::resource('admissions', '\App\Http\Controllers\Course\AdmissionsController');  
+Route::resource('course-registers', '\App\Http\Controllers\Course\RegistersController');  
+Route::resource('students', '\App\Http\Controllers\Course\StudentsController');  
+
 Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
                                         ['only' => ['show','edit','update']]);
 Route::resource('classtimes', '\App\Http\Controllers\Course\ClassTimesController');

@@ -77,12 +77,13 @@ class Signups
           $signup=Signup::create($values);
           return $signup;
      }
-     public function update($signup,$course,$discount,$user_id,$updated_by,$date)
+     public function update($signup,$course,$discount,$user_id,$updated_by,$date,$net_signup)
      {
           $values=[
                 'course_id' => $course->id,
                 'user_id' => $user_id,
                 'updated_by' => $updated_by,
+                'net_signup' => $net_signup
           ];
 
           if($date){

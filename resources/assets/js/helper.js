@@ -9,6 +9,14 @@ class Helper {
         if(!val) return 0
         return parseInt(val)
     }
+    static isTrue(val){
+        val=this.tryParseInt(val)
+        return val>0
+    }
+    static boolText(val){
+        if(this.isTrue(val)) return '是'
+            return '否'
+    }
     static getOptions(list, valueKey, textKey){
         let options=[]
         if(list.length<1) return []
@@ -70,6 +78,12 @@ class Helper {
             break;
             case 'admissions':
                 html = '<i class="fa fa-list-alt" aria-hidden="true"></i>'
+            break;
+            case 'registers':
+                html = '<i class="fa fa-registered" aria-hidden="true"></i>'
+            break;
+            case 'students':
+                html = '<i class="fa fa-user-circle" aria-hidden="true"></i>'
             break;
             case 'statuses':
                 html = '<i class="fa fa-check-circle" aria-hidden="true"></i>'

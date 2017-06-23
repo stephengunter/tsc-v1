@@ -1,21 +1,19 @@
 <template>
 <div>
-  <student-list v-if="course_id > 0" v-show="hasData" :course_id="course_id" 
+  <admit-list v-if="course_id > 0" v-show="hasData" :course_id="course_id" 
      :can_edit="canEdit" @edit="onEdit"
      @loaded="onDataLoaded" @selected="onSelected">
        
-  </student-list>
+  </admit-list>
   <div v-show="!hasData"   class="panel panel-default">
-     
+      
       <div v-if="course" class="panel-heading">
           <div class="panel-title">
               <h4 v-html="title"></h4>
-              
-            
           </div>
-          
+        
           <div>
-              <button v-if="course.canCreateStudent"  v-show="can_edit" @click="btnCreateClicked" class="btn btn-primary btn-sm" >
+              <button v-if="course.canCreateAdmit"  v-show="can_edit" @click="btnCreateClicked" class="btn btn-primary btn-sm" >
                   <span class="glyphicon glyphicon-plus"></span> 新增
               </button>
           </div>
@@ -37,9 +35,9 @@
     import List from './list.vue'
 
     export default {
-        name: 'ShowRegister',
+        name: 'ShowAdmission',
         components: {
-            'student-list':List,
+            'admit-list':List,
         },
         props: {
             course_id: {
@@ -61,27 +59,21 @@
         },
         data() {
             return {
-               title:Helper.getIcon(Register.title())  + '  錄取名單', 
+               title:Helper.getIcon(Admission.title())  + '  錄取名單', 
 
                loaded:false,
                course:null,
-
-               summary:{
-                  total:31,
-                  in:20,
-                  out:11
-               }
             }
         },
         computed: {
             hasData: function () {
                 if(!this.course) return false
-                if(!this.course.register) return false
+                if(!this.course.admission) return false
                 return true
             },
             canEdit(){
                if(this.hasData){
-                   return this.course.register.canEdit
+                   return this.course.admission.canEdit
                }else return false
             }
         },
@@ -101,7 +93,7 @@
         methods: {
             init(){
               this.loaded=false
-              this.register=null
+              this.admission=null
             },
             onDataLoaded(data){
                 this.course=data.course
@@ -111,14 +103,6 @@
             },
             btnCreateClicked(){
                this.$emit('begin-create') 
-            },
-            btnDeleteClicked(){
-                 let values={
-                    name: this.category.name,
-                    id:this.id
-                }
-               this.$emit('btn-delete-clicked',values)
-            
             },
             onEdit(){
                 this.$emit('begin-edit')
