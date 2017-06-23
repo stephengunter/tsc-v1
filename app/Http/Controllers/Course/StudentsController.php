@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Repositories\Courses;
 use App\Repositories\Signups;
 
+use App\Register;
 use App\Student;
 use App\Course;
 use App\Admit;
@@ -73,6 +74,7 @@ class StudentsController extends BaseController
 
         $values=$request->student;
         $student->active=$values['active'];
+        $student->join_date=$values['join_date'];
         $student->ps=$values['ps'];
         $student->updated_by=$current_user->id;
 
@@ -83,34 +85,24 @@ class StudentsController extends BaseController
 
     public function destroy($id)
     {
-        $admit=Admit::findOrFail($id); 
-        $student=Student::findOrFail($admit->course_id);
+        $student=Student::findOrFail($id);
         $current_user=$this->currentUser();
-
-        if(!$admit->canDeleteBy($current_user)){
+        $register=Register::findOrFail($student->course_id);
+        if(!$student->canDeleteBy($current_user)){
             return  $this->unauthorized();
-        }    
+        }   
 
-        $admit->delete();
+        $student->delete();
 
-        if(!count($student->admits)){
-             $student->delete();
+        if(!count($register->students)){
+             $register->delete();
         }
 
         return response()->json(['deleted' => true ]);     
     }
 
 
-    private function getAdmitSummary($course)
-    {
-        $signup_ids=Admit::where('course_id',$course->id)->get()->pluck('signup_id');
-        $info = DB::table('signups')
-                        ->whereIn('id',$signup_ids)
-                        ->select('status', DB::raw('count(*) as total'))
-                        ->groupBy('status')->get();
-        return $this->signups->printSignupSummary($info); 
-    }
-    
+   
    
    
 }

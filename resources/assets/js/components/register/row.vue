@@ -52,6 +52,7 @@
             {{ student.user.profile.fullname  }}
           </a>
        </td>
+       <td v-text="student.join_date"></td>
        <td v-html="activeLabel(student.active)"></td>
        <td v-text="student.user.phone"></td>
        <td v-text="student.user.email"></td>
@@ -107,6 +108,21 @@
         },
         
         methods: {
+            statusStyle(status){
+              if(this.can_select){
+                 return 'label label-' + Signup.getStatusStyle(status)
+              }else{
+                return 'btn-xs btn btn-' +  Signup.getStatusStyle(status)
+              }
+             
+            },
+            statusText(status){
+                return Signup.getStatusText(status)
+            },
+            discountText(signup){
+                if(!signup.discount) return ''
+                return Signup.formatDiscountText(signup.discount, signup.points)
+            },
             activeLabel(val){
                 return Student.activeLabel(val)
             },

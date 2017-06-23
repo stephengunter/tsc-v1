@@ -26,7 +26,16 @@
                     <div class="col-sm-1">
                         
                     </div>
-                    
+                    <div class="col-sm-4">
+                        <div class="form-group">                           
+                            <label>加入日期</label>
+                            <div>
+                              
+                                <date-picker :option="datePickerOption" :date="join_date" ></date-picker>
+                           
+                            </div>
+                        </div>  
+                    </div>
                     <div class="col-sm-4">
                         <div class="form-group">                           
                             <label>狀態</label>
@@ -87,11 +96,22 @@
               
                 form: {},
                 
-                
+                datePickerOption:Helper.datetimePickerOption(),
+                join_date: {
+                    time: ''
+                },
                 activeOptions: Student.activeOptions(),
             }
         },
-        
+        watch:{
+            join_date: {
+              handler: function () {
+                  this.form.student.join_date=this.join_date.time
+                 
+              },
+              deep: true
+            },
+        },
         beforeMount() {
             this.init()
         },
@@ -110,7 +130,7 @@
                 getData.then(data=>{
                     let student=data.student
                     this.form.student=data.student
-
+                    this.join_date.time=student.join_date
                     this.loaded=true
                 }).catch(error=>{
                    Helper.BusEmitError(error)  

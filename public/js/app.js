@@ -30020,7 +30020,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
          var _this = this;
 
          var id = this.deleteConfirm.id;
-         var remove = Register.delete(id);
+         var remove = Student.delete(id);
          remove.then(function (result) {
             _this.current_version += 1;
             Helper.BusEmitOK('刪除成功');
@@ -30041,6 +30041,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
 //
 //
 //
@@ -30148,6 +30149,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
    methods: {
+      statusStyle: function statusStyle(status) {
+         if (this.can_select) {
+            return 'label label-' + Signup.getStatusStyle(status);
+         } else {
+            return 'btn-xs btn btn-' + Signup.getStatusStyle(status);
+         }
+      },
+      statusText: function statusText(status) {
+         return Signup.getStatusText(status);
+      },
+      discountText: function discountText(signup) {
+         if (!signup.discount) return '';
+         return Signup.formatDiscountText(signup.discount, signup.points);
+      },
       activeLabel: function activeLabel(val) {
          return Student.activeLabel(val);
       },
@@ -45963,6 +45978,13 @@ var Register = function () {
             }, {
                 title: '姓名',
                 key: 'user.profile.fullname',
+                sort: false,
+                static: true,
+                default: true
+
+            }, {
+                title: '加入日期',
+                key: 'join_date',
                 sort: false,
                 static: true,
                 default: true
@@ -79873,6 +79895,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("\n        " + _vm._s(_vm.student.user.profile.fullname) + "\n      ")])]), _vm._v(" "), _c('td', {
     domProps: {
+      "textContent": _vm._s(_vm.student.join_date)
+    }
+  }), _vm._v(" "), _c('td', {
+    domProps: {
       "innerHTML": _vm._s(_vm.activeLabel(_vm.student.active))
     }
   }), _vm._v(" "), _c('td', {
@@ -93698,6 +93724,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
@@ -93719,8 +93754,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             form: {},
 
+            datePickerOption: Helper.datetimePickerOption(),
+            join_date: {
+                time: ''
+            },
             activeOptions: Student.activeOptions()
         };
+    },
+
+    watch: {
+        join_date: {
+            handler: function handler() {
+                this.form.student.join_date = this.join_date.time;
+            },
+            deep: true
+        }
     },
     beforeMount: function beforeMount() {
         this.init();
@@ -93743,7 +93791,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             getData.then(function (data) {
                 var student = data.student;
                 _this.form.student = data.student;
-
+                _this.join_date.time = student.join_date;
                 _this.loaded = true;
             }).catch(function (error) {
                 Helper.BusEmitError(error);
@@ -93787,6 +93835,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
 //
 //
 //
@@ -94246,6 +94298,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "col-sm-4"
   }, [_c('div', {
     staticClass: "form-group"
+  }, [_c('label', [_vm._v("加入日期")]), _vm._v(" "), _c('div', [_c('date-picker', {
+    attrs: {
+      "option": _vm.datePickerOption,
+      "date": _vm.join_date
+    }
+  })], 1)])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-4"
+  }, [_c('div', {
+    staticClass: "form-group"
   }, [_c('label', [_vm._v("狀態")]), _vm._v(" "), _c('div', [_c('input', {
     directives: [{
       name: "model",
@@ -94378,11 +94439,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('div', {
     staticClass: "row"
   }, [_c('div', {
-    staticClass: "col-sm-4"
+    staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("姓名")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.student.user.profile.fullname))])]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-4"
+    staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("編號")]), _vm._v(" "), _c('p', {
@@ -94390,7 +94451,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "textContent": _vm._s(_vm.student.number)
     }
   })]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-4"
+    staticClass: "col-sm-3"
+  }, [_c('label', {
+    staticClass: "label-title"
+  }, [_vm._v("加入日期")]), _vm._v(" "), _c('p', {
+    domProps: {
+      "textContent": _vm._s(_vm.student.join_date)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("狀態")]), _vm._v(" "), _c('p', {
@@ -94400,31 +94469,31 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   })])]), _vm._v(" "), _c('div', {
     staticClass: "row"
   }, [_c('div', {
-    staticClass: "col-sm-4"
+    staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("性別")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm._f("genderText")(_vm.student.user.profile.gender)))])]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-4"
+    staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("身分證號")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.student.user.profile.SID))])]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-4"
+    staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("生日")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.student.user.profile.dob))])])]), _vm._v(" "), _c('div', {
     staticClass: "row"
   }, [_c('div', {
-    staticClass: "col-sm-4"
+    staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("手機")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.student.user.phone))])]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-8"
+    staticClass: "col-sm-6"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("Email")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.student.user.email))])])]), _vm._v(" "), _c('div', {
     staticClass: "row"
   }, [_c('div', {
-    staticClass: "col-sm-8"
+    staticClass: "col-sm-9"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("備註")]), _vm._v(" "), _c('p', {
@@ -94432,7 +94501,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "textContent": _vm._s(_vm.student.ps)
     }
   })]), _vm._v(" "), _c('div', {
-    staticClass: "col-sm-4"
+    staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
   }, [_vm._v("最後更新")]), _vm._v(" "), _c('updated', {

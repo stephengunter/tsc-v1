@@ -56,11 +56,9 @@ class RegistersController extends BaseController
             $course->canCreateRegister=$course->canCreateRegister();           
         }
 
-        $studentList=Student::where('course_id',$id)->with(['user.profile']);
+        $studentList=Student::where('course_id',$id) ->with(['user.profile']);
 
         $studentList=$studentList->filterPaginateOrder();
-
-        
 
         return response() ->json([ 'model' => $studentList,
                                    'course' => $course,
@@ -126,6 +124,7 @@ class RegistersController extends BaseController
         for($i = 0; $i < $rows; ++$i) {
             $student=new Student();
             $student->number=$i+1;
+            $student->join_date=$course->begin_date;
             $student->course_id=$course_id;
             $student->user_id=$selected_users[$i];
             $student->updated_by=$current_user->id;
@@ -206,6 +205,7 @@ class RegistersController extends BaseController
             $student=new Student();
             $student->course_id=$course_id;
             $student->signup_id=$selected_signups[$i];
+            $student->join_date=$course->begin_date;
             $student->updated_by=$current_user->id;
             
             array_push($studentList,  $student);

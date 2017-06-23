@@ -126,6 +126,13 @@
                     default:true
 
                 },{
+                    title: '加入日期',
+                    key: 'join_date',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
                     title: '',
                     key: 'active',
                     sort: false,

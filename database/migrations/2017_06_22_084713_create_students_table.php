@@ -22,7 +22,7 @@ class CreateStudentsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->string('number')->nullable();
-            $table->boolean('removed')->default(false);
+            $table->date('join_date');
             $table->boolean('active')->default(true);
             $table->text('ps')->nullable();
 

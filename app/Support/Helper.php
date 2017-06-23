@@ -102,6 +102,20 @@ class Helper
         if(!count($canAddIds)) return null;
         return Center::where('removed',false)->whereIn('id' , $canAddIds)->get();
 	}
+    public static function getHourMinute($val)
+    {
+        $value=(string)$val;
+        if(strlen($value) < 4 ){
+            $value='0' . $value;         
+        }
+        $hour=substr($value, 0, 2);
+        $minute=substr($value, 2, 2);
+        return [
+            'hour' => (int)$hour,
+            'minute' => (int)$minute
+        ];
+    }
+    
     
 
    

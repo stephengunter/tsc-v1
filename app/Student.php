@@ -22,7 +22,8 @@ class Student extends Model
 
 	public function canDeleteBy($user)
 	{
-       return $this->register->course->canEditBy($user) ;
+
+        return $this->register->course->canEditBy($user) ;
 	}
     public function canEditBy($user)
 	{

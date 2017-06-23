@@ -172,7 +172,7 @@
             },
             submitDelete(){
                 let id = this.deleteConfirm.id 
-                let remove= Register.delete(id)
+                let remove= Student.delete(id)
                 remove.then(result => {
                     this.current_version+=1
                     Helper.BusEmitOK('刪除成功')

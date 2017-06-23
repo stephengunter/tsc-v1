@@ -9,6 +9,8 @@ use App\Teacher;
 use App\Course;
 use Carbon\Carbon;
 
+use App\Support\Helper;
+
 class Lesson extends Model
 {
     use FilterPaginateOrder;
@@ -105,6 +107,19 @@ class Lesson extends Model
 	{
 	  
        	return $this->canEditBy($user);
+        
+	}
+
+    public function getHours()
+	{
+        $on=Helper::getHourMinute($this->on);
+        $off=Helper::getHourMinute($this->off);
+
+        $from=Carbon::createFromTime($on['hour'], $on['minute'], 0);
+        $end=Carbon::createFromTime($off['hour'], $off['minute'], 0);
+      
+
+        return $end->diffInMinutes($from) /60  ;
         
 	}
 
