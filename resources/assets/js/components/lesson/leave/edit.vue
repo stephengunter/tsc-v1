@@ -29,18 +29,40 @@
              <option v-for="item in typeOptions" :value="item.value" v-text="item.text"></option>
         </select>
     </td> 
-    <td v-if="loaded">
+    <!-- <td v-if="loaded">
         <div>
-            <time-picker :minute-interval="10" v-model="on" ></time-picker>
+            <time-picker :minute-interval="10" v-model="begin_at" ></time-picker>
         </div>
-        <small class="text-danger" v-if="form.errors.has('leave.on')" v-text="form.errors.get('leave.on')"></small>
+        <small class="text-danger" v-if="form.errors.has('leave.begin_at')" v-text="form.errors.get('leave.begin_at')"></small>
+        
+        <div>
+            <time-picker :minute-interval="10" v-model="begin_at" ></time-picker>
+        </div>
+        <small class="text-danger" v-if="form.errors.has('leave.begin_at')" v-text="form.errors.get('leave.begin_at')"></small>
+    
+
+    </td> -->
+    <td v-if="loaded">
+        <form class="form-inline">
+            <div class="form-group">
+                <time-picker :minute-interval="10" v-model="begin_at" ></time-picker>
+                <!-- <small class="text-danger" v-if="form.errors.has('leave.begin_at')" v-text="form.errors.get('leave.begin_at')"></small> -->
+        
+            </div>
+                
+            <div class="form-group">
+                 <time-picker :minute-interval="10" v-model="begin_at" ></time-picker>
+                 <!-- <small class="text-danger" v-if="form.errors.has('leave.begin_at')" v-text="form.errors.get('leave.begin_at')"></small> -->
+            
+            </div>
+        </form>
+         <small class="text-danger">cccccccccccccccc</small>  
     </td>
     <td v-if="loaded">
-        <div>
-            <time-picker :minute-interval="10" v-model="off"></time-picker>
-        </div>
-        <small class="text-danger" v-if="form.errors.has('leave.off')"  v-text="form.errors.get('leave.off')"></small>
-                
+        
+       
+       <!--  <small class="text-danger" v-if="form.errors.has('leave.end_at')"  v-text="form.errors.get('leave.end_at')"></small>
+        -->         
 
     </td>
     <td>
@@ -49,12 +71,12 @@
    
     <td v-if="loaded">
          
-        <button @click.prevent="onSubmit"  class="btn btn-success btn-xs">
+       <!--  <button @click.prevent="onSubmit"  class="btn btn-success btn-xs">
             <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
         </button>  
          <button  class="btn btn-default btn-xs" @click.prevent="cancelEdit">
              <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
-        </button>
+        </button> -->
     </td> 
 </tr>  
 </template>
@@ -79,20 +101,20 @@
             
         },
         watch:{
-            on: function (val) {
+            begin_at: function (val) {
                 let time=Helper.getTimeSelected(val)
 
                 if(time){
-                    this.clearErrorMsg('leave.on')
-                    this.form.leave.on=time
+                    this.clearErrorMsg('leave.begin_at')
+                    this.form.leave.begin=time
                 }
             },
-            off: function (val) {
+            end_at: function (val) {
                 let time=Helper.getTimeSelected(val)
 
                 if(time){
-                    this.clearErrorMsg('leave.off')
-                    this.form.leave.off=time
+                    this.clearErrorMsg('leave.end_at')
+                    this.form.leave.end=time
                 }
             },
         },
@@ -105,8 +127,8 @@
 
                 selectedUser:null,
                 userOptions:[],
-                begin:{},
-                end:{},
+                begin_at:{},
+                end_at:{},
                 typeOptions: []
            
             }
@@ -134,7 +156,7 @@
                 }else{
                     this.loaded=false
                     this.readOnly=false
-                    this.activeOptions= Helper.activeOptions()
+                   
                     this.fetchData()
                 } 
                           
@@ -154,10 +176,11 @@
                         leave: leave
                     }) 
 
-                    this.on=Helper.getTimeobj(leave.on)
-                    this.off=Helper.getTimeobj(leave.off)
-                    this.weekdayOptions = data.weekdayOptions
-                   
+                    this.begin=Helper.getTimeobj(leave.begin)
+                    this.end=Helper.getTimeobj(leave.end)
+                    
+                    this.userOptions=data.userOptions
+                    this.typeOptions=data.typeOptions
                    
                     this.loaded=true
                     

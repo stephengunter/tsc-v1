@@ -28,8 +28,25 @@ class Leave {
     static deleteUrl(id){
          return this.source() + '/' + id
     }
-    static create(){
-        let url = this.createUrl() 
+    static index(lesson, user){
+        let params={
+            lesson:lesson,
+            user:user
+        }
+        let url =Helper.buildQuery(this.source(),params) 
+        return new Promise((resolve, reject) => {
+            axios.get(url)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
+    static create(lesson){
+        let url = this.createUrl() + '?lesson=' + lesson
       
         return new Promise((resolve, reject) => {
             axios.get(url)

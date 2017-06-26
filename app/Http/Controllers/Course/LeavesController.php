@@ -31,6 +31,24 @@ class LeavesController extends BaseController
 		
 	}
 
+    public function index()
+    {
+        $request=request();
+        $lesson_id=(int)$request->lesson;
+        if(!$lesson_id) abort(404);
+
+        $user_id=(int)$request->user;
+
+        $leaveList=Leave::where('lesson_id',$lesson_id);
+        if($user_id){
+            $leaveList=Leave::where('user_id',$user_id);
+        }
+
+        $leaveList=$leaveList->get();
+        return response()->json(['leaveList' => $leaveList]);           
+
+    }
+
     public function  create()
     {
         $request=request();

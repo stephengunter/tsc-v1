@@ -5,13 +5,14 @@
 //   Artisan::call('db:seed');
     
 //  });
-
+Route::get('test', function(){
+     return view('test');
+});
 Route::get('/', 'HomeController@index');
 Route::get('errors', function(){
      return view('errors');
 });
 
-Route::get('/test', '\App\Http\Controllers\Discounts\IdentitiesController@index');
 
 Route::get('login', '\App\Http\Controllers\Auth\SessionsController@create')->name('login');
 Route::post('login', '\App\Http\Controllers\Auth\SessionsController@store');

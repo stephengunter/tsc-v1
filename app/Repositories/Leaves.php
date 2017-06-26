@@ -7,7 +7,7 @@ use App\LeaveType;
 
 class Leaves 
 {
-    
+  
     
     public function options()
     {

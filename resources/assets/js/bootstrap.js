@@ -26,7 +26,7 @@ Vue.component('combination-select', require('./components/CombinationSelect') )
 Vue.component('updated', require('./components/Updated') )
 Vue.component('admin-card', require('./components/AdminCard') )
 
-
+Vue.component('test', require('./views/test') )
 Vue.component('menus', require('./views/menus') )
 
 Vue.component('login', require('./components/auth/login') )

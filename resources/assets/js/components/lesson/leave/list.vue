@@ -6,14 +6,14 @@
                 <h4 v-html="title"></h4>
             </span>
             <div>
-                <button class="btn btn-primary btn-sm" @click.prevent="beginCreate">
+                <button v-show="!hide_create" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
                 </button>
             </div>
             
         </div>  <!-- End panel-heading-->
         <div v-if="loaded" class="panel-body">
-            <table v-show="hasData" class="table table-striped" style="width: 99%;">
+            <table  class="table table-striped" style="width: 99%;">
              <thead> 
                 <tr> 
                     <th style="width:15%">姓名</th> 
@@ -28,7 +28,7 @@
                 <edit v-for="leave in leaveList"  :leave="leave" @canceled="onEditCanceled"
                      @saved="onUpdated"  @btn-delete-clicked="onBtnDeleteClicked" >
                 </edit>
-                <edit v-if="creating"  @saved="onCreated"  @canceled="onCreateCanceled" > </edit> 
+                <edit v-if="creating" :lesson_id="lesson_id"  @saved="onCreated"  @canceled="onCreateCanceled" > </edit> 
             </tbody> 
             </table>
 
@@ -39,9 +39,9 @@
 
     </div>   
                    
-    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+    <!-- <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
       @close="closeConfirm" @confirmed="deleteLeave">        
-    </delete-confirm>       
+    </delete-confirm>   -->     
 
     
 
@@ -50,11 +50,33 @@
 </template>
 
 <script>
-    import Edit from '../../components/leave/edit.vue'
+    import Edit from './edit.vue'
     export default {
-        name: 'LeaveIndex',
+        name: 'LeaveList',
         components: {
              Edit,
+        },
+        props: {
+            lesson_id: {
+              type: Number,
+              default: 0
+            },
+            user_id: {
+              type: Number,
+              default: 0
+            },
+            hide_create: {
+              type: Boolean,
+              default: false
+            },
+            version:{
+               type: Number,
+               default: 0
+            },
+            can_select:{
+               type: Boolean,
+               default: true
+            },
         },
         beforeMount() {
            this.init()
@@ -67,7 +89,7 @@
         },
         data() {
             return {
-                title:Helper.getIcon('leaves') + '  折扣管理',
+                title:Helper.getIcon('leaves') + '  缺席/請假紀錄',
                 loaded:false,
                 creating:false,
                 leaveList:[],
@@ -100,7 +122,9 @@
                 this.fetchData()         
             }, 
             fetchData() {
-                let index=Leave.index()
+                let lesson=this.lesson_id
+                let user=this.user_id
+                let index=Leave.index(lesson,user)
                 index.then(data => {
                    
                    this.leaveList=data.leaveList
