@@ -33,7 +33,6 @@
      
     export default {
         name: 'CenterList',
-        props: ['hide_create','version'],
         props: {
             hide_create:{
                type: Boolean,

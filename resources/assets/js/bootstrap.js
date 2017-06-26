@@ -128,6 +128,7 @@ import SignupInfo from './models/signupinfo.js'
 import Classtime from './models/classtime.js'
 import Schedule from './models/schedule.js'
 import Lesson from './models/lesson.js'
+import LessonParticipant from './models/lesson-participant.js'
 
 
 
@@ -174,6 +175,7 @@ window.SignupInfo=SignupInfo
 window.Classtime=Classtime
 window.Schedule=Schedule
 window.Lesson=Lesson
+window.LessonParticipant=LessonParticipant
 
 window.Signup=Signup
 window.Tuition=Tuition

@@ -10,6 +10,8 @@ class DatabaseSeeder extends Seeder {
 	 * @return void
 	 */
 	public function run() {
+		 $this->call(LeaveSeeder::class);
+
 		 $this->call(TermTableSeeder::class);
 		 $this->call(AccountSeeder::class);
 		 $this->call(WeekdaySeeder::class);

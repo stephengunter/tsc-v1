@@ -24,7 +24,7 @@ trait FilterPaginateOrder {
         $request = request();
 
         $v = Validator::make($request->all(), [
-            'column' => 'required|in:'.implode(',', $this->filter),
+            // 'column' => 'required|in:'.implode(',', $this->filter),
             'direction' => 'required|in:asc,desc',
             'per_page' => 'required|integer|min:1',
             'search_operator' => 'required|in:'.implode(',', array_keys($this->operators)),
@@ -65,9 +65,14 @@ trait FilterPaginateOrder {
             }
         }
 
-        return $query->orderBy($request->column, $request->direction)->paginate($request->per_page);
-
+        if(empty($request->column)){
+            return $query->paginate($request->per_page);
        
+        }else{
+            return $query->orderBy($request->column, $request->direction)->paginate($request->per_page);
+        }
+
+        
 
         
     }

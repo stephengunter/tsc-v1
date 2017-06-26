@@ -5,8 +5,13 @@ namespace App\Repositories;
 use App\Lesson;
 use App\Role;
 use App\LessonParticipant;
+
+
+
 class LessonParticipants 
 {
+     
+
      public function addTeacher($lesson_id, $teacher_id,$updated_by)
      {
         $lesson=Lesson::findOrFail($lesson_id);

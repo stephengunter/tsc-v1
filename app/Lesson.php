@@ -5,8 +5,10 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\FilterPaginateOrder;
 
+use App\Role;
 use App\Teacher;
 use App\Course;
+use App\Student;
 use Carbon\Carbon;
 
 use App\Support\Helper;
@@ -122,6 +124,36 @@ class Lesson extends Model
         return $end->diffInMinutes($from) /60  ;
         
 	}
+
+    public function getRegisterStudents()
+    {
+        $lesson_date=date($this->date);
+        $studentList=Student::where('course_id',$this->course_id)
+                              ->whereDate('join_date','<=',$lesson_date)
+                              ->orderBy('number')
+                              ->get();
+        return $studentList;
+
+    }
+
+    public function findStudent($user_id)
+    {
+        $role_name=Role::studentRoleName();
+        return $this->lessonParticipants()->where('role',$role_name)
+                                    ->where('user_id',$user_id)
+                                    ->get();
+
+
+    }
+
+    public function addStudent($user_id,$update_by)
+    {
+        $student=new LessonParticipant();
+        $student->role=Role::studentRoleName();
+        $student->user_id=$user_id;
+        $student->update_by=$update_by;
+        $this->lessonParticipants()->save();
+    }
 
      
 }

@@ -10,14 +10,14 @@
         <div class="panel-heading">
             <ul class="nav nav-tabs">
                 <li class="active">
-                     <a @click="activeIndex=0" href="#participant" data-toggle="tab">出席狀況</a>
+                     <a @click="activeIndex=0" href="#students" data-toggle="tab">學員名單</a>
                 </li>
             </ul>
         </div>
         <div class="panel-body">
             <div class="tab-content">
-                <div class="tab-pane fade active in" id="participant">
-                    
+                <div class="tab-pane fade active in" id="students">
+                   <!--  <students :lesson_id="id"></students> -->
                 </div>
                                
             </div>
@@ -34,12 +34,13 @@
 
 <script>
     import Lesson from '../../components/lesson/lesson.vue'
-    
+    import LessonStudents from '../../components/lesson/participant/list.vue'
     
     export default {
         name: 'LessonDetails',
         components: {
             Lesson,
+            'students':LessonStudents
          
         },
         props: {
