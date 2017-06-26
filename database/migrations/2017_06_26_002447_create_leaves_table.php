@@ -23,7 +23,7 @@ class CreateLeavesTable extends Migration
             $table->integer('type_id')->unsigned();
          
             $table->text('ps')->nullable();
-            $table->integer('course_id')->unsigned()->nullable();
+            $table->integer('lesson_id')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();
         });

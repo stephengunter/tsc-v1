@@ -138,21 +138,26 @@ class Lesson extends Model
 
     public function findStudent($user_id)
     {
-        $role_name=Role::studentRoleName();
-        return $this->lessonParticipants()->where('role',$role_name)
-                                    ->where('user_id',$user_id)
-                                    ->get();
-
-
+        return $this->students() ->where('user_id',$user_id)
+                                  ->first();
     }
 
-    public function addStudent($user_id,$update_by)
+    public function students()
+    {
+         $role_name=Role::studentRoleName();
+         return $this->lessonParticipants()->where('role',$role_name);
+                                    
+    }
+
+    public function addStudent($user_id,$number, $updated_by)
     {
         $student=new LessonParticipant();
         $student->role=Role::studentRoleName();
         $student->user_id=$user_id;
-        $student->update_by=$update_by;
-        $this->lessonParticipants()->save();
+        $student->number=$number;
+        $student->updated_by=$updated_by;
+       
+        $this->lessonParticipants()->save($student);
     }
 
      

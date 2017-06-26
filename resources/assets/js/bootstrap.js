@@ -129,7 +129,7 @@ import Classtime from './models/classtime.js'
 import Schedule from './models/schedule.js'
 import Lesson from './models/lesson.js'
 import LessonParticipant from './models/lesson-participant.js'
-
+import Leave from './models/leave.js'
 
 
 import Signup from './models/signup.js'
@@ -176,6 +176,7 @@ window.Classtime=Classtime
 window.Schedule=Schedule
 window.Lesson=Lesson
 window.LessonParticipant=LessonParticipant
+window.Leave=Leave
 
 window.Signup=Signup
 window.Tuition=Tuition

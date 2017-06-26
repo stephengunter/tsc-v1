@@ -25,6 +25,7 @@ class CreateLessonParticipantsTable extends Migration
 
             $table->integer('status')->default(1);
             $table->string('role');  
+            $table->integer('number')->unsigned()->nullable();
 
             $table->string('ps')->nullable();  
             $table->integer('updated_by')->unsigned()->nullable();

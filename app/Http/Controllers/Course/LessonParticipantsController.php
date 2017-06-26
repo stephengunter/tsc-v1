@@ -54,24 +54,26 @@ class LessonParticipantsController extends BaseController
 
         $lesson=Lesson::findOrFail($lesson_id);
         $registerStudents=$lesson->getRegisterStudents();
+
         if(count($registerStudents)){
-            $update_by= $current_user->id;
-            foreach ($registerStudents as $students) {
+          
+            $updated_by= $current_user->id;
+            foreach ($registerStudents as $student) {
                 $user_id=$student->user_id;
                 $exist=$lesson->findStudent($user_id);
+               
                 if(!$exist){
-                    $lesson->addStudent($user_id,$update_by);
+                    $lesson->addStudent($user_id, $student->number ,$updated_by);
                 }
 
             }
            
         }
-
-        //Students
-        $studentList=LessonParticipants::where('lesson_id',$lesson_id);
+        $studentList=$lesson->students()->with('user.profile') -> filterPaginateOrder();
+       
         return response()
             ->json([
-                'model' => $studentList -> filterPaginateOrder()
+                'model' => $studentList
             ]);
 
     }
@@ -222,31 +224,17 @@ class LessonParticipantsController extends BaseController
     public function update(Request $request, $id)
     {
         $current_user=$this->currentUser();
-        $register=Register::findOrFail($id);
+        $record=LessonParticipant::findOrFail($id);
        
-        if(!$register->canEditBy($current_user)){
+        if(!$record->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
 
-        $selected_signups=$request->selected;
-        $rows=count($selected_signups);
-        if(!$rows) abort(404);
-
-        $course_id=$id;
-        $studentList=[];
-        for($i = 0; $i < $rows; ++$i) {
-            $student=new Student();
-            $student->course_id=$course_id;
-            $student->signup_id=$selected_signups[$i];
-            $student->join_date=$course->begin_date;
-            $student->updated_by=$current_user->id;
-            
-            array_push($studentList,  $student);
-        }
-
-        $register->students()->saveMany($studentList);
+        $record->ps=$request['ps'];
+        $record->updated_by=$current_user->id;
+        $record->save();
         
-        return response() ->json([ 'register' => $register ]);   
+        return response() ->json([ 'record' => $record ]);   
     }
 
     public function destroy($id)

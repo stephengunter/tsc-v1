@@ -85,6 +85,9 @@ class Helper {
             case 'students':
                 html = '<i class="fa fa-user-circle" aria-hidden="true"></i>'
             break;
+            case 'leaves':
+                html = '<i class="fa fa-calendar-o" aria-hidden="true"></i>'
+            break;
             case 'statuses':
                 html = '<i class="fa fa-check-circle" aria-hidden="true"></i>'
             break;

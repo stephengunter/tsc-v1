@@ -1,19 +1,14 @@
-class Student {
+class Leave {
     constructor(data) {
        
         for (let property in data) {
             this[property] = data[property];
-        }
+        } 
 
     }
-    static roleName(){
-         return 'Student'
-    }
-    static title(){
-       return 'Students'
-    }
+    
     static source(){
-        return '/students'
+        return '/leaves'
     }
     static createUrl(){
          return this.source() + '/create' 
@@ -99,22 +94,7 @@ class Student {
                 })
         })
     }
-    static updateDisplayOrder(id,up){
-        let url =this.updateUrl(id) + '/update-order'
-        let method='put'
-        let form = new Form({                        
-                         up: up
-                    })
-        return new Promise((resolve, reject) => {
-            form.submit(method,url)
-                .then(data => {
-                    resolve(data);
-                })
-                .catch(error => {
-                    reject(error);
-                })
-        })
-    }
+    
     static delete(id) {
         return new Promise((resolve, reject) => {
             let url =this.deleteUrl(id) 
@@ -128,30 +108,28 @@ class Student {
                 })
         })
     }
-    static activeLabel(val,show_normal){
-       
-        if(Helper.isTrue(val)){
-            if(!show_normal) return ''
-            else   return `<span class="label label-info" > 正常 </span>`  
-        
-        }else{
-            let style='label label-danger'  
-            let text='已退出'  
-            return `<span class="${style}" > ${text} </span>`  
-        } 
-        
-
-    }
-    static activeOptions(){
-         return  [{
-                    text: '正常',
-                    value: '1'
-                }, {
-                    text: '已退出',
-                    value: '0'
-                }]
-    }
+    
    
+    
+    static options(){
+        let url =this.source() + '/options' 
+       
+        return new Promise((resolve, reject) => {
+                     axios.get(url)
+                    .then(response => {
+                        resolve(response.data);
+                    })
+                    .catch(error => {
+                        reject(error);
+                    })
+                })  
+    }
+
+    
+   
+    
+
 }
 
-export default Student
+
+export default Leave;

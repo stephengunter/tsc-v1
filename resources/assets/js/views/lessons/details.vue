@@ -12,14 +12,22 @@
                 <li class="active">
                      <a @click="activeIndex=0" href="#students" data-toggle="tab">學員名單</a>
                 </li>
+                 <li>
+                     <a @click="activeIndex=1" href="#leaves" data-toggle="tab">請假/缺席人員</a>
+                </li>
             </ul>
+           
+               
+         
         </div>
         <div class="panel-body">
             <div class="tab-content">
                 <div class="tab-pane fade active in" id="students">
-                   <!--  <students :lesson_id="id"></students> -->
+                    <students v-if="activeIndex==0" :lesson_id="id"></students>
                 </div>
-                               
+                <div class="tab-pane fade active in" id="leaves">
+                    <!-- <students v-if="activeIndex==1" :lesson_id="id"></students> -->
+                </div>               
             </div>
         </div>
   </div>
