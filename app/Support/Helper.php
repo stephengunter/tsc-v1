@@ -4,6 +4,8 @@ namespace App\Support;
 
 use App\Center;
 
+use Carbon\Carbon;
+
 class Helper 
 {
     public static function getAppSettings($frontend=false)
@@ -114,6 +116,11 @@ class Helper
             'hour' => (int)$hour,
             'minute' => (int)$minute
         ];
+    }
+    public static function getTimeNumber($date)
+    {
+        $date=Carbon::parse($date);
+        return $date->hour*100 + $date->minute;
     }
     
     

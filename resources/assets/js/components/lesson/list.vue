@@ -14,7 +14,7 @@
                 </button>
         </div>
         <span slot="btn">
-            <button @click.prevent="beginInitialize" class="btn btn-warning btn-sm" >
+            <button v-if="canInit" @click.prevent="beginInitialize" class="btn btn-warning btn-sm" >
                 <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 初始化
             </button>
         </span>
@@ -86,7 +86,9 @@
                     course : this.course_id,
                 },
                 hasData:false,
-                viewMore:false
+                viewMore:false,
+
+                canInit:true
              
             }
         },
@@ -120,6 +122,7 @@
 
             onDataLoaded(data){
                 this.hasData=data.model.total
+                this.canInit = data.canInit
             },
             onRowSelected(id){
                 this.$emit('selected',id)

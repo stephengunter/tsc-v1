@@ -171,6 +171,11 @@
                     
                     this.userOptions=data.userOptions
                     this.typeOptions=data.typeOptions
+
+                    if(data.selectedUser){
+                        this.selectedUser=data.selectedUser
+                    }
+                    
                    
                     this.loaded=true
                     

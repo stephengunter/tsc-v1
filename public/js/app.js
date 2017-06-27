@@ -28396,6 +28396,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 _this.userOptions = data.userOptions;
                 _this.typeOptions = data.typeOptions;
 
+                if (data.selectedUser) {
+                    _this.selectedUser = data.selectedUser;
+                }
+
                 _this.loaded = true;
             }).catch(function (error) {
                 Helper.BusEmitError(error);
@@ -28867,7 +28871,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 course: this.course_id
             },
             hasData: false,
-            viewMore: false
+            viewMore: false,
+
+            canInit: true
 
         };
     },
@@ -28899,6 +28905,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         onDataLoaded: function onDataLoaded(data) {
             this.hasData = data.model.total;
+            this.canInit = data.canInit;
         },
         onRowSelected: function onRowSelected(id) {
             this.$emit('selected', id);
@@ -38387,6 +38394,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_lesson_initialize_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9__components_lesson_initialize_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__components_admission_view_vue__ = __webpack_require__(140);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__components_admission_view_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10__components_admission_view_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__components_register_view_vue__ = __webpack_require__(484);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__components_register_view_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11__components_register_view_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__components_student_view_vue__ = __webpack_require__(491);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__components_student_view_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_12__components_student_view_vue__);
 //
 //
 //
@@ -38509,6 +38520,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 
 
 
@@ -38523,192 +38546,209 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
-   name: 'CourseDetails',
-   components: {
-      'course': __WEBPACK_IMPORTED_MODULE_0__components_course_course_vue___default.a,
-      'signup-info': __WEBPACK_IMPORTED_MODULE_1__components_course_signupinfo_view_vue___default.a,
-      'course-status': __WEBPACK_IMPORTED_MODULE_3__components_course_status_view_vue___default.a,
-      'classtime': __WEBPACK_IMPORTED_MODULE_2__components_classtime_classtime_vue___default.a,
-      'schedule': __WEBPACK_IMPORTED_MODULE_4__components_schedule_schedule_vue___default.a,
-      'signup-list': __WEBPACK_IMPORTED_MODULE_5__components_signup_list_vue___default.a,
-      'create-signup': __WEBPACK_IMPORTED_MODULE_6__components_signup_create_vue___default.a,
-      'lesson-list': __WEBPACK_IMPORTED_MODULE_7__components_lesson_list_vue___default.a,
-      'edit-lesson': __WEBPACK_IMPORTED_MODULE_8__components_lesson_edit_vue___default.a,
-      'lesson-initialize': __WEBPACK_IMPORTED_MODULE_9__components_lesson_initialize_vue___default.a,
-      'admission-view': __WEBPACK_IMPORTED_MODULE_10__components_admission_view_vue___default.a
-   },
-   props: {
-      id: {
-         type: Number,
-         default: 0
-      },
-      can_edit: {
-         type: Boolean,
-         default: true
-      },
-      can_back: {
-         type: Boolean,
-         default: true
-      }
-   },
-   data: function data() {
-      return {
-         loaded: false,
+    name: 'CourseDetails',
+    components: {
+        'course': __WEBPACK_IMPORTED_MODULE_0__components_course_course_vue___default.a,
+        'signup-info': __WEBPACK_IMPORTED_MODULE_1__components_course_signupinfo_view_vue___default.a,
+        'course-status': __WEBPACK_IMPORTED_MODULE_3__components_course_status_view_vue___default.a,
+        'classtime': __WEBPACK_IMPORTED_MODULE_2__components_classtime_classtime_vue___default.a,
+        'schedule': __WEBPACK_IMPORTED_MODULE_4__components_schedule_schedule_vue___default.a,
+        'signup-list': __WEBPACK_IMPORTED_MODULE_5__components_signup_list_vue___default.a,
+        'create-signup': __WEBPACK_IMPORTED_MODULE_6__components_signup_create_vue___default.a,
+        'lesson-list': __WEBPACK_IMPORTED_MODULE_7__components_lesson_list_vue___default.a,
+        'edit-lesson': __WEBPACK_IMPORTED_MODULE_8__components_lesson_edit_vue___default.a,
+        'lesson-initialize': __WEBPACK_IMPORTED_MODULE_9__components_lesson_initialize_vue___default.a,
+        'admission-view': __WEBPACK_IMPORTED_MODULE_10__components_admission_view_vue___default.a,
+        'register-view': __WEBPACK_IMPORTED_MODULE_11__components_register_view_vue___default.a,
+        'student-view': __WEBPACK_IMPORTED_MODULE_12__components_student_view_vue___default.a
+    },
+    props: {
+        id: {
+            type: Number,
+            default: 0
+        },
+        can_edit: {
+            type: Boolean,
+            default: true
+        },
+        can_back: {
+            type: Boolean,
+            default: true
+        }
+    },
+    data: function data() {
+        return {
+            loaded: false,
 
-         readonly: true,
-         course: null,
-         version: 0,
-
-         activeIndex: 0,
-         user: {
-            contact_info: 0
-         },
-
-         userSettings: {
-            can_edit: true,
-            can_back: false,
-            hide_delete: true,
-            role: this.role
-         },
-         contactInfoSettings: {
-            id: 0,
-            user_id: 0,
-            can_edit: true,
-            can_back: false,
-            show_residence: true
-         },
-
-         backTuitionSettings: {
-            hide_create: false
-         },
-
-         signupRecordSettings: {
-            hide_create: false,
+            readonly: true,
+            course: null,
             version: 0,
-            can_select: false,
-            creating: false
 
-         },
-         lessonSettings: {
-            listing: true,
-            hide_create: false,
-            version: 0,
-            can_select: false,
-            creating: false,
-            initializing: false
+            activeIndex: 0,
+            user: {
+                contact_info: 0
+            },
 
-         }
-      };
-   },
+            userSettings: {
+                can_edit: true,
+                can_back: false,
+                hide_delete: true,
+                role: this.role
+            },
+            contactInfoSettings: {
+                id: 0,
+                user_id: 0,
+                can_edit: true,
+                can_back: false,
+                show_residence: true
+            },
 
-   computed: {},
-   beforeMount: function beforeMount() {
-      this.init();
-   },
+            backTuitionSettings: {
+                hide_create: false
+            },
 
-   methods: {
-      init: function init() {
-         this.loaded = false;
-         this.readonly = true;
-         this.activeIndex = 0;
+            signupRecordSettings: {
+                hide_create: false,
+                version: 0,
+                can_select: false,
+                creating: false
 
-         this.course = null;
-         this.user = {
-            contact_info: 0
-         };
-      },
-      toBoolean: function toBoolean(val) {
-         return val == 'true';
-      },
-      onDataLoaded: function onDataLoaded(course) {
-         this.loaded = true;
-         this.course = course;
-      },
-      btnEditClicked: function btnEditClicked() {
-         this.beginEdit();
-      },
-      beginEdit: function beginEdit() {
-         this.readonly = false;
-      },
-      editCanceled: function editCanceled() {
-         this.readonly = true;
-      },
-      onSignupInfoSaved: function onSignupInfoSaved(signupinfo) {
-         this.version += 1;
-      },
-      onCourseUpdated: function onCourseUpdated() {
-         this.init();
-      },
-      onBtnBackClicked: function onBtnBackClicked() {
-         this.$emit('btn-back-clicked');
-      },
-      onCourseDeleted: function onCourseDeleted() {
-         this.$emit('course-deleted');
-      },
-      onClasstimeChanged: function onClasstimeChanged() {
-         this.version += 1;
-      },
-      onScheduleChanged: function onScheduleChanged() {},
-      onSignupRecordSelected: function onSignupRecordSelected(id) {
-         this.$emit('signup-selected', id);
-      },
-      onBeginCreateSignupRecord: function onBeginCreateSignupRecord() {
-         this.signupRecordSettings.creating = true;
-      },
-      onCreateSignupCanceled: function onCreateSignupCanceled() {
-         this.signupRecordSettings.creating = false;
-         this.signupRecordSettings.version += 1;
-      },
-      onSignupCreated: function onSignupCreated() {
-         this.signupRecordSettings.creating = false;
-         this.signupRecordSettings.version += 1;
-      },
-      onLessonSelected: function onLessonSelected(id) {
-         Helper.newWindow('/lessons/' + id);
-      },
-      onBeginCreateLesson: function onBeginCreateLesson() {
-         this.lessonSettings.listing = false;
-         this.lessonSettings.initializing = false;
-         this.lessonSettings.creating = true;
-      },
-      onCreateLessonCanceled: function onCreateLessonCanceled() {
-         this.lessonSettings.listing = true;
-         this.lessonSettings.creating = false;
-         this.lessonSettings.initializing = false;
-         this.lessonSettings.version += 1;
-      },
-      onLessonCreated: function onLessonCreated() {
-         this.lessonSettings.creating = false;
-         this.lessonSettings.listing = true;
-         this.lessonSettings.initializing = false;
-         this.lessonSettings.version += 1;
-      },
-      onBeginLessonsInitialize: function onBeginLessonsInitialize() {
-         this.lessonSettings.initializing = true;
-         this.lessonSettings.listing = false;
-         this.lessonSettings.creating = false;
-      },
-      onLessonInitializeCanceled: function onLessonInitializeCanceled() {
-         this.lessonSettings.initializing = false;
-         this.lessonSettings.listing = true;
-         this.lessonSettings.creating = false;
-         this.lessonSettings.version += 1;
-      },
-      onLessonInitializeSuccess: function onLessonInitializeSuccess() {
-         Helper.BusEmitOK('初始化成功');
-         this.onLessonInitializeCanceled();
-      },
-      onLessonInitializeFailed: function onLessonInitializeFailed() {
-         Helper.BusEmitOK('初始化失敗');
-         this.onLessonInitializeCanceled();
-      },
-      onStatusSaved: function onStatusSaved(status) {
-         this.version += 1;
-      },
-      onSignupSelected: function onSignupSelected(signup_id) {
-         this.$emit('signup-selected', signup_id);
-      }
-   }
+            },
+            lessonSettings: {
+                listing: true,
+                hide_create: false,
+                version: 0,
+                can_select: false,
+                creating: false,
+                initializing: false
+
+            },
+
+            registerSettings: {
+                student_id: 0,
+                version: 0
+            }
+        };
+    },
+
+    computed: {},
+    beforeMount: function beforeMount() {
+        this.init();
+    },
+
+    methods: {
+        init: function init() {
+            this.loaded = false;
+            this.readonly = true;
+            this.activeIndex = 0;
+
+            this.course = null;
+            this.user = {
+                contact_info: 0
+            };
+        },
+        toBoolean: function toBoolean(val) {
+            return val == 'true';
+        },
+        onDataLoaded: function onDataLoaded(course) {
+            this.loaded = true;
+            this.course = course;
+        },
+        btnEditClicked: function btnEditClicked() {
+            this.beginEdit();
+        },
+        beginEdit: function beginEdit() {
+            this.readonly = false;
+        },
+        editCanceled: function editCanceled() {
+            this.readonly = true;
+        },
+        onSignupInfoSaved: function onSignupInfoSaved(signupinfo) {
+            this.version += 1;
+        },
+        onCourseUpdated: function onCourseUpdated() {
+            this.init();
+        },
+        onBtnBackClicked: function onBtnBackClicked() {
+            this.$emit('btn-back-clicked');
+        },
+        onCourseDeleted: function onCourseDeleted() {
+            this.$emit('course-deleted');
+        },
+        onClasstimeChanged: function onClasstimeChanged() {
+            this.version += 1;
+        },
+        onScheduleChanged: function onScheduleChanged() {},
+        onSignupRecordSelected: function onSignupRecordSelected(id) {
+            this.$emit('signup-selected', id);
+        },
+        onBeginCreateSignupRecord: function onBeginCreateSignupRecord() {
+            this.signupRecordSettings.creating = true;
+        },
+        onCreateSignupCanceled: function onCreateSignupCanceled() {
+            this.signupRecordSettings.creating = false;
+            this.signupRecordSettings.version += 1;
+        },
+        onSignupCreated: function onSignupCreated() {
+            this.signupRecordSettings.creating = false;
+            this.signupRecordSettings.version += 1;
+        },
+        onLessonSelected: function onLessonSelected(id) {
+            Helper.newWindow('/lessons/' + id);
+        },
+        onBeginCreateLesson: function onBeginCreateLesson() {
+            this.lessonSettings.listing = false;
+            this.lessonSettings.initializing = false;
+            this.lessonSettings.creating = true;
+        },
+        onCreateLessonCanceled: function onCreateLessonCanceled() {
+            this.lessonSettings.listing = true;
+            this.lessonSettings.creating = false;
+            this.lessonSettings.initializing = false;
+            this.lessonSettings.version += 1;
+        },
+        onLessonCreated: function onLessonCreated() {
+            this.lessonSettings.creating = false;
+            this.lessonSettings.listing = true;
+            this.lessonSettings.initializing = false;
+            this.lessonSettings.version += 1;
+        },
+        onBeginLessonsInitialize: function onBeginLessonsInitialize() {
+            this.lessonSettings.initializing = true;
+            this.lessonSettings.listing = false;
+            this.lessonSettings.creating = false;
+        },
+        onLessonInitializeCanceled: function onLessonInitializeCanceled() {
+            this.lessonSettings.initializing = false;
+            this.lessonSettings.listing = true;
+            this.lessonSettings.creating = false;
+            this.lessonSettings.version += 1;
+        },
+        onLessonInitializeSuccess: function onLessonInitializeSuccess() {
+            Helper.BusEmitOK('初始化成功');
+            this.onLessonInitializeCanceled();
+        },
+        onLessonInitializeFailed: function onLessonInitializeFailed() {
+            Helper.BusEmitOK('初始化失敗');
+            this.onLessonInitializeCanceled();
+        },
+        onStatusSaved: function onStatusSaved(status) {
+            this.version += 1;
+        },
+        onSignupSelected: function onSignupSelected(signup_id) {
+            this.$emit('signup-selected', signup_id);
+        },
+        onStudentSelected: function onStudentSelected(id) {
+            this.registerSettings.student_id = id;
+        },
+        onEditUser: function onEditUser(user_id) {
+            this.$emit('edit-user', user_id);
+        },
+        onEndStudentView: function onEndStudentView() {
+            this.registerSettings.student_id = 0;
+            this.registerSettings.version += 1;
+        }
+    }
 
 };
 
@@ -40217,8 +40257,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_register_view_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_register_view_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_student_view_vue__ = __webpack_require__(491);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_student_view_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_student_view_vue__);
-//
-//
 //
 //
 //
@@ -77897,7 +77935,30 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "id": "registers"
     }
-  }, [(_vm.activeIndex == 6) ? _c('div', [_vm._v("\r\n                      registers\r\n                     ")]) : _vm._e()]), _vm._v(" "), _c('div', {
+  }, [(_vm.activeIndex == 6) ? _c('div', [_c('register-view', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.registerSettings.student_id),
+      expression: "!registerSettings.student_id"
+    }],
+    attrs: {
+      "version": _vm.registerSettings.version,
+      "course_id": _vm.id
+    },
+    on: {
+      "signup-selected": _vm.onSignupSelected,
+      "student-selected": _vm.onStudentSelected
+    }
+  }), _vm._v(" "), (_vm.registerSettings.student_id) ? _c('student-view', {
+    attrs: {
+      "id": _vm.registerSettings.student_id
+    },
+    on: {
+      "edit-user": _vm.onEditUser,
+      "btn-back-clicked": _vm.onEndStudentView
+    }
+  }) : _vm._e()], 1) : _vm._e()]), _vm._v(" "), _c('div', {
     staticClass: "tab-pane fade",
     attrs: {
       "id": "lesson"
@@ -78019,7 +78080,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }) : _vm._e()])]), _vm._v(" "), _c('span', {
     slot: "btn"
-  }, [_c('button', {
+  }, [(_vm.canInit) ? _c('button', {
     staticClass: "btn btn-warning btn-sm",
     on: {
       "click": function($event) {
@@ -78032,7 +78093,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "aria-hidden": "true"
     }
-  }), _vm._v(" 初始化\n        ")])])]) : _vm._e()
+  }), _vm._v(" 初始化\n        ")]) : _vm._e()])]) : _vm._e()
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

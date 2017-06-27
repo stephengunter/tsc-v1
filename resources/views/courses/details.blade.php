@@ -4,7 +4,8 @@
 
    <course-details   :id="id" :can_back="can_back" 
      @btn-back-clicked="backToIndex" @course-deleted="onCourseDeleted"
-     @signup-selected="onSignupSelected" >
+     @signup-selected="onSignupSelected" 
+     @edit-user="onEditUser">
      
    </course-details>
 
@@ -41,6 +42,9 @@
             onSignupSelected(id){
                let url='/signups/' + id
                Helper.newWindow(url)
+            },
+            onEditUser(user_id){
+               Helper.newWindow('/users/' + user_id)
             }
 
         },

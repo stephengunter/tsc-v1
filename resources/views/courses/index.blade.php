@@ -11,7 +11,9 @@
        
 
        <course-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
-        @btn-back-clicked="backToIndex" @course-deleted="onDeleted">
+          @btn-back-clicked="backToIndex" @course-deleted="onDeleted"
+          @signup-selected="onSignupSelected" 
+          @edit-user="onEditUser" >
        </course-details>
       
        
@@ -65,6 +67,13 @@
                 this.version+=1
                 this.selected=0                 
             },
+            onSignupSelected(id){
+               let url='/signups/' + id
+               Helper.newWindow(url)
+            },
+            onEditUser(user_id){
+               Helper.newWindow('/users/' + user_id)
+            }
            
             
 

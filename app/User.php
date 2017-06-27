@@ -303,6 +303,13 @@ class User extends Authenticatable {
         } 
 		
 	}
+	public function toOption()
+	{		
+		 return [ 'text' =>   $this->profile->fullname,
+                  'value' => $this->id , 
+                ];
+		
+	}
 
 	
 

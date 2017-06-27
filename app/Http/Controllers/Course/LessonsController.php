@@ -57,13 +57,14 @@ class LessonsController extends BaseController
             return view('lessons.index')
                     ->with(['menus' => $menus]);
         } 
-        $course=(int)$request->course;
+        $course_id=(int)$request->course;
+        $course=$this->courses->findOrFail($course_id);
         
-        if(!$course) abort(404);
+        $canInit=$course->canInitLessons();
        
         $lessonList=$this->lessons->getAll()   
                                   ->with('classroom')
-                                  ->where('course_id', $course)
+                                  ->where('course_id', $course_id)
                                   ->filterPaginateOrder();
 
         if(count($lessonList)){
@@ -82,7 +83,10 @@ class LessonsController extends BaseController
             }
         }
         
-         return response() ->json(['model' => $lessonList  ]);  
+         return response() ->json([
+                                    'model' => $lessonList,
+                                    'canInit' => $canInit  
+                                  ]);  
        
        
     }

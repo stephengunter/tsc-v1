@@ -123,10 +123,13 @@ class Course extends Model
 
     public function validLessons()
     {
-        if(!$this->lessons()->count()) return null;
         return $this->lessons()->where('removed',false)->get();
     }
-   
+    public function canInitLessons()
+    {
+        if(  count($this->validLessons()) ) return false;
+        return true;
+    }
 
     public function validCategories()
     {
@@ -145,6 +148,7 @@ class Course extends Model
     {
         return $this->signups()->where('removed',false);
     }
+   
     public function canCreateAdmit()
     {
         if($this->admission) return false;

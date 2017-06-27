@@ -86,7 +86,17 @@
                 </div>
                 <div class="tab-pane fade" id="registers">
                     <div  v-if="activeIndex==6"  >
-                      registers
+                       <register-view  v-show="!registerSettings.student_id"
+                         :version="registerSettings.version" :course_id="id" 
+                         @signup-selected="onSignupSelected"
+                         @student-selected="onStudentSelected" >
+                      </register-view>
+
+
+                        <student-view v-if="registerSettings.student_id" :id="registerSettings.student_id"
+                           @edit-user="onEditUser"
+                           @btn-back-clicked="onEndStudentView"  >
+                        </student-view>
                      </div>  
                 </div>
                 <div class="tab-pane fade" id="lesson">
@@ -132,6 +142,10 @@
     import EditLesson from '../../components/lesson/edit.vue'
     import InitializeLessons from '../../components/lesson/initialize.vue'
     import AdmissionView from '../../components/admission/view.vue'
+    import RegisterView from '../../components/register/view.vue'
+    import StudentView from '../../components/student/view.vue'
+    
+
     
     
     export default {
@@ -147,7 +161,9 @@
            'lesson-list':LessonList,
            'edit-lesson':EditLesson,
            'lesson-initialize':InitializeLessons,
-           'admission-view':AdmissionView
+           'admission-view':AdmissionView,
+           'register-view':RegisterView,
+           'student-view':StudentView
         },
         props: {
             id: {
@@ -209,6 +225,11 @@
                    creating:false,
                    initializing:false,
 
+               },
+
+               registerSettings:{
+                   student_id:0,
+                   version:0
                }
             }
         },
@@ -324,6 +345,16 @@
             },
             onSignupSelected(signup_id){
                 this.$emit('signup-selected',signup_id)
+            },
+            onStudentSelected(id){
+                this.registerSettings.student_id=id
+            },
+            onEditUser(user_id){
+                this.$emit('edit-user',user_id)
+            },
+            onEndStudentView(){
+                 this.registerSettings.student_id=0
+                 this.registerSettings.version+=1
             }
              
             

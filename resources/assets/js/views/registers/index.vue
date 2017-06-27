@@ -22,9 +22,7 @@
 
     <student-view v-if="student_id" :id="student_id"
        @edit-user="onEditUser"
-       @btn-back-clicked="onEndStudentView"
-     >
-       
+       @btn-back-clicked="onEndStudentView"  >
     </student-view>
 
 </div>

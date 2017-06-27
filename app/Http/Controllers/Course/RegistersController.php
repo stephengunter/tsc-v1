@@ -146,7 +146,7 @@ class RegistersController extends BaseController
               
         });
         
-        return response() ->json([ 'register' => $register ]);
+        return response() ->json($register);
     }
     public function edit($id)
     {
@@ -213,7 +213,7 @@ class RegistersController extends BaseController
 
         $register->students()->saveMany($studentList);
         
-        return response() ->json([ 'register' => $register ]);   
+        return response() ->json($register);   
     }
 
     public function destroy($id)
