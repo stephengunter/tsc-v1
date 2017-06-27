@@ -28969,7 +28969,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
@@ -29019,11 +29018,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 sort: false,
                 default: true
             }, {
-                title: '出席狀況',
-                key: 'status',
-                sort: false,
-                default: true
-            }, {
                 title: '備註',
                 key: 'ps',
                 sort: false,
@@ -29057,9 +29051,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         init: function init() {
             this.searchParams.lesson = this.lesson_id;
             if (this.hide_create) this.createText = '';
-        },
-        getStatusLabel: function getStatusLabel(student) {
-            return LessonParticipant.getStatusLabel(student);
         },
         beginEdit: function beginEdit(id, ps) {
             this.selected = id;
@@ -39462,6 +39453,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_lesson_lesson_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_lesson_lesson_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_lesson_participant_list_vue__ = __webpack_require__(476);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_lesson_participant_list_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_lesson_participant_list_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_lesson_leave_list_vue__ = __webpack_require__(474);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_lesson_leave_list_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__components_lesson_leave_list_vue__);
 //
 //
 //
@@ -39504,6 +39497,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+
 
 
 
@@ -39512,7 +39506,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
    name: 'LessonDetails',
    components: {
       Lesson: __WEBPACK_IMPORTED_MODULE_0__components_lesson_lesson_vue___default.a,
-      'students': __WEBPACK_IMPORTED_MODULE_1__components_lesson_participant_list_vue___default.a
+      'students': __WEBPACK_IMPORTED_MODULE_1__components_lesson_participant_list_vue___default.a,
+      'leave-list': __WEBPACK_IMPORTED_MODULE_2__components_lesson_leave_list_vue___default.a
 
    },
    props: {
@@ -46489,24 +46484,6 @@ var LessonParticipant = function () {
                 });
             });
         }
-    }, {
-        key: 'getStatusLabel',
-        value: function getStatusLabel(data) {
-            var label = '';
-            switch (Number(data.status)) {
-                case -1:
-                    label = '<span class="label label-danger">缺席</span>';
-                    break;
-                case 0:
-                    label = '<span class="label label-warning">請假</span>';
-                    break;
-                case 1:
-                    label = '';
-                    break;
-
-            }
-            return label;
-        }
     }]);
 
     return LessonParticipant;
@@ -53240,7 +53217,7 @@ exports.push([module.i, "/*!\n *  Font Awesome 4.7.0 by @davegandy - http://font
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)();
-exports.push([module.i, "html * {\r\n    font-family: \"微軟正黑體\", \"Lato\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\r\n}\r\n\r\n.show-data {\r\n    font-size: 18px;\r\n}\r\n\r\n.label-title {\r\n    font-size: 15px;\r\n}\r\n\r\n.profile-img {\r\n    max-width: 200px;\r\n}\r\n\r\n.center-block {\r\n    display: block;\r\n    margin-right: auto;\r\n    margin-left: auto;\r\n}", ""]);
+exports.push([module.i, "html * {\r\n    font-family: \"微軟正黑體\", \"Lato\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\r\n}\r\n\r\n.show-data {\r\n    font-size: 18px;\r\n}\r\n\r\n.label-title {\r\n    font-size: 15px;\r\n}\r\n\r\n.profile-img {\r\n    max-width: 200px;\r\n}\r\n\r\n.center-block {\r\n    display: block;\r\n    margin-right: auto;\r\n    margin-left: auto;\r\n}\r\n\r\n.title {\r\n    text-align: center;\r\n}", ""]);
 
 /***/ }),
 /* 411 */
@@ -73659,7 +73636,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "id": "leaves"
     }
-  })])])]) : _vm._e()], 1)
+  }, [(_vm.activeIndex == 1) ? _c('leave-list', {
+    attrs: {
+      "lesson_id": _vm.id
+    }
+  }) : _vm._e()], 1)])])]) : _vm._e()], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -84925,11 +84906,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     },
     scopedSlots: {
       default: function(props) {
-        return [_c('tr', [_c('td', [_vm._v(_vm._s(props.item.number))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(props.item.user.profile.fullname))]), _vm._v(" "), _c('td', {
-          domProps: {
-            "innerHTML": _vm._s(_vm.getStatusLabel(props.item))
-          }
-        }), _vm._v(" "), (_vm.editting(props.item.id)) ? _c('td', [_c('textarea', {
+        return [_c('tr', [_c('td', [_vm._v(_vm._s(props.item.number))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(props.item.user.profile.fullname))]), _vm._v(" "), (_vm.editting(props.item.id)) ? _c('td', [_c('textarea', {
           directives: [{
             name: "model",
             rawName: "v-model",

@@ -43,6 +43,8 @@ Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@op
 Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
 Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);
 
+Route::get('lessons/{id}/print', '\App\Http\Controllers\Course\LessonsController@print');
+
 Route::get('teachers/options', '\App\Http\Controllers\Teacher\TeachersController@options');
 
 Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
@@ -88,7 +90,8 @@ Route::resource('import-schedules', '\App\Http\Controllers\Course\ImportSchedule
 Route::resource('lessons', '\App\Http\Controllers\Course\LessonsController');
 Route::resource('lessons-initialize', '\App\Http\Controllers\Course\LessonsInitializeController', 
                                      ['only' => ['create','store']]);   
-Route::resource('lesson-participants', '\App\Http\Controllers\Course\LessonParticipantsController');
+Route::resource('lesson-participants', '\App\Http\Controllers\Course\LessonParticipantsController',
+                                     ['only' => ['index','update']]);   
 Route::resource('leaves', '\App\Http\Controllers\Course\LeavesController');
 
 Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController');                                                                  

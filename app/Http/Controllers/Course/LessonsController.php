@@ -23,6 +23,7 @@ use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
 use Carbon\Carbon;
+use PDF;
 
 class LessonsController extends BaseController
 {
@@ -334,7 +335,40 @@ class LessonsController extends BaseController
             
     }
 
+    public function print($id)
+    {
+        $current_user=$this->currentUser();
+     
+        $lesson=Lesson::with('course','classroom')->findOrFail($id);
+        if($lesson->canEditBy($current_user)){
+            $updated_by=$current_user->id;
+            $lesson->checkStudents($updated_by);
+        }
 
+        $lesson->teachers=$lesson->teachers();
+        foreach ($lesson->teachers as $teacher) {
+                $teacher->name=$teacher->getName();
+        }
+        $lesson->volunteers=$lesson->volunteers();
+        
+        foreach ($lesson->volunteers as $volunteer) {
+                $volunteer->name=$volunteer->getName();
+        }
+
+        $studentList=$lesson->students()->with('user.profile')
+                                        ->get();
+        
+
+        $pdf = PDF::loadView('lessons.form', [
+                                 'lesson' => $lesson,
+                                 'studentList' => $studentList
+                            ]);
+        return $pdf->stream();
+        //return $pdf->download('lesson.pdf');
+
+        
+       
+    }
     
 
    

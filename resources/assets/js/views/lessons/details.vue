@@ -26,7 +26,7 @@
                     <students v-if="activeIndex==0" :lesson_id="id"></students>
                 </div>
                 <div class="tab-pane fade active in" id="leaves">
-                    <!-- <students v-if="activeIndex==1" :lesson_id="id"></students> -->
+                    <leave-list v-if="activeIndex==1"  :lesson_id="id"></leave-list>
                 </div>               
             </div>
         </div>
@@ -43,12 +43,14 @@
 <script>
     import Lesson from '../../components/lesson/lesson.vue'
     import LessonStudents from '../../components/lesson/participant/list.vue'
-    
+    import LeaveList from '../../components/lesson/leave/list.vue'
+
     export default {
         name: 'LessonDetails',
         components: {
             Lesson,
-            'students':LessonStudents
+            'students':LessonStudents,
+            'leave-list':LeaveList,
          
         },
         props: {

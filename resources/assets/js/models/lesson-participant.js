@@ -80,23 +80,7 @@ class LessonParticipant {
         })
     }
     
-    static getStatusLabel(data){
-        let label=''
-        switch (Number(data.status)) {
-            case -1 :
-                label = '<span class="label label-danger">缺席</span>'
-            break
-            case 0 :
-                label = '<span class="label label-warning">請假</span>'
-            break
-            case 1 :
-                label = ''
-            break
-           
-
-        }
-        return label
-    }
+    
     
     
    

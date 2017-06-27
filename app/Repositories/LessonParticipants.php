@@ -22,7 +22,6 @@ class LessonParticipants
         $values=[
                     'lesson_id' => $lesson_id,
                     'user_id' => $teacher_id,
-                    'status' => 0,  
                     'updated_by' => $updated_by           
                 ];
 
@@ -43,7 +42,6 @@ class LessonParticipants
         $values=[
                     'lesson_id' => $lesson_id,
                     'user_id' => $volunteer_id,
-                    'status' => 0,  
                     'updated_by' => $updated_by           
                 ];
 
@@ -90,8 +88,7 @@ class LessonParticipants
                 $id=$teacherIds[$i];
                 $values=[
                     'lesson_id' => $lesson_id,
-                    'user_id' => $id,
-                    'status' => 0,              
+                    'user_id' => $id,         
                     ];
 
                 $this->addTeacher($values);
@@ -107,7 +104,7 @@ class LessonParticipants
                      $values=[
                         'lesson_id' => $lesson_id,
                         'user_id' => $id,
-                        'status' => 0,              
+                               
                      ];
 
                     $this->addTeacher($values);
@@ -179,8 +176,7 @@ class LessonParticipants
                 $id=$volunteerIds[$i];
                 $values=[
                     'lesson_id' => $lesson_id,
-                    'user_id' => $id,
-                    'status' => 0,              
+                    'user_id' => $id,           
                     ];
 
                 $this->addVolunteer($values);
@@ -195,8 +191,7 @@ class LessonParticipants
                  {
                      $values=[
                         'lesson_id' => $lesson_id,
-                        'user_id' => $id,
-                        'status' => 0,              
+                        'user_id' => $id,          
                      ];
 
                     $this->addVolunteer($values);

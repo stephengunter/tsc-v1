@@ -25,7 +25,7 @@ class Helper
              $url= $url .'/' . $action;
          }
          if($query){
-             $url=  $url . "?" . http_build_query($query);
+             $url=  $url . '?' . http_build_query($query);
          }
 
          return $url;
@@ -121,6 +121,37 @@ class Helper
     {
         $date=Carbon::parse($date);
         return $date->hour*100 + $date->minute;
+    }
+
+    public static function getWeekdayChineses($date,$formated)
+    {
+        $date=Carbon::parse($date);
+        $weekday=$date->dayOfWeek;
+        $text='';
+        switch ($weekday) {
+            case 0:
+                $text = '日';
+                break;
+            case 1:
+                $text = '一';
+                break;
+            case 2:
+                $text = '二';
+                break;
+            case 3:
+                $text = '三';
+                break;
+            case 4:
+                $text = '四';
+                break;
+            case 5:
+                $text = '五';
+                break;
+            case 6:
+                $text = '六';
+        }
+        if ($formated) return '(' . $text . ')' ;
+        return $text;
     }
     
     

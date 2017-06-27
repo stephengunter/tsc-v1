@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Leave extends Model
 {
@@ -52,6 +53,15 @@ class Leave extends Model
 	public function canDeleteBy($user)
 	{
        	return $this->canEditBy($user);
+        
+	}
+
+    public function hours()
+	{
+       	$begin = Carbon::parse($this->begin_at);
+        $end = Carbon::parse($this->end_at);
+
+        return $end->diffInHours($begin);
         
 	}
 }

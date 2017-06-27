@@ -142,6 +142,24 @@ class Lesson extends Model
                                   ->first();
     }
 
+    public function checkStudents($updated_by)
+    {
+       $registerStudents=$this->getRegisterStudents();
+
+       if(count($registerStudents)){
+            foreach ($registerStudents as $student) {
+                $user_id=$student->user_id;
+                $exist=$this->findStudent($user_id);
+               
+                if(!$exist){
+                    $this->addStudent($user_id, $student->number ,$updated_by);
+                }
+
+            }
+           
+        } 
+    }
+
     public function students()
     {
          $role_name=Role::studentRoleName();

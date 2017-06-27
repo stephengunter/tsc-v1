@@ -9,7 +9,7 @@ class LessonParticipant extends Model
 {
     use FilterPaginateOrder;
 
-    protected $fillable = ['lesson_id', 'user_id', 'status', 
+    protected $fillable = ['lesson_id', 'user_id', 
 						    'role', 'ps','updated_by'
 						  ];
 

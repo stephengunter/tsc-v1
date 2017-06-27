@@ -19,3 +19,7 @@ html * {
     margin-right: auto;
     margin-left: auto;
 }
+
+.title {
+    text-align: center;
+}

@@ -173,7 +173,7 @@ class LeavesController extends BaseController
 
     private function userOptions($lesson)
     {
-        $students=$lesson->students()->with('user.profile')->get();
+        $students=$lesson->lessonParticipants()->with('user.profile')->get();
         $userOptions=[];
         foreach($students as $lessonParticipant)
         {

@@ -11,7 +11,6 @@
             <tr>    
                <td>{{ props.item.number }}</td>
                <td>{{ props.item.user.profile.fullname }}</td>
-               <td v-html="getStatusLabel(props.item)"></td>
               
                <td v-if="editting(props.item.id)">
                      <textarea rows="3" cols="30" class="form-control" v-model="props.item.ps"> </textarea>  
@@ -90,12 +89,7 @@
                         key: 'name',
                         sort: false,
                         default:true
-                    }, {
-                        title: '出席狀況',
-                        key: 'status',
-                        sort: false,
-                        default:true
-                    }, {
+                    },  {
                         title: '備註',
                         key: 'ps',
                         sort: false,
@@ -132,9 +126,7 @@
                 this.searchParams.lesson=this.lesson_id
                 if(this.hide_create) this.createText=''
             },
-            getStatusLabel(student){
-               return LessonParticipant.getStatusLabel(student)
-            },
+            
             beginEdit(id, ps){
                 this.selected=id
                 this.selectedPS=ps
