@@ -1,8 +1,9 @@
 <template>
 <tr v-if="readOnly" >
-     <td  v-text="leave.user.profile.name"></td> 
+     <td v-text="leave.user.profile.fullname"></td> 
+
      <td v-text="leave.typeName"></td>
-     <td v-html="formattedLeaveTime"></td>
+     <td v-html="formattedLeaveTime()"></td>
      <td v-text="leave.ps"></td>
      <td>
          <updated :entity="leave"></updated>
@@ -21,48 +22,31 @@
 <tr v-else>
     <td v-if="loaded">
        <drop-down  v-model="selectedUser" :options="userOptions" label="text"></drop-down>
-       <small class="text-danger" v-if="form.errors.has('signup.user_id')" v-text="form.errors.get('signup.user_id')"></small>
-
+       <small class="text-danger"  v-if="form.errors.has('leave.user_id')" v-text="form.errors.get('leave.user_id')"></small> 
+        
     </td> 
     <td v-if="loaded">
         <select  v-model="form.leave.type_id"  class="form-control" >
              <option v-for="item in typeOptions" :value="item.value" v-text="item.text"></option>
         </select>
     </td> 
-    <!-- <td v-if="loaded">
-        <div>
+    <td v-if="loaded" class="form-inline">
+       
+        <div class="form-group">
             <time-picker :minute-interval="10" v-model="begin_at" ></time-picker>
+           
         </div>
-        <small class="text-danger" v-if="form.errors.has('leave.begin_at')" v-text="form.errors.get('leave.begin_at')"></small>
-        
-        <div>
-            <time-picker :minute-interval="10" v-model="begin_at" ></time-picker>
-        </div>
-        <small class="text-danger" v-if="form.errors.has('leave.begin_at')" v-text="form.errors.get('leave.begin_at')"></small>
-    
-
-    </td> -->
-    <td v-if="loaded">
-        <form class="form-inline">
-            <div class="form-group">
-                <time-picker :minute-interval="10" v-model="begin_at" ></time-picker>
-                <!-- <small class="text-danger" v-if="form.errors.has('leave.begin_at')" v-text="form.errors.get('leave.begin_at')"></small> -->
-        
-            </div>
-                
-            <div class="form-group">
-                 <time-picker :minute-interval="10" v-model="begin_at" ></time-picker>
-                 <!-- <small class="text-danger" v-if="form.errors.has('leave.begin_at')" v-text="form.errors.get('leave.begin_at')"></small> -->
+        <div class="form-group">
+             <time-picker :minute-interval="10" v-model="end_at" ></time-picker>
             
-            </div>
-        </form>
-         <small class="text-danger">cccccccccccccccc</small>  
+        </div>
+      
+        <small class="text-danger"  v-if="form.errors.has('leave.time')" v-text="form.errors.get('leave.time')"></small> 
+        
     </td>
     <td v-if="loaded">
-        
-       
-       <!--  <small class="text-danger" v-if="form.errors.has('leave.end_at')"  v-text="form.errors.get('leave.end_at')"></small>
-        -->         
+          <textarea rows="3" cols="50" class="form-control" name="leave.ps"   v-model="form.leave.ps" >
+          </textarea>    
 
     </td>
     <td>
@@ -71,12 +55,12 @@
    
     <td v-if="loaded">
          
-       <!--  <button @click.prevent="onSubmit"  class="btn btn-success btn-xs">
+        <button @click.prevent="onSubmit"  class="btn btn-success btn-xs" :disabled="form.errors.any()">
             <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
         </button>  
          <button  class="btn btn-default btn-xs" @click.prevent="cancelEdit">
              <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
-        </button> -->
+        </button>
     </td> 
 </tr>  
 </template>
@@ -102,20 +86,26 @@
         },
         watch:{
             begin_at: function (val) {
+              
                 let time=Helper.getTimeSelected(val)
 
-                if(time){
-                    this.clearErrorMsg('leave.begin_at')
-                    this.form.leave.begin=time
-                }
+                this.clearErrorMsg('leave.time')
+                this.form.leave.begin_at=time
             },
             end_at: function (val) {
                 let time=Helper.getTimeSelected(val)
 
-                if(time){
-                    this.clearErrorMsg('leave.end_at')
-                    this.form.leave.end=time
-                }
+                this.clearErrorMsg('leave.time')
+                this.form.leave.end_at=time
+            },
+            selectedUser: {
+              handler: function () {
+                  this.form.leave.user_id=this.selectedUser.value
+                  if( Helper.tryParseInt(this.form.leave.user_id) > 0 ){
+                     this.clearErrorMsg('leave.user_id')
+                  }
+              },
+              deep: true
             },
         },
         data() {
@@ -176,8 +166,8 @@
                         leave: leave
                     }) 
 
-                    this.begin=Helper.getTimeobj(leave.begin)
-                    this.end=Helper.getTimeobj(leave.end)
+                    this.begin_at=Helper.getTimeobj(leave.begin_at)
+                    this.end_at=Helper.getTimeobj(leave.end_at)
                     
                     this.userOptions=data.userOptions
                     this.typeOptions=data.typeOptions
@@ -190,8 +180,9 @@
                 })
             },
             formattedLeaveTime(){
+               
                 if(!this.leave) return ''
-                 return  Leave.classTimeFullText(this.leave)
+                 return  Leave.timeFullText(this.leave)
             },
             beginEdit(){
               
@@ -204,14 +195,11 @@
             cancelEdit(){
                 this.$emit('canceled')
                
-            },
-            setActive(val){
-                this.form.leave.active=val
-            },            
+            },          
             btnDeleteClicked(){
                 let values={
                     id:this.getId(),
-                    name:this.leaveFulltext()
+                    name:this.leave.user.profile.fullname + '  ' + this.leave.typeName
                 }
                 this.$emit('btn-delete-clicked' , values)
             },

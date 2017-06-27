@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="panel panel-default show-data">
+    <div class="panel panel-default">
         <div class="panel-heading">
             <span class="panel-title">
                 <h4 v-html="title"></h4>
@@ -16,12 +16,12 @@
             <table  class="table table-striped" style="width: 99%;">
              <thead> 
                 <tr> 
-                    <th style="width:15%">姓名</th> 
+                    <th style="width:22%">姓名</th> 
                     <th style="width:10%">假別</th> 
-                    <th style="width:40%">時間</th>
+                    <th style="width:35%">時間</th>
                     <th style="width:15%">備註</th>
                     <th style="width:10%">最後更新</th> 
-                    <th style="width:10%"></th>
+                    <th style="width:8%"></th>
                 </tr> 
             </thead>
             <tbody> 
@@ -39,9 +39,9 @@
 
     </div>   
                    
-    <!-- <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
       @close="closeConfirm" @confirmed="deleteLeave">        
-    </delete-confirm>   -->     
+    </delete-confirm>       
 
     
 
@@ -145,7 +145,7 @@
                  this.init()
             },
             onBtnDeleteClicked(values){
-                this.deleteConfirm.msg='確定要刪除折扣： ' + values.name + ' 嗎？'
+                this.deleteConfirm.msg='確定要刪除紀錄： ' + values.name + ' 嗎？'
                 this.deleteConfirm.id=values.id
                 this.deleteConfirm.show=true     
                 

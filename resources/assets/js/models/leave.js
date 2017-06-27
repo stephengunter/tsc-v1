@@ -142,6 +142,12 @@ class Leave {
                 })  
     }
 
+    static timeFullText(leave){
+      let begin= Moment(leave.begin_at).format('YYYY-MM-DD HH:mm')
+      let end= Moment(leave.end_at).format('YYYY-MM-DD HH:mm')
+           return begin + ' ~ ' + end
+    }
+
     
    
     

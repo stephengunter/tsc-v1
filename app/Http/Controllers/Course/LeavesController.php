@@ -16,6 +16,8 @@ use App\Repositories\Leaves;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
+use Carbon\Carbon;
+
 class LeavesController extends BaseController
 {
    
@@ -37,24 +39,36 @@ class LeavesController extends BaseController
         $lesson_id=(int)$request->lesson;
         if(!$lesson_id) abort(404);
 
+        
         $user_id=(int)$request->user;
 
         $leaveList=Leave::where('lesson_id',$lesson_id);
         if($user_id){
             $leaveList=Leave::where('user_id',$user_id);
         }
-
-        $leaveList=$leaveList->get();
+        $current_user=$this->currentUser();
+        $leaveList=$leaveList->with('user.profile')
+                             ->orderBy('type_id')->get();
+        if(count($leaveList)){
+            foreach($leaveList as $leave)
+            {
+                $leave->typeName= $leave->typeName();
+                $leave->canEdit= $leave->canEditBy($current_user);
+                $leave->canDelete= $leave->canDeleteBy($current_user);
+            }
+        }
+        
         return response()->json(['leaveList' => $leaveList]);           
 
     }
 
     public function  create()
     {
+
         $request=request();
         $lesson_id=(int)$request->lesson;
         $lesson=Lesson::findOrFail($lesson_id);
-        $leave=Leave::initialize();
+        $leave=Leave::initialize($lesson);
         $typeOptions=$this->leaves->options();
 
         $students=$lesson->students()->with('user.profile')->get();
@@ -64,6 +78,7 @@ class LeavesController extends BaseController
             $item=$lessonParticipant->toOption();
             array_push($userOptions,  $item);
         }
+        
         return response()
                    ->json([ 
                             'leave' => $leave ,
@@ -71,20 +86,29 @@ class LeavesController extends BaseController
                             'userOptions' => $userOptions 
                           ]); 
     }
-    
-    public function show($id)
+    public function store(LeaveRequest $request)
     {
         $current_user=$this->currentUser();
-        $leave=Leave::findOrFail($id);
-        if($leave->hasRemoved()) {
-            abort(404);
-        }
-        $leave->canEdit=$leave->canEditBy($current_user);
-        $leave->canDelete=$leave->canDeleteBy($current_user);
+        $updated_by=$current_user->id;
+        
 
-        return response()->json(['leave' => $leave ]);   
+        $lesson_id=$request->getLessonId();
+        $lesson=Lesson::findOrFail($lesson_id);
+        if(!$lesson->canEditBy($current_user)){
+            return  $this->unauthorized();  
+        }  
+        $error=$request->check($lesson);
+        if($error){
+            return   response()->json($error ,  422); 
+        }
+
+        $values=$request->getValues($lesson,$updated_by);
        
+        $leave=Leave::create($values);
+
+         return response() ->json($leave);  
     }
+    
     public function edit($id)
     {
         $current_user=$this->currentUser();
@@ -133,6 +157,19 @@ class LeavesController extends BaseController
 
         return response()->json(['leave' => $leave ]);   
     }
+    public function destroy($id)
+    {
+        $leave=Leave::findOrFail($id);
+        $current_user=$this->currentUser();
+        if(!$leave->canDeleteBy($current_user)){
+            return  $this->unauthorized();
+        }   
+
+        $leave->delete();
+
+        return response()->json(['deleted' => true ]);     
+    }
+
 
     public function options()
     {
