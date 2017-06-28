@@ -339,11 +339,19 @@ class LessonsController extends BaseController
     {
         $current_user=$this->currentUser();
      
-        $lesson=Lesson::with('course','classroom')->findOrFail($id);
+        $lesson=Lesson::with('course.center','classroom')->findOrFail($id);
         if($lesson->canEditBy($current_user)){
             $updated_by=$current_user->id;
-            $lesson->checkStudents($updated_by);
+            $studentList=$lesson->checkStudents($updated_by)
+                                ->with('user.profile')
+                                ->get();
+           
+        }else{
+            $studentList=$lesson->students()->with('user.profile')
+                                            ->get();
         }
+
+        
 
         $lesson->teachers=$lesson->teachers();
         foreach ($lesson->teachers as $teacher) {
@@ -355,16 +363,22 @@ class LessonsController extends BaseController
                 $volunteer->name=$volunteer->getName();
         }
 
-        $studentList=$lesson->students()->with('user.profile')
-                                        ->get();
-        
+        $lesson->time=$lesson->formattedTime();
+       
 
+        $rows=floor(count($studentList)/2);
+       
+        $title=$lesson->course->name . $lesson->date . '課堂紀錄表'; 
         $pdf = PDF::loadView('lessons.form', [
+                                 'title' => $title,
                                  'lesson' => $lesson,
-                                 'studentList' => $studentList
+                                 'studentList' => $studentList,
+                                  'rows' => $rows
                             ]);
+
+                           
         return $pdf->stream();
-        //return $pdf->download('lesson.pdf');
+      
 
         
        

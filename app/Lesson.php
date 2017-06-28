@@ -112,6 +112,13 @@ class Lesson extends Model
         
 	}
 
+    public function formattedTime()
+    {
+        $text= $this->date . ' ' . Helper::getWeekdayChineses($this->date,true) . ' ';
+        $text=$text . Helper::getFormattedTime($this->on) . ' - ' . Helper::getFormattedTime($this->off);
+        return $text;
+    }
+
     public function getHours()
 	{
         $on=Helper::getHourMinute($this->on);
@@ -129,9 +136,9 @@ class Lesson extends Model
     {
         $lesson_date=date($this->date);
         $studentList=Student::where('course_id',$this->course_id)
-                              ->whereDate('join_date','<=',$lesson_date)
-                              ->orderBy('number')
-                              ->get();
+                            ->whereDate('join_date','<=',$lesson_date)
+                            ->orderBy('number');
+                              
         return $studentList;
 
     }
@@ -147,7 +154,8 @@ class Lesson extends Model
        $registerStudents=$this->getRegisterStudents();
 
        if(count($registerStudents)){
-            foreach ($registerStudents as $student) {
+            $students=$registerStudents->get();
+            foreach ($students as $student) {
                 $user_id=$student->user_id;
                 $exist=$this->findStudent($user_id);
                
@@ -157,7 +165,9 @@ class Lesson extends Model
 
             }
            
-        } 
+        }
+
+        return  $registerStudents;
     }
 
     public function students()

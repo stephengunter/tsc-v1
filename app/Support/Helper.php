@@ -117,6 +117,13 @@ class Helper
             'minute' => (int)$minute
         ];
     }
+    public static function getFormattedTime($val)
+    {
+        $value=self::getHourMinute($val);
+        $hour=$value['hour'] * 100;
+        $minute=$value['minute'];
+        return $hour + $minute;
+    }
     public static function getTimeNumber($date)
     {
         $date=Carbon::parse($date);
