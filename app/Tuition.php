@@ -22,6 +22,7 @@ class Tuition extends Model
     {
 		   return $this->belongsTo('App\Signup');
 	}
+    
 
     public static function initialize($signup,$refund=null)
     {

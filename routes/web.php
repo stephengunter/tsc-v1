@@ -32,6 +32,7 @@ Route::get('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsCont
 Route::post('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@store');
 Route::get('signups/index-options', '\App\Http\Controllers\Signups\SignupsController@indexOptions');
 Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsController@statusOptions');
+Route::get('signups/{id}/print', '\App\Http\Controllers\Signups\SignupsController@print');
 
 Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
 

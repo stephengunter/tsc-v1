@@ -3,7 +3,8 @@
 @section('content')
 
    <lesson-details   :id="id" :can_back="can_back" 
-     @btn-back-clicked="backToIndex" @lesson-deleted="onLessonDeleted" >
+     @btn-back-clicked="backToIndex" @lesson-deleted="onLessonDeleted" 
+     @print-lesson="onPrintLesson">
      
    </lesson-details>
 
@@ -37,6 +38,10 @@
             backToIndex(){
                Helper.redirect('/lessons')
             },
+            onPrintLesson(id){
+                let url='/lessons/' + id + '/print'
+                Helper.newWindow(url)
+            }
             // onSignupSelected(id){
             //    let url='/signups/' + id
             //    Helper.newWindow(url)

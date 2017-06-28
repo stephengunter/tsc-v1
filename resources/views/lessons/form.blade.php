@@ -69,7 +69,6 @@
         </td>
     </tr> 
 </table>
-{{-- <h4>學員名單</h4> --}}
 <table style="width:99%;">
     
 <caption>學員名單</caption>

@@ -12,6 +12,9 @@
                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
                  返回
               </button>
+              <button @click="btnPrintClicked" class="btn btn-warning btn-sm" >
+                 <span class="glyphicon glyphicon-print" aria-hidden="true"></span> 列印收據
+              </button>
               <button  v-if="signup.canEdit" v-show="can_edit" @click="btnEditClicked" class="btn btn-primary btn-sm" >
                   <span class="glyphicon glyphicon-pencil"></span> 編輯
               </button>
@@ -143,9 +146,9 @@
                this.$emit('btn-delete-clicked',values)
             
             },
-            showUpdatedBy(){
-                Bus.$emit('onShowEditor',this.signup.updated_by)
-            },
+            btnPrintClicked(){
+               this.$emit('print-invoice',this.id)
+            }
         }, 
     }
 </script>

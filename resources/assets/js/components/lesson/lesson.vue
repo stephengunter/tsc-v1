@@ -3,7 +3,8 @@
     
     <show v-if="readOnly"  :id="id" can_edit="can_edit"  :can_back="can_back"  
        :version="version"  @begin-edit="beginEdit" @loaded="onDataLoaded"
-       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" >                 
+       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" 
+       @print-lesson="onPrintLesson">                 
     </show>
 
     <edit v-else :id="id" 
@@ -111,6 +112,9 @@
                     this.closeConfirm()   
                 })
             },
+            onPrintLesson(id){
+                this.$emit('print-lesson',id)
+            }
             
         }
     }

@@ -2,7 +2,8 @@
 <div>
   <lesson v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
      @saved="lessonUpdated" @loaded="onDataLoaded" :version="current_version"
-     @btn-back-clicked="onBtnBackClicked" @deleted="onLessonDeleted" > 
+     @btn-back-clicked="onBtnBackClicked" @deleted="onLessonDeleted" 
+     @print-lesson="onPrintLesson"> 
 
   </lesson>
 
@@ -129,6 +130,9 @@
             onLessonDeleted(){
                this.$emit('lesson-deleted')
             },
+            onPrintLesson(id){
+                this.$emit('print-lesson',id)
+            }
            
         }, 
 

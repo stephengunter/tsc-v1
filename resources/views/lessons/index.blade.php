@@ -7,7 +7,8 @@
    </lesson-index> 
 
    <lesson-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
-     @btn-back-clicked="backToIndex" @lesson-deleted="onLessonDeleted">
+     @btn-back-clicked="backToIndex" @lesson-deleted="onLessonDeleted"
+     @print-lesson="onPrintLesson" >
   </lesson-details>
 
    <lesson-create v-if="creating"   :course_id="course_id"
@@ -79,6 +80,10 @@
                  this.selected=0
                  this.creating=false
                  this.version +=1
+            },
+            onPrintLesson(id){
+                let url='/lessons/' + id + '/print'
+                Helper.newWindow(url)
             }
 
         },

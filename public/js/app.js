@@ -28779,6 +28779,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 
@@ -28872,6 +28873,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 Helper.BusEmitError(error, '刪除失敗');
                 _this.closeConfirm();
             });
+        },
+        onPrintLesson: function onPrintLesson(id) {
+            this.$emit('print-lesson', id);
         }
     }
 };
@@ -29380,6 +29384,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
@@ -29450,6 +29457,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             id: this.id
          };
          this.$emit('btn-delete-clicked', values);
+      },
+      btnPrintClicked: function btnPrintClicked() {
+         this.$emit('print-lesson', this.id);
       }
    }
 };
@@ -32638,6 +32648,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = {
@@ -32712,8 +32725,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
          };
          this.$emit('btn-delete-clicked', values);
       },
-      showUpdatedBy: function showUpdatedBy() {
-         Bus.$emit('onShowEditor', this.signup.updated_by);
+      btnPrintClicked: function btnPrintClicked() {
+         this.$emit('print-invoice', this.id);
       }
    }
 };
@@ -39599,6 +39612,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 
@@ -39689,6 +39703,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       },
       onLessonDeleted: function onLessonDeleted() {
          this.$emit('lesson-deleted');
+      },
+      onPrintLesson: function onPrintLesson(id) {
+         this.$emit('print-lesson', id);
       }
    }
 
@@ -70200,7 +70217,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "aria-hidden": "true"
     }
-  }), _vm._v("\n             返回\n          ")]), _vm._v(" "), (_vm.signup.canEdit) ? _c('button', {
+  }), _vm._v("\n             返回\n          ")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-warning btn-sm",
+    on: {
+      "click": _vm.btnPrintClicked
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-print",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v(" 列印收據\n          ")]), _vm._v(" "), (_vm.signup.canEdit) ? _c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -70819,7 +70846,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "aria-hidden": "true"
     }
-  }), _vm._v("\n              返回\n           ")]), _vm._v(" "), (_vm.lesson.canEdit) ? _c('button', {
+  }), _vm._v("\n              返回\n           ")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-warning btn-sm",
+    on: {
+      "click": _vm.btnPrintClicked
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-print",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v(" 列印\n           ")]), _vm._v(" "), (_vm.lesson.canEdit) ? _c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -73585,7 +73622,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "saved": _vm.lessonUpdated,
       "loaded": _vm.onDataLoaded,
       "btn-back-clicked": _vm.onBtnBackClicked,
-      "deleted": _vm.onLessonDeleted
+      "deleted": _vm.onLessonDeleted,
+      "print-lesson": _vm.onPrintLesson
     }
   }), _vm._v(" "), (_vm.loaded) ? _c('div', {
     staticClass: "panel with-nav-tabs panel-default",
@@ -75313,7 +75351,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "begin-edit": _vm.beginEdit,
       "loaded": _vm.onDataLoaded,
       "btn-back-clicked": _vm.onBtnBackClicked,
-      "btn-delete-clicked": _vm.beginDelete
+      "btn-delete-clicked": _vm.beginDelete,
+      "print-lesson": _vm.onPrintLesson
     }
   }) : _c('edit', {
     attrs: {

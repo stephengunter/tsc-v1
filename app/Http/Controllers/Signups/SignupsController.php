@@ -9,6 +9,7 @@ use App\Http\Requests\Signups\SignupRequest;
 
 use App\Repositories\Courses;
 use App\Repositories\Discounts;
+use App\Repositories\Payways;
 use App\Repositories\Signups;
 use App\Repositories\Users;
 use App\Repositories\Terms;
@@ -22,11 +23,12 @@ use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
 use App\Events\SignupChanged;
+use PDF;
 
 class SignupsController extends BaseController
 {
     protected $key='signups';
-    public function __construct(Courses $courses, Discounts $discounts,
+    public function __construct(Courses $courses, Discounts $discounts,Payways $payways,
                                 Terms $terms , Centers $centers, 
                                   Signups $signups, Users $users, CheckAdmin $checkAdmin) 
                                
@@ -37,6 +39,7 @@ class SignupsController extends BaseController
 
 		 $this->courses=$courses;
          $this->discounts=$discounts;
+         $this->payways=$payways;
          $this->terms=$terms;
          $this->centers=$centers;
          $this->signups=$signups;
@@ -257,15 +260,12 @@ class SignupsController extends BaseController
             return  $this->unauthorized(); 
         }
 
-         $signup->canEdit=$signup->canEditBy($current_user);
-         $signup->canDelete=$signup->canDeleteBy($current_user);
-         $signup->hasRefund=$signup->hasRefund();
+        $signup->canEdit=$signup->canEditBy($current_user);
+        $signup->canDelete=$signup->canDeleteBy($current_user);
+        $signup->hasRefund=$signup->hasRefund();
 
-         return response()
-                ->json([
-                    'signup' => $signup
-                ]);
-       
+        return response()->json([ 'signup' => $signup ]);
+
     }
     public function destroy($id)
     {
@@ -282,6 +282,45 @@ class SignupsController extends BaseController
                 ->json([
                     'deleted' => true
                 ]);
+    }
+    public function print($id)
+    {
+        $current_user=$this->currentUser();
+     
+        $signup=Signup::with('course','user.profile')->findOrFail($id);
+        $invoiceMoney=$signup->invoiceMoney();
+        $date='';
+
+        if($invoiceMoney > 0){
+            $incomeRecords=$signup->incomeRecords()
+                                  ->orderBy('date','desc');
+            $date=$incomeRecords->first();
+
+        }
+
+        $invoice=[
+            'money'=> $invoiceMoney,
+            'date' => $date
+        ];
+       
+        $title=$signup->course->name . ' 課程費用收據'; 
+        return view('lessons.form')->with([
+            'title' => $title,
+                                 'signup' => $signup,
+                                 'invoice' => $invoice
+        ]);
+        $pdf = PDF::loadView('lessons.form', [
+                                 'title' => $title,
+                                 'signup' => $signup,
+                                 'invoice' => $invoice
+                            ]);
+
+                           
+        return $pdf->stream();
+      
+
+        
+       
     }
     public function getByUser($user)
     {

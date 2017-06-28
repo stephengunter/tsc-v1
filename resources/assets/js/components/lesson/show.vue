@@ -9,6 +9,9 @@
                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
                  返回
               </button>
+              <button @click="btnPrintClicked" class="btn btn-warning btn-sm" >
+                 <span class="glyphicon glyphicon-print" aria-hidden="true"></span> 列印
+              </button>
               <button  v-if="lesson.canEdit" v-show="can_edit" @click="btnEditClicked" class="btn btn-primary btn-sm" >
                   <span class="glyphicon glyphicon-pencil"></span> 編輯
               </button>
@@ -164,6 +167,9 @@
                this.$emit('btn-delete-clicked',values)
             
             },
+            btnPrintClicked(){
+               this.$emit('print-lesson',this.id)
+            }
           
         }, 
     }

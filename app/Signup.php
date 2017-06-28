@@ -56,12 +56,21 @@ class Signup extends Model
         return $this->refund;
 	}
 
+    public function invoiceMoney()
+    {
+        $totalIncome=$this->incomeRecords()->sum('amount');
+                                        
+        return $totalIncome;
+    }
+    public function incomeRecords()
+    {
+        return $this->tuitions()->where('refund',false);
+    }
+
     public function tuitions() 
 	{
 		return $this->hasMany('App\Tuition');
 	}
-
-    
 
 
     public function canViewBy($user)
