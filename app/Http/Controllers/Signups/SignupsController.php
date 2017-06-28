@@ -261,8 +261,11 @@ class SignupsController extends BaseController
         }
 
         $signup->canEdit=$signup->canEditBy($current_user);
-        $signup->canDelete=$signup->canDeleteBy($current_user);
+        $signup->canDelete=$signup->canDeleteBy($current_user);        
         $signup->hasRefund=$signup->hasRefund();
+
+        $invoiceMoney=$signup->invoiceMoney();
+        $signup->hasInvoice=$invoiceMoney > 0;
 
         return response()->json([ 'signup' => $signup ]);
 
@@ -287,29 +290,38 @@ class SignupsController extends BaseController
     {
         $current_user=$this->currentUser();
      
-        $signup=Signup::with('course','user.profile')->findOrFail($id);
+        $signup=Signup::with('course.center','user.profile')->findOrFail($id);
+        $signup->course->center->contactInfo=$signup->course->center->contactInfo();
+        
         $invoiceMoney=$signup->invoiceMoney();
         $date='';
+        $payBy='';
 
         if($invoiceMoney > 0){
-            $incomeRecords=$signup->incomeRecords()
-                                  ->orderBy('date','desc');
-            $date=$incomeRecords->first();
+            $incomeRecord=$signup->incomeRecords()
+                                  ->orderBy('date','desc')
+                                  ->first();
+            $date=$incomeRecord->date;
+            $payBy=$this->payways->textPayBy($incomeRecord->pay_by);
+           
 
         }
 
         $invoice=[
-            'money'=> $invoiceMoney,
-            'date' => $date
+            'money'=> Helper::formatMoney($invoiceMoney),
+            'date' => $date,
+            'payBy' => $payBy
         ];
+
+        $signup->tuition=Helper::formatMoney($signup->tuition);
        
         $title=$signup->course->name . ' 課程費用收據'; 
-        return view('lessons.form')->with([
-            'title' => $title,
-                                 'signup' => $signup,
-                                 'invoice' => $invoice
-        ]);
-        $pdf = PDF::loadView('lessons.form', [
+        // return view('signups.invoice')->with([
+        //     'title' => $title,
+        //                          'signup' => $signup,
+        //                          'invoice' => $invoice
+        // ]);
+        $pdf = PDF::loadView('signups.invoice', [
                                  'title' => $title,
                                  'signup' => $signup,
                                  'invoice' => $invoice

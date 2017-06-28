@@ -160,6 +160,19 @@ class Helper
         if ($formated) return '(' . $text . ')' ;
         return $text;
     }
+
+    public static function formatMoney($val)
+    {
+       
+        $strValue=(String)$val;
+        $pos=strpos($strValue, '.',0);
+        if(!$pos) return $strValue;
+
+        $cents=(int)substr($strValue , $pos+1 );
+        if ($cents > 0) return $strValue;
+        return substr($strValue ,0, $pos );
+
+    }
     
     
 

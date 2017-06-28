@@ -12,7 +12,7 @@
                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
                  返回
               </button>
-              <button @click="btnPrintClicked" class="btn btn-warning btn-sm" >
+              <button v-if="signup.hasInvoice" @click="btnPrintClicked" class="btn btn-warning btn-sm" >
                  <span class="glyphicon glyphicon-print" aria-hidden="true"></span> 列印收據
               </button>
               <button  v-if="signup.canEdit" v-show="can_edit" @click="btnEditClicked" class="btn btn-primary btn-sm" >
