@@ -7,7 +7,8 @@
    </signup-index> 
 
    <signup-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
-     @btn-back-clicked="backToIndex" @signup-deleted="onSignupDeleted">
+     @btn-back-clicked="backToIndex" @signup-deleted="onSignupDeleted"
+      @print-invoice="onPrintInvoice">
   </signup-details>
 
    <signup-create v-if="creating"   :course_id="course_id"
@@ -79,6 +80,10 @@
                  this.selected=0
                  this.creating=false
                  this.version +=1
+            },
+            onPrintInvoice(id){
+               let url='/signups/' + id + '/print'
+               Helper.newWindow(url)
             }
 
         },

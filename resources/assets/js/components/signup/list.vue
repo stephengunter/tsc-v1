@@ -68,6 +68,10 @@
                type: Boolean,
                default: true
             },
+            for_refund:{
+               type: Boolean,
+               default: false
+            },
         },
         beforeMount() {
            this.init()
@@ -137,19 +141,33 @@
                 
             },
             loadStatusOptions(){
-                 return new Promise((resolve, reject) => {
-                    let options=Signup.statusOptions()
-                    options.then(data => {
+               
+                return new Promise((resolve, reject) => {
+                   if(this.for_refund){
+                       this.statusOptions = [
+                                               {
+                                                  text:'已繳費',
+                                                  value:1,
+                                               }
+                                            ]
+                       resolve(1)                      
+                   }else{
+                      let options=Signup.statusOptions()
+                      options.then(data => {
                         this.statusOptions = data.options
                         let allStatuses={ text:'總數' , value:'-9' }
                         this.statusOptions.splice(0, 0, allStatuses);
                         resolve(this.statusOptions[0].value);
-                    })
-                    .catch(error => {
+                      })
+                      .catch(error => {
                         console.log(error)
                         reject(error.response);
-                    })
+                      })
+                   }
+                   
                 })   //End Promise
+              
+                 
             },
             onDataLoaded(data){
                 if(data.summary)  this.summary=data.summary

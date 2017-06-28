@@ -316,11 +316,6 @@ class SignupsController extends BaseController
         $signup->tuition=Helper::formatMoney($signup->tuition);
        
         $title=$signup->course->name . ' 課程費用收據'; 
-        // return view('signups.invoice')->with([
-        //     'title' => $title,
-        //                          'signup' => $signup,
-        //                          'invoice' => $invoice
-        // ]);
         $pdf = PDF::loadView('signups.invoice', [
                                  'title' => $title,
                                  'signup' => $signup,

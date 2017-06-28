@@ -42,7 +42,7 @@ class Refund extends Model
             'cost' => 0,
             'charge' => 0,
             'status' => -1,
-             'pay_by' => 0,
+             'pay_by' => 1,
              'bank_branch'=>'',
              'account_owner'=>'',
              'account_number'=>'',

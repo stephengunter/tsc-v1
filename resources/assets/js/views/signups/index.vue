@@ -13,7 +13,7 @@
      </div>
      
     <signup-list v-if="ready" :course_id="course_id" :hide_create="hide_create" 
-        :version="version" :can_select="can_select"
+        :version="version" :can_select="can_select" :for_refund="for_refund"
         @selected="onSelected" @begin-create="onBeginCreate">
     </signup-list>
 
@@ -38,7 +38,11 @@
             hide_create:{
                type: Boolean,
                default: false
-            }
+            },
+            for_refund:{
+               type: Boolean,
+               default: false
+            },
         },
         data() {
             return {

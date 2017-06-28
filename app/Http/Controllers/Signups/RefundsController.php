@@ -128,7 +128,7 @@ class RefundsController extends BaseController
         $signup=Signup::with('course','user.profile')->findOrFail($signup_id);
         $refund=Refund::initialize($signup);
 
-        $payOptions=$this->payways->getAll();
+        $payOptions=$this->payways->bankOnly();
         
         return response()
             ->json([
@@ -140,7 +140,7 @@ class RefundsController extends BaseController
     }
     public function store(RefundRequest $request)
     {
-         $current_user=$this->checkAdmin->getAdmin();
+         $current_user=$this->currentUser();
          $removed=false;
          $updated_by=$current_user->id;
          $values=$request->getValues($updated_by, $removed);
@@ -148,8 +148,10 @@ class RefundsController extends BaseController
          $signup_id=$values['signup_id']; 
          $signup=Signup::findOrFail($signup_id);
          if(!$signup->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+             return  $this->unauthorized();   
          }
+
+
 
          $refund=$this->refunds->store($values,$signup);
 
@@ -168,7 +170,7 @@ class RefundsController extends BaseController
                         ]);
          }  
 
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
 
         $refund=$this->refunds->getById($id);
         if(!$refund){
@@ -181,7 +183,7 @@ class RefundsController extends BaseController
         }
 
         if(!$refund->canViewBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);
+            return  $this->unauthorized();
         }
 
          $refund->canEdit=$refund->canEditBy($current_user);
@@ -197,11 +199,11 @@ class RefundsController extends BaseController
     }
     public function edit($id)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
 
         $refund=$this->refunds->findOrFail($id);
         if(!$refund->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);
+             return  $this->unauthorized();
         }
 
         $signup_id=$refund->signup_id;
@@ -221,11 +223,11 @@ class RefundsController extends BaseController
     }
     public function update(RefundRequest $request, $id)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
 
         $refund=$this->refunds->findOrFail($id);
         if(!$refund->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);
+            return  $this->unauthorized();
         }
         $removed=false;
         $updated_by=$current_user->id;
@@ -240,10 +242,10 @@ class RefundsController extends BaseController
     public function destroy($id)
     {
         $refund=$this->refunds->findOrFail($id);
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
 
         if(!$refund->canDeleteBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+            return  $this->unauthorized(); 
         } 
 
         $updated_by=$current_user->id;

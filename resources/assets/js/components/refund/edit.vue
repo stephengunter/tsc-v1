@@ -68,7 +68,7 @@
                     </div>
                     <div class="col-sm-3">
                         <div class="form-group">                           
-                            <label>退費比例</label>
+                            <label>退費比例 %</label>
                             <input type="text" name="refund.points" class="form-control" v-model="refund.points" disabled>
                             <small class="text-danger" v-if="form.errors.has('refund.points')" v-text="form.errors.get('refund.points')"></small>
                         </div>
@@ -93,7 +93,7 @@
                     <div class="col-sm-3">
                         <div class="form-group">                           
                             <label>可退學費</label>
-                            <input type="text" name="refund.tuition" class="form-control" v-model="refund.tuition">
+                            <input type="text" name="refund.tuition" class="form-control" v-model="refund.tuition" disabled>
                             <small class="text-danger" v-if="form.errors.has('refund.tuition')" v-text="form.errors.get('refund.tuition')"></small>
                         </div>
                     </div>
@@ -166,6 +166,21 @@
                 
             </form>
         </div>
+        <div class="panel-footer">
+            ※完成報名繳費後，因故退學者，依下列標準退費：
+              <ul>
+                  <li>
+                      開課前申請退班者，退還已繳學費九折。
+                  </li>
+                  <li>
+                      開課後未逾全期三分之一申請退班者，退還已繳學費半數。
+                  </li>
+                  <li>
+                      在班時間已逾全期三分之一者，將不予退還。
+                  </li>
+              </ul>
+            ※本中心一律以匯款方式退費，不提供現金退費。
+        </div>
     </div>
     
 </template>
@@ -236,10 +251,11 @@
                 
             },
             countRefund(){
+               
                 let done= Number(this.refund.courses_done)
                 if(!done){
-                   
-                    this.setRefund(100,this.signup.tuition,this.signup.cost)
+                    let money= Math.ceil(this.signup.tuition * 0.9) 
+                    this.setRefund(90 ,money , 0)
                       return   
                 }   
 
@@ -248,19 +264,24 @@
                 if(total){
                     let ratio=Refund.countRefundRatio(done,total)
                     let points=100 * ratio
-                  
 
-                    let tuition=Math.ceil(ratio * this.signup.tuition)
-                   
+                    let money=Math.ceil(ratio * this.signup.tuition)
 
-                    this.setRefund(points,tuition,this.signup.cost)
+                    this.setRefund(points,money, 0)
+
+                    if(!ratio){
+                        let errors={}
+
+                        errors['refund.courses_done']=['課程超過三分之一無法退費']
+                    
+                        this.form.onFail(errors)
+                    }
                 }  
             },
             setRefund(points,tuition,cost){
                 this.refund.points=  this.formatMoney(Number(points).toFixed(2))
                 this.refund.tuition=this.formatMoney(tuition)
                 this.refund.cost=this.formatMoney(cost)
-
             },
             fetchData() {
                 let getData=null
@@ -299,7 +320,7 @@
             },
             formatMoney(money)
             {
-                return Helper.formatMoney(money)  
+                return Helper.formatMoney(money,true)  
             },
             clearErrorMsg(name) {
                this.form.errors.clear(name)
@@ -326,12 +347,17 @@
                 
             },
             onSubmit() {
+                
                 this.checkInput()
                
                 if(this.form.errors.any()) {
                    return false
                 }
 
+                this.countRefund()
+                if(this.form.errors.any()) {
+                   return false
+                }
 
                 this.submitForm()
             },

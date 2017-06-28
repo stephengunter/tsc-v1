@@ -37,6 +37,20 @@ class Payways
         if($value==1) return '銀行匯款';
         if($value==2) return '現金收付';
     }
+
+    public function bankOnly()
+    {
+         return [
+			
+			[
+				'value' => 1,
+                'text' => '銀行匯款'
+			],
+			
+        ];
+
+        
+    }
    
     
      

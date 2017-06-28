@@ -14,8 +14,8 @@
               </div>          
         </div>
         <div class="panel-body">
-             <signup-index  :hide_create="hideSignupCreate"
-                @selected="onSignupSelected">
+             <signup-index  :hide_create="signupIndexSettings.hide_create"
+               :for_refund="signupIndexSettings.for_refund" @selected="onSignupSelected">
              </signup-index>
          </div>
     </div>
@@ -39,7 +39,12 @@
             return {
                 title: Helper.getIcon('Refunds') + '  新增退費申請 - 請先找出對應的報名紀錄',
                 creating:true,
-                hideSignupCreate:true,
+
+                signupIndexSettings:{
+                   hide_create:true,
+                   for_refund:true
+                },
+                
 
                 signupId:0,
              

@@ -2,7 +2,8 @@
 <div>
   <signup v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
      @saved="signupUpdated" @data-loaded="onDataLoaded" :version="current_version"
-     @btn-back-clicked="onBtnBackClicked" @signup-deleted="onSignupDeleted" > 
+     @btn-back-clicked="onBtnBackClicked" @signup-deleted="onSignupDeleted" 
+      @print-invoice="onPrintInvoice" > 
 
   </signup>
 
@@ -150,6 +151,9 @@
             onRefundChanged(){
                 this.current_version += 1               
             },
+            onPrintInvoice(){
+                this.$emit('print-invoice',this.id)
+            }
         }, 
 
     }

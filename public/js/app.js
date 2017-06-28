@@ -29641,6 +29641,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = {
     name: 'CreateRefund',
@@ -29709,10 +29724,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.datePickerOption = Helper.datetimePickerOption();
         },
         countRefund: function countRefund() {
+
             var done = Number(this.refund.courses_done);
             if (!done) {
-
-                this.setRefund(100, this.signup.tuition, this.signup.cost);
+                var money = Math.ceil(this.signup.tuition * 0.9);
+                this.setRefund(90, money, 0);
                 return;
             }
 
@@ -29722,9 +29738,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 var ratio = Refund.countRefundRatio(done, total);
                 var points = 100 * ratio;
 
-                var tuition = Math.ceil(ratio * this.signup.tuition);
+                var _money = Math.ceil(ratio * this.signup.tuition);
 
-                this.setRefund(points, tuition, this.signup.cost);
+                this.setRefund(points, _money, 0);
+
+                if (!ratio) {
+                    var errors = {};
+
+                    errors['refund.courses_done'] = ['課程超過三分之一無法退費'];
+
+                    this.form.onFail(errors);
+                }
             }
         },
         setRefund: function setRefund(points, tuition, cost) {
@@ -29767,7 +29791,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.studentName = signup.user.profile.fullname;
         },
         formatMoney: function formatMoney(money) {
-            return Helper.formatMoney(money);
+            return Helper.formatMoney(money, true);
         },
         clearErrorMsg: function clearErrorMsg(name) {
             this.form.errors.clear(name);
@@ -29793,8 +29817,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
         },
         onSubmit: function onSubmit() {
+
             this.checkInput();
 
+            if (this.form.errors.any()) {
+                return false;
+            }
+
+            this.countRefund();
             if (this.form.errors.any()) {
                 return false;
             }
@@ -32453,6 +32483,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         can_select: {
             type: Boolean,
             default: true
+        },
+        for_refund: {
+            type: Boolean,
+            default: false
         }
     },
     beforeMount: function beforeMount() {
@@ -32529,17 +32563,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var _this2 = this;
 
             return new Promise(function (resolve, reject) {
-                var options = Signup.statusOptions();
-                options.then(function (data) {
-                    _this2.statusOptions = data.options;
-                    var allStatuses = { text: '總數', value: '-9' };
-                    _this2.statusOptions.splice(0, 0, allStatuses);
-                    resolve(_this2.statusOptions[0].value);
-                }).catch(function (error) {
-                    console.log(error);
-                    reject(error.response);
-                });
+                if (_this2.for_refund) {
+                    _this2.statusOptions = [{
+                        text: '已繳費',
+                        value: 1
+                    }];
+                    resolve(1);
+                } else {
+                    var options = Signup.statusOptions();
+                    options.then(function (data) {
+                        _this2.statusOptions = data.options;
+                        var allStatuses = { text: '總數', value: '-9' };
+                        _this2.statusOptions.splice(0, 0, allStatuses);
+                        resolve(_this2.statusOptions[0].value);
+                    }).catch(function (error) {
+                        console.log(error);
+                        reject(error.response);
+                    });
+                }
             }); //End Promise
+
         },
         onDataLoaded: function onDataLoaded(data) {
             if (data.summary) this.summary = data.summary;else this.summary = null;
@@ -32760,6 +32803,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 
@@ -32847,6 +32891,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 Helper.BusEmitError(error, '刪除失敗');
                 _this.closeConfirm();
             });
+        },
+        onPrintInvoice: function onPrintInvoice() {
+            this.$emit('print-invoice', this.id);
         }
     }
 };
@@ -39997,7 +40044,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         return {
             title: Helper.getIcon('Refunds') + '  新增退費申請 - 請先找出對應的報名紀錄',
             creating: true,
-            hideSignupCreate: true,
+
+            signupIndexSettings: {
+                hide_create: true,
+                for_refund: true
+            },
 
             signupId: 0
 
@@ -40600,6 +40651,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 
@@ -40695,6 +40747,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       },
       onRefundChanged: function onRefundChanged() {
          this.current_version += 1;
+      },
+      onPrintInvoice: function onPrintInvoice() {
+         this.$emit('print-invoice', this.id);
       }
    }
 
@@ -40745,6 +40800,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             default: 0
         },
         hide_create: {
+            type: Boolean,
+            default: false
+        },
+        for_refund: {
             type: Boolean,
             default: false
         }
@@ -47324,7 +47383,11 @@ var RefundScripts = function () {
     }, {
         key: 'countRefundRatio',
         value: function countRefundRatio(done, total) {
-            return 1 - done / total;
+            if (done == 0) return 0.9;
+            var oneThird = Math.ceil(total / 3);
+            if (done <= oneThird) return 0.5;
+
+            return 0;
         }
     }, {
         key: 'getStatusText',
@@ -70217,7 +70280,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "aria-hidden": "true"
     }
-  }), _vm._v("\n             返回\n          ")]), _vm._v(" "), _c('button', {
+  }), _vm._v("\n             返回\n          ")]), _vm._v(" "), (_vm.signup.hasInvoice) ? _c('button', {
     staticClass: "btn btn-warning btn-sm",
     on: {
       "click": _vm.btnPrintClicked
@@ -70227,7 +70290,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "aria-hidden": "true"
     }
-  }), _vm._v(" 列印收據\n          ")]), _vm._v(" "), (_vm.signup.canEdit) ? _c('button', {
+  }), _vm._v(" 列印收據\n          ")]) : _vm._e(), _vm._v(" "), (_vm.signup.canEdit) ? _c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -72307,7 +72370,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "begin-edit": _vm.beginEdit,
       "dataLoaded": _vm.onDataLoaded,
       "btn-back-clicked": _vm.onBtnBackClicked,
-      "btn-delete-clicked": _vm.beginDelete
+      "btn-delete-clicked": _vm.beginDelete,
+      "print-invoice": _vm.onPrintInvoice
     }
   }) : _c('edit', {
     attrs: {
@@ -77385,7 +77449,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "col-sm-3"
   }, [_c('div', {
     staticClass: "form-group"
-  }, [_c('label', [_vm._v("退費比例")]), _vm._v(" "), _c('input', {
+  }, [_c('label', [_vm._v("退費比例 %")]), _vm._v(" "), _c('input', {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -77490,7 +77554,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "form-control",
     attrs: {
       "type": "text",
-      "name": "refund.tuition"
+      "name": "refund.tuition",
+      "disabled": ""
     },
     domProps: {
       "value": _vm._s(_vm.refund.tuition)
@@ -77689,8 +77754,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("取消")])]), _vm._v(" "), _c('div', {
     staticClass: "col-sm-4"
-  })])])])])
-},staticRenderFns: []}
+  })])])]), _vm._v(" "), _vm._m(0)])
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel-footer"
+  }, [_vm._v("\n        ※完成報名繳費後，因故退學者，依下列標準退費：\n          "), _c('ul', [_c('li', [_vm._v("\n                  開課前申請退班者，退還已繳學費九折。\n              ")]), _vm._v(" "), _c('li', [_vm._v("\n                  開課後未逾全期三分之一申請退班者，退還已繳學費半數。\n              ")]), _vm._v(" "), _c('li', [_vm._v("\n                  在班時間已逾全期三分之一者，將不予退還。\n              ")])]), _vm._v("\n        ※本中心一律以匯款方式退費，不提供現金退費。\n    ")])
+}]}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()
@@ -79218,7 +79287,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "panel-body"
   }, [_c('signup-index', {
     attrs: {
-      "hide_create": _vm.hideSignupCreate
+      "hide_create": _vm.signupIndexSettings.hide_create,
+      "for_refund": _vm.signupIndexSettings.for_refund
     },
     on: {
       "selected": _vm.onSignupSelected
@@ -83442,7 +83512,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "course_id": _vm.course_id,
       "hide_create": _vm.hide_create,
       "version": _vm.version,
-      "can_select": _vm.can_select
+      "can_select": _vm.can_select,
+      "for_refund": _vm.for_refund
     },
     on: {
       "selected": _vm.onSelected,
@@ -86137,7 +86208,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "saved": _vm.signupUpdated,
       "data-loaded": _vm.onDataLoaded,
       "btn-back-clicked": _vm.onBtnBackClicked,
-      "signup-deleted": _vm.onSignupDeleted
+      "signup-deleted": _vm.onSignupDeleted,
+      "print-invoice": _vm.onPrintInvoice
     }
   }), _vm._v(" "), (_vm.loaded) ? _c('div', {
     staticClass: "panel with-nav-tabs panel-default",

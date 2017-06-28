@@ -214,7 +214,11 @@ class RefundScripts {
     }
 
     static countRefundRatio(done,total){
-       return 1- (done/total)
+        if(done==0) return 0.9
+        let oneThird=Math.ceil(total/3)
+        if(done <= oneThird) return 0.5
+            
+        return 0
     }
     static getStatusText(status){
         status=parseInt(status)
