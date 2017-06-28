@@ -2,12 +2,14 @@
 
 namespace App\Listeners;
 
+
 class SignupEventListener
 {
     public function updateSignupStatus($event) 
     {
-         $signup=$event->signup;
-         $signup->updateStatus();
+        $signup=$event->signup;
+        $signup->updateStatus();
+
     }
     public function updateRefundStatus($event) 
     {

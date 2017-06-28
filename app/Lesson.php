@@ -136,11 +136,22 @@ class Lesson extends Model
     {
         $lesson_date=date($this->date);
         $studentList=Student::where('course_id',$this->course_id)
+                            ->where(function($q) use($lesson_date) {
+                                $q->whereNull('out_date')
+                                    ->orWhereDate('out_date', '>=',$lesson_date);
+                            })
                             ->whereDate('join_date','<=',$lesson_date)
                             ->orderBy('number');
                               
         return $studentList;
 
+    }
+
+    public function getDropOutStudents()
+    {
+        $studentList=Student::where('course_id',$this->course_id)
+                             ->where('active',false);
+                              
     }
 
     public function findStudent($user_id)
@@ -151,6 +162,7 @@ class Lesson extends Model
 
     public function checkStudents($updated_by)
     {
+       
        $registerStudents=$this->getRegisterStudents();
 
        if(count($registerStudents)){

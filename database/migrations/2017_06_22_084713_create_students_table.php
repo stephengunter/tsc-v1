@@ -23,6 +23,7 @@ class CreateStudentsTable extends Migration
 
             $table->string('number')->nullable();
             $table->date('join_date');
+            $table->date('out_date')->nullable();
             $table->boolean('active')->default(true);
             $table->text('ps')->nullable();
 
