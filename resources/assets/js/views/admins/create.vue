@@ -1,188 +1,275 @@
 <template>
+<div>
     <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4>
-                <i class="fa fa-key" aria-hidden="true"></i> 新增管理員
-            </h4>  
-        </div>
-        <div class="panel-body" v-if="loaded">
-            <form class="form" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
+        <div class="panel-heading">           
+            <span class="panel-title">
+                <h4 v-html="title"></h4>
+            </span>           
+        </div> <!--  panel  heading -->
+        <div class="panel-body">
+            <user-checker v-if="newUser"
+               :version="userCheckerSettings.version"
+               :status="userCheckerSettings.status" :col_width="userCheckerSettings.col_width"
+               @checked="onUserChecked"  @check-failed="onUserCheckFailed" >
+                  
+            </user-checker>
+            <form v-show="user_checked" v-if="loaded" @keydown="clearErrorMsg($event.target.name)" @submit.prevent="onSubmit" class="form">
+                <user-inputs :form="form" :with_user="inputsSettings.with_user"
+                   :with_profile="inputsSettings.with_profile"
+                   @gender-selected="setGender"  @dob-selected="setDOB"   >
+                </user-inputs>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="form-group">
-                            
-                            <label>姓名</label>
-                            <input type="text" name="profile.fullname" class="form-control" v-model="form.profile.fullname" >
-                            <small class="text-danger" v-if="form.errors.has('profile.fullname')" v-text="form.errors.get('profile.fullname')"></small>
-                        </div>
-                        
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label>性別</label>
+                            <label>角色</label>
                             <div>
-                            <input type="hidden" v-model="form.profile.gender"  >
-                            <toggle :items="genderOptions"   :defaultVal="form.profile.gender" @selected=setGender></toggle>
+                                <toggle :items="roleOptions"   :default_val="form.admin.role" @selected=setRole></toggle>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-4">
-                        <div class="form-group">
-                            <label>角色</label>
-                            <select  v-model="form.admin.role"  name="admin.role" class="form-control" >
-                                <option v-for="item in roleOptions" :value="item.value" v-text="item.text"></option>
-                            </select>
-                        </div>
-                    </div>
-                   
-              </div>  <!-- end row-->
-               <div class="row">
-                    <div class="col-sm-4">
-                       <div class="form-group">
-                        <label>手機號碼</label>
-                        <input type="text" name="user.phone" class="form-control" v-model="form.user.phone">
-                        <small class="text-danger" v-if="form.errors.has('user.phone')" v-text="form.errors.get('user.phone')"></small>
-                        </div>
+                        
                     </div>
                     <div class="col-sm-4">
-                        <div class="form-group">  
-                            <label>所屬中心</label>
-                             <drop-down :value.sync="centers" multiple  :options="centerOptions" label="text"></drop-down>
-                            <small class="text-danger" v-if="form.errors.has('centers')" v-text="form.errors.get('centers')"></small>
+                        
+                    </div>
+                </div>   <!-- row    -->
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">                           
+                           <button type="submit"  class="btn btn-success" :disabled="form.errors.any()">確認送出</button>
+                               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                           <button type="button" class="btn btn-default" @click.prevent="onCanceled">取消</button>  
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                       
-                    </div>
-                    
-              </div>  <!-- end row-->
-                
-              <button class="btn btn-success" :disabled="form.errors.any()">確認送出</button>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        
-              <button class="btn btn-default" @click.prevent="backToIndex">取消</button>
-              
-                
+      
+                </div><!-- row    -->
             </form>
+           
+        </div> <!--  panel  body -->
+    </div>  <!--  panel  -->
+
+    <modal :showbtn="false"  :show="showUserList" effect="fade" :width="modalSettings.width">
+        
+          <div slot="modal-header" class="modal-header modal-header-danger">
+             <button id="close-button" type="button" class="close" data-dismiss="modal" @click="showUserList=false">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+             </button>
+             <h3>
+                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                 相同資料的使用者已經存在
+             </h3>
+          </div>
+        <div slot="modal-body" class="modal-body">
+            <user-selector :users=userList @selected="onUserSelected"></user-selector>
         </div>
-    </div>
+    </modal>
+
+
+</div>   
 </template>
+
 <script>
-    
+    import UserChecker from '../../components/user/checker.vue'
+    import UserInputs from '../../components/user/inputs.vue'
+    import UserSelector from '../../components/user/selector.vue'
     export default {
-        name: 'CreateAdmin',
+        name: 'AdminCreate',
         components: {
-            'toggle': Toggle,
-            'drop-down':DropDown,
-            'date-picker' : MyDatepicker
+            'user-checker':UserChecker,
+            'user-inputs':UserInputs,
+            'user-selector':UserSelector
         },
+        props: {
+            user_id:{
+               type: Number,
+               default: 0
+            },
+        },   
         data() {
             return {
-                 id:0,
-                form: {},
-                gender: 1,
-
-                centers:[],
-
-                genderOptions:[],
-                roleOptions:[],
-                centerOptions:[],
-
-                loaded:false,
+                title:Helper.getIcon('Admins')  + '  新增系統管理員',
                 
+                loaded:false,
+
+                newUser:true,
+
+                user_checked: false,
+                userCheckerSettings:{
+                    version:0,
+                    status:0,
+                    col_width:4
+                },
+                inputsSettings:{
+                    with_user:false,
+                    with_profile:true,
+                },
+                form : new Form({
+                    user:{
+                       email:'',
+                       phone:'',
+                       profile:{
+                          fullname:'',
+                       }
+                    },
+                    admin:{}
+                }),
+                
+               
+                roleOptions:[],
+
+                userList:[],
+                showUserList:false,
+                modalSettings:{
+                   width:1200,
+                },
+
+
+             
             }
         },
-        
+        computed: {
+            creating() {
+               if(this.selectedSignups.length < 1) return false
+               return !this.submitting 
+            }
+        }, 
         beforeMount() {
-            this.init()
-        },
-        watch: {
-            $route:function(){
-                this.init()
-            },
-            centers: function (val) {
-               if(val.length){
-                 this.clearErrorMsg('centers')
-               }
-            },
+             this.init()
         },
         methods: {
             init(){
-                
-                this.id=this.$route.params.id
-                this.loaded=false
-                this.genderOptions= Helper.genderOptions()
-                this.datePickerOption=Helper.datetimePickerOption()
-                this.form= new Form({
-                    user:{},
-                    profile:{},
-                    admin:{},
+                this.form = new Form({
+                    user:{
+                       email:'',
+                       phone:'',
+                       profile:{
+                          fullname:'',
+                       }
+                    },
+                    admin:{
+                    }
                 })
-                this.fetchData()
+
+                this.formSubmitting=false
+                this.user_checked= false
+                this.loaded=false
+
+                this.dob={
+                    time: ''
+                }
+                this.dobError=false
+
+                this.userList=[]
+                this.showUserList=false
+
+                let create=Admin.create(this.user_id)
+                create.then(data=>{
+
+                     let user=data.user
+                     let admin=data.admin
+
+                     this.setUser(user)
+                     this.form.admin=admin
+
+                     this.roleOptions=data.roleOptions
+                     this.loaded=true
+
+                }).catch(error =>{
+                     Helper.BusEmitError(error)
+                     this.loaded=false
+                })
+             
             },
-            
-            fetchData() {
-                let url = '/api/admins/create?user=' + this.id 
-                axios.get(url)
-                    .then(response => {
-                        let user = response.data.user
-                        let admin= response.data.admin
-                        this.form = new Form({
-                            user:{
-                                id:user.id,
-                                phone:user.phone                                
-                            },
-                            profile:{
-                                fullname:user.profile.fullname,
-                                gender:user.profile.gender,
-                            },
-                            admin:admin,
-                            centers:[]
-                        })
+            setUser(user){
+               if(user.id){
+                   this.newUser=false
+                   this.user_checked=true
 
-                        this.roleOptions=response.data.roleOptions
-                       
-                        this.centerOptions=response.data.centerOptions
+                   this.inputsSettings.with_user=true
+                   this.inputsSettings.with_profile=true
+                  
+               }else{
+                   this.newUser=true
+                   this.user_checked=false
 
-                        this.loaded=true
-                    })
-                    .catch(error => {
-                       console.log(error)
-                    })
+                   this.inputsSettings.with_user=false
+                   this.inputsSettings.with_profile=true
+              } 
+
+               this.form.user=user
+                    
+            },
+            onUserChecked(user){
+                this.user_checked=true
+                this.form.user.phone=user.phone
+                this.form.user.email=user.email
+                this.form.user.profile.fullname=user.profile.fullname
+
+                if(!this.form.user.id){
+                   this.form.user.name=user.profile.fullname
+                }
+
+                if(this.formSubmitting) {
+                   this.submitForm()
+                }
+
+            },
+            onUserCheckFailed(userList){
+                this.formSubmitting=false
+                this.userList=userList
+                if(userList.length){
+                   this.showUserList=true
+                }
+            },           
+            onUserSelected(selected){
+                let id=selected[0]
+                let url=User.showUrl(id)
+                Helper.redirect(url)
             },
             setGender(val) {
-                this.form.profile.gender = val;
+                this.form.user.profile.gender = val;
             },
-            onSubmit() {
-                let refreshToken=this.$auth.refreshToken()
-                refreshToken.then(() => {
-                    this.submitForm()
-                }).catch(error => {
-                     this.$auth.logout()
-                     Bus.$emit('login')
-                })
+            setDOB(val){
+                this.form.user.profile.dob=val
+              
+                this.clearErrorMsg('user.profile.dob')
             },
-            submitForm() {
-                let method = 'post'
-                let url = '/api/admins' 
-                
-                this.form.centers=this.centers
-               
-                this.form.submit(method, url)
-                    .then(user => {
-                       Helper.BusEmitOK()
-                       this.backToIndex()
-                    }).catch(error => {
-                        Helper.BusEmitError(error,'存檔失敗')                        
-                    })
+          
+            setRole(val){
+                this.form.admin.role=val
             },
             clearErrorMsg(name) {
-                this.form.errors.clear(name);
+                this.form.errors.clear()
+                
             },
+            onSubmit() {
+                if(!this.form.user.id){
+                   this.form.user.name=this.form.user.profile.fullname
+                   this.formSubmitting=true
+                   this.userCheckerSettings.status+=1
+                }else{
+                    this.submitForm()
+                }
+                
+            },
+            onCanceled(){
+                this.$emit('canceled')
+            },
+            submitForm() {
 
-            backToIndex() {
-                this.$router.push('/admins')
+                let store=Admin.store(this.form)
+                    .then(data => {
+                       Helper.BusEmitOK()
+                       this.$emit('saved',data)                            
+                    })
+                    .catch(error => {
+                        Helper.BusEmitError(error,'存檔失敗') 
+                    })
             },
+           
+            
+            
         },
 
     }

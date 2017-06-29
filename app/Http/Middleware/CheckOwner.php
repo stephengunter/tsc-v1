@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Auth\AuthenticationException;
+use App\Exceptions\EmailUnconfirmed;
 
 class CheckOwner
 {
@@ -30,14 +32,15 @@ class CheckOwner
     {
         $user=request()->user();
         if(!$user){
-            return   response()
-                    ->json(['msg' => '權限不足'
-                        ]  ,  401);
+           throw new AuthenticationException();
         }  
         if(!$user->isOwner()){
-             return   response()
-                    ->json(['msg' => '權限不足'
-                        ]  ,  401);
+           throw new AuthenticationException();
+        }
+        if(!$user->email_confirmed){
+            $email=$user->email;
+            auth()->logout();
+            throw new EmailUnconfirmed($email);
         }
 
         $user->admin->centers;

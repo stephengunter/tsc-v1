@@ -20,7 +20,7 @@ class CreateAdminsTable extends Migration
             
             $table->string('role');
             $table->boolean('removed')->default(false);
-          
+            $table->boolean('active')->default(true);
 
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();

@@ -11,9 +11,15 @@ use App\Support\Helper;
 class Admin extends Model
 {
 	protected $primaryKey = 'user_id';
-	protected $guarded = [];
-	// protected $fillable = ['user_id', 'role', 'removed','create_by'];
-
+	protected $fillable = ['role', 'active', 'removed','updated_by' ];			 
+    
+    public static function initialize()
+    {
+        return [ 
+                 'active' => 1,
+               ];      
+       
+    }
     public function centers()
     {
         return $this->belongsToMany('App\Center','center_admin','admin_id','center_id');

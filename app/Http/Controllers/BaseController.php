@@ -226,6 +226,12 @@ class BaseController extends Controller
                     'path' => '/admins',
                     'active' => $current=='admins'
                 ],
+                [
+                    'id' => 2,
+                    'text' => '新增管理員',
+                    'path' => '/admins/create',
+                    'active' => $current=='admins/create'
+                ],
                 
                 
             );

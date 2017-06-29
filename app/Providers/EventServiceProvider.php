@@ -31,6 +31,7 @@ class EventServiceProvider extends ServiceProvider
         'App\Listeners\ContactInfoEventListener',
         'App\Listeners\CourseEventListener',
         'App\Listeners\StudentEventListener',
+        'App\Listeners\AdminEventListener',
     ];
 
     /**

@@ -58,6 +58,12 @@ Vue.component('volunteer-index', require('./views/volunteers/index') )
 Vue.component('volunteer-create', require('./views/volunteers/create') )
 Vue.component('volunteer-details', require('./views/volunteers/details') )
 
+
+Vue.component('admin-index', require('./views/admins/index') )
+Vue.component('admin-create', require('./views/admins/create') )
+Vue.component('admin-details', require('./views/admins/details') )
+
+
 Vue.component('teacher-index', require('./views/teachers/index') )
 Vue.component('teacher-create', require('./views/teachers/create') )
 Vue.component('teacher-details', require('./views/teachers/details') )
@@ -138,6 +144,7 @@ import Refund from './models/refund.js'
 import Center from './models/center.js'
 import Teacher from './models/teacher.js'
 import Volunteer from './models/volunteer.js'
+import Admin from './models/admin.js'
 import Discount from './models/discount.js'
 import Identity from './models/identity.js'
 
@@ -183,6 +190,7 @@ window.Tuition=Tuition
 window.Refund=Refund
 window.Teacher=Teacher
 window.Volunteer=Volunteer
+window.Admin=Admin
 window.Center=Center
 window.Discount=Discount
 window.Identity=Identity

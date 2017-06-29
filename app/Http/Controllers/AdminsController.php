@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
+use App\User;
+use App\Profile;
+use App\Admin;
+
 use App\Repositories\Admins;
 use App\Repositories\Titles;
 use App\Repositories\Centers;
@@ -17,9 +21,13 @@ use App\Http\Middleware\CheckOwner;
 
 use App\Support\Helper;
 
+use App\Events\AdminCreated;
+
+use DB;
+
 class AdminsController extends BaseController
 {
-    
+    protected $key='admins';
     public function __construct(Admins $admins, Centers $centers,
                                  Users $users, Roles $roles, CheckOwner $checkOwner)
     {   
@@ -36,7 +44,7 @@ class AdminsController extends BaseController
 	}
     public function indexOptions()
     {
-        $adminRoles=$this->roles->getAdminRoles();
+        $adminRoles=$this->roles->getAdminRoles()->get();
         $roleOptions=$this->roles->optionsConverting($adminRoles);
 
         $centerOptions=$this->centers->options();
@@ -50,6 +58,12 @@ class AdminsController extends BaseController
 
     public function index()
     {
+        if(!request()->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('admins.index')
+                    ->with(['menus' => $menus]);
+        }
+
         $adminList=[];
         $center=intval(request()->get('center'));
         if($center){
@@ -80,81 +94,168 @@ class AdminsController extends BaseController
 
     public function create()
     {
-       $user=request()->get('user');
-       if(!$user) abort(404);
+        $request = request();
+        $user_id=(int)$request->user;
 
-       $user=$this->users->findOrFail($user);
-       $user->profile;
-       $admin=$this->admins->initialize($user->id);
-      
-       $adminRoles=$this->roles->getAdminRoles()->get();
-       $roleOptions=$this->roles->optionsConverting($adminRoles);
+        if(!$request->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('admins.create')
+                   ->with([ 'menus' => $menus,
+                              'id' => $user_id     
+                        ]);
+        }  
 
-       $centers=$this->checkOwner->centersCanAdmin();       
-       $centerOptions=$this->centers->optionsConverting($centers);
+        $adminRoles=$this->roles->getAdminRoles()->get();
+        $roleOptions=$this->roles->optionsConverting($adminRoles);
 
-       return response()
+        $user=null;
+        $admin=null;
+
+        if($user_id){
+            $current_user=$this->currentUser();
+            $user=$this->users->findOrFail($user_id);
+            if(!$user->canViewBy($current_user)){
+                return  $this->unauthorized();     
+            }
+            
+            $user->profile;
+            $admin=$user->admin;
+            if(!$admin){
+                 $admin=Admin::initialize();
+                 $admin['role']=$roleOptions[0]['value'];
+            }
+           
+        }else{
+            $user=User::initialize();
+            $admin=Admin::initialize();
+            $admin['role']=$roleOptions[0]['value'];
+        }
+
+
+        
+
+        return response()
             ->json([
                 'user' => $user,
                 'admin' => $admin,
-                'roleOptions' => $roleOptions,
-                'centerOptions' => $centerOptions
+                'roleOptions' => $roleOptions,               
             ]);
+
+    
     }
     public function store(AdminRequest $request)
     {
-         $current_user=$this->checkOwner->getOwner();
-         $user_id=$request->getUserId();
-         $user=$this->users->findOrFail($user_id);
-         if(!$user->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
-         }
-
+         $current_user=$this->currentUser();
          $updated_by=$current_user->id;
          $removed=false;
-         $userValues=$request->getUserValues($updated_by,$removed);       
-         $profileValues=$request->getProfileValues($updated_by,$removed);
+
          $adminValues=$request->getAdminValues($updated_by,$removed);
+         $userValues=$request->getUserValues($updated_by,$removed);
+         $profileValues=$request->getProfileValues($updated_by,$removed);
 
-         $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
+         $user_id=$request->getUserId();
+         $adminId=$request->getAdminId();
 
-         $centerIds = $request->getCenterIds();
-         $user= $this->admins->store($user,$adminValues,$centerIds);
+         $user= DB::transaction(function() 
+                use($userValues,$profileValues,$adminValues,$user_id,$adminId)
+                {
+                    $user=null;
+                    if($user_id){
+                        $user=User::findOrFail($user_id);
+                        $user->update($userValues);
+                        $user->profile->update($profileValues);
+                    }else{
+                        $user=new User($userValues);
+                        $user->password= config('app.default_password');
+                        $user->save();
+                        $profile=new Profile($profileValues);
+                        $user->profile()->save($profile);
+                    }
 
-         $this->admins->addToRole($user->id);
-          
-          
-          return response()->json([
-                'user' => $user
-            ]); 
+                    
+                    if($adminId){
+                        $admin = Admin::findOrFail($id);
+                        $admin->update($adminValues);
+                    }else{
+                        $admin=$user->admin;
+                        if(!$admin){
+                            $admin=new Admin($adminValues);  
+                            $user->admin()->save($admin);
+                        }else{
+                            $user->admin->update($adminValues);
+                        }
+                    }
+                 
+                    return $user;
+                });
+
+         $admin= Admin::findOrFail($user->id);
+         event(new AdminCreated($admin, $current_user));
+        
+         return response()->json($admin); 
     }
 
     public function show($id)
     {
-         $current_user=$this->checkOwner->getOwner();
+        if(!request()->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('admins.details')
+                    ->with([ 'menus' => $menus,
+                              'id' => $id     
+                        ]);
+        }  
+        $current_user=$this->currentUser();
 
-         $admin=$this->admins->findOrFail($id);
+        $admin=$this->admins->findOrFail($id);
+        $admin->user->profile;
+        $canEdit=$admin->canEditBy($current_user);
+        $admin->canEdit=$canEdit;
+        $admin->canDelete=$canEdit;
+        $admin->roleModel=$admin->roleModel();
          
-         $canEdit=$admin->canEditBy($current_user);
-         $admin->canEdit=$canEdit;
-         $admin->canDelete=$canEdit;
-         $admin->roleModel=$admin->roleModel();
-         
-         return response()
+         return response() ->json([ 'admin' => $admin  ]);  
+           
+                            
+           
+    }
+    public function edit($id)
+    {
+        $current_user=$this->currentUser();
+        $admin=$this->admins->findOrFail($id);
+        if(!$admin->canEditBy($current_user)){
+            return  $this->unauthorized();    
+        }
+        $user=$admin->user;
+        $user->profile;
+        $adminRoles=$this->roles->getAdminRoles()->get();
+        $roleOptions=$this->roles->optionsConverting($adminRoles);
+       
+
+        return response()
             ->json([
-                'admin' => $admin                
+                'user' => $user,
+                'admin' => $admin,
+                'roleOptions' => $roleOptions,               
             ]);
+        
     }
     public function update(Request $request ,$id)
     {
-         $values=$request['admin'];
-       
-         $admin=$this->admins->update($id, $values);
+        $current_user=$this->currentUser();
+        $admin=$this->admins->findOrFail($id);
+        if(!$admin->canEditBy($current_user)){
+            return  $this->unauthorized();   
+        }
 
-         return response()
-            ->json([
-                'admin' => $admin                
-            ]);
+        $updated_by=$current_user->id;
+
+        $request = $request->get('admin');
+       
+        $adminValues=array_except($request, ['user']);       
+        $adminValues=Helper::setUpdatedBy($adminValues,$updated_by);
+        $admin->update($adminValues);
+
+        return response()->json($admin);
     }
     public function destroy($id)
     {
@@ -165,23 +266,23 @@ class AdminsController extends BaseController
                 'deleted' => true
             ]);
     }
-    public function updateUser(AdminUserRequest $request, $id)
-    {
-         $current_user=request()->user();  
-         $user=$this->users->findOrFail($id);
-         if(!$user->canEditBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);      
-         }
-         $removed=false;
-         $updated_by=$current_user->id;
-         $userValues=$request->getUserValues($updated_by,$removed);       
-         $profileValues=$request->getProfileValues($updated_by);
-         $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
+    // public function updateUser(AdminUserRequest $request, $id)
+    // {
+    //      $current_user=request()->user();  
+    //      $user=$this->users->findOrFail($id);
+    //      if(!$user->canEditBy($current_user)){
+    //         return   response()->json(['msg' => '權限不足' ]  ,  401);      
+    //      }
+    //      $removed=false;
+    //      $updated_by=$current_user->id;
+    //      $userValues=$request->getUserValues($updated_by,$removed);       
+    //      $profileValues=$request->getProfileValues($updated_by);
+    //      $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
         
-         return response()->json([
-                'user' => $user
-            ]); 
-    }
+    //      return response()->json([
+    //             'user' => $user
+    //         ]); 
+    // }
 
     
 

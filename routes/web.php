@@ -39,6 +39,8 @@ Route::get('refunds/{id}/print', '\App\Http\Controllers\Signups\RefundsControlle
 
 Route::put('categories/{id}/update-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
 
+Route::get('admins/index-options', 'AdminsController@indexOptions');
+
 
 Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
 Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
@@ -65,6 +67,8 @@ Route::resource('user-centers', '\App\Http\Controllers\User\UserCenterController
 Route::resource('photoes', 'PhotoesController');
 
 Route::resource('volunteers', '\App\Http\Controllers\User\VolunteersController');
+
+Route::resource('admins', 'AdminsController');
 
 Route::resource('contactinfoes', '\App\Http\Controllers\Contact\ContactInfoesController');
 Route::resource('address', '\App\Http\Controllers\Contact\AddressController');

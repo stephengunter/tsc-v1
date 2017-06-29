@@ -160,16 +160,16 @@ class User extends Authenticatable {
 	{
 		return $this->hasMany('App\Signup');
 	}
-	public function courseStudents() 
+	public function students() 
 	{
-		return $this->hasMany('App\CourseStudent');
+		return $this->hasMany('App\Student');
 	}
 
 	
 
 	public function rolesCanAdd($with_admin=false)
 	{
-		$roles = Role::where('can_add',true);
+		$roles = Role::orderBy('importance','desc');
 		if(!$with_admin){
 			$adminRoleNames=Role::adminRoleNames();
 			$roles = $roles->whereNotIn('name',$adminRoleNames);
@@ -216,12 +216,7 @@ class User extends Authenticatable {
 	}
 	public function isStudent()
 	{
-		if(!$this->roles->count()){
-			return false;
-		}
-		
-		if($this->hasRole(Role::studentRoleName())) return true;
-
+		if(count($this->students)) return true;
 		return false;
 	}
 	public function isVolunteer()
