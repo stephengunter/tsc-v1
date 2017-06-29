@@ -13,6 +13,7 @@ use App\Role;
 use App\Teacher;
 use App\Center;
 use App\Volunteer;
+use App\Admin;
 
 use App\Repositories\Users;
 use App\Repositories\Centers;
@@ -41,7 +42,7 @@ class UserCenterController extends BaseController
 
 	public function index()
     {
-        $current_user=$this->checkAdmin->currentUser();
+        $current_user=$this->currentUser();
         $request = request();
         
         $role=$request->role; 
@@ -56,6 +57,8 @@ class UserCenterController extends BaseController
             $centers=$user->teacher->validCenters();
         }else if( $role == strtolower(Role::volunteerRoleName()) ){
             $centers=$user->volunteer->validCenters();
+        }else if(in_array($role, Role::adminRoleNames(true))){
+            $centers=$user->admin->validCenters();
         }
        
         if(count($centers)){
@@ -68,14 +71,11 @@ class UserCenterController extends BaseController
         
 
         return response()->json(['centers' => $centers ]);
-            
-                
-           
        
     }
     public function create()
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_admin=$this->currentUser()->admin;
         $request = request();
         
         $role=$request->role; 
@@ -89,22 +89,20 @@ class UserCenterController extends BaseController
         $centersCanAdd=[];
        
         if( $role == strtolower(Role::teacherRoleName()) ){
-            $centersCanAdd=$user->teacher->centersCanAddByAdmin($current_user);
+            $centersCanAdd=$user->teacher->centersCanAddByAdmin($current_admin);
         }else if( $role == strtolower(Role::volunteerRoleName()) ){
-            $centersCanAdd=$user->volunteer->centersCanAddByAdmin($current_user);
+            $centersCanAdd=$user->volunteer->centersCanAddByAdmin($current_admin);
+        }else if(in_array($role, Role::adminRoleNames(true))){
+            $centersCanAdd=$user->admin->centersCanAddByAdmin($current_admin);
         }else{
             abort(404);
         }
         
         if(count($centersCanAdd)){
-        
             $options=$this->centers->optionsConverting($centersCanAdd);
         }
-        
 
         return response()->json(['options' => $options ]);
-
-        
             
     }
     
@@ -122,16 +120,13 @@ class UserCenterController extends BaseController
             $user->teacher->attachCenter($center_id);
         }else if( $role == strtolower(Role::volunteerRoleName()) ){
             $user->volunteer->attachCenter($center_id);
+        }else if(in_array($role, Role::adminRoleNames(true))){
+            $user->admin->attachCenter($center_id);
         }else{
             abort(404);
         }
-
-       
         
-        return response()
-                ->json([
-                    'saved' => true
-                ]);
+        return response()->json([ 'saved' => true ]);   
       
     }
    
@@ -148,17 +143,14 @@ class UserCenterController extends BaseController
         }else if( $role == strtolower(Role::volunteerRoleName()) ){
             $volunteer=Volunteer::findOrFail($id);
             $volunteer->detachCenter($center_id);
+        }else if(in_array($role, Role::adminRoleNames(true))){
+            $admin=Admin::findOrFail($id);
+            $admin->detachCenter($center_id);
         }else{
             abort(404);
         }
-
         
-       
-        
-        return response()
-                    ->json([
-                        'deleted' => true
-                    ]);
+        return response()->json(['deleted' => true  ]);        
     }
 
     

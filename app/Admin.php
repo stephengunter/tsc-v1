@@ -49,6 +49,7 @@ class Admin extends Model
 
 	public function removeRole()
 	{
+        $user=$this->user;
 		$roleName=Role::adminRoleName();		
 		if($user->hasRole($roleName)){
             $role=Role::where('name',$roleName)->first();

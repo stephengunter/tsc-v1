@@ -22,6 +22,7 @@ use App\Http\Middleware\CheckOwner;
 use App\Support\Helper;
 
 use App\Events\AdminCreated;
+use App\Events\AdminDeleted;
 
 use DB;
 
@@ -259,30 +260,18 @@ class AdminsController extends BaseController
     }
     public function destroy($id)
     {
-       $this->admins->delete($id);
+        $admin=$this->admins->findOrFail($id);
+        $current_user=$this->currentUser();
+        if(!$admin->canDeleteBy($current_user)){
+            return  $this->unauthorized();  
+        }
+        $this->admins->delete($id, $current_user->id);
 
-        return response()
-            ->json([
-                'deleted' => true
-            ]);
+        event(new AdminDeleted($admin, $current_user));
+
+        return response()->json([ 'deleted' => true  ]);
     }
-    // public function updateUser(AdminUserRequest $request, $id)
-    // {
-    //      $current_user=request()->user();  
-    //      $user=$this->users->findOrFail($id);
-    //      if(!$user->canEditBy($current_user)){
-    //         return   response()->json(['msg' => '權限不足' ]  ,  401);      
-    //      }
-    //      $removed=false;
-    //      $updated_by=$current_user->id;
-    //      $userValues=$request->getUserValues($updated_by,$removed);       
-    //      $profileValues=$request->getProfileValues($updated_by);
-    //      $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
-        
-    //      return response()->json([
-    //             'user' => $user
-    //         ]); 
-    // }
+    
 
     
 

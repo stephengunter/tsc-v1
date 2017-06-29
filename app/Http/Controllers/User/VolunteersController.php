@@ -261,10 +261,7 @@ class VolunteersController extends BaseController
 
         event(new VolunteerDeleted($volunteer, $current_user));
 
-        return response()
-            ->json([
-                'deleted' => true
-            ]);
+        return response()->json([ 'deleted' => true  ]);
     }
 
    

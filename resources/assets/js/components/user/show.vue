@@ -49,13 +49,7 @@
                        
                     
                     <label class="label-title">最後更新</label>
-                     <p v-if="!user.updated_by"> {{   user.updated_at|tpeTime  }}</p>
-                     <p v-else>
-                        <a  href="#" @click.prevent="showUpdatedBy" >
-                            {{   user.updated_at|tpeTime  }}
-                        </a>
-                        
-                     </p>
+                     <updated :entity="user"></updated>
                 </div>
                 <div class="col-sm-3">
                     
@@ -153,10 +147,7 @@
                     this.loaded = false 
                     Helper.BusEmitError(error)
                 })
-            },   
-            showUpdatedBy(){
-                Bus.$emit('onShowEditor',this.user.updated_by)
-            },
+            },  
             onAddRoleCilcked(){
                this.$emit('add-role');
             },

@@ -86,6 +86,7 @@
                
             },
             submitRole(){
+
                  let url=''
                  switch (this.selectedRole) {
                      case 'Teacher':
@@ -93,6 +94,12 @@
                      break;
                      case 'Volunteer':
                         url = Volunteer.createUrl()
+                     break;
+                     case 'Admin':
+                        url = Admin.createUrl()
+                     break;
+                      case 'Owner':
+                        url = Admin.createUrl()
                      break;
                  }
 

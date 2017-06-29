@@ -7,7 +7,7 @@
        @add-role="onAddRole" >
     </show>
 
-    <edit v-else :id="id" 
+    <edit v-else :id="id" :role="role"
        @saved="onUserSaved"   @canceled="onEditCanceled" >                 
     </edit>
     

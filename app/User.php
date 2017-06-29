@@ -66,6 +66,13 @@ class User extends Authenticatable {
 		$extraRules=[]; 
 		if($role =='User'){
 			 return $basicRules;         
+		}else if(in_array($role, Role::adminRoleNames())){
+			$extraRules=[
+			  'user.profile.fullname' => 'required|max:255',
+			  'user.profile.dob' => 'required',
+              'user.profile.SID' =>'required|unique:profiles,SID,'.$id .',user_id',
+			  'user.phone' =>'required|min:6|unique:users,phone,'.$id,
+		    ];
 		}else if($role =='Teacher'){
 			$extraRules=[
 			  'user.profile.fullname' => 'required|max:255',

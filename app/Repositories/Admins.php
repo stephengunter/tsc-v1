@@ -120,12 +120,12 @@ class Admins
     }
 
   
-   public function delete($id,$admin_id)
+   public function delete($id,$updated_by)
    {
          $admin=$this->findOrFail($id); 
           $values=[
             'removed' => 1,
-            'updated_by' => $admin_id
+            'updated_by' => $updated_by
          ];
         
          $admin->update($values);

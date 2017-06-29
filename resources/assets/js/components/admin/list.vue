@@ -151,6 +151,7 @@
                
             },
             selected(id){
+              
                 this.$emit('selected',id)
             },
             

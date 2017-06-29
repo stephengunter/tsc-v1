@@ -28,13 +28,11 @@ class Role extends EntrustRole {
     {
         return 'Teacher';
     }
-    public static function studentRoleName()
-    {
-        return 'Student';       
-    }
+    
 
-    public static function adminRoleNames()
+    public static function adminRoleNames($toLower=false)
     {
+        if($toLower) return  ['owner','admin'];
         return ['Owner','Admin'];
 
     }

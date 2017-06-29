@@ -26,22 +26,22 @@
 
 </data-viewer>
 
-<modal effect="fade" width="800"title="加入角色" :show.sync="showModal" 
-    @closed="closeModel"  @ok="submitRole">
-    <div slot="modal-body" class="modal-body">
-        <p style="font-size:17px">請選擇您要加入的角色</p>
-        <toggle v-if="showModal" :items="rolesCanAdd"   :default_val="roleToAdd" @selected=addToRole></toggle>
+
+<user-roles :user_id="userRoles.id" :showing="userRoles.show"
+     @canceled="onUserRolesCanceled" >
         
-    </div>
-</modal>
+</user-roles>
 
 </div>
 </template>
 
 <script>
-     
+    import UserRoles from '../../components/user/user-roles.vue'
     export default {
         name: 'UserList',
+        components: {
+            'user-roles':UserRoles
+        },
         props: ['hide_create','version'],
         
         data() {
@@ -98,10 +98,10 @@
 
                
 
-                showModal: false,
-                selected: 0,
-                roleToAdd: 0,
-                rolesCanAdd: [],    
+                  userRoles:{
+                    show:false,
+                    adding:true,
+                },   
              
             }
         },
@@ -121,38 +121,14 @@
             beginCreate(){
                  this.$emit('begin-create')
             },
-            addUserToRole(user_id) {
-                this.selected = user_id
-                let rolesCanAdd=User.roleCanAdd(user_id)
-                rolesCanAdd.then((roles) => {
-                    let options = []
-
-                    for (let i = 0; i < roles.length; i++) {
-
-                        let option = {
-                            text: roles[i].display_name,
-                            value: roles[i].name
-                        }
-
-                        options[i] = option
-                    }
-
-                    this.rolesCanAdd = options
-                    this.roleToAdd = options[0].value
-                    this.showModal = true
-                 })
-               
-
+            addUserToRole(id){
+                this.userRoles.show=true
+                this.userRoles.id=id
             },
-            closeModel() {
-                this.showModal = false
-            },
-            submitRole() {
-                this.$emit('add-to-role',this.selected,this.roleToAdd)                   
-            },
-            addToRole(name) {
-                this.roleToAdd = name
-            },
+           
+            onUserRolesCanceled() {
+               this.userRoles.show = false
+            },     
         },
 
     }

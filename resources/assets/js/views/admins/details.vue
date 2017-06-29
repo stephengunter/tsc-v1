@@ -102,7 +102,7 @@
                     can_edit:true,
                     can_back:false,
                     hide_delete:true,
-                    role:this.role
+                    role:Admin.role()
                },
                contactInfoSettings:{
                     id:0,

@@ -36293,9 +36293,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_user_user_roles_vue__ = __webpack_require__(508);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_user_user_roles_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_user_user_roles_vue__);
 //
 //
 //
@@ -36337,6 +36336,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = {
     name: 'UserList',
+    components: {
+        'user-roles': __WEBPACK_IMPORTED_MODULE_0__components_user_user_roles_vue___default.a
+    },
     props: ['hide_create', 'version'],
 
     data: function data() {
@@ -36390,10 +36392,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 key: 'updated_at'
             }],
 
-            showModal: false,
-            selected: 0,
-            roleToAdd: 0,
-            rolesCanAdd: []
+            userRoles: {
+                show: false,
+                adding: true
+            }
 
         };
     },
@@ -36412,37 +36414,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         beginCreate: function beginCreate() {
             this.$emit('begin-create');
         },
-        addUserToRole: function addUserToRole(user_id) {
-            var _this = this;
-
-            this.selected = user_id;
-            var rolesCanAdd = User.roleCanAdd(user_id);
-            rolesCanAdd.then(function (roles) {
-                var options = [];
-
-                for (var i = 0; i < roles.length; i++) {
-
-                    var option = {
-                        text: roles[i].display_name,
-                        value: roles[i].name
-                    };
-
-                    options[i] = option;
-                }
-
-                _this.rolesCanAdd = options;
-                _this.roleToAdd = options[0].value;
-                _this.showModal = true;
-            });
+        addUserToRole: function addUserToRole(id) {
+            this.userRoles.show = true;
+            this.userRoles.id = id;
         },
-        closeModel: function closeModel() {
-            this.showModal = false;
-        },
-        submitRole: function submitRole() {
-            this.$emit('add-to-role', this.selected, this.roleToAdd);
-        },
-        addToRole: function addToRole(name) {
-            this.roleToAdd = name;
+        onUserRolesCanceled: function onUserRolesCanceled() {
+            this.userRoles.show = false;
         }
     }
 
@@ -36622,12 +36599,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
 
 
 
@@ -36696,9 +36667,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 _this.loaded = false;
                 Helper.BusEmitError(error);
             });
-        },
-        showUpdatedBy: function showUpdatedBy() {
-            Bus.$emit('onShowEditor', this.user.updated_by);
         },
         onAddRoleCilcked: function onAddRoleCilcked() {
             this.$emit('add-role');
@@ -36810,6 +36778,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.selectedRole = role;
         },
         submitRole: function submitRole() {
+
             var url = '';
             switch (this.selectedRole) {
                 case 'Teacher':
@@ -36817,6 +36786,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     break;
                 case 'Volunteer':
                     url = Volunteer.createUrl();
+                    break;
+                case 'Admin':
+                    url = Admin.createUrl();
+                    break;
+                case 'Owner':
+                    url = Admin.createUrl();
                     break;
             }
 
@@ -71178,17 +71153,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "label-title"
   }, [_vm._v("生日")]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.user.profile.dob))]), _vm._v(" "), _c('label', {
     staticClass: "label-title"
-  }, [_vm._v("最後更新")]), _vm._v(" "), (!_vm.user.updated_by) ? _c('p', [_vm._v(" " + _vm._s(_vm._f("tpeTime")(_vm.user.updated_at)))]) : _c('p', [_c('a', {
+  }, [_vm._v("最後更新")]), _vm._v(" "), _c('updated', {
     attrs: {
-      "href": "#"
-    },
-    on: {
-      "click": function($event) {
-        $event.preventDefault();
-        _vm.showUpdatedBy($event)
-      }
+      "entity": _vm.user
     }
-  }, [_vm._v("\n                            " + _vm._s(_vm._f("tpeTime")(_vm.user.updated_at)) + "\n                        ")])])]), _vm._v(" "), _c('div', {
+  })], 1), _vm._v(" "), _c('div', {
     staticClass: "col-sm-3"
   }, [_c('label', {
     staticClass: "label-title"
@@ -71604,7 +71573,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }) : _c('edit', {
     attrs: {
-      "id": _vm.id
+      "id": _vm.id,
+      "role": _vm.role
     },
     on: {
       "saved": _vm.onUserSaved,
@@ -80485,33 +80455,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         })], 2), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm._f("tpeTime")(props.item.updated_at)))])])]
       }
     }
-  }), _vm._v(" "), _c('modal', {
+  }), _vm._v(" "), _c('user-roles', {
     attrs: {
-      "effect": "fade",
-      "width": "800",
-      "title": "加入角色",
-      "show": _vm.showModal
+      "user_id": _vm.userRoles.id,
+      "showing": _vm.userRoles.show
     },
     on: {
-      "closed": _vm.closeModel,
-      "ok": _vm.submitRole
+      "canceled": _vm.onUserRolesCanceled
     }
-  }, [_c('div', {
-    staticClass: "modal-body",
-    slot: "modal-body"
-  }, [_c('p', {
-    staticStyle: {
-      "font-size": "17px"
-    }
-  }, [_vm._v("請選擇您要加入的角色")]), _vm._v(" "), (_vm.showModal) ? _c('toggle', {
-    attrs: {
-      "items": _vm.rolesCanAdd,
-      "default_val": _vm.roleToAdd
-    },
-    on: {
-      "selected": _vm.addToRole
-    }
-  }) : _vm._e()], 1)])], 1)
+  })], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -96425,6 +96377,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         onDataLoaded: function onDataLoaded(data) {},
         selected: function selected(id) {
+
             this.$emit('selected', id);
         },
         beginCreate: function beginCreate() {
@@ -97523,7 +97476,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 can_edit: true,
                 can_back: false,
                 hide_delete: true,
-                role: this.role
+                role: Admin.role()
             },
             contactInfoSettings: {
                 id: 0,

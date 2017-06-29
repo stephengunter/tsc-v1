@@ -97,8 +97,6 @@ class Helper
 		}else{
           	$centerIds= Center::where('removed',false)->pluck('id')->toArray();
 		}
-
-        
 		
         $canAddIds= array_intersect($centerIds, $admin->centers()->pluck('id')->toArray());
         if(!count($canAddIds)) return null;
