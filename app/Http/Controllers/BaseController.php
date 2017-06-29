@@ -5,32 +5,35 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Route;
 use App\Http\Middleware\CheckAdmin;
+use App\Http\Middleware\CheckOwner;
 
 class BaseController extends Controller
 {
     protected $checkAdmin;
     public function __construct()
     {
-          $exceptAdmin=[];
-          $allowVisitors=[];
+        //   $exceptAdmin=[];
+        //   $allowVisitors=[];
         
-		  $this->middleware('admin', ['except' => array_merge($exceptAdmin,$allowVisitors) ]);
+		//   $this->middleware('admin', ['except' => array_merge($exceptAdmin,$allowVisitors) ]);
         
           
           
           
 	}
-    protected function setMiddleware(array $exceptAdmin, array $allowVisitors)
+    protected function setMiddleware(array $exceptAdmin, array $allowVisitors,$key='admin')
     {
-        $this->middleware('admin', ['except' => array_merge($exceptAdmin,$allowVisitors) ]);
+       
+        $this->middleware($key, ['except' => array_merge($exceptAdmin,$allowVisitors) ]);
 
         if(count($exceptAdmin)) $this->middleware('auth', ['only' => $exceptAdmin]);
         
     }
-    protected function setCheckAdmin(CheckAdmin $checkAdmin)
+    protected function setCheckAdmin($checkAdmin)
     {
         $this->checkAdmin=$checkAdmin;
     }
+   
     protected function currentUser()
     {
         if($this->checkAdmin){
@@ -40,17 +43,6 @@ class BaseController extends Controller
         }
         
     }
-    protected function currentAdmin()
-    {
-        if($this->checkAdmin){
-            return $this->checkAdmin->getAdmin();
-        }else{
-           return request()->user()->admin;
-        }
-        
-    }
-    
-
     protected function unauthorized()
     {
         return  response()->json(['msg' => 'from basecontroller 權限不足' ]  ,  401);  
@@ -222,6 +214,19 @@ class BaseController extends Controller
                     'path' => '/identities',
                     'active' => $current=='identities'
                 ],
+                
+            );
+        }
+
+        if($key=='admins'){
+           return array(
+                [
+                    'id' => 1,
+                    'text' => '權限管理',
+                    'path' => '/admins',
+                    'active' => $current=='admins'
+                ],
+                
                 
             );
         }

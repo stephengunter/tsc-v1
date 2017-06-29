@@ -2,7 +2,7 @@
 <div>
     <show v-if="readOnly"  :id="id" can_edit="can_edit"  :can_back="can_back"  
        :version="version"  @begin-edit="beginEdit" @dataLoaded="onDataLoaded"
-       @begin-create="beginCreate"
+       @begin-create="beginCreate" @print-refund="onPrintRefund"
        @btn-back-clicked="onBtnBackClicked"   @begin-delete="beginDelete" >                 
     </show>
 
@@ -103,6 +103,9 @@
                  this.confirmMsg='確定要刪除退費申請 ' + values.name + ' 嗎？'
                  this.showConfirm=true               
             },
+            onPrintRefund(){
+                 this.$emit('print-refund',this.id)
+            }
             
             
         }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\BaseController;
+
+use App\Http\Middleware\CheckAdmin;
 use Illuminate\Http\Request;
 use Hash;
 use Auth;
@@ -11,12 +13,13 @@ use App\User;
 class HomeController extends BaseController
 {
     
-    public function __construct()
+    public function __construct(CheckAdmin $checkAdmin)
     {
-          $exceptAdmin=[];
-          $allowVisitors=[];
-          $this->setMiddleware( $exceptAdmin, $allowVisitors);
-        
+        $exceptAdmin=[];
+        $allowVisitors=[];
+        $this->setMiddleware( $exceptAdmin, $allowVisitors);
+          
+        $this->setCheckAdmin($checkAdmin);
     }
 
    
@@ -24,9 +27,14 @@ class HomeController extends BaseController
     {
         if(!request()->ajax()){
             return view('app');
-         }  
+        }
+
+        $current_user=$this->currentUser(); 
 
         $keys=['signups','refunds','courses','users','teachers','discounts','settings'];
+        if($current_user->isOwner()){
+            array_push($keys, 'admins');
+        }
         $systems=[];
         for( $i=0; $i < count($keys); $i++ ){
            $menus=array(

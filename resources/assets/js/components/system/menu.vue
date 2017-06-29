@@ -53,6 +53,9 @@
                     case 'settings':
                         html += ' 基本設定'
                          break
+                    case 'admins':
+                        html += ' 權限管理'
+                        break
                 }
 
                 return html

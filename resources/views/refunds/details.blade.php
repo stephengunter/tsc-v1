@@ -3,7 +3,8 @@
 @section('content')
 
    <refund-details   :id="id" :can_back="can_back" 
-     @btn-back-clicked="backToIndex" @refund-deleted="onRefundDeleted">
+     @btn-back-clicked="backToIndex" @refund-deleted="onRefundDeleted"
+      @print-refund="onPrintRefund">
   </refund-details>
 
    
@@ -35,6 +36,10 @@
             },
             backToIndex(){
                Helper.redirect('/refunds')
+            },
+            onPrintRefund(id){
+                let url='/refunds/' + id + '/print'
+                Helper.newWindow(url)
             }
 
         },

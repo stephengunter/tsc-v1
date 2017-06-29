@@ -33,6 +33,7 @@ class RoleTableSeeder extends Seeder {
 			[
 				'name' => 'Student',
 				'display_name' => '學生',
+				'can_add' => 0,
 				'importance' => 66,
 				'style'=>'default'
 			],

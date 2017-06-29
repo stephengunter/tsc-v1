@@ -7,13 +7,9 @@
    </refund-index> 
 
    <refund-details v-if="selected"  :id="selected" :can_back="can_back" 
-     @btn-back-clicked="backToIndex" @refund-deleted="onRefundDeleted">
+     @btn-back-clicked="backToIndex" @refund-deleted="onRefundDeleted"
+      @print-refund="onPrintRefund">
   </refund-details>
-
-   {{-- <signup-create v-if="creating"   :course_id="course_id"
-    @canceled="createCanceled" @saved="signupCreated">
-      
-    </signup-create> --}}
 
 @endsection
 
@@ -74,6 +70,10 @@
                  this.selected=0
                  this.creating=false
                  this.version +=1
+            },
+            onPrintRefund(id){
+                let url='/refunds/' + id + '/print'
+                Helper.newWindow(url)
             }
 
         },

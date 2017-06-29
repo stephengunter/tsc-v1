@@ -169,7 +169,7 @@ class User extends Authenticatable {
 
 	public function rolesCanAdd($with_admin=false)
 	{
-		$roles = Role::orderBy('id');
+		$roles = Role::where('can_add',true);
 		if(!$with_admin){
 			$adminRoleNames=Role::adminRoleNames();
 			$roles = $roles->whereNotIn('name',$adminRoleNames);

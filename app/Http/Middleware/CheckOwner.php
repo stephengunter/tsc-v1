@@ -12,6 +12,9 @@ class CheckOwner
     public function getOwner() {
         return   $this->user;
     }
+    public function currentUser() {
+        return   $this->user;
+    }
     public function adminId() {
         return   $this->user->id;
     }

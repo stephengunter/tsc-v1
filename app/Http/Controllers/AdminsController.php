@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
 use App\Repositories\Admins;
@@ -16,17 +17,17 @@ use App\Http\Middleware\CheckOwner;
 
 use App\Support\Helper;
 
-class AdminsController extends Controller
+class AdminsController extends BaseController
 {
     
     public function __construct(Admins $admins, Centers $centers,
                                  Users $users, Roles $roles, CheckOwner $checkOwner)
     {   
-        $exceptOwner=['updateUser'];
-		$this->middleware('owner', ['except' => $exceptOwner ]);       
-        $this->middleware('auth', ['only' => $exceptOwner]);
-        $this->checkOwner=$checkOwner;
-       
+        $exceptAdmin=[];
+        $allowVisitors=[];
+		$this->setMiddleware( $exceptAdmin, $allowVisitors,'owner');
+
+        $this->setCheckAdmin($checkOwner);
                  
 		$this->admins=$admins;
         $this->centers=$centers;

@@ -14,7 +14,10 @@
                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
                  返回
               </button>
-              <button  v-if="refund.canEdit" v-show="can_edit" @click="btnEditClicked" class="btn btn-primary btn-sm" >
+              <button  @click="btnPrintClicked" class="btn btn-warning btn-sm" >
+                 <span class="glyphicon glyphicon-print" aria-hidden="true"></span> 列印
+              </button>
+              <button  v-if="refund.canEdit"  v-show="can_edit" @click="btnEditClicked" class="btn btn-primary btn-sm" >
                   <span class="glyphicon glyphicon-pencil"></span> 編輯
               </button>
               <button v-if="refund.canDelete" v-show="can_edit" @click="btnDeleteClicked" class="btn btn-danger btn-sm" >
@@ -203,6 +206,9 @@
             onBtnBackClick(){
                 this.$emit('btn-back-clicked')
             },
+            btnPrintClicked(){
+               this.$emit('print-refund',this.id)
+            }
         }, 
 
     }

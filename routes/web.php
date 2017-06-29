@@ -35,6 +35,7 @@ Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsContr
 Route::get('signups/{id}/print', '\App\Http\Controllers\Signups\SignupsController@print');
 
 Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
+Route::get('refunds/{id}/print', '\App\Http\Controllers\Signups\RefundsController@print');
 
 Route::put('categories/{id}/update-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
 

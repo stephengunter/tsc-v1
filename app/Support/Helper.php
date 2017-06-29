@@ -166,7 +166,9 @@ class Helper
        
         $strValue=(String)$val;
         $pos=strpos($strValue, '.',0);
-        if(!$pos) return $strValue;
+        if(!$pos){
+            return (int)$strValue;
+        } 
 
         $cents=(int)substr($strValue , $pos+1 );
         if ($cents > 0) return $strValue;

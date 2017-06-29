@@ -2,7 +2,8 @@
 <div>
   <refund v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
      @saved="onRefundUpdated" @data-loaded="onDataLoaded" :version="current_version"
-     @btn-back-clicked="onBtnBackClicked" @refund-deleted="onRefundDeleted" > 
+     @btn-back-clicked="onBtnBackClicked" @refund-deleted="onRefundDeleted" 
+     @print-refund="onPrintRefund"> 
 
   </refund>
 
@@ -149,6 +150,9 @@
             },
             onTuitionChanged(){
                 this.current_version += 1               
+            },
+            onPrintRefund(id){
+                 this.$emit('print-refund',id)
             }
         }, 
 

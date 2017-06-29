@@ -23,6 +23,8 @@ use App\Http\Middleware\CheckAdmin;
 
 use App\Events\RefundChanged;
 
+use PDF;
+
 class RefundsController extends BaseController
 {
     protected $key='refunds';
@@ -262,6 +264,29 @@ class RefundsController extends BaseController
                 ->json([
                     'deleted' => true
                 ]);
+    }
+
+    public function print($id)
+    {
+        $current_user=$this->currentUser();
+     
+        $signup=Signup::with('course.center','user.profile')->findOrFail($id);
+        if(!$signup->hasRefund()) abort(404);
+       
+        $signup->refund->total=Helper::formatMoney($signup->refund->getTotal());
+        $signup->refund->tuition=Helper::formatMoney($signup->refund->tuition);
+        $signup->refund->charge=Helper::formatMoney($signup->refund->charge);
+        $signup->refund->points=Helper::formatMoney($signup->refund->points);
+       
+        $title=$signup->course->name . ' 退費申請 ' . $signup->user->profile->fullname; 
+        
+        $pdf = PDF::loadView('refunds.form', [
+                                    'title' => $title,
+                                 'signup' => $signup
+                            ]);
+
+                           
+        return $pdf->stream();
     }
 
     public function statusOptions()

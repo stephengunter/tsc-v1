@@ -30167,6 +30167,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         beginDelete: function beginDelete(values) {
             this.confirmMsg = '確定要刪除退費申請 ' + values.name + ' 嗎？';
             this.showConfirm = true;
+        },
+        onPrintRefund: function onPrintRefund() {
+            this.$emit('print-refund', this.id);
         }
     }
 };
@@ -30177,6 +30180,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
 //
 //
 //
@@ -30382,6 +30388,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         onBtnBackClick: function onBtnBackClick() {
             this.$emit('btn-back-clicked');
+        },
+        btnPrintClicked: function btnPrintClicked() {
+            this.$emit('print-refund', this.id);
         }
     }
 
@@ -33392,6 +33401,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     break;
                 case 'settings':
                     html += ' 基本設定';
+                    break;
+                case 'admins':
+                    html += ' 權限管理';
                     break;
             }
 
@@ -40143,6 +40155,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 
@@ -40239,6 +40252,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       },
       onTuitionChanged: function onTuitionChanged() {
          this.current_version += 1;
+      },
+      onPrintRefund: function onPrintRefund(id) {
+         this.$emit('print-refund', id);
       }
    }
 
@@ -72416,6 +72432,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "begin-edit": _vm.beginEdit,
       "dataLoaded": _vm.onDataLoaded,
       "begin-create": _vm.beginCreate,
+      "print-refund": _vm.onPrintRefund,
       "btn-back-clicked": _vm.onBtnBackClicked,
       "begin-delete": _vm.beginDelete
     }
@@ -74340,7 +74357,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "aria-hidden": "true"
     }
-  }), _vm._v("\n               返回\n            ")]), _vm._v(" "), (_vm.refund.canEdit) ? _c('button', {
+  }), _vm._v("\n               返回\n            ")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-warning btn-sm",
+    on: {
+      "click": _vm.btnPrintClicked
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-print",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v(" 列印\n            ")]), _vm._v(" "), (_vm.refund.canEdit) ? _c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -80799,7 +80826,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "saved": _vm.onRefundUpdated,
       "data-loaded": _vm.onDataLoaded,
       "btn-back-clicked": _vm.onBtnBackClicked,
-      "refund-deleted": _vm.onRefundDeleted
+      "refund-deleted": _vm.onRefundDeleted,
+      "print-refund": _vm.onPrintRefund
     }
   }), _vm._v(" "), _c('div', {
     staticClass: "panel with-nav-tabs panel-default",

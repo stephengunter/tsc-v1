@@ -324,10 +324,6 @@ class SignupsController extends BaseController
 
                            
         return $pdf->stream();
-      
-
-        
-       
     }
     public function getByUser($user)
     {
