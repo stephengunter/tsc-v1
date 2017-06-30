@@ -140,9 +140,9 @@ class BaseController extends Controller
                 ],
                 [
                     'id' => 2,
-                    'text' => '新增課程',
-                    'path' => '/courses/create',
-                    'active' => $current=='courses/create'
+                    'text' => '狀態查詢',
+                    'path' => '/statuses',
+                    'active' => $current=='statuses'
                 ],
                 [
                     'id' => 3,

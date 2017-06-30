@@ -23,10 +23,11 @@ class Course extends Model
                             
                             ];
 	
-    protected $filter =  ['name',  'weeks', 'hours', 'number',
-                             'net_signup' , 'credit_count' ,
+    protected $filter =  [ 'name',  'weeks', 'hours', 'number',
+                           'net_signup' , 'credit_count' ,
                            'begin_date' ,   'tuition' , 'cost' , 
-                           'open_date' ,  'limit' , 'active'	];
+                           'open_date' ,  'limit' , 'active',	
+                         ];
 
     public static function initialize($center_id)
     {

@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests\Course\StatusRequest;
 
+use App\Repositories\Courses;
+use App\Repositories\Terms;
+use App\Repositories\Centers;
 use App\Status;
 use App\Course;
 
@@ -15,17 +18,49 @@ use App\Http\Middleware\CheckAdmin;
 
 class StatusesController extends BaseController
 {
-   
-    public function __construct(CheckAdmin $checkAdmin) 
+    
+    public function __construct(Courses $courses,   Terms $terms , 
+                               Centers $centers,CheckAdmin $checkAdmin)
+                               
     {
        
-		$exceptAdmin=[];
+        $exceptAdmin=[];
         $allowVisitors=[];
         $this->setMiddleware( $exceptAdmin, $allowVisitors);
-         
+        
+        $this->courses=$courses;
+        $this->terms=$terms;
+        $this->centers=$centers;
+
         $this->setCheckAdmin($checkAdmin);
-		
+       
+      
+
 	}
+    public function index()
+    {
+        if(!request()->ajax()){
+            $menus=$this->menus('courses');            
+            return view('courses.statuses')
+                    ->with(['menus' => $menus]);
+        }   
+
+        $courseList=$this->courses->getAll();
+
+        $request = request();
+        $termId=(int)$request->term;     
+        if($termId){
+            $courseList=$courseList->where('term_id',$termId);
+        }
+
+        $centerId=(int)$request->center;
+        if($centerId){
+            $courseList=$courseList->where('center_id',$centerId);
+        }
+        
+        $courseList=$courseList->with('status')->filterPaginateOrder();
+        return response() ->json(['model' => $courseList  ]);
+    }
     
     public function show($id)
     {

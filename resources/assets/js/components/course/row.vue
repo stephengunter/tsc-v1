@@ -12,7 +12,7 @@
         
         <td v-text="course.number"></td>   
         <td>
-            <a herf="#" @click="selected(course.id)">
+            <a herf="#" @click.prevent="selected(course.id)">
                    {{ course.name }}
             </a>
         </td> 

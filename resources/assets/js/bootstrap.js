@@ -75,6 +75,7 @@ Vue.component('category-details', require('./views/categories/details') )
 Vue.component('course-index', require('./views/courses/index') )
 Vue.component('course-create', require('./views/courses/create') )
 Vue.component('course-details', require('./views/courses/details') )
+Vue.component('course-statuses', require('./views/courses/statuses') )
 
 Vue.component('admission-index', require('./views/admissions/index') )
 Vue.component('register-index', require('./views/registers/index') )
