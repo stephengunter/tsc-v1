@@ -26307,6 +26307,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+
 
 /* harmony default export */ __webpack_exports__["default"] = {
     name: 'EditCourse',
@@ -26315,6 +26319,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             type: Number,
             default: 0
         }
+    },
+    components: {
+        'course-selector': CourseSelector
     },
     data: function data() {
         return {
@@ -26537,6 +26544,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 }
                 Helper.BusEmitError(error, title);
             });
+        },
+        onImportClicked: function onImportClicked() {
+            this.$emit('import');
         }
     }
 
@@ -39651,6 +39661,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_course_edit_vue__ = __webpack_require__(144);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_course_edit_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_course_edit_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_course_selector_vue__ = __webpack_require__(479);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_course_selector_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_course_selector_vue__);
+//
+//
+//
+//
+//
 //
 //
 //
@@ -39677,7 +39694,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         }
     },
     data: function data() {
-        return {};
+        return {
+            importing: false
+
+        };
     },
     beforeMount: function beforeMount() {
         this.init();
@@ -39690,6 +39710,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         onSaved: function onSaved(course) {
             this.$emit('saved', course);
+        },
+        beginImport: function beginImport() {
+            this.importing = true;
         }
     }
 
@@ -44316,39 +44339,40 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__config_js__ = __webpack_require__(341);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_time_js__ = __webpack_require__(377);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__services_common_js__ = __webpack_require__(376);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__models_user_js__ = __webpack_require__(372);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__models_photo_js__ = __webpack_require__(361);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__models_contactinfo_js__ = __webpack_require__(352);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__models_usercenters_js__ = __webpack_require__(373);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__models_address_js__ = __webpack_require__(343);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__models_category_js__ = __webpack_require__(348);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__models_category_courses_js__ = __webpack_require__(347);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__models_course_js__ = __webpack_require__(354);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__models_course_status_js__ = __webpack_require__(353);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__models_admit_js__ = __webpack_require__(346);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__models_admission_js__ = __webpack_require__(345);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__models_register_js__ = __webpack_require__(363);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__models_student_js__ = __webpack_require__(367);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__models_signupinfo_js__ = __webpack_require__(366);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__models_classtime_js__ = __webpack_require__(351);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__models_schedule_js__ = __webpack_require__(364);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__models_lesson_js__ = __webpack_require__(360);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__models_lesson_participant_js__ = __webpack_require__(359);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__models_leave_js__ = __webpack_require__(358);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__models_signup_js__ = __webpack_require__(365);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__models_tuition_js__ = __webpack_require__(371);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__models_refund_js__ = __webpack_require__(362);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__models_center_js__ = __webpack_require__(349);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__models_teacher_js__ = __webpack_require__(368);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__models_volunteer_js__ = __webpack_require__(374);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__models_admin_js__ = __webpack_require__(344);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36__models_discount_js__ = __webpack_require__(355);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__models_identity_js__ = __webpack_require__(357);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__models_term_js__ = __webpack_require__(369);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39__models_holiday_js__ = __webpack_require__(356);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_40__models_classroom_js__ = __webpack_require__(350);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_41__models_title_js__ = __webpack_require__(370);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_42__packages_auth_Auth_js__ = __webpack_require__(375);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_dataviewer_js__ = __webpack_require__(762);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__models_user_js__ = __webpack_require__(372);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__models_photo_js__ = __webpack_require__(361);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__models_contactinfo_js__ = __webpack_require__(352);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__models_usercenters_js__ = __webpack_require__(373);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__models_address_js__ = __webpack_require__(343);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__models_category_js__ = __webpack_require__(348);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__models_category_courses_js__ = __webpack_require__(347);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__models_course_js__ = __webpack_require__(354);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__models_course_status_js__ = __webpack_require__(353);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__models_admit_js__ = __webpack_require__(346);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__models_admission_js__ = __webpack_require__(345);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__models_register_js__ = __webpack_require__(363);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__models_student_js__ = __webpack_require__(367);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__models_signupinfo_js__ = __webpack_require__(366);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__models_classtime_js__ = __webpack_require__(351);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__models_schedule_js__ = __webpack_require__(364);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__models_lesson_js__ = __webpack_require__(360);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__models_lesson_participant_js__ = __webpack_require__(359);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__models_leave_js__ = __webpack_require__(358);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__models_signup_js__ = __webpack_require__(365);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__models_tuition_js__ = __webpack_require__(371);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__models_refund_js__ = __webpack_require__(362);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__models_center_js__ = __webpack_require__(349);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__models_teacher_js__ = __webpack_require__(368);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__models_volunteer_js__ = __webpack_require__(374);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36__models_admin_js__ = __webpack_require__(344);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__models_discount_js__ = __webpack_require__(355);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__models_identity_js__ = __webpack_require__(357);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39__models_term_js__ = __webpack_require__(369);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_40__models_holiday_js__ = __webpack_require__(356);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_41__models_classroom_js__ = __webpack_require__(350);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_42__models_title_js__ = __webpack_require__(370);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_43__packages_auth_Auth_js__ = __webpack_require__(375);
 __webpack_require__(435);
 __webpack_require__(436);
 __webpack_require__(437);
@@ -44497,7 +44521,8 @@ window.MomentTimeZone = __WEBPACK_IMPORTED_MODULE_4_moment_timezone___default.a;
 
 
 
-__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_42__packages_auth_Auth_js__["a" /* default */]);
+
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_43__packages_auth_Auth_js__["a" /* default */]);
 
 window.Form = __WEBPACK_IMPORTED_MODULE_5__utilities_Form__["a" /* default */];
 window.Helper = __WEBPACK_IMPORTED_MODULE_6__helper_js__["a" /* default */];
@@ -44505,42 +44530,43 @@ window.Config = __WEBPACK_IMPORTED_MODULE_7__config_js__["a" /* default */];
 
 window.TimeService = __WEBPACK_IMPORTED_MODULE_8__services_time_js__["a" /* default */];
 window.CommonService = __WEBPACK_IMPORTED_MODULE_9__services_common_js__["a" /* default */];
+window.DataViewerService = __WEBPACK_IMPORTED_MODULE_10__services_dataviewer_js__["a" /* default */];
 
-window.User = __WEBPACK_IMPORTED_MODULE_10__models_user_js__["a" /* default */];
-window.Photo = __WEBPACK_IMPORTED_MODULE_11__models_photo_js__["a" /* default */];
-window.ContactInfo = __WEBPACK_IMPORTED_MODULE_12__models_contactinfo_js__["a" /* default */];
-window.Address = __WEBPACK_IMPORTED_MODULE_14__models_address_js__["a" /* default */];
-window.UserCenters = __WEBPACK_IMPORTED_MODULE_13__models_usercenters_js__["a" /* default */];
+window.User = __WEBPACK_IMPORTED_MODULE_11__models_user_js__["a" /* default */];
+window.Photo = __WEBPACK_IMPORTED_MODULE_12__models_photo_js__["a" /* default */];
+window.ContactInfo = __WEBPACK_IMPORTED_MODULE_13__models_contactinfo_js__["a" /* default */];
+window.Address = __WEBPACK_IMPORTED_MODULE_15__models_address_js__["a" /* default */];
+window.UserCenters = __WEBPACK_IMPORTED_MODULE_14__models_usercenters_js__["a" /* default */];
 
-window.Category = __WEBPACK_IMPORTED_MODULE_15__models_category_js__["a" /* default */];
-window.CategoryCourses = __WEBPACK_IMPORTED_MODULE_16__models_category_courses_js__["a" /* default */];
-window.Course = __WEBPACK_IMPORTED_MODULE_17__models_course_js__["a" /* default */];
-window.CourseStatus = __WEBPACK_IMPORTED_MODULE_18__models_course_status_js__["a" /* default */];
-window.Admit = __WEBPACK_IMPORTED_MODULE_19__models_admit_js__["a" /* default */];
-window.Admission = __WEBPACK_IMPORTED_MODULE_20__models_admission_js__["a" /* default */];
-window.Register = __WEBPACK_IMPORTED_MODULE_21__models_register_js__["a" /* default */];
-window.Student = __WEBPACK_IMPORTED_MODULE_22__models_student_js__["a" /* default */];
-window.SignupInfo = __WEBPACK_IMPORTED_MODULE_23__models_signupinfo_js__["a" /* default */];
-window.Classtime = __WEBPACK_IMPORTED_MODULE_24__models_classtime_js__["a" /* default */];
-window.Schedule = __WEBPACK_IMPORTED_MODULE_25__models_schedule_js__["a" /* default */];
-window.Lesson = __WEBPACK_IMPORTED_MODULE_26__models_lesson_js__["a" /* default */];
-window.LessonParticipant = __WEBPACK_IMPORTED_MODULE_27__models_lesson_participant_js__["a" /* default */];
-window.Leave = __WEBPACK_IMPORTED_MODULE_28__models_leave_js__["a" /* default */];
+window.Category = __WEBPACK_IMPORTED_MODULE_16__models_category_js__["a" /* default */];
+window.CategoryCourses = __WEBPACK_IMPORTED_MODULE_17__models_category_courses_js__["a" /* default */];
+window.Course = __WEBPACK_IMPORTED_MODULE_18__models_course_js__["a" /* default */];
+window.CourseStatus = __WEBPACK_IMPORTED_MODULE_19__models_course_status_js__["a" /* default */];
+window.Admit = __WEBPACK_IMPORTED_MODULE_20__models_admit_js__["a" /* default */];
+window.Admission = __WEBPACK_IMPORTED_MODULE_21__models_admission_js__["a" /* default */];
+window.Register = __WEBPACK_IMPORTED_MODULE_22__models_register_js__["a" /* default */];
+window.Student = __WEBPACK_IMPORTED_MODULE_23__models_student_js__["a" /* default */];
+window.SignupInfo = __WEBPACK_IMPORTED_MODULE_24__models_signupinfo_js__["a" /* default */];
+window.Classtime = __WEBPACK_IMPORTED_MODULE_25__models_classtime_js__["a" /* default */];
+window.Schedule = __WEBPACK_IMPORTED_MODULE_26__models_schedule_js__["a" /* default */];
+window.Lesson = __WEBPACK_IMPORTED_MODULE_27__models_lesson_js__["a" /* default */];
+window.LessonParticipant = __WEBPACK_IMPORTED_MODULE_28__models_lesson_participant_js__["a" /* default */];
+window.Leave = __WEBPACK_IMPORTED_MODULE_29__models_leave_js__["a" /* default */];
 
-window.Signup = __WEBPACK_IMPORTED_MODULE_29__models_signup_js__["a" /* default */];
-window.Tuition = __WEBPACK_IMPORTED_MODULE_30__models_tuition_js__["a" /* default */];
-window.Refund = __WEBPACK_IMPORTED_MODULE_31__models_refund_js__["a" /* default */];
-window.Teacher = __WEBPACK_IMPORTED_MODULE_33__models_teacher_js__["a" /* default */];
-window.Volunteer = __WEBPACK_IMPORTED_MODULE_34__models_volunteer_js__["a" /* default */];
-window.Admin = __WEBPACK_IMPORTED_MODULE_35__models_admin_js__["a" /* default */];
-window.Center = __WEBPACK_IMPORTED_MODULE_32__models_center_js__["a" /* default */];
-window.Discount = __WEBPACK_IMPORTED_MODULE_36__models_discount_js__["a" /* default */];
-window.Identity = __WEBPACK_IMPORTED_MODULE_37__models_identity_js__["a" /* default */];
+window.Signup = __WEBPACK_IMPORTED_MODULE_30__models_signup_js__["a" /* default */];
+window.Tuition = __WEBPACK_IMPORTED_MODULE_31__models_tuition_js__["a" /* default */];
+window.Refund = __WEBPACK_IMPORTED_MODULE_32__models_refund_js__["a" /* default */];
+window.Teacher = __WEBPACK_IMPORTED_MODULE_34__models_teacher_js__["a" /* default */];
+window.Volunteer = __WEBPACK_IMPORTED_MODULE_35__models_volunteer_js__["a" /* default */];
+window.Admin = __WEBPACK_IMPORTED_MODULE_36__models_admin_js__["a" /* default */];
+window.Center = __WEBPACK_IMPORTED_MODULE_33__models_center_js__["a" /* default */];
+window.Discount = __WEBPACK_IMPORTED_MODULE_37__models_discount_js__["a" /* default */];
+window.Identity = __WEBPACK_IMPORTED_MODULE_38__models_identity_js__["a" /* default */];
 
-window.Term = __WEBPACK_IMPORTED_MODULE_38__models_term_js__["a" /* default */];
-window.Holiday = __WEBPACK_IMPORTED_MODULE_39__models_holiday_js__["a" /* default */];
-window.Classroom = __WEBPACK_IMPORTED_MODULE_40__models_classroom_js__["a" /* default */];
-window.Title = __WEBPACK_IMPORTED_MODULE_41__models_title_js__["a" /* default */];
+window.Term = __WEBPACK_IMPORTED_MODULE_39__models_term_js__["a" /* default */];
+window.Holiday = __WEBPACK_IMPORTED_MODULE_40__models_holiday_js__["a" /* default */];
+window.Classroom = __WEBPACK_IMPORTED_MODULE_41__models_classroom_js__["a" /* default */];
+window.Title = __WEBPACK_IMPORTED_MODULE_42__models_title_js__["a" /* default */];
 
 window.Vue = __WEBPACK_IMPORTED_MODULE_0_vue___default.a;
 
@@ -84666,7 +84692,20 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(_vm.title)
     }
-  })])]), _vm._v(" "), _c('div', {
+  })]), _vm._v(" "), (!_vm.id) ? _c('button', {
+    staticClass: "btn btn-warning btn-sm",
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.onImportClicked($event)
+      }
+    }
+  }, [_c('span', {
+    staticClass: "glyphicon glyphicon-import",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v(" 從舊課程匯入\r\n             ")]) : _vm._e()]), _vm._v(" "), _c('div', {
     staticClass: "panel-body"
   }, [(_vm.loaded) ? _c('form', {
     staticClass: "form",
@@ -88339,11 +88378,12 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('edit-course', {
+  return (_vm.importing) ? _c('course-selector') : _c('edit-course', {
     attrs: {
       "course_id": _vm.course_id
     },
     on: {
+      "import": _vm.beginImport,
       "canceled": _vm.onCanceled,
       "saved": _vm.onSaved
     }
@@ -99097,6 +99137,83 @@ if (false) {
      require("vue-hot-reload-api").rerender("data-v-e22343bc", module.exports)
   }
 }
+
+/***/ }),
+/* 762 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var DataViewerService = function () {
+    function DataViewerService(source, order, direction, search, perPage, search_params) {
+        _classCallCheck(this, DataViewerService);
+
+        this.source = source;
+        this.order = order;
+        this.direction = direction;
+        this.search = search;
+        this.perPage = perPage;
+        this.search_params = search_params;
+    }
+
+    _createClass(DataViewerService, [{
+        key: 'getOperators',
+        value: function getOperators() {
+            return {
+                like: 'LIKE',
+                equal_to: '=',
+                not_equal: '<>',
+                less_than: '<',
+                greater_than: '>',
+                less_than_or_equal_to: '<=',
+                greater_than_or_equal_to: '>=',
+                in: 'IN',
+                not_in: 'NOT IN',
+                between: 'BETWEEN'
+            };
+        }
+    }, {
+        key: 'getParams',
+        value: function getParams() {
+
+            return {
+                column: this.order,
+                direction: this.direction,
+                per_page: this.perPage,
+                page: 1,
+                search_column: this.search,
+                search_operator: 'like',
+                search_query_1: '',
+                search_query_2: ''
+            };
+        }
+    }, {
+        key: 'buildURL',
+        value: function buildURL() {
+            var url = this.source + '?';
+            if (this.search_params) {
+                var searchParams = this.search_params;
+                for (var field in searchParams) {
+
+                    var value = searchParams[field];
+                    url += field + '=' + value + '&';
+                }
+            }
+            var p = this.params;
+
+            url += 'column=' + p.column + '&direction=' + p.direction + '&per_page=' + p.per_page + '&page=' + p.page + '&search_column=' + p.search_column + '&search_operator=' + p.search_operator + '&search_query_1=' + p.search_query_1 + '&search_query_2=' + p.search_query_2;
+
+            return url;
+        }
+    }]);
+
+    return DataViewerService;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = DataViewerService;
 
 /***/ })
 /******/ ]);

@@ -49,7 +49,7 @@ class Course {
                    resolve(response.data)
                 })
                 .catch(error=> {
-                     reject(error);
+                     reject(error)
                 })
            
         })

@@ -116,6 +116,7 @@ import Config from './config.js'
 
 import TimeService from './services/time.js'
 import CommonService from './services/common.js'
+import DataViewerService from './services/dataviewer.js'
 
 import User from './models/user.js'
 import Photo from './models/photo.js'
@@ -163,7 +164,8 @@ window.Helper = Helper
 window.Config = Config
 
 window.TimeService = TimeService
-window.CommonService = CommonService;
+window.CommonService = CommonService
+window.DataViewerService = DataViewerService
 
 window.User=User
 window.Photo=Photo

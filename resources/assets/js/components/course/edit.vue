@@ -5,7 +5,10 @@
         <div class="panel-heading">           
              <span class="panel-title">
                    <h4 v-html="title"></h4>  
-             </span>           
+             </span>   
+             <button  v-if="!id" @click.prevent="onImportClicked"  class="btn btn-warning btn-sm" >
+                  <span class="glyphicon glyphicon-import" aria-hidden="true"></span> 從舊課程匯入
+             </button>     
         </div>
         <div class="panel-body">
             <form v-if="loaded" class="form" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
@@ -193,12 +196,13 @@
       @close="onDeletePhotoCanceled" @confirmed="deletePhoto">        
     </delete-confirm>
 
-
+    
 
 
 </div>    
 </template>
 <script>
+   
     export default {
         name: 'EditCourse',
         props: {
@@ -206,6 +210,9 @@
               type: Number,
               default: 0
             },
+        },
+        components: {
+             'course-selector':CourseSelector
         },
         data() {
             return {
@@ -430,7 +437,9 @@
                     Helper.BusEmitError(error,title)                        
                 })
             },
-
+            onImportClicked(){
+                this.$emit('import')
+            }
 
 
 
