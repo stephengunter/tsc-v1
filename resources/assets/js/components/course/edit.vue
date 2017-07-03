@@ -211,9 +211,7 @@
               default: 0
             },
         },
-        components: {
-             'course-selector':CourseSelector
-        },
+       
         data() {
             return {
                 title:Helper.getIcon(Course.title()) ,

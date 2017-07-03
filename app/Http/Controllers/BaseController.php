@@ -140,30 +140,36 @@ class BaseController extends Controller
                 ],
                 [
                     'id' => 2,
+                    'text' => '新增課程',
+                    'path' => '/courses/create',
+                    'active' => $current=='courses/create'
+                ],
+                [
+                    'id' => 3,
                     'text' => '狀態查詢',
                     'path' => '/statuses',
                     'active' => $current=='statuses'
                 ],
                 [
-                    'id' => 3,
+                    'id' => 4,
                     'text' => '錄取名單',
                     'path' => '/admissions',
                     'active' => $current=='admissions'
                 ],
                 [
-                    'id' => 4,
+                    'id' => 5,
                     'text' => '註冊學員名單',
                     'path' => '/course-registers',
                     'active' => $current=='course-registers'
                 ],
                 [
-                    'id' => 5,
+                    'id' => 6,
                     'text' => '課堂紀錄表',
                     'path' => '/lessons',
                     'active' => $current=='lessons'
                 ],
                 [
-                    'id' => 6,
+                    'id' => 7,
                     'text' => '課程分類',
                     'path' => '/categories',
                     'active' => $current=='categories'

@@ -9,13 +9,16 @@ class Terms
     public function getAll()
     {
        return Term::where('removed',false); 
-       
-         
     }
     public function activeTerms()
     {
        return $this->getAll()->where('active',true);
          
+    }
+    public function latest()
+    {
+        return  $this->activeTerms()
+                ->orderBy('number','desc')->first();
     }
 
     public function checkNumber($number,$id)

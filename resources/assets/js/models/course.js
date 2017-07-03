@@ -67,6 +67,19 @@ class Course {
                 })
         })
     }
+    static import(form){
+        let url =this.storeUrl() + '/import'
+        let method='post'
+        return new Promise((resolve, reject) => {
+            form.submit(method,url)
+                .then(data => {
+                    resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+    }
     static show(id){
         return new Promise((resolve, reject) => {
             let url = this.showUrl(id) 

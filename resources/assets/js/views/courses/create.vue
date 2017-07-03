@@ -1,22 +1,25 @@
 <template>
-    <course-selector v-if="importing">
-    </course-selector>
+   
+    
+    <course-import v-if="importing">
+    </course-import>
 
     <edit-course v-else :course_id="course_id" 
       @import="beginImport"
       @canceled="onCanceled" @saved="onSaved">
     </edit-course>
+   
 
-    
 </template>
 
 <script>
     import EditCourse from '../../components/course/edit.vue'
-    import CourseSelector from '../../components/course/selector.vue'
+    import CourseImport from '../../components/course/import.vue'
     export default {
         name: 'CourseCreate',
         components: {
-            'edit-course':EditCourse
+            'edit-course':EditCourse,
+            'course-import':CourseImport
         },
         props: {
             course_id:{

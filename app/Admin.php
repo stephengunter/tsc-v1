@@ -95,8 +95,15 @@ class Admin extends Model
 
 	public function validCenters()
 	{
+      
 		 return Helper::validCenters($this);
 	}
+
+    public function defaultCenter()
+    {
+          if(!$this->validCenters()) return null;
+          return $this->validCenters()->first();
+    }
 
 	public function centersCanAdd()
 	{

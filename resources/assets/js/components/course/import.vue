@@ -1,9 +1,15 @@
 <template>
 <div>
     <div class="panel panel-default">
+         <div class="panel-heading">           
+             <span class="panel-title">
+                   <h4><span class="glyphicon glyphicon-import" aria-hidden="true"></span> 從舊課程匯入</h4>  
+             </span>   
+             
+        </div>
         <div class="panel-heading">
             <div class="form-inline">
-                
+               
                 <div class="form-group">
                     <select  v-model="params.term"    style="width:auto;" class="form-control selectWidth">
                         <option v-for="item in termOptions" :value="item.value" v-text="item.text"></option>
@@ -25,12 +31,25 @@
                     </select>
                 </div>
             </div>
+
+            <div v-if="hasSelected">
+                 <button type="button" @click.prevent="submit" class="btn btn-success">確認送出</button>
+                 &nbsp;&nbsp;&nbsp;
+                <button class="btn btn-default" @click.prevent="cancel">取消</button>
+            </div>
+            <div v-else>
+                請選擇需要匯入的舊課程
+                &nbsp;&nbsp;&nbsp;
+                <button class="btn btn-default" @click.prevent="cancel">取消</button>
+            </div>
         </div>
     </div>
      
-    <course-list v-if="ready" :search_params="params"  :hide_create="hide_create" :version="version"  
-        :can_select="can_select"
-        @selected="onSelected" @begin-create="onBeginCreate">
+    <course-list v-if="ready" :search_params="params"  
+        :hide_create="listSettings.hide_create" 
+        :can_select="listSettings.can_select"
+        :show_title="listSettings.show_title"
+        @selected="onSelected" @unselected="onUnSelected">
     </course-list>
 
 </div>
@@ -38,12 +57,12 @@
 </template>
 
 <script>
-    import CourseSelector from '../../components/course/selector.vue'
-
+    import CourseList from './list.vue'
+ 
     export default {
         name: 'CourseImport',       
         components: {
-            'course-selector':CourseSelector
+           'course-list':CourseList
         },
         props: {
            
@@ -52,27 +71,33 @@
             return {
                 ready:false,
 
-                dataviewer:{},
-                source: Course.source(),
-                defaultSearch:'name',
-                defaultOrder:'begin_date',  
-                direction:'desc', 
-                perPage:99,
-                
-                
-                termOptions:[],
-                categoryOptions:[],
-                centerOptions:[],
-                weekdayOptions:[],
+                listSettings:{
+                    hide_create:false,
+                    can_select:true,
+                    show_title:false
+                },
+
                 params:{
                     term:0,
                     center:0,
                     category:0,
                     weekday:0,
                 },
+                
+                termOptions:[],
+                categoryOptions:[],
+                centerOptions:[],
+                weekdayOptions:[],
+
                
+                selectedIds:[]
 
              
+            }
+        },
+        computed: {
+            hasSelected() {
+                return this.selectedIds.length > 0
             }
         },
         beforeMount() {
@@ -98,8 +123,7 @@
                     this.weekdayOptions.splice(0, 0, allWeekdays);
                     this.params.weekday=this.weekdayOptions[0].value
                     
-                    this.dataviewer=new DataViewerService(this.source, this.defaultOrder, 
-                                  this.direction , this.defaultSearch, this.perPage, this.params)
+                    this.ready=true
                     
                 }).catch(error=>{
                     Helper.BusEmitError(error)
@@ -107,22 +131,31 @@
                 })
              
             },
-            fetchData(){
-                
-                axios.get(url)
-                .then(response => {
-                    this.courseList=data.courseList
-                })
-                .catch(error=> {
-                     Helper.BusEmitError(error)
-                })  
-            },
             onSelected(id){
-                this.$emit('selected',id)
+               this.selectedIds.push(id)
             },
-            onBeginCreate(){
-                this.$emit('begin-create',this.course_id)
-            }
+            onUnSelected(id){
+                 let index = this.selectedIds.indexOf(id)
+                 if (index > -1) {
+                    this.selectedIds.splice(index, 1)
+                }
+            },
+            submit(){
+                let form=new Form({
+                    selected_ids:this.selectedIds,
+                })
+                let store=Course.import(form)
+                store.then(data => {
+                   Helper.BusEmitOK()
+                   this.$emit('saved',data)                            
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error) 
+                })
+            },
+            cancel(){
+                this.$emit('canceled')
+            },
             
             
         },

@@ -128,6 +128,29 @@ class CoursesController extends BaseController
                 
             ]);
     }
+    public function import(Request $request)
+    {
+        $current_user=$this->currentUser();
+        $removed=false;
+        $updated_by=$current_user->id;
+
+        $selected_ids=$request['selected_ids'];
+        $selected_courses=Course::whereIn('id',$selected_ids)->get();
+
+        $old_course=$selected_courses[0];
+        $courseValues=$old_course->toArray();
+
+        $courseValues['term_id']=$this->terms->latest()->id;
+        $courseValues['term_id']=$current_user->admin->defaultCenter()->id;
+
+        $courseValues['reviewed']=false;
+        $courseValues['active']=false;
+        $courseValues['removed']=false;
+        $courseValues['updated_by']=$updated_by;
+
+        dd($courseValues);
+
+    }
     public function store(CourseRequest $request)
     {
         $current_user=$this->currentUser();

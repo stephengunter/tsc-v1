@@ -2,7 +2,8 @@
     <data-viewer  :default_search="defaultSearch" :default_order="defaultOrder"
       :source="source" :search_params="search_params"  :thead="thead" :no_search="can_select"  
       :filter="filter"  :title="title" create_text="新增課程" 
-      @refresh="init" :version="version"   @beginCreate="beginCreate"
+      :show_title="show_title"  
+     @refresh="init" :version="version"   @beginCreate="beginCreate"
        @dataLoaded="onDataLoaded">
          <div  class="form-inline" slot="header">
                
@@ -15,7 +16,8 @@
          
          <template scope="props">
             <row :course="props.item" :more="viewMore" :select="can_select"
-               @selected="onRowSelected">
+               @selected="onRowSelected"
+               @unselected ="onRowUnselected">
                 
             </row>
             
@@ -47,6 +49,10 @@
                default: 0
             },
             can_select:{
+               type: Boolean,
+               default: true
+            },
+            show_title:{
                type: Boolean,
                default: true
             },
@@ -107,7 +113,9 @@
             onRowSelected(id){
                 this.$emit('selected',id)
             },
-            
+            onRowUnselected(id){
+                this.$emit('unselected',id)
+            },
             beginCreate(){
                  this.$emit('begin-create')
             },
