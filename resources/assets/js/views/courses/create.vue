@@ -1,7 +1,9 @@
 <template>
    
     
-    <course-import v-if="importing">
+    <course-import v-if="importing"
+      @canceled="endImport"
+      @imported="onImported">
     </course-import>
 
     <edit-course v-else :course_id="course_id" 
@@ -51,8 +53,14 @@
             onSaved(course){
                 this.$emit('saved',course)
             },
+            onImported(){
+                this.$emit('imported')
+            },
             beginImport(){
                 this.importing=true
+            },
+            endImport(){
+                this.importing=false
             }
             
            

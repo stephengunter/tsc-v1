@@ -2,7 +2,8 @@
 
 @section('content')
 
-    <course-create @canceled="onCanceled" @saved="onSaved">
+    <course-create @canceled="onCanceled" 
+    @saved="onSaved" @imported="onImported">
     </course-create>
 
 @endsection
@@ -31,6 +32,9 @@
             },            
             backToIndex(){
                 Helper.redirect('/courses')
+            },
+            onImported(){
+               this.backToIndex()
             }
 
         },

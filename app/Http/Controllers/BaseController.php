@@ -243,6 +243,25 @@ class BaseController extends Controller
             );
         }
 
+        if($key=='notices'){
+           return array(
+                [
+                    'id' => 1,
+                    'text' => '公告管理',
+                    'path' => '/notices',
+                    'active' => $current=='admins'
+                ],
+                [
+                    'id' => 2,
+                    'text' => '新增公告',
+                    'path' => '/notices/create',
+                    'active' => $current=='admins/create'
+                ],
+                
+                
+            );
+        }
+
         return [];
     }
 }

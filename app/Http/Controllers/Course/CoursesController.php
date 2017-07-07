@@ -19,6 +19,7 @@ use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
 use App\Events\CourseUpdated;
+use Carbon\Carbon;
 
 
 class CoursesController extends BaseController
@@ -134,21 +135,40 @@ class CoursesController extends BaseController
         $removed=false;
         $updated_by=$current_user->id;
 
+        $defaultCenter=$current_user->admin->defaultCenter();
+        $defaultTerm=$this->terms->latest();
+
         $selected_ids=$request['selected_ids'];
         $selected_courses=Course::whereIn('id',$selected_ids)->get();
 
-        $old_course=$selected_courses[0];
-        $courseValues=$old_course->toArray();
+        foreach ($selected_courses as $old_course) {
+            $courseValues=$old_course->toArray();
 
-        $courseValues['term_id']=$this->terms->latest()->id;
-        $courseValues['term_id']=$current_user->admin->defaultCenter()->id;
+            $courseValues['term_id']=$defaultTerm->id;
+            $courseValues['center_id']=$defaultCenter->id;
 
-        $courseValues['reviewed']=false;
-        $courseValues['active']=false;
-        $courseValues['removed']=false;
-        $courseValues['updated_by']=$updated_by;
+            $courseValues['begin_date']='';
+            $courseValues['end_date']='';
+            $courseValues['open_date']='';
+            $courseValues['close_date']='';
 
-        dd($courseValues);
+            $courseValues['reviewed']=false;
+            $courseValues['active']=false;
+            $courseValues['removed']=false;
+            $courseValues['updated_by']=$updated_by;
+           
+
+            $categoryIds = $old_course->privateCategories()
+                                        ->pluck('id')->toArray();
+            
+            $teacherIds = $old_course->teachers()->get()
+                                        ->pluck('user_id')->toArray(); 
+
+            $course = $this->courses->store($courseValues , $categoryIds, $teacherIds);
+                                   
+        }
+        
+        return response()->json(['saved' => true ]);  
 
     }
     public function store(CourseRequest $request)
@@ -202,6 +222,8 @@ class CoursesController extends BaseController
         if(!$course->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
+        $course->begin_date=Helper::checkDateString($course->begin_date);
+        $course->end_date=Helper::checkDateString($course->end_date);
 
         $validCenters=$current_user->admin->validCenters();
         $centerOptions=$this->centers->optionsConverting($validCenters);

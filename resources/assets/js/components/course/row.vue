@@ -6,7 +6,9 @@
             </button>
         </td>
         <td v-if="select">
-             <checkbox @selected="selected(course.id)" @unselected="unselected(course.id)" ></checkbox>
+             <checkbox :default="been_selected"
+             @selected="selected(course.id, course.number, course.name)"
+              @unselected="unselected(course.id)" ></checkbox>
         </td>
         <td v-text="course.center.name"></td>   
         
@@ -54,6 +56,10 @@
                type: Boolean,
                default: false
             },
+            been_selected:{
+                type: Boolean,
+               default: false
+            }
             
         },
         data() {
@@ -84,8 +90,8 @@
                 }
                 this.$emit('remove-clicked',values)
             },
-            selected(id){
-                this.$emit('selected',id)
+            selected(id,number,name){
+                this.$emit('selected',id,number,name)
             },
             unselected(id){
                  this.$emit('unselected',id)

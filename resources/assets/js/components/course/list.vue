@@ -3,7 +3,7 @@
       :source="source" :search_params="search_params"  :thead="thead" :no_search="can_select"  
       :filter="filter"  :title="title" create_text="新增課程" 
       :show_title="show_title"  
-     @refresh="init" :version="version"   @beginCreate="beginCreate"
+      @refresh="init" :version="version"   @beginCreate="beginCreate"
        @dataLoaded="onDataLoaded">
          <div  class="form-inline" slot="header">
                
@@ -16,6 +16,7 @@
          
          <template scope="props">
             <row :course="props.item" :more="viewMore" :select="can_select"
+               :been_selected="beenSelected(props.item.id)"       
                @selected="onRowSelected"
                @unselected ="onRowUnselected">
                 
@@ -51,6 +52,10 @@
             can_select:{
                type: Boolean,
                default: true
+            },
+            selected_ids: {
+              type: Array,
+              default: null
             },
             show_title:{
                type: Boolean,
@@ -89,7 +94,9 @@
   
                 
                 hasData:false,
-                viewMore:false
+                viewMore:false,
+
+              
              
             }
         },
@@ -110,8 +117,8 @@
                     
                 }
             },
-            onRowSelected(id){
-                this.$emit('selected',id)
+            onRowSelected(id,number,name){
+                this.$emit('selected',id,number,name)
             },
             onRowUnselected(id){
                 this.$emit('unselected',id)
@@ -119,6 +126,12 @@
             beginCreate(){
                  this.$emit('begin-create')
             },
+            beenSelected(id){
+                if(!this.selected_ids) return false
+                if(this.selected_ids.length < 1)  return false
+                 let index = this.selected_ids.indexOf(id)
+                return index >= 0
+            }
             
            
         },

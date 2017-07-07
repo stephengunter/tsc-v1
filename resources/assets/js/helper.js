@@ -91,6 +91,9 @@ class Helper {
             case 'statuses':
                 html = '<i class="fa fa-check-circle" aria-hidden="true"></i>'
             break;
+            case 'notices':
+                html = '<i class="fa fa-comments-o" aria-hidden="true"></i>'
+            break;
                
         }
 
@@ -119,15 +122,17 @@ class Helper {
                 html = '<i class="fa fa-pencil-square-o" aria-hidden="true"></i> 課程管理'
                 break;
             case 'signups':
-            html = '<i class="fa fa-file-text-o" aria-hidden="true"></i> 報名紀錄'
-            break;
+                html = '<i class="fa fa-file-text-o" aria-hidden="true"></i> 報名紀錄'
+                break;
             case 'tuitions':
-            html = '<i class="fa fa-money" aria-hidden="true"></i> 繳費紀錄'
-            break;
+                html = '<i class="fa fa-money" aria-hidden="true"></i> 繳費紀錄'
+                break;
             case 'refunds':
-            html = '<i class="fa fa-arrow-circle-left" aria-hidden="true"></i> 退費申請'
+                html = '<i class="fa fa-arrow-circle-left" aria-hidden="true"></i> 退費申請'
+                break;
+            case 'notices':
+            html = '<i class="fa fa-comments-o" aria-hidden="true"></i> 公告管理'
             break;
-
             case 'admins':
                 html = '<i class="fa fa-key" aria-hidden="true"></i> 權限管理'
                 break;
@@ -138,6 +143,9 @@ class Helper {
     static todayString(){
         let now = Moment()
         return this.tpeDate(now)
+    }
+    static strTime(datetime) {
+        return Moment(datetime).format('YYYY-MM-DD HH:mm:ss')
     }
     static tpeTime(datetime) {
         return MomentTimeZone.utc(datetime).tz("Asia/Taipei").format('YYYY-MM-DD HH:mm:ss')
@@ -314,7 +322,38 @@ class Helper {
     static removeItem(list, item) {
         list.splice(list.indexOf(item), 1);
     }
+    static splitToArray(strVal){
+        if(!strVal) return []
+        return strVal.split(',')
+    }
+    static arrayToSplit(arrVal){
+        if(!arrVal) return ''
+        if(!arrVal.length) return ''
+        let str=''
+        for (let i = 0; i < arrVal.length; ++i) {
+            str+=arrVal[i]
+            if(i < arrVal.length-1){
+                str+= ','
+            }
+        }
 
+        return str
+    }
+    static okSign(val){
+
+        if(this.isTrue(val)){
+            return '<span class="glyphicon glyphicon-ok-sign text-success"></span>'
+        }else{
+            return ''
+        }
+    }
+    static removeHTML(strText){
+        let regEx = /<[^>]*>/g;
+ 
+        strText= strText.replace(regEx, '')
+        return strText.replace('&nbsp;', ' ')
+    }
+   
 
 }
 

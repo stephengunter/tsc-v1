@@ -102,6 +102,15 @@ class Helper
         if(!count($canAddIds)) return null;
         return Center::where('removed',false)->whereIn('id' , $canAddIds)->get();
 	}
+    public static function checkDateString($date_string)
+    {
+        $date=Carbon::parse($date_string);
+        if($date->year < 1911){
+            return '';
+        }else{
+            return $date_string;
+        }
+    }
     public static function getHourMinute($val)
     {
         $value=(string)$val;

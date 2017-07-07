@@ -9,7 +9,17 @@
 
 <script>
     export default {
-      props: ['value','default'],
+      
+      props: {
+          value: {
+               type: String,
+               default: ''
+            },
+          default:{
+             type: Boolean,
+             default: false
+          },
+      },
       name: 'Checkbox',
       data() {
           return {

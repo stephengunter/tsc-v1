@@ -1,13 +1,19 @@
+window.$ = window.jQuery = require('jquery');
 require('../css/app.css');
 require('../css/font-awesome.css');
 require('../css/site.css');
+require('../summernote/summernote.css');
 
 require('bootstrap-sass');
+
+require('../summernote/summernote.js');
+require('../summernote/lang/summernote-zh-TW.js');
 
 import Vue from 'vue';
 Vue.component('modal', require('vue-strap/src/modal') )
 Vue.component('alert', require('vue-strap/src/alert') )
 Vue.component('tooltip', require('vue-strap/src/tooltip') )
+
 
 import vSelect from 'vue-select'
 Vue.component('drop-down', vSelect)
@@ -15,6 +21,7 @@ Vue.component('date-picker', require('vue-datepicker') )
 Vue.component('time-picker', require('vue2-timepicker') )
 Vue.component('pager', require('vue-simple-pager') )
 
+Vue.component('html-editor', require('./components/HtmlEditor') )
 Vue.component('delete-confirm', require('./components/DeleteConfirm') )
 Vue.component('toggle', require('./components/Toggle') )
 Vue.component('checkbox', require('./components/CheckBox') )
@@ -84,6 +91,10 @@ Vue.component('lesson-index', require('./views/lessons/index') )
 Vue.component('lesson-details', require('./views/lessons/details') )
 Vue.component('lesson-create', require('./views/lessons/create') )
 
+Vue.component('notice-index', require('./views/notices/index') )
+// Vue.component('notice-details', require('./views/notice/details') )
+Vue.component('notice-create', require('./views/notices/create') )
+
 Vue.component('center-index', require('./views/centers/index') )
 Vue.component('center-create', require('./views/centers/create') )
 Vue.component('center-details', require('./views/centers/details') )
@@ -149,6 +160,7 @@ import Volunteer from './models/volunteer.js'
 import Admin from './models/admin.js'
 import Discount from './models/discount.js'
 import Identity from './models/identity.js'
+import Notice from './models/notice.js'
 
 import Term from './models/term.js'
 import Holiday from './models/holiday.js'
@@ -197,6 +209,7 @@ window.Admin=Admin
 window.Center=Center
 window.Discount=Discount
 window.Identity=Identity
+window.Notice=Notice
 
 window.Term=Term
 window.Holiday=Holiday
@@ -210,7 +223,9 @@ window.Title=Title
 window.Vue = Vue;
 
 
-
+Vue.filter('strTime', function (datetime) {
+    return Helper.tpeTime(datetime)
+})
 Vue.filter('tpeTime', function (datetime) {
     return Helper.tpeTime(datetime)
 })
@@ -246,6 +261,9 @@ Vue.filter('titleHtml', function (title) {
 })
 Vue.filter('tryParseInt', function (val) {
     return Helper.tryParseInt(val)
+})
+Vue.filter('okSign', function (val) {
+     return Helper.okSign(val)
 })
 
 window.Bus = new Vue({});

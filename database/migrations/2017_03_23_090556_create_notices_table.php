@@ -17,8 +17,12 @@ class CreateNoticesTable extends Migration
             $table->increments('id');
             $table->string('title');
             $table->text('content');
+            
             $table->boolean('active')->default(false);
             $table->boolean('public')->default(false);
+            $table->boolean('removed')->default(false);
+
+            $table->string('courses')->nullable();
 
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();

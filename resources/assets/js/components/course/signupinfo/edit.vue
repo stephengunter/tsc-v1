@@ -177,8 +177,8 @@
                             signupinfo: signupinfo,
                         })
 
-                    this.open_date.time=signupinfo.begin_date
-                    this.close_date.time=signupinfo.end_date
+                    this.open_date.time=signupinfo.open_date
+                    this.close_date.time=signupinfo.close_date
 
                     this.loaded=true
 

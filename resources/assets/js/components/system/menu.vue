@@ -56,6 +56,9 @@
                     case 'admins':
                         html += ' 權限管理'
                         break
+                    case 'notices':
+                    html += ' 公告管理'
+                    break
                 }
 
                 return html

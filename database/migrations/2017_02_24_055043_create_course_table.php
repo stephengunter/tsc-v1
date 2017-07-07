@@ -26,8 +26,8 @@ class CreateCourseTable extends Migration
             $table->boolean('net_signup')->default(true);
 
 		
-			$table->date('begin_date');
-            $table->date('end_date');
+			$table->date('begin_date')->nullable();;
+            $table->date('end_date')->nullable();;
             $table->integer('weeks');
             $table->integer('hours');
             	

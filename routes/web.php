@@ -82,6 +82,8 @@ Route::resource('tuitions', '\App\Http\Controllers\Signups\TuitionsController');
 Route::resource('back-tuitions', '\App\Http\Controllers\Signups\BackTuitionsController');
 Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
 
+Route::resource('notices', '\App\Http\Controllers\Notice\NoticesController');
+
 Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
 Route::resource('statuses', '\App\Http\Controllers\Course\StatusesController',
                                  ['only' => ['index','show','edit','update']]);
