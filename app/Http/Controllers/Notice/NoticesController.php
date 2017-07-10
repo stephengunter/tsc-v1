@@ -13,6 +13,8 @@ use App\Repositories\Notices;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
+use App\Events\NoticeMailCreated;
+
 class NoticesController extends BaseController
 {
     protected $key='notices';
@@ -65,9 +67,14 @@ class NoticesController extends BaseController
         $removed=false;
         $values=$request->getValues($updated_by,$removed);
 
-        if($values['courses']){
+        $emails=(int)$values['emails'];
+      
+        if($emails && $values['courses']){
             $courseIds= explode(",", $values['courses']);
             $notice=$this->notices->store($values , $courseIds);
+            
+            event(new NoticeMailCreated($notice));
+            
 
             return response() ->json($notice);
         }else{

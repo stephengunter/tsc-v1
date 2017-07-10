@@ -23,11 +23,14 @@ class SendEmailNotice  implements ShouldQueue
     public function handle(NoticeMailCreated $event)
     {
         $notice=$event->notice;
-        // $courses=
-        // if($user->email){
-        //     dispatch(new SendEmail($notice));
-        // }
-         
-       
+        $courses=$notice->courses;
+        foreach ($courses as $course) {
+            $students=$course->students;
+            foreach ($students as $student) {
+                 $user=$student->user;
+                 dispatch(new SendEmail($notice, $user));   
+            }
+
+        }
     }
 }

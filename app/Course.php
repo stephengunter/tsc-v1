@@ -99,7 +99,7 @@ class Course extends Model
 	}
     public function students() 
 	{
-		return $this->hasMany('App\CourseStudent');
+		return $this->hasMany('App\Student');
 	}
 
     public function classroom()

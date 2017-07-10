@@ -50,14 +50,15 @@
                 <div v-if="!id" class="form-group">
                     <label  class="col-sm-2 control-label">Email給學員</label>
                     <div class="col-sm-2">
+                        <input type="hidden" v-model="form.notice.emails"  >
                         <input type="hidden" v-model="form.notice.courses"  >
-                        <toggle :items="publicOptions"   :default_val="emails" @selected=setEmails></toggle>
+                        <toggle :items="publicOptions"   :default_val="form.notice.emails" @selected=setEmails></toggle>
                        
                     </div>
                     <div  class="col-sm-8">
                         <small class="text-danger" v-if="form.errors.has('notice.courses')" v-text="form.errors.get('notice.courses')"></small>
 
-                        <p v-show="emails">
+                        <p v-show="form.notice.emails">
                             <a href="#" @click.prevent="beginSelectCourses" >
                                <span v-for="course  in selectedCourses">
                                    {{ course.number }} &nbsp; {{ course.name }}
@@ -128,7 +129,7 @@
 
                 publicOptions: Helper.boolOptions(),
 
-                emails:false,
+              
 
                 selectorSettings:{
                     width:1200,
@@ -173,16 +174,15 @@
                         this.form = new Form({
                                 notice: notice,
                             })
+                        // if(notice.courses){
+                        //     this.selectedCourseIds=Helper.splitToArray(notice.courses)
+                        //     this.selectedCourses= data.selectedCourses
+                        // }else{
+                          
+                        //     this.courseNames=''
+                        // }
 
-                        if(notice.courses){
-                            this.emails=true
-                            this.selectedCourseIds=Helper.splitToArray(notice.courses)
-                            this.selectedCourses= data.selectedCourses
-                        }else{
-                            this.emails=false
-                            this.courseNames=''
-                        }
-
+                        
                         this.loaded=true
 
 
@@ -203,9 +203,9 @@
                 
                 if( Helper.isTrue(val)){
                     this.beginSelectCourses()
-                    this.emails=true
+                    this.form.notice.emails=1
                 }else{
-                    this.emails=false
+                    this.form.notice.emails=0
                     this.clearErrorMsg('notice.courses')
                 }
             },
@@ -224,7 +224,7 @@
             },
             submitForm() {
                 let errors={}
-                if(this.emails) {
+                if(this.form.notice.emails) {
                     if(!this.selectedCourseIds || !this.selectedCourseIds.length){
                         errors['notice.courses']=['請選擇要Email通知的課程']
                     }else{
@@ -246,7 +246,7 @@
                 }
                 store.then(data => {
                    Helper.BusEmitOK()
-                   this.$emit('saved',data)                            
+                  // this.$emit('saved',data)                            
                 })
                 .catch(error => {
                     Helper.BusEmitError(error) 

@@ -9,17 +9,17 @@
 
 <script>
     export default {
-      
-      props: {
-          value: {
-               type: String,
-               default: ''
-            },
-          default:{
-             type: Boolean,
-             default: false
-          },
-      },
+      props: ['value','default'],
+      // props: {
+      //     value: {
+      //          type: String,
+      //          default: ''
+      //       },
+      //     default:{
+      //        type: Boolean,
+      //        default: false
+      //     },
+      // },
       name: 'Checkbox',
       data() {
           return {
@@ -27,7 +27,7 @@
           }
       },
       beforeMount() {
-        if(this.default) this.selected=true
+        if(Helper.isTrue(this.default)) this.selected=true
           else this.selected=false
       },
       methods:{
