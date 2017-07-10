@@ -1,5 +1,5 @@
 <template>
-    <edit-notice :course_id="course_id" 
+    <edit-notice 
       @canceled="onCanceled" @saved="onSaved">
           
     </edit-notice>
@@ -13,12 +13,7 @@
         components: {
             'edit-notice':EditNotice
         },
-        props: {
-            course_id:{
-               type: Number,
-               default: 0
-            },
-        },   
+        
         data() {
             return {
                 

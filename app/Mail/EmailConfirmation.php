@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Mail;
+
 use App\User;
 use App\EmailToken;
 

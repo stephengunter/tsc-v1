@@ -20,8 +20,8 @@ class EmailResetPassword extends Mailable
 
     public function __construct(User $user, $frontend=false)
     {
-       $this->user = $user;
-       $this->settings = Helper::getAppSettings($frontend);
+        $this->user = $user;
+        $this->settings = Helper::getAppSettings($frontend);
        
     }
     

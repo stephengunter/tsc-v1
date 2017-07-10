@@ -9,14 +9,13 @@ class Notice extends Model
 {
     use FilterPaginateOrder;
     protected $filter =  [  'title' , 'content', 'active',       
-                            'public',  'courses', 'created_at'
+                            'public', 'emails', 'created_at'
                          ];
 
     protected $fillable = [ 
-                            'title' , 'content', 'active',       
-                            'public',  'courses',
-                            'removed','updated_by'
-                            ];
+                            'title' , 'content', 'active', 'emails',      
+                            'public', 'removed','updated_by'                           
+                          ];
 
     public static function initialize()
     {
@@ -24,13 +23,14 @@ class Notice extends Model
             'title' => '',
             'content' => '',
             'active' => 0,
-            'public' => 0,
+            'public' => 1,
+            'emails' => 0,
             'courses' => ''
         ];
     }
     public function courses()
     {
-        return $this->belongsToMany('App\Course','course_category');
+        return $this->belongsToMany('App\Course','course_notice');
     }
 
     public function canEditBy($user)
@@ -52,4 +52,13 @@ class Notice extends Model
 	{
          return  true;
 	}
+
+    public function courseNames()
+    {
+        $names=[];
+        foreach ($this->courses as $course) {
+           array_push($names, $course->fullName());
+        }
+        return $names;
+    }
 }

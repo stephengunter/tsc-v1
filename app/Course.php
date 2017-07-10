@@ -235,6 +235,10 @@ class Course extends Model
             return false;
         }
     }
+    public function fullName()
+    {
+        return $this->number . ' ' . $this->name;
+    }
     public function nameWithNumber()
     {
         return $this->name . ' (' . $this->number . ')';

@@ -249,13 +249,13 @@ class BaseController extends Controller
                     'id' => 1,
                     'text' => '公告管理',
                     'path' => '/notices',
-                    'active' => $current=='admins'
+                    'active' => $current=='notices'
                 ],
                 [
                     'id' => 2,
                     'text' => '新增公告',
                     'path' => '/notices/create',
-                    'active' => $current=='admins/create'
+                    'active' => $current=='notices/create'
                 ],
                 
                 

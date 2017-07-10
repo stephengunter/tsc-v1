@@ -31,7 +31,15 @@
                     
                     </div>
                 </div>
-                <div class="form-group">
+                <div v-if="id" class="form-group">
+                    <label  class="col-sm-2 control-label">狀態</label>
+                    <div class="col-sm-10">
+                        <input type="hidden" v-model="form.notice.active"  >
+                        <toggle :items="activeOptions"   :default_val="form.notice.active" @selected=setActive></toggle>
+                        
+                    </div>
+                </div>
+                <div v-if="!id" class="form-group">
                     <label  class="col-sm-2 control-label">發佈到網站</label>
                     <div class="col-sm-10">
                         <input type="hidden" v-model="form.notice.public"  >
@@ -39,7 +47,7 @@
                     
                     </div>
                 </div>
-                <div class="form-group">
+                <div v-if="!id" class="form-group">
                     <label  class="col-sm-2 control-label">Email給學員</label>
                     <div class="col-sm-2">
                         <input type="hidden" v-model="form.notice.courses"  >
@@ -73,7 +81,7 @@
     <modal :showbtn="selectorSettings.showBtn"  :show.sync="selectorSettings.showing" @closed="onSelectorCanceled" 
         effect="fade" :width="selectorSettings.width">
          
-        <div slot="modal-body" class="modal-body">
+        <div v-if="!id" slot="modal-body" class="modal-body">
             <course-selector
               :selected_ids="selectedCourseIds"
               :show_title="selectorSettings.show_title"
@@ -153,6 +161,7 @@
                 
                 let id=this.id
                 let getData=null
+               
                 if(id){
                     getData=Notice.edit(id)
                 }else{
@@ -237,7 +246,7 @@
                 }
                 store.then(data => {
                    Helper.BusEmitOK()
-                   // this.$emit('saved',data)                            
+                   this.$emit('saved',data)                            
                 })
                 .catch(error => {
                     Helper.BusEmitError(error) 

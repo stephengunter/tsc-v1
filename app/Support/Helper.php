@@ -182,6 +182,17 @@ class Helper
         return substr($strValue ,0, $pos );
 
     }
+
+    public static function strFromArray($arrVal,$split=',')
+    {
+        $str='';
+        for($i = 0; $i < count($arrVal); ++$i) {
+            if($i>0){
+                $str .= ',' ;
+            }
+            $str .=  $arrVal[$i];
+        }
+    }
     
     
 

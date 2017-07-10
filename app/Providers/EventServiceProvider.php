@@ -16,9 +16,9 @@ class EventServiceProvider extends ServiceProvider
          'App\Events\UserRegistered' => [
             'App\Listeners\SendActivationToken',
         ],
-        // 'App\Events\TeacherCreated' => [
-        //     'App\Listeners\SendActivationToken',
-        // ],
+        'App\Events\NoticeMailCreated' => [
+            'App\Listeners\SendEmailNotice',
+        ],
 
        
 

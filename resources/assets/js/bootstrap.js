@@ -92,7 +92,7 @@ Vue.component('lesson-details', require('./views/lessons/details') )
 Vue.component('lesson-create', require('./views/lessons/create') )
 
 Vue.component('notice-index', require('./views/notices/index') )
-// Vue.component('notice-details', require('./views/notice/details') )
+Vue.component('notice-details', require('./views/notices/details') )
 Vue.component('notice-create', require('./views/notices/create') )
 
 Vue.component('center-index', require('./views/centers/index') )

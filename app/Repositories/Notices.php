@@ -20,7 +20,14 @@ class Notices
         $noticeList=$this->getAll();
         return $noticeList->where('active',true);
     }
-   
+    public function store($values , $courseIds)
+    {
+        $notice= Notice::create($values);
+        
+        $this->syncCourses($courseIds , $notice);
+
+        return $notice;
+    }
 
     public function delete($id,$admin_id)
     {
@@ -34,6 +41,11 @@ class Notices
         
          $notice->update($values);
         
+    }
+
+    private function syncCourses($courseIds , $notice)
+    {
+        $notice->courses()->sync($courseIds);
     }
 
     

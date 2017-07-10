@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Notice\NoticeRequest;
 
 use App\Notice;
+use App\Course;
 use App\Repositories\Notices;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
@@ -35,17 +36,6 @@ class NoticesController extends BaseController
         }          
         
         $noticeList=$this->notices->getAll()->filterPaginateOrder();
-        
-        // if(count($courseList)){
-        //     foreach ($courseList as $course) {
-        //         foreach ($course->classTimes as $classTime) {
-        //           $classTime->weekday;
-        //         }
-        //         foreach ($course->teachers as $teacher) {
-        //           $teacher->name=$teacher->getName();
-        //         }
-        //     }
-        // }
 
         return response() ->json(['model' => $noticeList  ]);  
        
@@ -75,7 +65,78 @@ class NoticesController extends BaseController
         $removed=false;
         $values=$request->getValues($updated_by,$removed);
 
-        $notice= Notice::create($values);
-        return response() ->json($notice);
+        if($values['courses']){
+            $courseIds= explode(",", $values['courses']);
+            $notice=$this->notices->store($values , $courseIds);
+
+            return response() ->json($notice);
+        }else{
+            $notice= Notice::create($values);
+            return response() ->json($notice);
+        }
+        
+    }
+    public function show($id)
+    {
+        if(!request()->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('notices.details')
+                    ->with([ 'menus' => $menus,
+                              'id' => $id     
+                        ]);
+        }  
+        $current_user=$this->currentUser();
+        $notice = Notice::findOrFail($id);
+        
+        $notice->canEdit=$notice->canEditBy($current_user);
+        $notice->canDelete=$notice->canDeleteBy($current_user);
+
+        if(count($notice->courses)){
+            $notice->courseNames= $notice->courseNames();
+        } 
+
+        return response()->json(['notice' => $notice]);
+    }
+    public function edit($id)
+    {
+        $current_user=$this->currentUser();
+        $notice = Notice::findOrFail($id);
+        if(!$notice->canEditBy($current_user)){
+            return  $this->unauthorized(); 
+        }
+       
+        return response()
+            ->json([
+                'notice' => $notice
+            ]);
+    }
+    public function update(NoticeRequest $request, $id)
+    {
+        $current_user=$this->currentUser();
+        $notice = Notice::findOrFail($id);
+        if(!$notice->canEditBy($current_user)){
+            return  $this->unauthorized();         
+        }
+        $removed=false;
+        $updated_by=$current_user->id;
+
+        $values=$request->getValues($updated_by,$removed); 
+       
+        $notice->update($values);
+        
+        return response()->json(['notice' => $notice ]);
+               
+    }
+    public function destroy($id)
+    {
+        $current_user=$this->currentUser();
+        $notice = Notice::findOrFail($id);
+        if(!$notice->canDeleteBy($current_user)){
+           return  $this->unauthorized();     
+        }
+        $this->notices->delete($id,$current_user->id);
+
+        return response()->json([ 'deleted' => true ]);
+           
     }
 }
