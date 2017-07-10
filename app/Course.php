@@ -115,6 +115,8 @@ class Course extends Model
 
 	}
 
+   
+
     public function isValid()
     {
         if($this->removed) return false;

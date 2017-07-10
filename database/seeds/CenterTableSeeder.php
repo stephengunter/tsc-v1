@@ -12,6 +12,7 @@ class CenterTableSeeder extends Seeder
 		$center=Center::create([
 			'name' => '台北中心',
 			'contact_info' => $contactinfo->id,
+			'code' => 'TPE',
 			'active' => 1,
 		]);
 
@@ -19,6 +20,7 @@ class CenterTableSeeder extends Seeder
 		$center=Center::create([
 			'name' => '花蓮中心',
 			'contact_info' => $contactinfo->id,
+			'code' => 'HUA',
 			'active' => 1,
 		]);
 
@@ -26,6 +28,7 @@ class CenterTableSeeder extends Seeder
 		$center=Center::create([
 			'name' => '宜蘭中心',
 			'contact_info' => $contactinfo->id,
+			'code' => 'ILA',
 			'active' => 1,
 		]);
 
@@ -33,36 +36,9 @@ class CenterTableSeeder extends Seeder
 		$center=Center::create([
 			'name' => '台中中心',
 			'contact_info' => $contactinfo->id,
+			'code' => 'TCU',
 			'active' => 1,
 		]);
-
-		// $centers = [
-		// 	[
-		// 		'name' => '台北中心',
-		// 		'contact_info' => $contact_infos[0]->id,
-		// 		'active' => 1,
-		// 	],
-		// 	[
-		// 		'name' => '花蓮中心',
-		// 		'contact_info' => $contact_infos[1]->id,
-		// 		'active' => 1,
-		// 	],
-		// 	[
-		// 		'name' => '高雄中心',
-		// 		'contact_info' => $contact_infos[2]->id,
-		// 		'active' => 1,
-		// 	],
-		// 	[
-		// 		'name' => '新竹中心',
-		// 		'contact_info' => $contact_infos[3]->id,
-		// 		'active' => 1,
-		// 	],
-			
-		// ];
-
-		// foreach ($centers as $key => $value) {
-		// 	Center::create($value);
-		// }
 
 		
 	}

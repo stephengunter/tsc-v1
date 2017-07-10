@@ -6,7 +6,11 @@
     
 //  });
 Route::get('test', function(){
-     return view('test');
+     $signup=\App\Signup::find(1);
+     $signup->user->profile;
+     $signup->course->center->addressText=$signup->course->center->addressText();
+     $signup->course->center->phone=$signup->course->center->phoneText();
+     return view('emails.signup')->with(['signup'=>$signup]);
 });
 Route::get('/', 'HomeController@index');
 Route::get('errors', function(){

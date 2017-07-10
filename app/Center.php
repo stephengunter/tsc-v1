@@ -66,6 +66,24 @@ class Center extends Model
 		     
 	}
 
+	public function addressText()
+    {
+       if($this->contactInfo()){
+		   $addressA=$this->contactInfo()->addressA();
+		  return $addressA->fullText();
+	   }else{
+		   return '';
+	   }
+    }
+	public function phoneText()
+    {
+       if($this->contactInfo()){
+		  return $this->contactInfo()->tel;
+	   }else{
+		   return '';
+	   }
+    }
+
 	public function isValid()
 	{
 		return !$this->removed;
