@@ -51,9 +51,12 @@ class AdmissionsController extends BaseController
         
         if($admission){
             $admission->canEdit=$admission->canEditBy($current_user);
+            
         }else{
             $course->canCreateAdmit=$course->canCreateAdmit();           
         }
+
+        
 
         $admitList=Admit::where('course_id',$id)->with(['signup.user.profile']);
         $request = request();
@@ -161,6 +164,8 @@ class AdmissionsController extends BaseController
                 return $admission;
               
         });
+
+        event(new \App\Events\AdmissionCreated($admission));
         
         return response() ->json([ 'admission' => $admission ]);
     }

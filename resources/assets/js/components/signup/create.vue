@@ -86,8 +86,54 @@
                    <div class="col-sm-3">
                         <div class="form-group"> 
                            <label>電話</label>
-                           <input class="form-control" type="text"  :value="user.phone" disabled>
-                        
+                           <div class=" form-inline">
+                              <input class="form-control" type="text"  :value="user.phone" disabled>
+                              &nbsp;&nbsp;
+                              <button @click.prevent="onEditUser" class="btn btn-primary btn-xs" >
+                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                              </button>
+                           </div>
+                         </div>  
+                   </div>
+               </div>
+                <div v-if="edittingUser" class="row">
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>性別</label>
+                           <div>
+                             <toggle :items="genderOptions"   :default_val="editUserForm.user.profile.gender" @selected=setGender></toggle>
+                           </div>
+                        </div>  
+                   </div>
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>生日</label>
+                            <div>
+                                <date-picker  :date="dob" :option="datePickerOption"></date-picker>
+                            </div>
+                         </div>  
+                   </div>
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>身分證號</label>
+                           <input type="text" name="user.profile.SID" class="form-control" v-model="editUserForm.user.profile.SID" @keydown="clearEditUserError('user.profile.SID')"  >
+                           <small class="text-danger" v-if="editUserForm.errors.has('user.profile.SID')" v-text="editUserForm.errors.get('user.profile.SID')"></small>
+                        </div>  
+                   </div>
+                   <div class="col-sm-3">
+                        <div class="form-group"> 
+                           <label>電話</label>
+                           <div class=" form-inline">
+                              <input type="text" name="user.phone" class="form-control" v-model="editUserForm.user.phone" @keydown="clearEditUserError('user.phone')">
+                              <small class="text-danger" v-if="editUserForm.errors.has('user.phone')" v-text="editUserForm.errors.get('user.phone')"></small>
+                               &nbsp;&nbsp;
+                                 <button class="btn btn-success btn-xs" @click.prevent="saveUser">
+                                    <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+                                 </button> 
+                                 <button class="btn btn-default btn-xs" @click.prevent="cancelEditUser">
+                                    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>               
+                                 </button> 
+                           </div>
                          </div>  
                    </div>
                </div>
@@ -102,12 +148,12 @@
                    </div>
                    
                </div>  
-               <div class="row">
+               <div class="row" v-show="canSubmit">
                     <div class="col-sm-6">
-                        <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確定</button>
-                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      <button class="btn btn-default" @click.prevent="canceled">取消</button>
-                  </div>
+                         <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確定</button>
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                         <button class="btn btn-default" @click.prevent="canceled">取消</button>
+                    </div>
 
 
 
@@ -140,6 +186,14 @@
                 selectedUser:null,
                 user:null,
 
+                edittingUser:false,
+                genderOptions:[],
+                dob:{
+                  time: ''
+                },
+                editUserForm:{},
+                
+
                 
                 courseName:'',
                 discount_id:0,
@@ -164,15 +218,29 @@
 
             }
         },
+        computed: {
+            canSubmit: function () {
+                if(this.edittingUser) return false
+                  if(!this.user) return false
+                    return true
+            }
+        },
         watch: {
             selectedUser: function () {
-              this.user=null
+               this.user=null
+               this.edittingUser=false
                this.getUser()               
             },
             date: {
               handler: function () {
                   this.signup.date=this.date.time
                   this.clearErrorMsg('signup.date')
+              },
+              deep: true
+            },
+            dob: {
+              handler: function () {
+                  this.editUserForm.user.profile.dob=this.dob.time        
               },
               deep: true
             },
@@ -218,8 +286,8 @@
                 
             },
             getUser(){
-                let user_id=this.selectedUser.value
-                let user=User.edit(user_id)   
+                 let user_id=this.selectedUser.value
+                 let user=User.edit(user_id)   
                   user.then(data => {
                       this.user = data.user
                       this.clearErrorMsg('signup.user_id')                    
@@ -307,6 +375,40 @@
             },
             canceled(){
                 this.$emit('canceled')
+            },
+            onEditUser(){
+             
+                this.editUserForm=new Form({
+                    user:this.user
+                })
+                this.dob.time=this.user.profile.dob
+                this.genderOptions= Helper.genderOptions()
+
+                this.user=null 
+                this.edittingUser=true
+
+            },
+            setGender(val) {
+                this.editUserForm.user.profile.gender = val;
+            },
+            clearEditUserError(name){
+                 this.editUserForm.errors.clear(name)
+            },
+            cancelEditUser(){
+                 this.getUser()
+                 this.edittingUser=false
+            },
+            saveUser(){
+
+                let updateUser=Signup.updateUser(this.editUserForm)
+                
+                updateUser.then(user => {
+                   this.user = user
+                   this.edittingUser=false
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error) 
+                })
             }
 
 

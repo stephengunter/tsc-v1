@@ -10,22 +10,14 @@
 <script>
     export default {
       props: ['value','default'],
-      // props: {
-      //     value: {
-      //          type: String,
-      //          default: ''
-      //       },
-      //     default:{
-      //        type: Boolean,
-      //        default: false
-      //     },
-      // },
+      
       name: 'Checkbox',
       data() {
           return {
               selected: false,
           }
       },
+     
       beforeMount() {
         if(Helper.isTrue(this.default)) this.selected=true
           else this.selected=false

@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\Signups\SignupRequest;
+use App\Http\Requests\Signups\SignupUserRequest;
 
 use App\Repositories\Courses;
 use App\Repositories\Discounts;
@@ -22,6 +23,7 @@ use App\Course;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
+use App\Events\SignupCreated;
 use App\Events\SignupChanged;
 use PDF;
 
@@ -171,7 +173,9 @@ class SignupsController extends BaseController
          $date=$values['date'];
          
          $signup=$this->signups->store($course,$discount,$user_id,$updated_by,$date);
-         
+
+         event(new SignupCreated($signup));
+
          return response()->json($signup);
             
     }
@@ -251,7 +255,7 @@ class SignupsController extends BaseController
                     ->with([ 'menus' => $menus,
                               'id' => $id     
                         ]);
-         }  
+        }  
 
         $current_user=$this->currentUser();
 
@@ -259,7 +263,8 @@ class SignupsController extends BaseController
         if(!$signup->canViewBy($current_user)){
             return  $this->unauthorized(); 
         }
-
+       
+        
         $signup->canEdit=$signup->canEditBy($current_user);
         $signup->canDelete=$signup->canDeleteBy($current_user);        
         $signup->hasRefund=$signup->hasRefund();
@@ -286,6 +291,23 @@ class SignupsController extends BaseController
                     'deleted' => true
                 ]);
     }
+    public function updateUser(SignupUserRequest $request)
+    {
+        $current_user=$this->currentUser();
+        $updated_by=$current_user->id;
+        $removed=false;
+        $userValues=$request->getUserValues($updated_by,$removed);       
+        $profileValues=$request->getProfileValues($updated_by);
+       
+        $user_id=$userValues['id'];
+        $user=User::findOrFail($user_id);
+
+        $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
+        
+        return response()->json($user);
+        
+    }
+
     public function print($id)
     {
         $current_user=$this->currentUser();

@@ -29,6 +29,8 @@
               this.id= {{ $id }}
 
             @endif
+            
+            
         },
         methods: {
             onSignupDeleted(){

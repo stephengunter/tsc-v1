@@ -10,8 +10,17 @@ class Helper {
         return parseInt(val)
     }
     static isTrue(val){
-        val=this.tryParseInt(val)
-        return val>0
+        if(typeof val=='number'){
+             return val > 0
+        }else if(typeof val=='string'){
+            if(val.toLowerCase()=='true') return true
+            if(val=='1') return true
+                  return false
+        }else if(typeof val=='boolean'){
+              return val
+        }
+      
+        return false
     }
     static boolText(val){
         if(this.isTrue(val)) return '是'

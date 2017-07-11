@@ -62,8 +62,8 @@
                          <combination-select :with_course="combinationSettings.withCourse"
                           @ready="onCombinationReady" @course-changed="setCourse"></combination-select>
 
-
-                          <small v-if="form.errors.has('signup.course')" v-text="form.errors.get('signup.course')" class="text-danger" >身分證號</small>
+                          <input type="hidden" name="signup.course_id" class="form-control" v-model="form.signup.course_id"  >
+                          <small v-if="form.errors.has('signup.course_id')" v-text="form.errors.get('signup.course_id')" class="text-danger" >身分證號</small>
                              
                         </div>
                    </div>
@@ -272,12 +272,14 @@
             },
             onCombinationReady(params){
                 this.setCourse(params.course)
+
             },
             setGender(val) {
                 this.form.user.profile.gender = val;
             },
             setCourse(val){
                 this.form.signup.course_id=val
+                 this.clearErrorMsg('signup.course_id')
             },
             setDiscount(val) {
                 this.form.signup.discount_id = val;

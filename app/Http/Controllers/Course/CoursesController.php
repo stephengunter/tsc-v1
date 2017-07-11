@@ -21,6 +21,8 @@ use App\Http\Middleware\CheckAdmin;
 use App\Events\CourseUpdated;
 use Carbon\Carbon;
 
+use Excel;
+
 
 class CoursesController extends BaseController
 {
@@ -190,18 +192,80 @@ class CoursesController extends BaseController
     }
     public function show($id)
     {
-        if(!request()->ajax()){
-            $menus=$this->menus($this->key);            
-            return view('courses.details')
-                    ->with([ 'menus' => $menus,
-                              'id' => $id     
-                        ]);
-        }  
+        // if(!request()->ajax()){
+        //     $menus=$this->menus($this->key);            
+        //     return view('courses.details')
+        //             ->with([ 'menus' => $menus,
+        //                       'id' => $id     
+        //                 ]);
+        // }  
         $current_user=$this->currentUser();
         $course = Course::with('center','term','categories','teachers','classTimes')->findOrFail($id);
         
         $course->canEdit=$course->canEditBy($current_user);
         $course->canDelete=$course->canDeleteBy($current_user);
+       
+        Excel::create('New file', function($excel) {
+
+            $excel->sheet('New sheet', function($sheet) {
+                $sheet->setWidth(array(
+                    'A'     =>  12,
+                    'B'     =>  28,
+                    'C'     =>  23,
+                    'D'     =>  33,
+                    'E'     =>  33,
+                    'F'     =>  12,
+                    'G'     =>  18,
+                    'H'     =>  12,
+                    'I'     =>  12,
+                    'J'     =>  12,
+                ));
+                
+                $sheet->row(1, array(
+                    '慈濟大學一佰六學年度第一學期台北社會教育推廣中心'
+                ));
+                $sheet->row(2, array(
+                    '課程審核清冊'
+                ));
+                $sheet->setHeight(1, 20);
+                $sheet->setHeight(2, 20);
+                $sheet->mergeCells('A1:J1');
+                $sheet->mergeCells('A2:J2');
+                $sheet->cells('A1:A2', function($cells) {
+                     $cells->setAlignment('center');
+                     $cells->setValignment('center');
+                     $cells->setFontColor('#0000ff');
+                });
+
+                $sheet->row(3, array(
+                    '編號','課程名稱','授課教師','師資簡介','課程簡介','課程日期','上課時間',
+                    '總時數','課程費用','報名日期'
+                ));
+                $sheet->setHeight(3, 20);
+                $sheet->cells('A3:J3', function($cells) {
+                     $cells->setAlignment('center');
+                     $cells->setValignment('center');
+                     $cells->setFontColor('#008000');
+                     $cells->setBorder('thin', 'thin', 'thin', 'thin');
+                });
+
+                $sheet->mergeCells('A4:A23');
+                $sheet->mergeCells('B4:B23');
+
+                $sheet->cells('A4:B4', function($cells) {
+                    //  $cells->setAlignment('center');
+                     $cells->setValignment('top');
+                      $cells->setFontColor('#0000ff');
+                     $cells->setBorder('thin', 'thin', 'thin', 'thin');
+                });
+
+               
+              
+                // $sheet->loadView('reports.courses');
+
+            });
+
+        })->download('xls');
 
         foreach ($course->classTimes as $classTime) {
                 $classTime->weekday;

@@ -5,6 +5,7 @@ namespace App\Listeners;
 
 class SignupEventListener
 {
+    
     public function updateSignupStatus($event) 
     {
         $signup=$event->signup;
@@ -20,6 +21,7 @@ class SignupEventListener
   
     public function subscribe($events)
     {
+       
         $events->listen(
             'App\Events\SignupChanged',
             'App\Listeners\SignupEventListener@updateSignupStatus'

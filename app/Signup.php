@@ -118,6 +118,14 @@ class Signup extends Model
          }
          $this->save();
     }    
+    public function formattedPoints()
+    {
+        if(!$this->points) return '';
+
+        $strValue=(String)$this->points;
+
+        return str_replace('0','',$strValue);
+    }
 
     
 

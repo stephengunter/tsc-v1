@@ -174,6 +174,7 @@
                 else this.summary=null
             }, 
             isTrue(val){
+            
                return Helper.isTrue(val)
             },
             statusStyle(status){

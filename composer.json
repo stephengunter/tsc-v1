@@ -19,7 +19,8 @@
         "laravel/passport": "^2.0",
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "^5.2.0",
-        "zizaco/entrust": "5.2.x-dev"
+        "zizaco/entrust": "5.2.x-dev",
+        "maatwebsite/excel": "~2.1.0"
     },
     "require-dev": {
         "laravel/tinker": "~1.0",
