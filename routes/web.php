@@ -124,6 +124,8 @@ Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController')
 Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
 Route::resource('titles', '\App\Http\Controllers\Settings\TitlesController');
 
+Route::resource('courses-report', '\App\Http\Controllers\Reports\CourseListController',
+                                     ['only' => ['index']]);  
 
 // Route::group(['prefix' => 'api/'], function() {
 //     Route::resource('sessions', '\App\Http\Controllers\Auth\SessionsController');
