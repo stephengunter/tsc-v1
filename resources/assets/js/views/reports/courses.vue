@@ -5,12 +5,12 @@
             <div class="form-inline">
                 
                 <div class="form-group">
-                    <select  v-model="params.term"    style="width:auto;" class="form-control selectWidth">
+                    <select  v-model="params.term"  @change="onParamChanged"  style="width:auto;" class="form-control selectWidth">
                         <option v-for="item in termOptions" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <select  v-model="params.center" style="width:auto;" class="form-control selectWidth">
+                    <select  v-model="params.center" @change="onParamChanged" style="width:auto;" class="form-control selectWidth">
                          <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
@@ -99,7 +99,7 @@
                     viewMore:false,
                 },
 
-                courseIds:'hhh'
+               
 
              
             }
@@ -122,6 +122,7 @@
                     this.centerOptions=data.centerOptions                   
                     this.params.center=this.centerOptions[0].value
 
+                   
                     this.fetchData()
                 }).catch(error=>{
                     Helper.BusEmitError(error)                   
@@ -147,18 +148,9 @@
                     
                 }
             },
-            // setCourseIds(){
-            //     return new Promise((resolve, reject) => {
-            //         this.courseIds=''
-            //          for (let i = 0; i < this.courses.length; i++) {
-            //                this.courseIds += String(this.courses[i].id)
-            //                if(i < this.courses.length-1){
-            //                     this.courseIds += ','
-            //              }
-            //         }
-            //         resolve(true)
-            //     })
-            // },
+            onParamChanged(){
+                this.fetchData()
+            },
             exportReport(){
                 document.forms['form-export'].submit()
             }

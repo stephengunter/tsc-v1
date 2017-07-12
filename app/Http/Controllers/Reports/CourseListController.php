@@ -7,6 +7,8 @@ use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
 use App\Course;
+use App\Term;
+use App\Center;
 use App\Repositories\Courses;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
@@ -181,22 +183,6 @@ class CourseListController extends BaseController
         });
         
         $this->setFullBorder($sheet,$current_row);
-        
-        // $cols=$this->cols;
-
-        //getRange($col_from,$row_from,$col_end,$row_end)
-        
-        // $end_row=$current_row + 24;
-       
-        // for($i = 0; $i < count($cols); ++$i) {
-        //     $range=$this->getRange($cols[$i],$current_row,$cols[$i],$end_row);
-        //     $sheet->mergeCells($range);
-        // }
-        //return $end_row + 1;
-       
-        // $sheet->getStyle('A4:B4')
-        //                 ->getAlignment()
-        //                 ->setWrapText(true);
     }
 
     private function getCourseList($termId,$centerId)
@@ -247,41 +233,43 @@ class CourseListController extends BaseController
         $termId=$request['term'];
         $centerId=$request['center'];
         $courseList=$this->getCourseList($termId,$centerId)->get();
+        
+
+        if(!count($courseList)) dd('查無資料');
+
+        $term=$courseList[0]->term;
+        $center=$courseList[0]->center;
        
-        $test=$courseList[0]->defaultCategory();
-        $categoryCollection = collect([$test]);
-
-        $x=$categoryCollection->first(function ($item) {
-            return $item->id == 0;
-        });
-
-        dd($x);
-
+        $categoryCollection = collect([]);
         foreach ($courseList as $course) {
             $category=$course->defaultCategory();
-            if(!$categoryCollection->contains('id', $category->id)){
-                $categoryCollection->push($category);
+            if($category){
+                $exist=$categoryCollection->first(function ($item) use ($category) {
+                return $item->id == $category->id;
+                });
+                if($exist){
+                    $exist->courseList->push($course);
+                }else{
+                    $category->courseList=collect([$course]);
+                    $categoryCollection->push($category);
+                }
             }
 
         }
 
-        
-
-
-
-        Excel::create('New file', function($excel) {
-
-            $excel->sheet('New sheet', function($sheet) {
+       
+        $title=config('app.name').' '. $term->year . ' 學年度第 ' . $term->order .' 學期 '.$center->name;
+        Excel::create($title.'課程清單', function($excel) use ($categoryCollection,$title){
+            
+            $excel->sheet('課程清單', function($sheet) use ($categoryCollection,$title){
+               
                 $colWidth=$this->getColWidth();               
                 $sheet->setWidth($colWidth);
-
-                $category=\App\Category::find(1);
-                $category->courses;
                
                 $current_row=1;
                 
                 $data=array(
-                    '慈濟大學一佰六學年度第一學期台北社會教育推廣中心'
+                   $title
                 );
                 $this->setTitle($sheet, $current_row, $data);
                 $current_row +=1;
@@ -292,59 +280,20 @@ class CourseListController extends BaseController
                 $this->setTitle($sheet, $current_row, $data);
                 $current_row +=1;
 
-                $this->setCategory($sheet,$current_row,$category);
-                $current_row +=1;
+                foreach ($categoryCollection as $category) {
+                    $this->setCategory($sheet,$current_row,$category);
+                    $current_row +=1;
 
-                $this->setTableHead($sheet,$current_row);
-                $current_row +=1;
+                    $this->setTableHead($sheet,$current_row);
+                    $current_row +=1;
 
-                $current_row = $this->setCourse($sheet,$current_row,$category->courses[0]);
+                    foreach ($category->courseList as $course) {
+                        $this->setCourse($sheet,$current_row,$course);
+                        $current_row +=1;
+                    }
 
-                // foreach ($category->courses as $course) {
-                //     $current_row = $this->setCourse($sheet,$current_row,$course);
-                    
-                // }
 
-                // $sheet->row(3, array(
-                //     '編號','課程名稱','授課教師','師資簡介','課程簡介','課程日期','上課時間',
-                //     '總時數','課程費用','報名日期'
-                // ));
-                // $sheet->setHeight(3, 20);
-                // $sheet->cells('A3:J3', function($cells) {
-                //      $cells->setAlignment('center');
-                //      $cells->setValignment('center');
-                //      $cells->setFontColor('#008000');
-                //      $cells->setBorder('thin', 'thin', 'thin', 'thin');
-                // });
-                // for ($i = 1; $i <= 10; $i++) {
-                //     echo $i;
-                // }
-                // $sheet->cell('A1', function($cell) {
-                //     // manipulate the cell
-                //     $cell->setValue('data1');
-                // });
-
-                // $sheet->mergeCells('A4:A23');
-                // $sheet->mergeCells('B4:B23');
-
-                // $sheet->cells('A4:B4', function($cells) {
-                //     //  $cells->setAlignment('center');
-                //     $cells->setValue('data1');
-                //     $cells->setValignment('top');
-                //     $cells->setFontColor('#0000ff');
-                //     $cells->setBorder('thin', 'thin', 'thin', 'thin');
-                   
-                // });
-
-                // $sheet->getStyle('A4:B4')
-                //         ->getAlignment()
-                //         ->setWrapText(true);
-                
-                
-
-               
-              
-                // $sheet->loadView('reports.courses');
+                }
 
             });
 
