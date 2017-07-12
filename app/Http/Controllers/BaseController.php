@@ -262,6 +262,20 @@ class BaseController extends Controller
             );
         }
 
+        if($key=='reports'){
+           return array(
+                [
+                    'id' => 1,
+                    'text' => '課程清單',
+                    'path' => '/courses-report',
+                    'active' => $current=='courses-report'
+                ],
+               
+                
+                
+            );
+        }
+
         return [];
     }
 }

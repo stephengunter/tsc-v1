@@ -107,6 +107,9 @@ class Helper {
             case 'notices':
                 html = '<i class="fa fa-comments-o" aria-hidden="true"></i>'
             break;
+            case 'reports':
+                html = '<i class="fa fa-file-word-o" aria-hidden="true"></i>'
+            break;
                
         }
 

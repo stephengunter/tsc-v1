@@ -72,6 +72,20 @@
                     <div v-if="id" class="col-sm-3">
                        
                     </div>
+                    <div class="col-sm-6">
+                        
+                        <div class="form-group">  
+                            <label>課程簡介</label>
+                            <textarea rows="6" cols="50" class="form-control" name="course.description"  v-model="form.course.description">
+                            </textarea>
+                            <small class="text-danger" v-if="form.errors.has('course.description')" v-text="form.errors.get('course.description')"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div v-if="id" class="col-sm-3">
+                       
+                    </div>
                     <div class="col-sm-3">
                         
                         <div class="form-group">  

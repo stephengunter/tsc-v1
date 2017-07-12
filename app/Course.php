@@ -148,6 +148,15 @@ class Course extends Model
                     ->where('active',true)
                     ->where('public',false)->get();
     }
+    public function defaultCategory()
+    {
+        $privateCategories=$this->privateCategories();
+        if($privateCategories){
+            return $privateCategories[0];
+        }else{
+            return null;
+        }
+    }
     public function validSignups()
     {
         return $this->signups()->where('removed',false);

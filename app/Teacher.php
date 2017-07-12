@@ -140,7 +140,7 @@ class Teacher extends Model
     public function experiencesArray()
     {
        
-        return   explode('\n', $this->experiences);
+        return   explode('<br>', $this->experiences);
     }
   
 }

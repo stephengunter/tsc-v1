@@ -1,4 +1,4 @@
-<template>
+\<template>
 <div v-if="loaded">
     <div class="row">
         <div v-if="keys[0]" class="col-md-6">
@@ -30,6 +30,14 @@
         </div>
         <div v-if="keys[7]" class="col-md-6">
             <menu-item  :title="keys[7]" :items="systems[keys[7]]"></menu-item>
+        </div>
+    </div> 
+    <div v-if="keys.length > 8" class="row">
+        <div v-if="keys[8]" class="col-md-6">
+            <menu-item  :title="keys[8]" :items="systems[keys[8]]"></menu-item>
+        </div>
+        <div v-if="keys[9]" class="col-md-6">
+            <menu-item  :title="keys[9]" :items="systems[keys[9]]"></menu-item>
         </div>
     </div> 
  </div>   

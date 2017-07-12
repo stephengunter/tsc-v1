@@ -2,7 +2,7 @@
     <data-viewer  :default_search="defaultSearch" :default_order="defaultOrder"
       :source="source" :search_params="search_params"  :thead="thead" :no_search="can_select"  
       :filter="filter"  :title="title" create_text="新增課程" 
-      :show_title="show_title"  
+      :show_title="show_title"  :no_page="no_page"
       @refresh="init" :version="version"   @beginCreate="beginCreate"
        @dataLoaded="onDataLoaded">
          <div  class="form-inline" slot="header">
@@ -60,6 +60,10 @@
             show_title:{
                type: Boolean,
                default: true
+            },
+            no_page:{
+               type: Boolean,
+               default: false
             },
         },
         beforeMount() {

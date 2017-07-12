@@ -57,7 +57,10 @@
                         html += ' 權限管理'
                         break
                     case 'notices':
-                    html += ' 公告管理'
+                        html += ' 公告管理'
+                    break
+                    case 'reports':
+                        html += ' 報表'
                     break
                 }
 

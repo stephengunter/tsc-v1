@@ -12,14 +12,16 @@ use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
 use Excel;
+use DB;
 
 class CourseListController extends BaseController
 {
+    protected $key='reports';
     private $cols=[
-                    'A','B','C','D','E','F','G','H','I','J'
+                    'A','B','C','D','E','F','G','H','I'
                 ];
     private $width=[
-       12,28,23,33,33,12,23,12,12,12
+       12,28,33,33,12,23,12,12,12
     ];
     public function __construct(Courses $courses,CheckAdmin $checkAdmin)                                          
     {
@@ -67,7 +69,7 @@ class CourseListController extends BaseController
     {
         $sheet->row($current_row, $data);
         $sheet->setHeight($current_row, 20);
-        $range=$this->getRange('A',$current_row,'J',$current_row);
+        $range=$this->rowRange($current_row);
         $sheet->mergeCells($range);
         $key=$this->getKey('A',$current_row);               
         $sheet->cell($key, function($cell) {
@@ -83,7 +85,7 @@ class CourseListController extends BaseController
                 );
         $sheet->row($current_row, $data);
         $sheet->setHeight($current_row, 20);
-        $range=$this->getRange('A',$current_row,'J',$current_row);
+        $range=$this->rowRange($current_row);
         $sheet->mergeCells($range);
         $key=$this->getKey('A',$current_row);               
         $sheet->cell($key, function($cell) {
@@ -105,11 +107,11 @@ class CourseListController extends BaseController
     private function setTableHead($sheet,$current_row)
     {
         $sheet->row($current_row, array(
-                    '編號','課程名稱','授課教師','師資簡介','課程簡介','課程日期','上課時間',
+                    '編號','課程名稱','授課教師','課程簡介','課程日期','上課時間',
                     '總時數','課程費用','報名日期'
                 ));
         $sheet->setHeight($current_row, 20);
-        $range=$this->getRange('A',$current_row,'J',$current_row);
+        $range=$this->rowRange($current_row);
         $sheet->cells($range, function($cells) {
              $cells->setAlignment('center');
              $cells->setValignment('center');
@@ -130,19 +132,17 @@ class CourseListController extends BaseController
     }
     private function teachers($course)
     {
-//         $text='';
-//         $text='沙瑞金'.Chr(10);
-//         $text .= ' ● ' .'翁央黨校依其' .Chr(10);
-//         $text .= ' ● ' .'省委書記' .Chr(10);
-//         $text .=Chr(10);
-//         $text .='豪鉅工程有限公司事業已達二十餘年之久，向來堅持品質與服務為優先之經營理念，不論在施工、材料、或品質控管都有一定之專業水準，未來公司在經營之方向
-
-// 與理念，就是把專業、用心、品質、服務 帶給每位客戶。';
+        $text='';
         
         $teachers=$course->teachers;
         foreach ($teachers as $teacher) {
-           $text .=  $teacher->getName() .Chr(10);    
-
+            $text .=  $teacher->getName() .Chr(10); 
+            $experiences=$teacher->experiencesArray();
+            for($i = 0; $i < count($experiences); ++$i) {
+                $text .= ' ● ' .$experiences[$i] .Chr(10);
+            }
+          
+            $text .= Chr(10) . $teacher->description;
         }
         return $text;
     }
@@ -153,15 +153,12 @@ class CourseListController extends BaseController
             $course->number,
             $course->name,
             $this->teachers($course),
-            '',
             $course->description,
             $course->begin_date .  Chr(10) . '至'.  Chr(10) . $course->end_date,
             $this->classTimes($course),
             $course->hours,
             $course->tuition,
             $course->open_date  .  Chr(10) . '至'.  Chr(10) . $course->close_date ,
-            
-            
         );
 
         $sheet->setHeight($current_row, 360);
@@ -175,7 +172,7 @@ class CourseListController extends BaseController
             $cells->setAlignment('center');
             $cells->setValignment('top');
             $cells->setFontColor('#0000ff');
-          
+            $cells->setFontSize(10);
         });
 
         $key=$this->getKey('C',$current_row);
@@ -183,7 +180,7 @@ class CourseListController extends BaseController
               $cell->setAlignment('left');
         });
         
-
+        $this->setFullBorder($sheet,$current_row);
         
         // $cols=$this->cols;
 
@@ -202,9 +199,76 @@ class CourseListController extends BaseController
         //                 ->setWrapText(true);
     }
 
+    private function getCourseList($termId,$centerId)
+    {
+        $courseList=$this->courses->getAll();
+        
+        $courseList=$courseList->where('term_id',$termId)
+                                ->where('center_id',$centerId)
+                                ->where('reviewed',true); 
+
+         return $courseList;
+    }
+
     public function index()
     {
+        if(!request()->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('reports.courses')
+                    ->with(['menus' => $menus]);
+        }  
+
+        $request = request();
+        $termId=(int)$request->term; 
+        $centerId=(int)$request->center;
+
+        $courseList=$this->getCourseList($termId,$centerId);
         
+        if(count($courseList)){
+            $courseList=$courseList->with(['center','categories','teachers','classTimes'])
+                                    ->get();
+            foreach ($courseList as $course) {
+                foreach ($course->classTimes as $classTime) {
+                  $classTime->weekday;
+                }
+                foreach ($course->teachers as $teacher) {
+                  $teacher->name=$teacher->getName();
+                }
+            }
+        }
+
+        return response() ->json(['courseList' => $courseList  ]);
+
+        
+    }
+
+    public function store(Request $request)
+    {
+        $termId=$request['term'];
+        $centerId=$request['center'];
+        $courseList=$this->getCourseList($termId,$centerId)->get();
+       
+        $test=$courseList[0]->defaultCategory();
+        $categoryCollection = collect([$test]);
+
+        $x=$categoryCollection->first(function ($item) {
+            return $item->id == 0;
+        });
+
+        dd($x);
+
+        foreach ($courseList as $course) {
+            $category=$course->defaultCategory();
+            if(!$categoryCollection->contains('id', $category->id)){
+                $categoryCollection->push($category);
+            }
+
+        }
+
+        
+
+
+
         Excel::create('New file', function($excel) {
 
             $excel->sheet('New sheet', function($sheet) {
