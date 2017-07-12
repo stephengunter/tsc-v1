@@ -124,6 +124,17 @@ class Helper
             'minute' => (int)$minute
         ];
     }
+    public static function convertTimeNumberToText($val)
+    {
+        $time=self::getHourMinute($val);
+        $minute='';
+        if($time['minute'] == 0 ){
+            $minute='00';
+        }else{
+             $minute=$time['minute'];
+        }
+        return $time['hour'] . ':' . $minute;
+    }
     public static function getFormattedTime($val)
     {
         $value=self::getHourMinute($val);

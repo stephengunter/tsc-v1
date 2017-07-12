@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Support\Helper;
+
 class ClassTime extends Model
 {
     protected $fillable = ['course_id', 'weekday_id', 'on', 'off','updated_by'];
@@ -37,5 +39,14 @@ class ClassTime extends Model
 		
        	return $this->canEditBy($user);
         
+	}
+
+	public function fullText() {
+		$day= $this->weekday->text ;
+
+		$on=Helper::convertTimeNumberToText($this->on);
+		$off=Helper::convertTimeNumberToText($this->off);
+
+		return $day . ' ' . $on . ' - ' . $off ;
 	}
 }

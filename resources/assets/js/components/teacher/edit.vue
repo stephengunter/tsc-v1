@@ -18,6 +18,7 @@
 
             </form>
         </div>
+        <div>{{ test }}</div>
     </div>
     
 </template>
@@ -47,7 +48,9 @@
                    with_user:false,
                    with_profile:false,
                    with_teacher_name:true
-                }
+                },
+
+                test:''
 
             }
         },
@@ -84,6 +87,9 @@
                 this.form.errors.clear(name)
             },
             onSubmit() {
+                let experience=Helper.replaceAll( this.form.teacher.experiences, '\n','<br>')
+                this.form.teacher.experiences=experience
+             
                 this.submitForm()
             },
             submitForm() {

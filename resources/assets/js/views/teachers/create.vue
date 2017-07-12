@@ -225,7 +225,9 @@
                 this.$emit('canceled')
             },
             submitForm() {
-
+                let experience=Helper.replaceAll( this.form.teacher.experiences, '\n','<br>')
+                this.form.teacher.experiences=experience
+                
                 let store=Teacher.store(this.form)
                     .then(data => {
                        Helper.BusEmitOK()

@@ -54,7 +54,7 @@
              <div class="row">
                  <div class="col-sm-4">
                       <label class="label-title">學經歷</label>
-                      <p v-text="teacher.experiences"></p>                     
+                      <p v-html="teacher.experiences"></p>                     
                  </div>
                   <div class="col-sm-4">
                       <label class="label-title">個人簡介</label>

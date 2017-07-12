@@ -136,5 +136,11 @@ class Teacher extends Model
 	{
 		return $this->canEditBy($user);
 	}
+
+    public function experiencesArray()
+    {
+       
+        return   explode('\n', $this->experiences);
+    }
   
 }

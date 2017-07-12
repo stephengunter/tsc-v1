@@ -22,6 +22,10 @@ class Helper {
       
         return false
     }
+    static replaceAll(strVal, oldVal, newVal){
+      
+       return strVal.replace( new RegExp(oldVal,'g'), newVal)
+    }
     static boolText(val){
         if(this.isTrue(val)) return '是'
             return '否'

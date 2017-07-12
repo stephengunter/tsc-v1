@@ -140,6 +140,7 @@ class TeachersController extends BaseController
         $teacher->canEdit=$teacher->canEditBy($current_user);
         $teacher->canDelete=$teacher->canDeleteBy($current_user);
         
+
          return response()
                 ->json([
                     'teacher' => $teacher
