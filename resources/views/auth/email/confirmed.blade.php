@@ -7,7 +7,7 @@
        <h1 class="text-success"><span class="glyphicon glyphicon-ok-sign"></span>您已通過Email驗證. 歡迎您成為本站會員!</h1>
 
         <h5 style="line-height:2">
-            本視窗將在 <span class="text-danger" v-text="seconds"></span> 後重新導向至登入頁面
+            本視窗將在 <span v-text="seconds"></span> 後重新導向至登入頁面
         </h5>
         
     </div>

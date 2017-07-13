@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\BaseController;
+
 use Illuminate\Http\Request;
 use App\Repositories\Courses;
 use App\Repositories\Discounts;
@@ -20,7 +22,7 @@ use App\Http\Requests\Course\SignupRequest;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
-class SignupsController extends Controller
+class SignupsController extends BaseController
 {
     protected $key='signups';
     public function __construct(Courses $courses, Discounts $discounts,

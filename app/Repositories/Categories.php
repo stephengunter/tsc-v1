@@ -108,10 +108,10 @@ class Categories
          $category->update($values);
         
     }
-     public function activeCategories()
-     {
-        
-     }
+    public function activeCategories()
+    {
+        return $this->getAll()->where('active',true);
+    }
    
    
     

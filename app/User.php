@@ -174,6 +174,8 @@ class User extends Authenticatable {
 
 	
 
+	
+
 	public function rolesCanAdd($with_admin=false)
 	{
 		$roles = Role::orderBy('importance','desc');

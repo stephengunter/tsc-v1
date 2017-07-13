@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegisterRequest;
 
@@ -9,7 +10,9 @@ use App\Repositories\Registrations;
 use App\Repositories\Users;
 use App\Jobs\SendEmailConfirmationMail;
 
-class RegisterController extends Controller
+use App\Events\UserRegistered;
+
+class RegisterController extends BaseController
 {
     public function __construct(Registrations $registrations, Users $users)
     {
@@ -18,12 +21,15 @@ class RegisterController extends Controller
           
 	}
 
-    public function register(RegisterRequest $request)
+    public function store(RegisterRequest $request)
     {
-        $userValues=$request->getValues();  
+       
+        $userValues=$request->getValues(); 
        
         $user=$this->registrations->register($userValues);
         
+        event(new UserRegistered($user));
+
         return response()->json($user);
            
     }

@@ -18,21 +18,21 @@ class Photo extends Model
     public static function defaultCourse()
     {
          $photo= new Photo();
-         $photo->path='/images/defaultCourse.png';
+         $photo->path='/images/default-course.png';
          $photo->default=true;
          return  $photo;
     }
     public static function defaultCenter()
     {
          $photo= new Photo();
-         $photo->path='/images/defaultCenter.png';
+         $photo->path='/images/default-center.png';
          $photo->default=true;
          return  $photo;
     }
     public static function defaultProfile()
     {
          $photo= new Photo();
-         $photo->path='/images/defaultProfile.png';
+         $photo->path='/images/default-profile.png';
          $photo->default=true;
          return  $photo;
     }

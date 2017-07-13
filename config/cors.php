@@ -12,9 +12,10 @@ return [
      */
     'supportsCredentials' => false,
     'allowedOrigins' => ['http://localhost:8080','http://tsc'],    
+   
     'allowedHeaders' => ['*'],
     'allowedMethods' => ['*'],
-    'exposedHeaders' => [],
+    // 'allowedHeaders' => ['Content-Type', 'X-Requested-With'],
     'maxAge' => 0,
     'hosts' => [],
 ];

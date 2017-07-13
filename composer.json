@@ -16,7 +16,7 @@
         "guzzlehttp/guzzle": "^6.2",
         "intervention/image": "^2.3",
         "laravel/framework": "5.4.*",
-        "laravel/passport": "^2.0",
+        "laravel/passport": "^3.0",
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "^5.2.0",
         "zizaco/entrust": "5.2.x-dev",

@@ -12,12 +12,6 @@ class BaseController extends Controller
     protected $checkAdmin;
     public function __construct()
     {
-        //   $exceptAdmin=[];
-        //   $allowVisitors=[];
-        
-		//   $this->middleware('admin', ['except' => array_merge($exceptAdmin,$allowVisitors) ]);
-        
-          
           
           
 	}
@@ -45,7 +39,7 @@ class BaseController extends Controller
     }
     protected function unauthorized()
     {
-        return  response()->json(['msg' => 'from basecontroller 權限不足' ]  ,  401);  
+        return  response()->json(['msg' => '權限不足' ]  ,  401);  
     }
     protected function menus($key)
     {

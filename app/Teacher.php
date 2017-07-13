@@ -51,6 +51,10 @@ class Teacher extends Model
     {
         return $this->user->profile->fullname;
     }
+    public function getPhoto()
+    {
+        return $this->user->profile->photo();
+    }
 
     public function addToRole()
     {

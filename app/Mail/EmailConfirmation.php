@@ -19,14 +19,10 @@ class EmailConfirmation extends Mailable
     private $user;
     private $settings;
 
-    public function __construct(User $user,$frontend=false)
+    public function __construct(User $user)
     {
-       $this->user = $user;
-       if($frontend){
-           $this->settings = config('app.frontend');
-       }else{
-           $this->settings = config('app.backend');
-       }
+        $this->user = $user;
+        $this->settings = config('app.frontend');
        
        
     }
