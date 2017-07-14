@@ -53,10 +53,13 @@ class LessonParticipantsController extends BaseController
         }
 
         $lesson=Lesson::findOrFail($lesson_id);
+       
         if($lesson->canEditBy($current_user)){
             $updated_by=$current_user->id;
             $lesson->checkStudents($updated_by);
         }
+
+       
         
         $studentList=$lesson->students()->with('user.profile') -> filterPaginateOrder();
        

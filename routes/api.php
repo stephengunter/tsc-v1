@@ -19,6 +19,9 @@ Route::post('/register',['uses'=>'\App\Http\Controllers\Api\RegisterController@s
 Route::post('/email-confirmation',['uses'=>'\App\Http\Controllers\Api\RegisterController@confirmEmail']);
 Route::post('/send-confirmation-mail',['uses'=>'\App\Http\Controllers\Api\RegisterController@sendConfirmationMail']);
 
+Route::post('/change-password',['uses'=>'\App\Http\Controllers\Api\PasswordsController@change'])
+            ->middleware('auth:api');
+
 
 
 // Route::post('/password/forgot', array('uses' => '\App\Http\Controllers\Auth\ResetPasswordController@forgot'));

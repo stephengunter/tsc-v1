@@ -156,35 +156,33 @@ class Lesson extends Model
 
     public function findStudent($user_id)
     {
-        return $this->students() ->where('user_id',$user_id)
-                                  ->first();
+        return $this->students()->where('user_id',$user_id)
+                                ->first();
     }
 
     public function checkStudents($updated_by)
     {
        
-       $registerStudents=$this->getRegisterStudents();
-
-       if(count($registerStudents)){
-            $students=$registerStudents->get();
-            foreach ($students as $student) {
-                $user_id=$student->user_id;
-                $exist=$this->findStudent($user_id);
-               
-                if(!$exist){
-                    $this->addStudent($user_id, $student->number ,$updated_by);
-                }
-
-            }
+        $registerStudents=$this->getRegisterStudents();
+        $students=$registerStudents->get();
+      
+        foreach ($students as $student) {
+            $user_id=$student->user_id;
+            $exist=$this->findStudent($user_id);
            
+            if(!$exist){
+                $this->addStudent($user_id, $student->number ,$updated_by);
+            }
+
         }
+    
 
         return  $registerStudents;
     }
 
     public function students()
     {
-         $role_name=Role::studentRoleName();
+         $role_name='Student';
          return $this->lessonParticipants()->where('role',$role_name);
                                     
     }
@@ -192,7 +190,7 @@ class Lesson extends Model
     public function addStudent($user_id,$number, $updated_by)
     {
         $student=new LessonParticipant();
-        $student->role=Role::studentRoleName();
+        $student->role='Student';
         $student->user_id=$user_id;
         $student->number=$number;
         $student->updated_by=$updated_by;

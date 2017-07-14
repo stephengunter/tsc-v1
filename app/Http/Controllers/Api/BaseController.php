@@ -21,5 +21,10 @@ class BaseController extends Controller
     {
         return  response()->json(['msg' => '權限不足' ]  ,  401);  
     }
+    protected function currentUser()
+    {
+        return request()->user();
+        
+    }
    
 }

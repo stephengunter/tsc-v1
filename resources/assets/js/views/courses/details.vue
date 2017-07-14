@@ -337,8 +337,8 @@
                this.onLessonInitializeCanceled()
             },
             onLessonInitializeFailed(){
-               Helper.BusEmitOK('初始化失敗')
-               this.onLessonInitializeCanceled()
+               Helper.BusEmitError('初始化失敗')
+              
             },
             onStatusSaved(status){
                this.version += 1
