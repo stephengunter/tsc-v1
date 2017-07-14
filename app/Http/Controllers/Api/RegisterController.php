@@ -36,9 +36,9 @@ class RegisterController extends BaseController
 
     public function confirmEmail(Request $request)
     {
-        $values=$request->user;
-        $user_id=$values['id'];
-        $token=$values['token'];
+       
+        $user_id=$request['id'];
+        $token=$request['token'];
        
         $confirm=$this->registrations->confirmEmail($user_id, $token);
 
@@ -49,10 +49,9 @@ class RegisterController extends BaseController
     }
     public function sendConfirmationMail(Request $request)
     {
-        $email=$request->email;
+        $email=$request['email'];
         $user=$this->users->findByEmail($email);
         if(!$user) abort(404);
-
         
         dispatch(new SendEmailConfirmationMail($user));
 

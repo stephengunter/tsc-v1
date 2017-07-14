@@ -16,6 +16,8 @@ Route::get('/courses/{id}', ['uses' => '\App\Http\Controllers\Api\CoursesControl
 
 
 Route::post('/register',['uses'=>'\App\Http\Controllers\Api\RegisterController@store']);
+Route::post('/email-confirmation',['uses'=>'\App\Http\Controllers\Api\RegisterController@confirmEmail']);
+Route::post('/send-confirmation-mail',['uses'=>'\App\Http\Controllers\Api\RegisterController@sendConfirmationMail']);
 
 
 
