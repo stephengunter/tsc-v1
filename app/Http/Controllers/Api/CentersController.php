@@ -28,7 +28,6 @@ class CentersController extends BaseController
 
     public function index()
     {
-        
         $centers=$this->centers->activeCenters()->get();
       
         foreach ($centers as $center) {

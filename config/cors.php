@@ -15,7 +15,7 @@ return [
    
     'allowedHeaders' => ['*'],
     'allowedMethods' => ['*'],
-    // 'allowedHeaders' => ['Content-Type', 'X-Requested-With'],
+    //'allowedHeaders' => ['Content-Type', 'X-Requested-With'],
     'maxAge' => 0,
     'hosts' => [],
 ];

@@ -56,14 +56,15 @@ class PasswordsController extends BaseController
 
     public function reset(ResetPasswordRequest $request)
     {
-        abort(404);
+        $user=new User();
+        $user->name='damn';
         
         $user_id=$request['user_id'];
         $token=$request['token'];
         $email=$request['email'];
 
         $user=$this->checkResetPasswordToken($user_id, $token, $email);
-
+      
         if(!$user) abort(404);
              
         $user->password = $request['password'];
