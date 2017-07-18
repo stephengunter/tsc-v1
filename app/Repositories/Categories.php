@@ -112,6 +112,10 @@ class Categories
     {
         return $this->getAll()->where('active',true);
     }
+    public function findByName($name)
+    {
+        return $this->activeCategories()->where('name',$name)->first();
+    }
    
    
     

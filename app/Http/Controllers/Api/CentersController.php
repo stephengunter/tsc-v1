@@ -10,8 +10,6 @@ use App\Repositories\Users;
 use App\Http\Requests\Settings\CenterRequest;
 
 use App\Center;
-
-use App\Http\Middleware\CheckAdmin;
 use App\Support\Helper;
 
 use DB;

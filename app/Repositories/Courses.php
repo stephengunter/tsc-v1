@@ -208,5 +208,7 @@ class Courses
          return $this->getAll()->whereDate('open_date','<=' , $today)
                                 ->whereDate('close_date','>=' , $today);
     }
+
+    
     
 }

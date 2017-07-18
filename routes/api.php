@@ -11,8 +11,13 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/centers', ['uses' => '\App\Http\Controllers\Api\CentersController@index']);
 Route::get('/categories', ['uses' => '\App\Http\Controllers\Api\CategoriesController@index']);
+
+Route::get('/notices', ['uses' => '\App\Http\Controllers\Api\NoticesController@index']);
+Route::get('/latest-notices', ['uses' => '\App\Http\Controllers\Api\NoticesController@latest']);
+
 Route::get('/courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@index']);
 Route::get('/courses/{id}', ['uses' => '\App\Http\Controllers\Api\CoursesController@show']);
+Route::get('/latest-courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@latest']);
 
 
 Route::post('/register',['uses'=>'\App\Http\Controllers\Api\RegisterController@store']);

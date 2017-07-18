@@ -16,7 +16,6 @@ use App\Repositories\Weekdays;
 use App\Http\Requests\Course\CourseRequest;
 
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 use App\Events\CourseUpdated;
 use Carbon\Carbon;
@@ -62,30 +61,21 @@ class CoursesController extends BaseController
     public function index()
     {
         $request = request();
-        $categoryId=(int)$request->category;       
-        $centerId=(int)$request->center;
+        $category=$request->category;       
+        $center=$request->center;
 
-        $courses=$this->courses->activeCourses()->where('center_id',$centerId);
-       
-
-        $courses= $courses->whereHas('categories', function($query) use ($categoryId) {
-                                            $query->where('id', $categoryId );
-                                     });
-        $courses= $courses->get();
-        if(count($courses)){
-            foreach ($courses as $course) {
-                $course->photo= $course->photo();
-                foreach ($course->classTimes as $classTime) {
-                    $classTime->weekday;
-                }
-            }
-        }
-        
-        
-        return response() ->json(['courses' => $courses  ]); 
+        return $this->getCourses($category,$center);
        
     }
+
     
+    public function latest()
+    {
+        $category=$this->categories->findByName('最新課程');          
+        $center=0;
+        return $this->getCourses($category->id,$center);
+       
+    }
     
     public function show($id)
     {
@@ -111,6 +101,8 @@ class CoursesController extends BaseController
         }
         return response()->json(['course' => $course]);
     }
+
+    
     
     public function options()
     {
@@ -149,6 +141,36 @@ class CoursesController extends BaseController
                     'courseList' => $courseList->get()
                 ]);  
         
+    }
+
+    private function getCourses($category,$center)
+    {
+        $categoryId=(int)$category;       
+        $centerId=(int)$center;
+
+        $courses=$this->courses->activeCourses();
+        if($centerId){
+            $courses=$courses->where('center_id',$centerId);       
+        }
+        $courses= $courses->whereHas('categories', function($query) use ($categoryId) {
+                                            $query->where('id', $categoryId );
+                                     });
+        $courses= $courses->get();
+        if(count($courses)){
+            foreach ($courses as $course) {
+                $course->photo= $course->photo();
+                if(!$centerId){
+                    $course->center;
+                }
+                
+                foreach ($course->classTimes as $classTime) {
+                    $classTime->weekday;
+                }
+            }           
+        }
+        
+        
+        return response() ->json(['courses' => $courses  ]); 
     }
     
     
