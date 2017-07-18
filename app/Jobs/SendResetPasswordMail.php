@@ -18,12 +18,10 @@ class SendResetPasswordMail implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $user;
-    private $frontend;
 
-    public function __construct(User $user, $frontend=false)
+    public function __construct(User $user)
     {
        $this->user = $user;
-       $this->frontend = $frontend;
     }
 
     /**
@@ -34,7 +32,6 @@ class SendResetPasswordMail implements ShouldQueue
     public function handle()
     {
         $user=$this->user;
-        $frontend=$this->frontend;
-        Mail::to($user)->send(new EmailResetPassword($user, $frontend));
+        Mail::to($user)->send(new EmailResetPassword($user));
     }
 }

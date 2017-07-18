@@ -31,15 +31,11 @@ class ForgotPasswordController extends Controller
     {
         $email=$request['email'];
         $user=$this->users->findByEmail($email);
-        $frontend=false;
         
         if($user){
-            dispatch(new SendResetPasswordMail($user,$frontend));          
+            dispatch(new SendResetPasswordMail($user));          
         }
-        return response()
-                    ->json([
-                        'done' => true
-                    ]);
+        return response()->json(['done' => true]);
     }
      
 }

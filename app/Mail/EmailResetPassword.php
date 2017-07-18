@@ -18,10 +18,10 @@ class EmailResetPassword extends Mailable
     private $user;
     private $settings;
 
-    public function __construct(User $user, $frontend=false)
+    public function __construct(User $user)
     {
         $this->user = $user;
-        $this->settings = Helper::getAppSettings($frontend);
+        $this->settings = config('app.frontend');
        
     }
     
@@ -59,16 +59,28 @@ class EmailResetPassword extends Mailable
     private function getVerificationUrl()
     {
         $url = $this->settings['url'];
-        // $spa= $this->settings['spa'];
-        // $action='reset-password';
+        $spa= $this->settings['spa'];
+        $action='reset-password';
+        if($spa){
+            $query = array(
+                'user' => $this->user->id,
+                'token' => $this->createToken()
+            );
+            return Helper::buildUrl($spa,$url,$action,$query);
+        }
+        
+
+        $url= $url .'/' . $action . '/user/' . $this->user->id;
+        $url= $url .'/token/' . $this->createToken();
+         return $url;
         // $query = array(
         //     'id' => $this->user->id,
         //     'token' => $this->createToken()
         // );
-        $url= $url .'/reset-password/user/' . $this->user->id;
-        $url= $url .'/token/' . $this->createToken();
+        // $url= $url .'/reset-password/user/' . $this->user->id;
+        // $url= $url .'/token/' . $this->createToken();
     //    return Helper::buildUrl($spa,$url,$action,$query);
 
-        return $url;
+       // return $url;
     }
 }

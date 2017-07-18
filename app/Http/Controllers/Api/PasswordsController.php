@@ -6,15 +6,14 @@ use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 
 use App\Http\Requests\Auth\ChangePasswordRequest;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 
 use App\Repositories\Users;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Middleware\CheckAdmin;
 use App\Jobs\SendResetPasswordMail;
 
 use App\User;
-
-use App\Http\Controllers\Controller;
 
 
 class PasswordsController extends BaseController
@@ -41,6 +40,50 @@ class PasswordsController extends BaseController
         {     
             return response()->json([ 'current_password' => ['密碼錯誤']]  ,  422);
         }
+    }
+
+    public function forgot(ForgotPasswordRequest $request)
+    {
+        $email=$request['email'];
+        $user=$this->users->findByEmail($email);
+        
+        if($user){
+            dispatch(new SendResetPasswordMail($user));          
+        }
+        return response()->json(['done' => true]);              
+                    
+    }
+
+    public function reset(ResetPasswordRequest $request)
+    {
+        abort(404);
+        
+        $user_id=$request['user_id'];
+        $token=$request['token'];
+        $email=$request['email'];
+
+        $user=$this->checkResetPasswordToken($user_id, $token, $email);
+
+        if(!$user) abort(404);
+             
+        $user->password = $request['password'];
+        $user->save(); 
+
+        return response()->json($user);   
+    }
+
+    private function checkResetPasswordToken($user_id, $token, $email)
+    {
+        $user= User::findOrFail($user_id);
+        if($user->email!=$email)  return null;
+
+        if(!$user->passwordResetToken) return null;
+        if(!$user->passwordResetToken->isValid()) return null;
+
+        if($token!=$user->passwordResetToken->token) return null;
+
+        return $user;
+
     }
 
     
