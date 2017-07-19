@@ -14,10 +14,13 @@ Route::get('/categories', ['uses' => '\App\Http\Controllers\Api\CategoriesContro
 
 Route::get('/notices', ['uses' => '\App\Http\Controllers\Api\NoticesController@index']);
 Route::get('/latest-notices', ['uses' => '\App\Http\Controllers\Api\NoticesController@latest']);
+Route::get('/notices/{id}', ['uses' => '\App\Http\Controllers\Api\NoticesController@show']);
 
 Route::get('/courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@index']);
 Route::get('/courses/{id}', ['uses' => '\App\Http\Controllers\Api\CoursesController@show']);
 Route::get('/latest-courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@latest']);
+
+Route::get('/signups/create', ['uses' => '\App\Http\Controllers\Api\SignupsController@create']);
 
 
 Route::post('/register',['uses'=>'\App\Http\Controllers\Api\RegisterController@store']);

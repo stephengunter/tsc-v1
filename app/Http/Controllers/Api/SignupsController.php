@@ -20,28 +20,22 @@ use App\Course;
 use App\Http\Requests\Course\SignupRequest;
 
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 class SignupsController extends BaseController
 {
-    protected $key='signups';
+    
     public function __construct(Courses $courses, Discounts $discounts,
                                 Terms $terms , Centers $centers, 
-                                  Signups $signups, Users $users, CheckAdmin $checkAdmin) 
+                                  Signups $signups, Users $users) 
                                
     {
-        //  $exceptAdmin=['store','show','getByUser'];
-        //  $allowVisitors=[];
-		//  $this->setMiddleware( $exceptAdmin, $allowVisitors);
-
+        
 		 $this->courses=$courses;
          $this->discounts=$discounts;
          $this->terms=$terms;
          $this->centers=$centers;
          $this->signups=$signups;
          $this->users=$users;
-
-         $this->checkAdmin=$checkAdmin;
 
 	}
 
@@ -92,22 +86,20 @@ class SignupsController extends BaseController
          $request = request();
         
          $course_id=(int)$request->course; 
-         $user_id=(int)$request->user_id; 
+         $user_id=(int)$request->user; 
 
          $course=null;
-         if($course_id>0){
-            $course= $this->courses->findOrFail($course_id);
+         if(!$course_id){
+            abort(404);
          }
-         $courseOptions=$this->getCourseOptions($course);
-         if(empty($courseOptions)) {
-             return   response()->json(['msg' => '無課程可報名' ]  ,  422);   
-         }
+         $course= $this->courses->findOrFail($course_id);
+         
          
          $user=null;
          if($user_id>0){
             $user= $this->users->findOrFail($user_id);
          }       
-         $userOptions = $this->getUserOptions($user);
+         
 
          $signup=Signup::initialize($user_id,$course_id);
          
@@ -115,13 +107,10 @@ class SignupsController extends BaseController
 
          return response()
             ->json([
-                'courseOptions' => $courseOptions,
-                'userOptions' => $userOptions,
                 'discountOptions' => $discountOptions,
                 'signup' => $signup,
                 'course' => $course,
                 'user' => $user
-
             ]);
          
     }

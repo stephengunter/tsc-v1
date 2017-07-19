@@ -23,7 +23,9 @@ class NoticesController extends BaseController
     
     public function index()
     {
-        $model=$this->getNotices()->paginate(1);
+        $request = request();
+        $per_page=(int)$request->per_page; 
+        $model=$this->getNotices()->paginate($per_page);
 
         return response() ->json(['model' => $model  ]); 
        
@@ -32,35 +34,24 @@ class NoticesController extends BaseController
     
     public function latest()
     {
-        $notices=$this->getNotices()->take(8)->get();
+        $request = request();
+        $count=(int)$request->count; 
+        if(!$count) $count=8;
+        $model=$this->getNotices()->take($count)->paginate(15);
 
-        return response() ->json(['notices' => $notices  ]);
+        return response() ->json(['model' => $model  ]);
        
     }
     
     public function show($id)
     {
-        $course = Course::with('center','term','teachers','classTimes','schedules')->findOrFail($id);
-        
-        $center=$course->center;
-        $center->contactInfo=$center->contactInfo();
-        $center->contactInfo->addressA=$center->contactInfo->addressA();
-
-        $course->privateCategories=$course->privateCategories();
-        $course->photo= $course->photo();
-        $course->canSignup= $course->canSignup();
-        
-        $course->classTimes= $course->classTimes->sortBy('weekday_id')
-                                                ->sortBy('on')->values()->all();
-        
-        foreach ($course->classTimes as $classTime) {
-            $classTime->weekday;
-        }
-        foreach ($course->teachers as $teacher) {
-              $teacher->name=$teacher->getName();
-              $teacher->photo=$teacher->getPhoto();
-        }
-        return response()->json(['course' => $course]);
+        $notice=$this->notices->findOrFail($id);
+        if($notice->public && $notice->active && !$notice->removed){
+             return response()->json(['notice' => $notice]);
+        }else{
+            abort(404);
+        }                  
+       
     }
 
     private function getNotices()
