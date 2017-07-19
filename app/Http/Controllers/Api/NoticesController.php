@@ -23,18 +23,18 @@ class NoticesController extends BaseController
     
     public function index()
     {
-        $notices=$this->notices->getAll()->paginate(15);
+        $model=$this->getNotices()->paginate(1);
 
-        return response() ->json(['notices' => $notices  ]); 
+        return response() ->json(['model' => $model  ]); 
        
     }
 
     
     public function latest()
     {
-        $category=$this->categories->findByName('最新課程');          
-        $center=0;
-        return $this->getCourses($category->id,$center);
+        $notices=$this->getNotices()->take(8)->get();
+
+        return response() ->json(['notices' => $notices  ]);
        
     }
     
@@ -63,34 +63,13 @@ class NoticesController extends BaseController
         return response()->json(['course' => $course]);
     }
 
-    private function getNotices($category,$center)
+    private function getNotices()
     {
-        $categoryId=(int)$category;       
-        $centerId=(int)$center;
-
-        $courses=$this->courses->activeCourses();
-        if($centerId){
-            $courses=$courses->where('center_id',$centerId);       
-        }
-        $courses= $courses->whereHas('categories', function($query) use ($categoryId) {
-                                            $query->where('id', $categoryId );
-                                     });
-        $courses= $courses->get();
-        if(count($courses)){
-            foreach ($courses as $course) {
-                $course->photo= $course->photo();
-                if(!$centerId){
-                    $course->center;
-                }
-                
-                foreach ($course->classTimes as $classTime) {
-                    $classTime->weekday;
-                }
-            }           
-        }
+        $notices=$this->notices->activeNotices()
+                                ->where('public',true)
+                                ->orderBy('date','desc');
         
-        
-        return response() ->json(['courses' => $courses  ]); 
+        return $notices; 
     }
     
     
