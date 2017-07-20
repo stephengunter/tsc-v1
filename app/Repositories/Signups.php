@@ -53,6 +53,28 @@ class Signups
 
         return $signupList;
     }
+    public function netSignup($course,$discount,$user_id,$updated_by)
+    {
+        $values=[
+                'course_id' => $course->id,
+                'user_id' => $user_id,
+                'status' => 0,
+                'updated_by' => $updated_by,
+                'net_signup' => 1
+        ];
+          
+        $values=array_add($values, 'date', Carbon::now()->toDateString());
+        
+
+        $tuitionValues=$this->getTuitionValues($course,$discount);
+        $values=array_merge($values,$tuitionValues);
+
+        $discountValues=$this->getDiscountValues($discount);
+        $values=array_merge($values,$discountValues);
+
+        $signup=Signup::create($values);
+        return $signup;
+    }
     public function store($course,$discount,$user_id,$updated_by,$date=null)
     {
           $values=[
@@ -112,6 +134,16 @@ class Signups
          $values=[
             'status' => -1 ,
             'removed' => 1,
+            'updated_by' => $updated_by
+         ];
+        
+         $signup->update($values);
+     }
+     public function cancel($id , $updated_by)
+     {
+         $signup = $this->findOrFail($id);
+         $values=[
+            'status' => -1 ,
             'updated_by' => $updated_by
          ];
         

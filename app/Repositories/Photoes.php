@@ -1,53 +1,26 @@
 <?php
 
-namespace App;
+namespace App\Repositories;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Photo;
+use Image;
 use Carbon\Carbon;
 
-class Photo extends Model
+class Photoes 
 {
-    protected $table='photoes';
+    private  $default_folder = '/images/uploads/';
 
-    protected $fillable = ['title', 'description', 'path', 'user_id'	];
-
-    public function user()
-    {
-	    return $this->belongsTo('App\User');
-	}
-
-    public static function defaultCourse()
-    {
-         $photo= new Photo();
-         $photo->path='/images/default-course.png';
-         $photo->default=true;
-         return  $photo;
-    }
-    public static function defaultCenter()
-    {
-         $photo= new Photo();
-         $photo->path='/images/default-center.png';
-         $photo->default=true;
-         return  $photo;
-    }
-    public static function defaultProfile()
-    {
-         $photo= new Photo();
-         $photo->path='/images/default-profile.png';
-         $photo->default=true;
-         return  $photo;
-    }
-
-
-    public static function create_file_name($file)
+    public function create_file_name($file)
     {
         $timestamp = str_replace([' ', ':'], '-', Carbon::now()->toDateTimeString());            
         return $timestamp. '-' .$file->getClientOriginalName();         
     }
 
-    public static function save_upload_photo($file ,$width , $height ,$folder_name) 
+    public function save_upload_photo($file ,$width , $height ,$folder_name=null ) 
     {
-        $file_name = Photo::create_file_name($file);  
+        if(!$folder_name) $folder_name= $this->default_folder;
+
+        $file_name = $this->create_file_name($file);  
         $file_path= $folder_name . $file_name;
 
         $save_path =  public_path() . $file_path;
@@ -85,6 +58,15 @@ class Photo extends Model
         }
 	}
 
+     
 
+   
+   
+   
+
+  
+  
+   
+   
     
 }

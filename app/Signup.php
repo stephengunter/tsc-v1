@@ -94,6 +94,11 @@ class Signup extends Model
        if($this->tuitions()->count()) return false;
 		   return $this->canEditBy($user);
 	}
+    public function canCancelBy($user)
+	{
+       if(!$this->canCancel()) return false;
+		   return $this->canEditBy($user);
+	}
 
     public function canCancel() 
     {

@@ -9,6 +9,14 @@ Route::get('/user', function (Request $request) {
      return $user;
 })->middleware('auth:api');
 
+Route::resource('/users', '\App\Http\Controllers\Api\UsersController',
+                                     ['except' => ['index','destroy']]);
+Route::resource('/signups', '\App\Http\Controllers\Api\SignupsController',
+                                     ['except' => ['edit','update']]);                                     
+
+Route::put('/users/{user}/update-photo',['uses'=>'\App\Http\Controllers\Api\UsersController@updatePhoto']);
+                                     
+
 Route::get('/centers', ['uses' => '\App\Http\Controllers\Api\CentersController@index']);
 Route::get('/categories', ['uses' => '\App\Http\Controllers\Api\CategoriesController@index']);
 
@@ -19,8 +27,6 @@ Route::get('/notices/{id}', ['uses' => '\App\Http\Controllers\Api\NoticesControl
 Route::get('/courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@index']);
 Route::get('/courses/{id}', ['uses' => '\App\Http\Controllers\Api\CoursesController@show']);
 Route::get('/latest-courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@latest']);
-
-Route::get('/signups/create', ['uses' => '\App\Http\Controllers\Api\SignupsController@create']);
 
 
 Route::post('/register',['uses'=>'\App\Http\Controllers\Api\RegisterController@store']);
@@ -33,6 +39,7 @@ Route::post('/forgot-password',['uses'=>'\App\Http\Controllers\Api\PasswordsCont
 Route::post('/reset-password',['uses'=>'\App\Http\Controllers\Api\PasswordsController@reset']);
             
 
+Route::post('/photoes',['uses'=>'\App\Http\Controllers\Api\PhotoesController@store']);
 
 
 // Route::post('/password/forgot', array('uses' => '\App\Http\Controllers\Auth\ResetPasswordController@forgot'));
