@@ -4,7 +4,7 @@
             <span class="panel-title">
                 <h4 v-html="title"></h4>
             </span>
-            <div v-if="editting">
+            <div v-show="editting">
                 <button @click="onSubmit" class="btn btn-sm btn-success">
                   <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
                   存檔
@@ -17,14 +17,17 @@
                 </button>
               
             </div>
-            <div v-else>
-                <label v-if="!editting" class="btn btn-sm btn-warning btn-file">
+            <div v-show="!editting">
+                <button v-show="hasData" @click.prevent="exportExcel" class="btn btn-warning btn-sm">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i> 匯出Excel
+                </button>
+                <label  class="btn btn-sm btn-success btn-file">
                   <span class="glyphicon  glyphicon-forward" aria-hidden="true"></span>
                     匯入
-                  <input type="file" name="scores_file" style="display: none;"  
+                  <input type="file" id="scores_file_input" name="scores_file" style="display: none;"  
                    @change="onFileChange" >
                 </label>
-                <button v-if="!editting"   v-show="can_edit" @click="editting=true" class="btn btn-primary btn-sm" >
+                <button  v-show="can_edit" @click="editting=true" class="btn btn-primary btn-sm" >
                         <span class="glyphicon glyphicon-pencil"></span> 編輯
                 </button>
             </div>
@@ -71,7 +74,10 @@
            
         </div><!-- End panel-body-->
         
-       
+        <form id="form-export" action="/scores/export" method="post">
+            <input name="course" type="hidden" :value="course_id"  >
+            
+        </form>
     </div>   
 </template>
 
@@ -116,8 +122,9 @@
                default: true
             },
         },
-        beforeMount() {
-           this.init()
+       
+        mounted(){
+            this.init()
         },
         data() {
             return {
@@ -158,6 +165,8 @@
                 this.loaded=false
                 this.editting=false
                 this.studentList=[]
+                document.getElementById("scores_file_input").value = ''
+               
                 this.fetchData()
                 
             },
@@ -183,32 +192,29 @@
                alert('beginImport')
             },
             onFileChange(e) {
-                var files = e.target.files || e.dataTransfer.files;
-                if (!files.length)
-                    return;
-                this.files = e.target.files;
+                var files = e.target.files || e.dataTransfer.files
+                if (!files.length)  return
+                   
+                this.files = e.target.files
 
-                this.submitImport();
+                this.submitImport()
             },
             submitImport() {
                 this.submitting = true
                 let form = new FormData();
-               
+                form.append('course', this.course_id);
 
                 for (let i = 0; i < this.files.length; i++) {
-                    form.append('score_file', this.files[i]);
+                    form.append('score_file', this.files[i])
                 }
 
                 let store=Score.import(form)
                 store.then(result => {
-                        // this.$emit('uploaded', photo)
-                        // this.removeImage()
-                        // this.submitting = false
+                        Helper.BusEmitOK()
+                        this.init()
                     })
                     .catch(error => {
-                        // this.removeImage()
-                        // Helper.BusEmitError(error,'上傳失敗')
-                        // this.submitting = false
+                         Helper.BusEmitError(error,'存檔失敗')
                     })
             },
             onSubmit(){
@@ -249,11 +255,9 @@
                 let student=this.studentList[index]
                 student.error= ''
             },
-            onDataLoaded(data){
-                // this.course=data.course
-                // this.$emit('loaded',data)
-
-            }, 
+            exportExcel(){
+                document.forms['form-export'].submit()
+            } 
             
             
             

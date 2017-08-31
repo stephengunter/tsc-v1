@@ -66,6 +66,7 @@ Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@
 Route::put('centers/{id}/display-order',['uses'=>'\App\Http\Controllers\Settings\CentersController@updateDisplayOrder']);
 Route::put('centers/{id}/update-photo',['uses'=>'\App\Http\Controllers\Settings\CentersController@updatePhoto']);
 
+Route::post('scores/export', '\App\Http\Controllers\Students\ScoresController@export');
 Route::post('scores/import', '\App\Http\Controllers\Students\ScoresController@import');
 
 Route::resource('home', 'HomeController');
@@ -102,7 +103,7 @@ Route::resource('admissions', '\App\Http\Controllers\Course\AdmissionsController
 Route::resource('course-registers', '\App\Http\Controllers\Course\RegistersController');  
 Route::resource('students', '\App\Http\Controllers\Course\StudentsController');  
 Route::resource('scores', '\App\Http\Controllers\Students\ScoresController',
-                                        ['only' => ['index','store','edit','update']]);   
+                                        ['only' => ['index','store']]);   
 
 Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
                                         ['only' => ['show','edit','update']]);
