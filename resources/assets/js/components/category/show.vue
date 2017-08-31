@@ -63,7 +63,7 @@
 <script>
    
     export default {
-        name: 'ShowSignup',
+        name: 'ShowCategory',
         props: {
             id: {
               type: Number,

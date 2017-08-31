@@ -19,6 +19,10 @@ class Student extends Model
 	{
 		 return $this->belongsTo('App\User');
 	}
+	public function scores()
+	{
+		return $this->hasMany('App\Score');
+	}
 
 	public function canDeleteBy($user)
 	{
@@ -28,5 +32,19 @@ class Student extends Model
     public function canEditBy($user)
 	{
        return $this->register->course->canEditBy($user) ;
+	}
+
+	public function getScore()
+	{
+		$this->score=null;
+		if(count($this->scores)) {
+			$this->score=$this->scores[0];
+		} 
+		return $this->score;
+	}
+	public function getName()
+	{
+		$this->name=$this->user->profile->fullname;
+		return $this->name;
 	}
 }

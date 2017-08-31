@@ -1,6 +1,6 @@
 <template>
 <div>
-    <data-viewer  :default_search="defaultSearch" :default_order="defaultOrder"
+    <data-viewer  :default_search="defaultSearch" :default_order="defaultOrder" :default_direction="defaultDirection"
       :source="source" :search_params="searchParams"  :thead="thead" :no_search="can_select"  
       :no_page="no_page" :show_title="show_title"  :filter="filter"  :title="title" :create_text="createText" 
       @refresh="init" :version="current_version"   @beginCreate="beginCreate"
@@ -90,7 +90,8 @@
                 thead:[],
                 filter: [],
                 defaultSearch:'id',
-                defaultOrder:'id',
+                defaultOrder:'number',
+                defaultDirection:'asc',
 
                 
                 statusOptions:[],

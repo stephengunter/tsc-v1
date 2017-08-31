@@ -41,10 +41,16 @@
                 </div>
                 <div v-if="!id" class="form-group">
                     <label  class="col-sm-2 control-label">發佈到網站</label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-2">
                         <input type="hidden" v-model="form.notice.public"  >
                         <toggle :items="publicOptions"   :default_val="form.notice.public" @selected=setPublic></toggle>
                     
+                    </div>
+                </div>
+                <div v-if="canEditDate" class="form-group">
+                    <label  class="col-sm-2 control-label">日期</label>
+                    <div class="col-sm-10">
+                         <date-picker :option="datePickerOption" :date="date" ></date-picker>
                     </div>
                 </div>
                 <div v-if="!id" class="form-group">
@@ -112,7 +118,6 @@
               default: 0
             },
         },
-       
         data() {
             return {
                 title:Helper.getIcon(Notice.title()),
@@ -129,8 +134,10 @@
 
                 publicOptions: Helper.boolOptions(),
 
-              
-
+                datePickerOption:Helper.datetimePickerOption(),
+                date:{
+                   time: ''
+                },
                 selectorSettings:{
                     width:1200,
                     showBtn:false,
@@ -145,8 +152,21 @@
 
             }
         },
+        computed:{
+            canEditDate(){
+                return Helper.isTrue(this.form.notice.public)
+            }
+        },
         beforeMount() {
             this.init()
+        },
+        watch:{
+            date: {
+              handler: function () {
+                  this.form.notice.date=this.date.time
+              },
+              deep: true
+            },
         },
         methods: {
             init() {
@@ -174,6 +194,7 @@
                         this.form = new Form({
                                 notice: notice,
                             })
+                        this.date.time=notice.date
                         // if(notice.courses){
                         //     this.selectedCourseIds=Helper.splitToArray(notice.courses)
                         //     this.selectedCourses= data.selectedCourses
@@ -246,7 +267,7 @@
                 }
                 store.then(data => {
                    Helper.BusEmitOK()
-                  // this.$emit('saved',data)                            
+                   this.$emit('saved',data)                            
                 })
                 .catch(error => {
                     Helper.BusEmitError(error) 

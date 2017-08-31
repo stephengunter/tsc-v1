@@ -86,6 +86,7 @@ Vue.component('course-statuses', require('./views/courses/statuses') )
 
 Vue.component('admission-index', require('./views/admissions/index') )
 Vue.component('register-index', require('./views/registers/index') )
+Vue.component('score-index', require('./views/scores/index') )
 
 Vue.component('lesson-index', require('./views/lessons/index') )
 Vue.component('lesson-details', require('./views/lessons/details') )
@@ -145,6 +146,7 @@ import Admit from './models/admit.js'
 import Admission from './models/admission.js'
 import Register from './models/register.js'
 import Student from './models/student.js'
+import Score from './models/score.js'
 import SignupInfo from './models/signupinfo.js'
 import Classtime from './models/classtime.js'
 import Schedule from './models/schedule.js'
@@ -195,6 +197,7 @@ window.Admit=Admit
 window.Admission=Admission
 window.Register=Register
 window.Student=Student
+window.Score=Score
 window.SignupInfo=SignupInfo
 window.Classtime=Classtime
 window.Schedule=Schedule

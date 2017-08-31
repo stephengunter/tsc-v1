@@ -31,7 +31,8 @@ class HomeController extends BaseController
 
         $current_user=$this->currentUser(); 
 
-        $keys=['signups','refunds','courses','users',
+        $keys=['signups','refunds','courses',
+                'students','users',
                 'teachers','discounts','settings',
                 'notices','reports'];
                 

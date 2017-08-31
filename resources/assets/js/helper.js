@@ -110,6 +110,9 @@ class Helper {
             case 'reports':
                 html = '<i class="fa fa-file-word-o" aria-hidden="true"></i>'
             break;
+            case 'scores':
+                html = '<i class="fa fa-check-square-o" aria-hidden="true"></i>'
+            break;
                
         }
 

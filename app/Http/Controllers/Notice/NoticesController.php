@@ -14,6 +14,7 @@ use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
 use App\Events\NoticeMailCreated;
+use Carbon\Carbon;
 
 class NoticesController extends BaseController
 {
@@ -68,6 +69,13 @@ class NoticesController extends BaseController
         $values=$request->getValues($updated_by,$removed);
 
         $emails=(int)$values['emails'];
+
+        $public=(bool)$values['public'];
+        if($public){
+            if(!$values['date']){
+                $values['date']=Carbon::now()->toDateString();
+            }
+        }
       
         if($emails && $values['courses']){
             $courseIds= explode(",", $values['courses']);
@@ -78,6 +86,7 @@ class NoticesController extends BaseController
 
             return response() ->json($notice);
         }else{
+           
             $notice= Notice::create($values);
             return response() ->json($notice);
         }

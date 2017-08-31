@@ -6,11 +6,15 @@
     
 //  });
 Route::get('test', function(){
-     $signup=\App\Signup::find(1);
-     $signup->user->profile;
-     $signup->course->center->addressText=$signup->course->center->addressText();
-     $signup->course->center->phone=$signup->course->center->phoneText();
-     return view('emails.signup')->with(['signup'=>$signup]);
+    $x=\Carbon\Carbon::now()->toDateString();
+
+    dd($x);
+    // Mail::raw('Text to e-mail', function($message)
+    // {
+    //     $message->from('us@example.com', 'Laravel');
+
+    //     $message->to('traders.com.tw@gmail.com');
+    // });
 });
 Route::get('/', 'HomeController@index');
 Route::get('errors', function(){
@@ -62,6 +66,8 @@ Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@
 Route::put('centers/{id}/display-order',['uses'=>'\App\Http\Controllers\Settings\CentersController@updateDisplayOrder']);
 Route::put('centers/{id}/update-photo',['uses'=>'\App\Http\Controllers\Settings\CentersController@updatePhoto']);
 
+Route::post('scores/import', '\App\Http\Controllers\Students\ScoresController@import');
+
 Route::resource('home', 'HomeController');
 
 Route::resource('change-password', '\App\Http\Controllers\Auth\ChangePasswordController',['only' => ['index','store']]);
@@ -95,6 +101,8 @@ Route::resource('statuses', '\App\Http\Controllers\Course\StatusesController',
 Route::resource('admissions', '\App\Http\Controllers\Course\AdmissionsController');  
 Route::resource('course-registers', '\App\Http\Controllers\Course\RegistersController');  
 Route::resource('students', '\App\Http\Controllers\Course\StudentsController');  
+Route::resource('scores', '\App\Http\Controllers\Students\ScoresController',
+                                        ['only' => ['index','edit','update']]);   
 
 Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
                                         ['only' => ['show','edit','update']]);

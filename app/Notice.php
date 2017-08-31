@@ -8,18 +8,19 @@ use App\Support\FilterPaginateOrder;
 class Notice extends Model
 {
     use FilterPaginateOrder;
-    protected $filter =  [  'title' , 'content', 'active',       
+    protected $filter =  [  'title' , 'content', 'active', 'date' ,      
                             'public', 'emails', 'created_at'
                          ];
 
     protected $fillable = [ 
                             'title' , 'content', 'active', 'emails',      
-                            'public', 'removed','updated_by'                           
+                            'public', 'date' , 'removed','updated_by'                           
                           ];
 
     public static function initialize()
     {
         return [
+            'date' => '',
             'title' => '',
             'content' => '',
             'active' => 0,

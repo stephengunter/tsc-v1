@@ -40,7 +40,10 @@
                         break
                     case 'courses':
                         html += ' 課程管理'
-                         break;
+                         break
+                    case 'students':
+                        html += ' 學員管理'
+                        break
                     case 'signups':
                          html += ' 報名管理'
                          break

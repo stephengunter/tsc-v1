@@ -9,7 +9,7 @@
          <button v-if="can_edit" v-show="holiday.canEdit"  class="btn btn-primary btn-xs" 
             @click.prevent="beginEdit">
             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-        </button>  
+         </button>  
          <button v-if="holiday.canDelete"  class="btn btn-danger btn-xs"
             @click.prevent="btnDeleteClicked">
              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>

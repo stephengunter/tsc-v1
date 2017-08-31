@@ -132,10 +132,10 @@ class CategoriesController extends BaseController
 
     public function destroy($id)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         $category=$this->categories->findOrFail($id);
-        if(!$category->canDelete()){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
+        if(!$category->canDeleteBy($current_user)){
+            return  $this->unauthorized();   
         }
         $this->categories->delete($id,$current_user->id);
 

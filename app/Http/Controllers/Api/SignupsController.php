@@ -48,6 +48,7 @@ class SignupsController extends BaseController
         $user=request()->user();
         $signupList=$this->signups->getAll()       
                                 ->where('user_id',$user->id)
+                                ->where('status','>','-1')
                                 ->orderBy('date','desc')
                                 ->with(['course','user.profile'])
                                 ->get();

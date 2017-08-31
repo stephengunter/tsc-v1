@@ -123,8 +123,8 @@ class BaseController extends Controller
                
             );
         }
-        if($key =='courses' || $key =='lessons' || $key =='categories'
-            || $key =='admissions'|| $key =='registers'){
+        if($key =='courses'  || $key =='categories')
+        {
            return array(
                 [
                     'id' => 1,
@@ -146,28 +146,41 @@ class BaseController extends Controller
                 ],
                 [
                     'id' => 4,
+                    'text' => '課程分類',
+                    'path' => '/categories',
+                    'active' => $current=='categories'
+                ],
+            );
+        }
+        if($key =='students'|| $key =='admissions'|| $key =='registers' 
+            || $key =='lessons' || $key =='scores'){
+            return array(
+            
+                [
+                    'id' => 1,
                     'text' => '錄取名單',
                     'path' => '/admissions',
                     'active' => $current=='admissions'
                 ],
                 [
-                    'id' => 5,
+                    'id' => 2,
                     'text' => '註冊學員名單',
                     'path' => '/course-registers',
                     'active' => $current=='course-registers'
                 ],
                 [
-                    'id' => 6,
+                    'id' => 3,
                     'text' => '課堂紀錄表',
                     'path' => '/lessons',
                     'active' => $current=='lessons'
                 ],
                 [
-                    'id' => 7,
-                    'text' => '課程分類',
-                    'path' => '/categories',
-                    'active' => $current=='categories'
+                    'id' => 4,
+                    'text' => '學員成績',
+                    'path' => '/scores',
+                    'active' => $current=='scores'
                 ],
+                
             );
         }
         if($key=='settings'){

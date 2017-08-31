@@ -10,10 +10,10 @@
          <template scope="props">
             <tr>
                 <td><a herf="#" @click="selected(props.item.id)">{{ props.item.title }}</a> </td>
-                <td  v-text="textContent(props.item.content)"></td>
-                <td  v-html="$options.filters.okSign(props.item.public)" ></td> 
+                <td v-text="textContent(props.item.content)"></td>
+                <td v-html="$options.filters.okSign(props.item.public)" ></td> 
+                <td  v-html="$options.filters.okSign(props.item.emails)" ></td> 
                
-                <td  v-html="emails(props.item)">
              
                 </td>
                 
@@ -87,10 +87,7 @@
                }
                
             },  
-            emails(notice){
-                  if(notice.courses)    return  Helper.okSign(1)
-                   return ''
-            },          
+               
             onDataLoaded(data){
                
             }, 
