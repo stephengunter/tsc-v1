@@ -17,8 +17,7 @@ class CreateScoresTable extends Migration
             $table->increments('id');
             $table->integer('student_id')->unsigned();
             $table->string('title')->nullable();
-            
-            $table->float('points')->default(0);
+            $table->float('points')->nullable();
             $table->text('ps')->nullable();            
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();

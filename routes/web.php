@@ -102,7 +102,7 @@ Route::resource('admissions', '\App\Http\Controllers\Course\AdmissionsController
 Route::resource('course-registers', '\App\Http\Controllers\Course\RegistersController');  
 Route::resource('students', '\App\Http\Controllers\Course\StudentsController');  
 Route::resource('scores', '\App\Http\Controllers\Students\ScoresController',
-                                        ['only' => ['index','edit','update']]);   
+                                        ['only' => ['index','store','edit','update']]);   
 
 Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
                                         ['only' => ['show','edit','update']]);

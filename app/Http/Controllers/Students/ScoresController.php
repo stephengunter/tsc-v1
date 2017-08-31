@@ -11,6 +11,7 @@ use App\Repositories\Courses;
 
 use App\Student;
 use App\Score;
+use App\Course;
 
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
@@ -57,10 +58,14 @@ class ScoresController extends BaseController
                     $score=$student->getScore();
                     if(!$score){
                         $score=new Score();
+                        $score->id=0;
                         $score->student_id=$student->id;
                         $score->points='';
+                        $score->ps='';
 
                         $student->score=$score;
+                    }else{
+                        $score->points=round($score->points, 2);
                     }
                     
                     $student->getName();
@@ -73,6 +78,35 @@ class ScoresController extends BaseController
         } 
 
         return response()->json([ 'studentList' => $studentList]);  
+    }
+
+    public function store(Request $form)
+    {
+        $course=Course::findOrFail($form['course']);
+
+        $current_user=$this->currentUser();
+        if(!$course->canEditBy($current_user)){
+            return  $this->unauthorized();         
+        }
+
+        $studentList=$form['studentList'];
+        for($i = 0; $i < count($studentList); ++$i) {
+            $student=$studentList[$i];
+            $score=$student['score'];
+
+            $score_id=$score['id'];
+            $student_id=$student['id'];
+            $points=$score['points'];
+            $ps=$score['ps'];
+            $updated_by=$current_user->id;
+
+            $this->createOrUpdate($score_id, $student_id, $points , $ps , $updated_by);
+            
+        }
+
+
+        return response()->json(['success' => true]);
+        
     }
 
     public function import(Request $form)
@@ -88,72 +122,29 @@ class ScoresController extends BaseController
         dd($file);
     }
 
+    private function createOrUpdate($score_id, $student_id, $points , $ps , $updated_by)
+    {
+        $exist=Score::find($score_id);
+        if($exist){
+            $exist->update([
+                'points' =>floatval($points),
+                'ps' => $ps,
+                'updated_by' => $updated_by
+            ]);
+        }else{
+            Score::create([
+                'student_id'=>$student_id,
+                'points' => floatval($points),
+                'ps' => $ps,
+                'updated_by' => $updated_by
+            ]);
+        }
+        
+    }
+
    
     
-    public function show($id)
-    {
-        $current_user=$this->currentUser();
-        $student=Student::with(['user.profile'])->findOrFail($id);
-
-        $student->canEdit=$student->canEditBy($current_user);
-       
-
-        return response()
-                ->json([
-                    'student' => $student
-                ]);
-       
-    }
-   
-    public function edit($id)
-    {
-        $current_user=$this->currentUser();
-        $student=Student::with(['user.profile'])->findOrFail($id);  
-      
-        if(!$student->canEditBy($current_user)){
-            return  $this->unauthorized();  
-        }  
-        
-        return response()->json(['student' => $student ]);        
-    }
-    public function update(Request $request, $id)
-    {
-        $current_user=$this->currentUser();
-        $student=Student::findOrFail($id);
-       
-        if(!$student->canEditBy($current_user)){
-            return  $this->unauthorized(); 
-        }
-
-        $values=$request->student;
-        $student->active=$values['active'];
-        $student->join_date=$values['join_date'];
-        $student->ps=$values['ps'];
-        $student->updated_by=$current_user->id;
-
-        $student->save();
-        
-        return response() ->json([ 'student' => $student ]);   
-    }
-
-    public function destroy($id)
-    {
-        $student=Student::findOrFail($id);
-        $current_user=$this->currentUser();
-        $register=Register::findOrFail($student->course_id);
-        if(!$student->canDeleteBy($current_user)){
-            return  $this->unauthorized();
-        }   
-
-        $student->delete();
-
-        if(!count($register->students)){
-             $register->delete();
-        }
-
-        return response()->json(['deleted' => true ]);     
-    }
-
+    
 
    
    
