@@ -76,16 +76,20 @@
                 <div class="form-group">
                     <label  class="col-sm-2 control-label">附件檔案</label>
                     <div class="col-sm-2">
-                        <file-upload @file-changed="onFileChanged">
+                        <file-upload @file-uploaded="onFileUploaded">
                         </file-upload>
                     </div>
                     <div  class="col-sm-8">
-                        
-                        <p v-show="hasFiles" v-for="file in files">
-                            <span >
-                                  {{  file.name }}
-                             </span>
-                        </p>
+                       <table v-show="hasFiles" class="table"  style="font-size:17px; width:75%">
+                           <tr v-for="(file,index) in files">
+                               <td style="width:10%"> 
+                                    <button class="btn btn-danger btn-xs" @click.prevent="removeFile(index)">
+                                       <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                    </button>
+                                </td>
+                               <td> {{ file.title }}</td>
+                           </tr>
+                       </table>
                     </div>
                 </div>
                 <div class="form-group">
@@ -139,7 +143,8 @@
                 loaded:false,
                
                 form: new Form({
-                   notice:{}
+                   notice:{},
+                   attachments:[]
                 }),
 
                 textEditor:{
@@ -165,13 +170,7 @@
                 selectedCourseIds:[],
                 selectedCourses:[],
 
-                formData:{},
-
-                // fileUploadSettings:{
-                //     input_id:'scores_file_input',
-                //     name:'scores_file',
-                //     text:'匯入'
-                // },
+           
                 files: [],
 
             }
@@ -206,8 +205,6 @@
 
                 this.files=[]
 
-                this.formData = new FormData()
-
                 this.fetchData() 
             },
             fetchData() {
@@ -225,15 +222,9 @@
                         let notice = data.notice
                         this.form = new Form({
                                 notice: notice,
+                                attachments:[]
                             })
                         this.date.time=notice.date
-                        // if(notice.courses){
-                        //     this.selectedCourseIds=Helper.splitToArray(notice.courses)
-                        //     this.selectedCourses= data.selectedCourses
-                        // }else{
-                          
-                        //     this.courseNames=''
-                        // }
 
                         
                         this.loaded=true
@@ -275,27 +266,11 @@
                 this.form.notice.content=val
                 this.submitForm()
             },
-            onFileChanged(){
-
+            onFileUploaded(file){
+                this.files.push(file)
             },
-            onFileChange(e) {
-                var files = e.target.files || e.dataTransfer.files
-                this.formData = new FormData();
-                if (!fileList.length) return;
-                // append the files to FormData
-                Array
-                  .from(Array(fileList.length).keys())
-                  .map(x => {
-                    formData.append(fieldName, fileList[x], fileList[x].name);
-                  });
-
-
-            //     var files = e.target.files || e.dataTransfer.files
-            //     if (!files.length)  return
-                   
-            //     this.files.push = e.target.files[0]
-            // alert(this.files.length)
-                
+            removeFile(index){
+                this.files.splice(index, 1);
             },
             submitForm() {
                 let errors={}
@@ -311,7 +286,7 @@
                   return false
                }
 
-
+                this.form.attachments=this.files
                 let id=this.id
                 let store=null
                 if(id){
@@ -320,8 +295,9 @@
                     store=Notice.store(this.form)
                 }
                 store.then(data => {
-                   Helper.BusEmitOK()
-                   this.$emit('saved',data)                            
+                    alert('then')
+                   // Helper.BusEmitOK()
+                   // this.$emit('saved',data)                            
                 })
                 .catch(error => {
                     Helper.BusEmitError(error) 

@@ -47,7 +47,11 @@ class NoticeRequest extends FormRequest
 
         
     }
-    
+    public function getFiles()
+    {
+        return $this->get('attachments');
+        
+    }
     public function getValues($updated_by=null,$removed=null)
     {
         $values=$this->get('notice');   

@@ -18,6 +18,7 @@ use App\Http\Middleware\CheckAdmin;
 
 use App\Events\NoticeMailCreated;
 use Carbon\Carbon;
+use Storage;
 
 
 class NoticesController extends BaseController
@@ -36,6 +37,7 @@ class NoticesController extends BaseController
 	}
     public function index()
     {
+       
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('notices.index')
@@ -71,6 +73,27 @@ class NoticesController extends BaseController
         $updated_by=$current_user->id;
         $removed=false;
         $values=$request->getValues($updated_by,$removed);
+      
+        $attachments=$request->getFiles();
+       
+        $attachment_ids='';
+        if($attachments && count($attachments)){
+            foreach ($attachments as $attachment) {
+                $entity=new \App\File([
+                    'title' => $attachment['title'],
+                    'path' => $attachment['path'],
+                    'mime' => $attachment['mime'],
+                ]);
+                $entity->save();
+               
+                $attachment_ids .= $entity->id .',';
+           }
+        }
+        $attachment_ids=Helper::removeLastComma($attachment_ids);
+       
+        $values['attachments'] = $attachment_ids;
+
+       
 
         $emails=(int)$values['emails'];
 
@@ -107,6 +130,7 @@ class NoticesController extends BaseController
 
             $receivcers=Helper::removeLastComma($receivcers);
             $email->receivers=$receivcers;
+            $email->attachments=$attachment_ids;
             $email->save();
             
             //event(new NoticeMailCreated($notice));

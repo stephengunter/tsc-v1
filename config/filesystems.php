@@ -55,6 +55,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'upload_files' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/files/uploads'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_KEY'),

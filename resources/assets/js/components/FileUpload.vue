@@ -32,16 +32,12 @@ export default {
            
 
             let upload=File.upload(files)
-            upload.then(data => {
-                alert('then')
-                         this.$emit('file-uploaded' , data)
+             upload.then(data => {
+                       this.$emit('file-uploaded' , data)
                     })
                     .catch(error => {
                          Helper.BusEmitError(error,'上傳失敗')
                     })
-
-           
-
         },
     }
 }

@@ -14,7 +14,8 @@ class Notice extends Model
 
     protected $fillable = [ 
                             'title' , 'content', 'active', 'emails',      
-                            'public', 'date' , 'removed','updated_by'                           
+                            'public', 'date' , 'attachments',
+                            'removed','updated_by'                           
                           ];
 
     public static function initialize()
@@ -26,6 +27,7 @@ class Notice extends Model
             'active' => 0,
             'public' => 1,
             'emails' => 0,
+            'attachments' => '',
             'courses' => ''
         ];
     }
