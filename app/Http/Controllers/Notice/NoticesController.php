@@ -9,12 +9,14 @@ use App\Http\Requests\Notice\NoticeRequest;
 
 use App\Notice;
 use App\Course;
+use App\Email;
 use App\Repositories\Notices;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
 use App\Events\NoticeMailCreated;
 use Carbon\Carbon;
+
 
 class NoticesController extends BaseController
 {
@@ -32,11 +34,6 @@ class NoticesController extends BaseController
 	}
     public function index()
     {
-        if(!request()->ajax()){
-            $menus=$this->menus($this->key);            
-            return view('notices.index')
-                    ->with(['menus' => $menus]);
-        }          
         
         $noticeList=$this->notices->getAll()->filterPaginateOrder();
 
@@ -78,10 +75,33 @@ class NoticesController extends BaseController
         }
       
         if($emails && $values['courses']){
-            $courseIds= explode(",", $values['courses']);
+            $courseIds= explode(',', $values['courses']);
             $notice=$this->notices->store($values , $courseIds);
+            $courses=$notice->courses;
+            $receivcers='';
+        
+            $email=new Email([
+                'notice_id' => $notice->id,
+                'title'=> $notice->title,
+                'content'=> $notice->content,
+                'updated_by' =>  $notice->updated_by,
+            ]);
+            foreach ($courses as $course) {
+                $students=$course->students;
+                foreach ($students as $student) {
+                     $user=$student->user;
+                     $receivcers .= $user->id . ',';
+                    // dispatch(new SendEmail($notice, $user));   
+                    
+                }
+    
+            }
+
+            $receivcers=Helper::removeLastComma($receivcers);
+            $email->receivers=$receivcers;
+            $email->save();
             
-            event(new NoticeMailCreated($notice));
+            //event(new NoticeMailCreated($notice));
             
 
             return response() ->json($notice);

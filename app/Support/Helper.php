@@ -204,6 +204,12 @@ class Helper
             $str .=  $arrVal[$i];
         }
     }
+
+    public static function removeLastComma($str_val)
+    {
+          $last=strrpos($str_val, ',');
+          return substr($str_val, 0, $last);
+    }
     
     
 

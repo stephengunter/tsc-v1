@@ -46,6 +46,7 @@
                 <div class="col-sm-3">
                       <label class="label-title">Email給學員</label>
                       <p>  {{  notice.emails |  boolText }} </p>
+                    
                                      
                 </div>
             </div>   <!-- End row-->
@@ -129,12 +130,8 @@
              
                 getData.then(data => {
                    let notice= data.notice
-                   if(notice.courses){
-                      notice.emails=true
-                   }else{
-                      notice.emails=false
-                   }
-
+                
+                   notice.emails=Helper.isTrue(notice.emails)
                    this.notice=notice
                    this.$emit('loaded',notice)
                    this.loaded = true                        

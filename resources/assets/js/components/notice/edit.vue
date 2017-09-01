@@ -54,7 +54,7 @@
                     </div>
                 </div>
                 <div v-if="!id" class="form-group">
-                    <label  class="col-sm-2 control-label">Email給學員</label>
+                    <label  class="col-sm-2 control-label">Email給學員與教師</label>
                     <div class="col-sm-2">
                         <input type="hidden" v-model="form.notice.emails"  >
                         <input type="hidden" v-model="form.notice.courses"  >
