@@ -68,6 +68,7 @@ Route::put('centers/{id}/update-photo',['uses'=>'\App\Http\Controllers\Settings\
 
 Route::post('scores/export', '\App\Http\Controllers\Students\ScoresController@export');
 Route::post('scores/import', '\App\Http\Controllers\Students\ScoresController@import');
+Route::post('files/upload', '\App\Http\Controllers\FilesController@upload');
 
 Route::resource('home', 'HomeController');
 

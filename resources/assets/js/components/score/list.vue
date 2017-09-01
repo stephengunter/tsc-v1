@@ -27,6 +27,7 @@
                   <input type="file" id="scores_file_input" name="scores_file" style="display: none;"  
                    @change="onFileChange" >
                 </label>
+                
                 <button  v-show="can_edit" @click="editting=true" class="btn btn-primary btn-sm" >
                         <span class="glyphicon glyphicon-pencil"></span> 編輯
                 </button>

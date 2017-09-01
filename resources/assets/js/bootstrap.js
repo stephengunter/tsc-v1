@@ -27,6 +27,7 @@ Vue.component('toggle', require('./components/Toggle') )
 Vue.component('checkbox', require('./components/CheckBox') )
 Vue.component('data-viewer', require('./components/DataViewer') )
 Vue.component('photo', require('./components/Photo') )
+Vue.component('file-upload', require('./components/FileUpload') )
 Vue.component('image-upload', require('./components/ImageUpload') )
 Vue.component('role-label', require('./components/RoleLabel') )
 Vue.component('combination-select', require('./components/CombinationSelect') )
@@ -134,6 +135,7 @@ import DataViewerService from './services/dataviewer.js'
 
 import User from './models/user.js'
 import Photo from './models/photo.js'
+import File from './models/file.js'
 import ContactInfo from './models/contactinfo.js'
 import UserCenters from './models/usercenters.js'
 import Address from './models/address.js'
@@ -185,6 +187,7 @@ window.DataViewerService = DataViewerService
 
 window.User=User
 window.Photo=Photo
+window.File=File
 window.ContactInfo=ContactInfo
 window.Address=Address
 window.UserCenters=UserCenters

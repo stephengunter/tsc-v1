@@ -74,6 +74,21 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label  class="col-sm-2 control-label">附件檔案</label>
+                    <div class="col-sm-2">
+                        <file-upload @file-changed="onFileChanged">
+                        </file-upload>
+                    </div>
+                    <div  class="col-sm-8">
+                        
+                        <p v-show="hasFiles" v-for="file in files">
+                            <span >
+                                  {{  file.name }}
+                             </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label  class="col-sm-2 control-label"></label>
                     <div class="col-sm-10">
                         <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確認送出</button>
@@ -150,14 +165,26 @@
                 selectedCourseIds:[],
                 selectedCourses:[],
 
+                formData:{},
+
+                // fileUploadSettings:{
+                //     input_id:'scores_file_input',
+                //     name:'scores_file',
+                //     text:'匯入'
+                // },
+                files: [],
+
             }
         },
         computed:{
             canEditDate(){
                 return Helper.isTrue(this.form.notice.public)
+            },
+            hasFiles(){
+                return this.files.length > 0
             }
         },
-        beforeMount() {
+        mounted() {
             this.init()
         },
         watch:{
@@ -176,6 +203,11 @@
                 }else{
                     this.title +='  新增公告'
                 }
+
+                this.files=[]
+
+                this.formData = new FormData()
+
                 this.fetchData() 
             },
             fetchData() {
@@ -242,6 +274,28 @@
             setContent(val){
                 this.form.notice.content=val
                 this.submitForm()
+            },
+            onFileChanged(){
+
+            },
+            onFileChange(e) {
+                var files = e.target.files || e.dataTransfer.files
+                this.formData = new FormData();
+                if (!fileList.length) return;
+                // append the files to FormData
+                Array
+                  .from(Array(fileList.length).keys())
+                  .map(x => {
+                    formData.append(fieldName, fileList[x], fileList[x].name);
+                  });
+
+
+            //     var files = e.target.files || e.dataTransfer.files
+            //     if (!files.length)  return
+                   
+            //     this.files.push = e.target.files[0]
+            // alert(this.files.length)
+                
             },
             submitForm() {
                 let errors={}

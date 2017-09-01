@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Notice;
 
 use App\Http\Controllers\BaseController;
 
+use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use App\Http\Requests\Notice\NoticeRequest;
 
 use App\Notice;
+use App\File;
 use App\Course;
 use App\Email;
 use App\Repositories\Notices;
@@ -34,7 +36,11 @@ class NoticesController extends BaseController
 	}
     public function index()
     {
-        
+        if(!request()->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('notices.index')
+                    ->with(['menus' => $menus]);
+        }   
         $noticeList=$this->notices->getAll()->filterPaginateOrder();
 
         return response() ->json(['model' => $noticeList  ]);  
@@ -58,6 +64,7 @@ class NoticesController extends BaseController
             ]);
          
     }
+    
     public function store(NoticeRequest $request)
     {
         $current_user=$this->currentUser();
@@ -91,7 +98,8 @@ class NoticesController extends BaseController
                 foreach ($students as $student) {
                      $user=$student->user;
                      $receivcers .= $user->id . ',';
-                    // dispatch(new SendEmail($notice, $user));   
+                     dispatch(new \App\Jobs\SendEmail($notice, $user));   
+                     
                     
                 }
     
