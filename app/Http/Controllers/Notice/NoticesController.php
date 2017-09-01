@@ -37,7 +37,6 @@ class NoticesController extends BaseController
 	}
     public function index()
     {
-       
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('notices.index')
@@ -78,15 +77,19 @@ class NoticesController extends BaseController
        
         $attachment_ids='';
         if($attachments && count($attachments)){
+            $disk=Storage::disk('upload_files');
             foreach ($attachments as $attachment) {
+                $file_path=$attachment['path'];
                 $entity=new \App\File([
                     'title' => $attachment['title'],
-                    'path' => $attachment['path'],
+                    'path' => $file_path,
                     'mime' => $attachment['mime'],
                 ]);
                 $entity->save();
                
                 $attachment_ids .= $entity->id .',';
+                $temp_path='temp/' . $file_path;
+                $disk->move($temp_path, $file_path);
            }
         }
         $attachment_ids=Helper::removeLastComma($attachment_ids);
