@@ -13,30 +13,63 @@ use App\File;
 use App\Course;
 use App\Email;
 use App\Repositories\Notices;
+use App\Repositories\Files;
 use App\Support\Helper;
 use App\Http\Middleware\CheckAdmin;
 
 use App\Events\NoticeMailCreated;
 use Carbon\Carbon;
 use Storage;
-
+use Config;
 
 class NoticesController extends BaseController
 {
     protected $key='notices';
-    public function __construct(Notices $notices,CheckAdmin $checkAdmin)                                          
+    public function __construct(Notices $notices,Files $files,CheckAdmin $checkAdmin)                                          
     {
          $exceptAdmin=[];
          $allowVisitors=[];
 		 $this->setMiddleware( $exceptAdmin, $allowVisitors);
 		
          $this->notices=$notices;
-
+         $this->files=$files;
          $this->setCheckAdmin($checkAdmin);
 
 	}
     public function index()
     {
+        $notice=\App\Notice::find(5);
+        $courses=$notice->courses;
+        event(new NoticeMailCreated($notice));
+        dd('done');   
+        
+        //$user=\App\User::find(51);
+
+        // foreach ($courses as $course) {
+        //     $students=$course->students;
+        //     foreach ($students as $student) {
+        //          $user=$student->user;
+        //           //  $receivcers .= $user->id;
+                  
+        //         dispatch(new \App\Jobs\SendEmail($notice, $user));   
+        //         //  if($students->hasNext()){
+        //         //     $receivcers .= ',';
+        //         //  }
+        //     }
+
+        // }
+
+     
+      
+        \Mail::to($user)->send(new \App\Mail\NoticeMail($notice));
+        dd('done');
+        // dd('done');
+       // $file=Storage::disk('upload_files')->get('attachment_20170903065549.xls');
+        
+         //dd(storage_path('attachment_20170903065549.xls'));
+          // $test=Storage::disk('upload_files')->url('attachment_20170903065549.xls');
+        $test=Storage::disk('upload_files')->getDriver()->getAdapter()->getPathPrefix();
+        dd($test);
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('notices.index')
@@ -77,7 +110,7 @@ class NoticesController extends BaseController
        
         $attachment_ids='';
         if($attachments && count($attachments)){
-            $disk=Storage::disk('upload_files');
+            
             foreach ($attachments as $attachment) {
                 $file_path=$attachment['path'];
                 $entity=new \App\File([
@@ -88,8 +121,8 @@ class NoticesController extends BaseController
                 $entity->save();
                
                 $attachment_ids .= $entity->id .',';
-                $temp_path='temp/' . $file_path;
-                $disk->move($temp_path, $file_path);
+                
+                $this->files->save_upload_file($entity);
            }
         }
         $attachment_ids=Helper::removeLastComma($attachment_ids);
@@ -110,34 +143,10 @@ class NoticesController extends BaseController
         if($emails && $values['courses']){
             $courseIds= explode(',', $values['courses']);
             $notice=$this->notices->store($values , $courseIds);
-            $courses=$notice->courses;
-            $receivcers='';
-        
-            $email=new Email([
-                'notice_id' => $notice->id,
-                'title'=> $notice->title,
-                'content'=> $notice->content,
-                'updated_by' =>  $notice->updated_by,
-            ]);
-            foreach ($courses as $course) {
-                $students=$course->students;
-                foreach ($students as $student) {
-                     $user=$student->user;
-                     $receivcers .= $user->id . ',';
-                     dispatch(new \App\Jobs\SendEmail($notice, $user));   
-                     
-                    
-                }
-    
-            }
 
-            $receivcers=Helper::removeLastComma($receivcers);
-            $email->receivers=$receivcers;
-            $email->attachments=$attachment_ids;
-            $email->save();
+             
             
-            //event(new NoticeMailCreated($notice));
-            
+            event(new NoticeMailCreated($notice));
 
             return response() ->json($notice);
         }else{

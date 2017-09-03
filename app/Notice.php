@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Support\FilterPaginateOrder;
+use App\File;
 
 class Notice extends Model
 {
@@ -63,5 +64,14 @@ class Notice extends Model
            array_push($names, $course->fullName());
         }
         return $names;
+    }
+    public function getAttachments()
+    {
+        if(!$this->attachments) return null;
+
+        $file_ids= explode(',', $this->attachments);
+
+        return File::whereIn('id',$file_ids)->get();
+
     }
 }

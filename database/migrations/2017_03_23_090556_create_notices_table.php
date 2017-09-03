@@ -18,7 +18,7 @@ class CreateNoticesTable extends Migration
             $table->string('title');
             $table->text('content');
             
-            $table->boolean('active')->default(false);
+            $table->boolean('active')->default(true);
             $table->boolean('public')->default(false);
             $table->boolean('emails')->default(false);
             $table->boolean('removed')->default(false);

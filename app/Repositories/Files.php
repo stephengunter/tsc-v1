@@ -7,7 +7,13 @@ use Storage;
 use File;
 
 class Files 
-{
+{   
+    
+    public function __construct()                                          
+    {
+         $this->disk=Storage::disk('upload_files');
+
+	}
     private function create_file_name($file)
     {
         $timestamp = str_replace([' ', ':','-'], '', Carbon::now()->toDateTimeString());            
@@ -17,7 +23,7 @@ class Files
     {
         $file_name = $this->create_file_name($file);  
         $path='/temp/' . $file_name;
-        Storage::disk('upload_files')->put($path,  File::get($file));
+        $this->disk->put($path,  File::get($file));
      
 
         return new \App\File([
@@ -27,10 +33,11 @@ class Files
            
         ]);
     }
-    public function save_upload_file(File $file) 
+    public function save_upload_file(\App\File $file) 
     {
-        
-
+        $file_path=$file->path;
+        $temp_path='temp/' . $file_path;
+        $this->disk->move($temp_path, $file_path);
        
 	}
 

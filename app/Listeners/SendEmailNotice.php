@@ -9,11 +9,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Bus\Dispatchable;
-
+use App\Support\Helper;
 use App\Jobs\SendEmail;
-use App\Email;
 
-class SendEmailNotice  implements ShouldQueue
+class SendEmailNotice  //implements ShouldQueue
 {
     
     public function __construct()
@@ -25,31 +24,29 @@ class SendEmailNotice  implements ShouldQueue
     {
         $notice=$event->notice;
         $courses=$notice->courses;
-        // $receivcers='';
-        // $fillable = [ 
-        //     'notice_id','title' , 'content',      
-        //     'from', 'receivers' , 'attachments','updated_by'                           
-        //   ];
-        // $email=new Email([
-        //     'notice_id' => $notice->id,
-        //     'title'=> $notice->title,
-        //     'content'=> $notice->content,
-        //     'updated_by' =>  $notice->updated_by,
-        // ]);
+
+        $receivers='';    
+         
+       
         foreach ($courses as $course) {
             $students=$course->students;
             foreach ($students as $student) {
-                 $user=$student->user;
-                //  $receivcers .= $user->id;
-                 dispatch(new SendEmail($notice, $user));   
-                //  if($students->hasNext()){
-                //     $receivcers .= ',';
-                //  }
+                $user=$student->user;
+                $receivers .= $user->id . ',';
+                dispatch(new \App\Jobs\SendEmail($notice, $user));  
             }
 
         }
 
-        // $email->receivers=$receivcers;
-        // $email->save();
+        \App\Email::create([
+            'notice_id' => $notice->id,
+            'title'=> $notice->title,
+            'content'=> $notice->content,
+            'updated_by' =>  $notice->updated_by,
+            'receivers' => Helper::removeLastComma($receivers),
+            'attachments' => $notice->attachments
+        ]);   
+
+      
     }
 }

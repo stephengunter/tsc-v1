@@ -8,36 +8,39 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 use App\Notice;
-use Config;
 
 class NoticeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     private $notice;
-    private $attachments;
-    private  $default_folder = '';
-    public function __construct(Notice $notice, Array $attachments=[])
+    public $attach_files;
+    private $default_folder = '';
+    public function __construct(Notice $notice)
     {
         $this->notice = $notice;
-        $this->attachments = $attachments;
-        $this->default_folder=Config::get('app.file_upload.default_folder');
+        $this->attach_files = $notice->getAttachments();
         
     }
     
     public function build()
     {
+        
         $subject=$this->notice->title;
-        $attachments=$this->attachments;
+        $attach_files=$this->attach_files;
        
         $mail= $this->markdown('emails.notice')->with([
                             'content' => $this->notice->content
                         ])->subject($subject);
-                        
-        if(count($attachments)){
-            foreach($attachments as $attachment){
-                $path='';
-                $email->attach($path,['as' => '']);
+       
+             
+        if(count($attach_files)){
+            foreach($attach_files as $attachFile){
+                $path=$attachFile->storagePath();
+                $mail->attach($path, [
+                    'as' => $attachFile->title,
+                    'mime' => $attachFile->mime,
+                ]); 
             }
         }
        

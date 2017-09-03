@@ -19,13 +19,11 @@ class SendEmail implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $notice;
-    private $attachments;
     private $user;
-    public function __construct(Notice $notice, User $user, Array $attachments=[])
+    public function __construct(Notice $notice, User $user)
     {
          $this->notice = $notice;
          $this->user = $user;
-         $this->attachments = $attachments;
     }
 
     /**
@@ -37,8 +35,7 @@ class SendEmail implements ShouldQueue
     {
         $notice=$this->notice;
         $user=$this->user;
-        $attachments=$this->attachments;
         
-        Mail::to($user)->send(new NoticeMail($notice,$attachments));
+        Mail::to($user)->send(new NoticeMail($notice));
     }
 }
