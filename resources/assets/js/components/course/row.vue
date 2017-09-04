@@ -18,7 +18,13 @@
                    {{ course.name }}
             </a>
         </td> 
-        <td v-if="!more" v-html="group(course)"></td> 
+        <td v-if="!more">
+            <a v-if="isParentGroup(course)" @click="onGroupSelected(course.id)" 
+            v-html="$options.filters.okSign(true)" class="btn">
+            </a>   
+            <span v-if="isGroupSubCourse(course)" >{{ course.parentCourse.name }}</span>
+
+        </td> 
         <td v-if="!more" v-html="getClassTimesText(course.class_times)"></td> 
         <td v-if="!more" v-html="period(course.begin_date , course.end_date)"></td> 
         <td v-if="!more" v-html="period(course.open_date , course.close_date)"></td> 
@@ -80,17 +86,15 @@
             getClassTimesText(class_times){
                 return Course.getClassTimesText(class_times)             
             },
+            isParentGroup(course){
+                return Course.isParentGroup(course)
+            },
+            isGroupSubCourse(course){
+                 return Course.isGroupSubCourse(course)
+            },
             
-            group(course){
-                let credit_count= parseInt(course.credit_count)
-                if(!credit_count) return ''
-                  let isGroup=
-                let parent= parseInt(course.parent)
-                if(!parent){
-                    return Helper.okSign(true)
-                }else{
-                  return course.parentCourse.name
-                } 
+            onGroupSelected(id){
+               this.$emit('group-selected',id)
             },
             period(begin,end){
                return Helper.period(begin,end)

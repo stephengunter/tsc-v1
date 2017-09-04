@@ -206,8 +206,20 @@ class Course {
                 }) 
     }
 
-  static getThead(canSelect){
-    let thead= [{
+    static isParentGroup(course){
+          let credit_count= parseInt(course.credit_count)
+          let parent= parseInt(course.parent)
+          return credit_count > 0  &&  parent==0
+    }
+
+    static isGroupSubCourse(course){
+        let credit_count= parseInt(course.credit_count)
+        let parent= parseInt(course.parent)
+        return credit_count > 0  &&  parent > 0
+    }
+
+    static getThead(canSelect){
+        let thead= [{
                     title: '開課中心',
                     key: 'center',
                     sort: false,

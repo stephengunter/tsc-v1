@@ -39,7 +39,8 @@
     <course-list v-if="ready" :search_params="listSettings.params"  
         :hide_create="listSettings.hide_create" :version="version"  
         :can_select="listSettings.can_select"
-        @selected="onSelected" @begin-create="onBeginCreate">
+        @selected="onSelected" @begin-create="onBeginCreate"
+        @group-selected="onGroupSelected">
     </course-list>
 
 </div>
@@ -144,8 +145,13 @@
                 })
              
             },
-            onParamChanged(){
-                this.params.parent=0
+            onParamChanged(parent){
+                if(parent){
+                    if(isNaN(parent))  this.params.parent=0
+                    else  this.params.parent=Helper.tryParseInt(parent)
+                }else{
+                    this.params.parent=0
+                }
 
                 if(this.isGroup){
                     let center=this.params.center
@@ -164,7 +170,7 @@
                            Helper.BusEmitError(error)                         
                     })   
                 }else{
-                     this.groupReady=false
+                    this.groupReady=false
                     this.setListParams()
                 }
               
@@ -182,6 +188,12 @@
             },
             onSelected(id){
                 this.$emit('selected',id)
+            },
+            onGroupSelected(id){
+
+                this.params.category=this.groupCategory.id
+                this.onParamChanged(id)
+                
             },
             onBeginCreate(){
                 this.$emit('begin-create',this.course_id)

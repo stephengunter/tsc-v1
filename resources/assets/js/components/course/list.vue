@@ -17,7 +17,7 @@
          <template scope="props">
             <row :course="props.item" :more="viewMore" :select="can_select"
                :been_selected="beenSelected(props.item.id)"       
-               @selected="onRowSelected"
+               @selected="onRowSelected" @group-selected="onGroupSelected"
                @unselected ="onRowUnselected">
                 
             </row>
@@ -135,6 +135,9 @@
                 if(this.selected_ids.length < 1)  return false
                  let index = this.selected_ids.indexOf(id)
                 return index >= 0
+            },
+            onGroupSelected(id){
+                 this.$emit('group-selected',id)
             }
             
            

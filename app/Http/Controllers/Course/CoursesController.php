@@ -82,7 +82,8 @@ class CoursesController extends BaseController
         $categoryId=(int)$request->category;       
         $centerId=(int)$request->center;
         $weekdayId=(int)$request->weekday;
-        $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId)->filterPaginateOrder();
+        $parentId=(int)$request->parent;
+        $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId,$parentId)->filterPaginateOrder();
         
         if(count($courseList)){
             foreach ($courseList as $course) {

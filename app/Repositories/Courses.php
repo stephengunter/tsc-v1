@@ -70,13 +70,15 @@ class Courses
         return $courseList;
         
     }
-    public function index($termId,$categoryId,$centerId,$weekdayId)
+    public function index($termId,$categoryId,$centerId,$weekdayId,$parentId)
     {
         $courseList=$this->getAll()->with(['center','categories','teachers','classTimes']);
         
         if($termId) $courseList=$courseList->where('term_id',$termId);       
 
         if($centerId) $courseList=$courseList->where('center_id',$centerId);
+
+        if($parentId) $courseList=$courseList->where('parent',$parentId);
 
         if($categoryId){
              $courseList= $courseList->whereHas('categories', function($q)  use ($categoryId)
@@ -92,6 +94,7 @@ class Courses
             });
 
         }
+        
 
         return $courseList;
     }
