@@ -15,7 +15,7 @@
                 <td  v-html="$options.filters.okSign(props.item.emails)" ></td> 
                
              
-                </td>
+                <td  v-html="$options.filters.activeLabel(props.item.active)" ></td>
                 
                 <td>{{ props.item.created_at | strTime }}</td>  
             </tr>

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="loaded" class="panel panel-default show-data">
+   <div v-if="loaded" class="panel panel-default show-data">
       <div class="panel-heading">
           <span class="panel-title">
               <h4 v-html="title"></h4>
@@ -50,17 +50,7 @@
                                      
                 </div>
             </div>   <!-- End row-->
-            <div v-show="notice.emails" class="row">
-                <div class="col-sm-12">
-                   <label class="label-title">Email課程名單</label>
-                   <p>
-                     <span v-for="course in notice.courseNames">
-                       {{ course }}   &nbsp;
-                     </span>
-                   </p>
-                </div>  
-                 
-            </div>   <!-- End row-->
+            
             <div class="row">
                 <div class="col-sm-3">
                       <label class="label-title">建檔日期</label>

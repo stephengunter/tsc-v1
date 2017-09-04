@@ -38,7 +38,7 @@ class FilesController extends BaseController
         $file=Input::file('upload_file');
 
         $file=$this->files->save_temp_file($file);
-
+       
         return response()->json($file);
     }
 }

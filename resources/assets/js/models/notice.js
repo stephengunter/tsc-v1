@@ -137,10 +137,15 @@ class Notice {
 
                 }, {
                     title: 'Email',
-                    key: 'courses',
+                    key: 'emails',
                     sort: true,
                     default:true
                 }, {
+                    title: '狀態',
+                    key: 'active',
+                    sort: true,
+                    default:true
+                },{
                     title: '建檔日期',
                     key: 'created_at',
                     sort: true,

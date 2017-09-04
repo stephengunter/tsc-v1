@@ -70,6 +70,9 @@ Route::post('scores/export', '\App\Http\Controllers\Students\ScoresController@ex
 Route::post('scores/import', '\App\Http\Controllers\Students\ScoresController@import');
 Route::post('files/upload', '\App\Http\Controllers\FilesController@upload');
 
+Route::get('notices-email', '\App\Http\Controllers\Notice\NoticesController@email');
+
+
 Route::resource('home', 'HomeController');
 
 Route::resource('change-password', '\App\Http\Controllers\Auth\ChangePasswordController',['only' => ['index','store']]);

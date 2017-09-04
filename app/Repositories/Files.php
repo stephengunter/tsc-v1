@@ -27,6 +27,7 @@ class Files
      
 
         return new \App\File([
+           
             'title' => $file->getClientOriginalName(),
             'mime' => $file->getClientMimeType(),
             'path' => $file_name,
@@ -37,9 +38,29 @@ class Files
     {
         $file_path=$file->path;
         $temp_path='temp/' . $file_path;
-        $this->disk->move($temp_path, $file_path);
+        $exists = $this->disk->exists($temp_path);
+        if($exists){
+            $this->disk->move($temp_path, $file_path);
+        }
        
-	}
+    }
+
+    public function createOrUpdate($values, $id)
+    {
+        $id=(int)$id;
+        
+        if($id){
+            $entity=\App\File::findOrFail($id);
+            $entity->update($values);
+
+            return $entity;
+        }else{
+            return  \App\File::create($values);
+            
+        }
+    }
+    
+    
 
     
 

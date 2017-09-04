@@ -38,38 +38,6 @@ class NoticesController extends BaseController
 	}
     public function index()
     {
-        $notice=\App\Notice::find(5);
-        $courses=$notice->courses;
-        event(new NoticeMailCreated($notice));
-        dd('done');   
-        
-        //$user=\App\User::find(51);
-
-        // foreach ($courses as $course) {
-        //     $students=$course->students;
-        //     foreach ($students as $student) {
-        //          $user=$student->user;
-        //           //  $receivcers .= $user->id;
-                  
-        //         dispatch(new \App\Jobs\SendEmail($notice, $user));   
-        //         //  if($students->hasNext()){
-        //         //     $receivcers .= ',';
-        //         //  }
-        //     }
-
-        // }
-
-     
-      
-        \Mail::to($user)->send(new \App\Mail\NoticeMail($notice));
-        dd('done');
-        // dd('done');
-       // $file=Storage::disk('upload_files')->get('attachment_20170903065549.xls');
-        
-         //dd(storage_path('attachment_20170903065549.xls'));
-          // $test=Storage::disk('upload_files')->url('attachment_20170903065549.xls');
-        $test=Storage::disk('upload_files')->getDriver()->getAdapter()->getPathPrefix();
-        dd($test);
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('notices.index')
@@ -112,14 +80,17 @@ class NoticesController extends BaseController
         if($attachments && count($attachments)){
             
             foreach ($attachments as $attachment) {
-                $file_path=$attachment['path'];
-                $entity=new \App\File([
+                $file_id=0;
+                if(array_key_exists('id',$attachment)){
+                    $file_id=$attachment['id'];
+                } 
+                $file_values=[
                     'title' => $attachment['title'],
-                    'path' => $file_path,
+                    'path' => $attachment['path'],
                     'mime' => $attachment['mime'],
-                ]);
-                $entity->save();
-               
+                ];
+                $entity=$this->files->createOrUpdate($file_values,$file_id);
+                
                 $attachment_ids .= $entity->id .',';
                 
                 $this->files->save_upload_file($entity);
@@ -144,8 +115,6 @@ class NoticesController extends BaseController
             $courseIds= explode(',', $values['courses']);
             $notice=$this->notices->store($values , $courseIds);
 
-             
-            
             event(new NoticeMailCreated($notice));
 
             return response() ->json($notice);
@@ -171,6 +140,7 @@ class NoticesController extends BaseController
         $notice->canEdit=$notice->canEditBy($current_user);
         $notice->canDelete=$notice->canDeleteBy($current_user);
 
+       
         if(count($notice->courses)){
             $notice->courseNames= $notice->courseNames();
         } 
@@ -184,10 +154,13 @@ class NoticesController extends BaseController
         if(!$notice->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
+
+        $files=$notice->getAttachments();
        
         return response()
             ->json([
-                'notice' => $notice
+                'notice' => $notice,
+                'files' => $files
             ]);
     }
     public function update(NoticeRequest $request, $id)
@@ -201,11 +174,49 @@ class NoticesController extends BaseController
         $updated_by=$current_user->id;
 
         $values=$request->getValues($updated_by,$removed); 
+
+        $attachments=$request->getFiles();
+        $attachment_ids='';
+       
+        if($attachments && count($attachments)){
+            
+            foreach ($attachments as $attachment) {
+                $file_id=0;
+                if(array_key_exists('id',$attachment)){
+                    $file_id=$attachment['id'];
+                } 
+                $file_values=[
+                    'title' => $attachment['title'],
+                    'path' => $attachment['path'],
+                    'mime' => $attachment['mime'],
+                ];
+                $entity=$this->files->createOrUpdate($file_values,$file_id);
+               
+                $attachment_ids .= $entity->id .',';
+                
+                $this->files->save_upload_file($entity);
+           }
+        }
+        $attachment_ids=Helper::removeLastComma($attachment_ids);
+       
+        $values['attachments'] = $attachment_ids;
+
        
         $notice->update($values);
         
         return response()->json(['notice' => $notice ]);
                
+    }
+    public function email()
+    {
+        $request = request();
+        $notice_id=(int)$request->notice; 
+
+        $mail=\App\Email::where('notice_id',$notice_id)->first();
+        $mail->files=$mail->getAttachments();
+        
+        return response()->json($mail);
+        
     }
     public function destroy($id)
     {

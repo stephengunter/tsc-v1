@@ -3,7 +3,7 @@
 @section('content')
   
    
-   <notice-create @back="backToIndex" @saved="backToIndex"></notice-create>
+   <notice-create @canceled="backToIndex" @saved="backToIndex"></notice-create>
     
       
     

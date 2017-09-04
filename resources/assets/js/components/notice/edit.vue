@@ -39,15 +39,15 @@
                         
                     </div>
                 </div>
-                <div v-if="!id" class="form-group">
+                <div  class="form-group">
                     <label  class="col-sm-2 control-label">發佈到網站</label>
                     <div class="col-sm-2">
                         <input type="hidden" v-model="form.notice.public"  >
-                        <toggle :items="publicOptions"   :default_val="form.notice.public" @selected=setPublic></toggle>
+                        <toggle :items="publicOptions"  :default_val="form.notice.public" @selected=setPublic></toggle>
                     
                     </div>
                 </div>
-                <div v-if="canEditDate" class="form-group">
+                <div v-if="canEditDate"   class="form-group">
                     <label  class="col-sm-2 control-label">日期</label>
                     <div class="col-sm-10">
                          <date-picker :option="datePickerOption" :date="date" ></date-picker>
@@ -220,6 +220,11 @@
                 
                getData.then(data=>{
                         let notice = data.notice
+                        if(data.files){
+                             this.files=data.files
+                        }
+
+                       
                         this.form = new Form({
                                 notice: notice,
                                 attachments:[]
@@ -241,6 +246,7 @@
                 this.form.notice.active = val
             },
             setPublic(val) {
+
                 this.form.notice.public = val
             },
             setEmails(val){
@@ -273,8 +279,9 @@
                 this.files.splice(index, 1);
             },
             submitForm() {
+                let id=this.id
                 let errors={}
-                if(this.form.notice.emails) {
+                if(!id && this.form.notice.emails) {
                     if(!this.selectedCourseIds || !this.selectedCourseIds.length){
                         errors['notice.courses']=['請選擇要Email通知的課程']
                     }else{
@@ -283,21 +290,23 @@
                 }
                this.form.onFail(errors)
                if(this.form.errors.any()){
+                
                   return false
                }
 
                 this.form.attachments=this.files
-                let id=this.id
+                
                 let store=null
                 if(id){
                     store=Notice.update(this.form, id)
+                   
                 }else{
                     store=Notice.store(this.form)
                 }
                 store.then(data => {
-                    alert('then')
-                   // Helper.BusEmitOK()
-                   // this.$emit('saved',data)                            
+
+                   Helper.BusEmitOK()
+                   this.$emit('saved',data)                            
                 })
                 .catch(error => {
                     Helper.BusEmitError(error) 

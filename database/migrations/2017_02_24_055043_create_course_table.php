@@ -17,6 +17,9 @@ class CreateCourseTable extends Migration
             $table->increments('id');
             $table->integer('term_id')->unsigned();
 
+            $table->integer('parent')->unsigned()->default(0);
+            $table->boolean('must')->default(false);
+
             $table->integer('center_id')->unsigned();
 
             $table->string('name');
@@ -26,8 +29,8 @@ class CreateCourseTable extends Migration
             $table->boolean('net_signup')->default(true);
 
 		
-			$table->date('begin_date')->nullable();;
-            $table->date('end_date')->nullable();;
+			$table->date('begin_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->integer('weeks');
             $table->integer('hours');
             	
