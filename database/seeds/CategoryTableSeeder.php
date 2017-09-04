@@ -23,6 +23,7 @@ class CategoryTableSeeder extends Seeder
 			],
 			[
 				'name' => '學分班',
+				'code' => 'group',
                 'icon' =>'fa fa-graduation-cap',
 				'active' => 1,
 			],

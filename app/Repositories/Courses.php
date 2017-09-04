@@ -31,6 +31,27 @@ class Courses
 
 
     }
+
+    public function getGroupCourses(int $term_id,int $center_id)
+    {
+        $category=Category::where('code','group')->first();
+        if(!$category) return null;
+
+        $categoryId=$category->id;
+
+        $courseList=$this->getAll();
+        if($term_id) $courseList=$courseList->where('term_id',$term_id);       
+        
+        if($center_id) $courseList=$courseList->where('center_id',$center_id);
+
+        $courseList= $courseList->whereHas('categories', function($q)  use ($categoryId)
+        {
+             $q->where('id', $categoryId );
+        });
+
+        return $courseList;
+    }
+    
     public function activeCourses()
     {
         $courseList=$this->getAll();
@@ -126,9 +147,13 @@ class Courses
               
         });
         
-        $this->syncCategories($categoryIds , $course);
-        
-        $this->syncTeachers($teacherIds , $course);
+        if(count($categoryIds)){
+            $this->syncCategories($categoryIds , $course);
+        }
+        if(count($teacherIds)){
+            $this->syncTeachers($teacherIds , $course);
+        }
+       
 
         return $course;
      }
@@ -173,9 +198,15 @@ class Courses
          
          return $term->number .  $countString;
      }
-    public function optionsConverting($courseList)
+    public function optionsConverting($courseList,$with_empty=false)
     {
         $options=[];
+        if($with_empty){
+            $item=[ 'text' => '-------' , 
+                    'value' => 0 , 
+                ];
+             array_push($options,  $item);
+        }
         foreach($courseList as $course)
         {
             $item=[ 'text' => $course->number . ' ' . $course->name , 

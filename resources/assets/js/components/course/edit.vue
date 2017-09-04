@@ -28,36 +28,58 @@
                         
                     </div>
                     <div class="col-sm-3">
+                        
                         <div class="form-group">                           
                             <label>名稱</label>
                             <input type="text" name="course.name" class="form-control" v-model="form.course.name">
                             <small class="text-danger" v-if="form.errors.has('course.name')" v-text="form.errors.get('course.name')"></small>
                         </div>
-                        <div class="form-group">  
-                            <label>課程分類</label>
-                             <drop-down :value.sync="categories" multiple  :options="categoryOptions" label="text"></drop-down>
-                            <small class="text-danger" v-if="form.errors.has('course.categories')" v-text="form.errors.get('course.categories')"></small>
+                        <div class="form-group">                           
+                            <label>學分班</label>
+                            <div>
+                               <input type="hidden" v-model="form.course.group"  >
+                               <toggle :items="groupOptions"   :default_val="form.course.group" @selected=setGroup></toggle>
+                            </div>
                         </div>
+                         <div v-show="isGroup" class="form-group">                           
+                           
+                             <label>學分數</label>
+                             <select @change="onCreditCountChanged"  v-model="form.course.credit_count"  name="course.credit_count" class="form-control" >
+                                <option v-for="item in creditCountOptions" :value="item.value" v-text="item.text"></option>
+                            </select>
+                            <small class="text-danger" v-if="form.errors.has('course.credit_count')" v-text="form.errors.get('course.credit_count')"></small>
+                        </div>
+                   
                        
                     </div>
                     <div class="col-sm-3">
+                        
                         <div class="form-group">                           
                           <label>開課中心</label>
-                            <select @change="loadTeacherOptions"  v-model="form.course.center_id"  name="course.center_id" class="form-control" >
+                            <select @change="onCenterChanged"  v-model="form.course.center_id"  name="course.center_id" class="form-control" >
                                 <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
                             </select>
                         </div>
-                        <div class="form-group">  
-                            <label>教師</label>
-                             <drop-down :value.sync="teachers" multiple  :options="teacherOptions" label="text"></drop-down>
-                            <small class="text-danger" v-if="form.errors.has('course.teachers')" v-text="form.errors.get('course.teachers')"></small>
+                        <div   class="form-group">                           
+                          <label>群組課程</label>
+                            <select :disabled="!isGroup" @change="onParentChanged"   v-model="form.course.parent"  name="course.parent" class="form-control" >
+                                <option v-for="item in parentOptions" :value="item.value" v-text="item.text"></option>
+                            </select>
                         </div>
+                        <div v-show="hasParent"  class="form-group">                           
+                            <label>必修</label>
+                            <div>
+                               <input type="hidden" v-model="form.course.must"  >
+                               <toggle :items="mustOptions"   :default_val="form.course.must" @selected=setMust></toggle>
+                            </div>
+                        </div>
+                    
                        
                     </div>
                     <div class="col-sm-3">
                         <div class="form-group">
                             <label>學期別</label>
-                            <select  v-model="form.course.term_id"  name="course.term_id" class="form-control" >
+                            <select @change="onTermChanged"  v-model="form.course.term_id"  name="course.term_id" class="form-control" >
                                 <option v-for="item in termOptions" :value="item.value" v-text="item.text"></option>
                             </select>
                          </div>
@@ -66,6 +88,22 @@
                         </div>
                        
                         
+                    </div>
+                </div>
+                <div class="row">
+                    <div  class="col-sm-3">
+                        <div class="form-group">  
+                            <label>課程分類</label>
+                             <drop-down :value.sync="categories" multiple  :options="categoryOptions" label="text"></drop-down>
+                            <small class="text-danger" v-if="form.errors.has('course.categories')" v-text="form.errors.get('course.categories')"></small>
+                        </div>
+                    </div>
+                    <div  class="col-sm-3">
+                        <div v-show="!hideTeacher" class="form-group">  
+                            <label>教師</label>
+                             <drop-down :value.sync="teachers" multiple  :options="teacherOptions" label="text"></drop-down>
+                            <small class="text-danger" v-if="form.errors.has('course.teachers')" v-text="form.errors.get('course.teachers')"></small>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -106,7 +144,7 @@
                              <small class="text-danger" v-if="form.errors.has('course.end_date')" v-text="form.errors.get('course.end_date')"></small>
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <!-- <div class="col-sm-3">
                         <div class="form-group">  
                             <label>學分數</label>
                              <select  v-model="form.course.credit_count"  name="course.credit_count" class="form-control" >
@@ -114,7 +152,7 @@
                             </select>
                         </div>
                            
-                    </div>
+                    </div> -->
                 </div>
                  <div class="row">
                     <div v-if="id" class="col-sm-3">
@@ -122,7 +160,7 @@
                     </div>
                     
                     <div class="col-sm-3">
-                     <div class="form-group">  
+                     <div v-show="!hideTeacher" class="form-group">  
                             <label>週數</label>
                              <select  v-model="form.course.weeks"  name="course.weeks" class="form-control" >
                                 <option v-for="item in weeksOptions" :value="item.value" v-text="item.text"></option>
@@ -130,7 +168,7 @@
                         </div>
                        
                     </div>
-                    <div class="col-sm-3">
+                    <div v-show="!hideTeacher" class="col-sm-3">
                        <div class="form-group">  
                             <label>時數</label>
                             <input type="text" name="course.hours" class="form-control" v-model="form.course.hours">
@@ -236,6 +274,10 @@
                    course:{}
                 }),
 
+                
+                groupOptions: Helper.boolOptions(),
+                mustOptions: Helper.boolOptions(),
+
                 datePickerOption:Helper.datetimePickerOption(),
                 begin_date: {
                     time: ''
@@ -249,9 +291,10 @@
                
                 centerOptions:[],
                 categoryOptions: [],
+                parentOptions:[],
                 teacherOptions:[],   
                 termOptions:[],
-                creditCountOptions:Helper.numberOptions(0,15),
+                creditCountOptions:Helper.numberOptions(0,60),
                 weeksOptions:Course.weeksOptions(),
                 activeOptions:Helper.activeOptions(),
                 reviewedOptions:Helper.reviewedOptions(),
@@ -299,6 +342,17 @@
               deep: true
             },
         },
+        computed:{
+            isGroup(){
+                return Helper.isTrue(this.form.course.group)  
+            },
+            hasParent(){
+                return Helper.isTrue(this.form.course.parent)
+            },
+            hideTeacher(){
+                return this.isGroup && !this.hasParent
+            }
+        }, 
         beforeMount() {
             this.init()
         },
@@ -357,6 +411,16 @@
                 
                 
             },
+            onCenterChanged(){
+                this.loadTeacherOptions()
+                this.loadParentOptions()
+            },
+            onTermChanged(){
+                 this.loadParentOptions()
+            },
+            onCreditCountChanged(){
+                this.clearErrorMsg('course.credit_count')
+            },
             loadTeacherOptions(){
                 let center=this.form.course.center_id
                 let params={ 
@@ -372,6 +436,37 @@
                     
                 })     
             },     
+            setGroup(val){
+                this.form.course.group=val
+                if(Helper.isTrue(val)){
+                    this.loadParentOptions()
+                }else{
+                    this.clearErrorMsg('course.credit_count')
+                }
+            },
+            setMust(val){
+                this.form.course.must = val
+            },
+            loadParentOptions(){
+                if(!this.isGroup) return false
+                let center=this.form.course.center_id
+                let term=this.form.course.term_id
+                let params={ 
+                    center:center,
+                    term:term
+                }
+                let options=Course.groupOptions(params)
+                options.then(data => {
+                    this.parentOptions=data.options
+                })
+                .catch(error=>{
+                       Helper.BusEmitError(error) 
+                    
+                })   
+            },
+            onParentChanged(val){
+
+            },
             setActive(val) {
                 this.form.course.active = val
             },
@@ -382,6 +477,19 @@
                 this.form.errors.clear(name)
             },
             onSubmit() {
+                 let errors={}
+                if( this.isGroup) {
+                    let credit_count=parseInt(this.form.course.credit_count)
+                    if(credit_count < 1){
+                         errors['course.credit_count']=['請選擇學分數']
+                    }
+                    
+                }
+               this.form.onFail(errors)
+               if(this.form.errors.any()){
+                
+                  return false
+               }
                 this.form.course.teachers=this.teachers
                 this.form.course.categories=this.categories
                 this.submitForm()
@@ -395,6 +503,7 @@
                     store=Course.store(this.form)
                 }
                 store.then(data => {
+
                    Helper.BusEmitOK()
                    this.$emit('saved',data)                            
                 })

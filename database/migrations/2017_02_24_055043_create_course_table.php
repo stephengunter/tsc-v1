@@ -31,8 +31,8 @@ class CreateCourseTable extends Migration
 		
 			$table->date('begin_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->integer('weeks');
-            $table->integer('hours');
+            $table->integer('weeks')->unsigned()->nullable();
+            $table->integer('hours')->unsigned()->nullable();
             	
 
             $table->decimal('tuition', 8, 2)->nullable();   //學費

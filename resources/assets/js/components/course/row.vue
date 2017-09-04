@@ -18,12 +18,13 @@
                    {{ course.name }}
             </a>
         </td> 
-        <td v-if="!more" v-html="teachersText(course.teachers)"></td> 
+        <td v-if="!more" v-html="group(course)"></td> 
         <td v-if="!more" v-html="getClassTimesText(course.class_times)"></td> 
         <td v-if="!more" v-html="period(course.begin_date , course.end_date)"></td> 
         <td v-if="!more" v-html="period(course.open_date , course.close_date)"></td> 
         <td v-if="!more" v-html="$options.filters.activeLabel(course.active)" ></td> 
 
+        <td v-if="more"  v-html="teachersText(course.teachers)"></td> 
         <td v-if="more" v-text="course.credit_count"></td>
         <td v-if="more" v-text="course.weeks"></td>
         <td v-if="more" v-text="course.hours"></td>
@@ -80,6 +81,17 @@
                 return Course.getClassTimesText(class_times)             
             },
             
+            group(course){
+                let credit_count= parseInt(course.credit_count)
+                if(!credit_count) return ''
+                  let isGroup=
+                let parent= parseInt(course.parent)
+                if(!parent){
+                    return Helper.okSign(true)
+                }else{
+                  return course.parentCourse.name
+                } 
+            },
             period(begin,end){
                return Helper.period(begin,end)
             },

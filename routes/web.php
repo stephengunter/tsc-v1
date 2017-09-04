@@ -53,6 +53,7 @@ Route::get('admins/index-options', 'AdminsController@indexOptions');
 
 Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
 Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
+Route::get('courses/group-options', '\App\Http\Controllers\Course\CoursesController@groupOptions');
 Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
 
 Route::post('courses/import', '\App\Http\Controllers\Course\CoursesController@import');

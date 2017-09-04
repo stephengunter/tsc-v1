@@ -32,7 +32,7 @@ class CourseSeeder extends Seeder
            'weeks' => '12',
            'hours' => '24',
 
-           'credit_count' => 3,
+           'credit_count' => 0,
            
            'net_signup' => true,
 

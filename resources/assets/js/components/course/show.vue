@@ -44,8 +44,11 @@
                     <label class="label-title">開課中心</label>
                     <p> {{ course.center.name }}</p>
 
-                    <label class="label-title">課程分類</label>
-                    <p v-html="course.categoriesText"></p>
+                    <label v-if="hasParent" class="label-title">群組課程</label>
+                    <p v-if="hasParent" v-html="course.parentCourse.name"></p>
+
+                    <label v-if="!hasParent" class="label-title">課程分類</label>
+                    <p v-if="!hasParent" v-html="course.categoriesText"></p>
 
                    
 
@@ -61,8 +64,14 @@
                     <p v-text="course.term.name">                       
                     </p>
                     
-                     <label class="label-title">教師</label>
-                     <p v-html="course.teachersText"></p>
+                     <label v-if="!groupAndParent" class="label-title">教師</label>
+                     <p  v-if="!groupAndParent" v-html="course.teachersText"></p>
+
+                    <label v-if="groupAndParent" class="label-title">群組課程</label>
+                    <p v-if="groupAndParent" >
+                      <span class="glyphicon glyphicon-ok-sign text-success"></span>
+                    </p>
+
 
                    
                     <label class="label-title">學分數</label>
@@ -82,11 +91,11 @@
                 </div>
                 
             </div> 
-            <div class="row">
+            <div v-if="!groupAndParent" class="row">
                 <div class="col-sm-3">
                 </div>
                 <div class="col-sm-3">
-                     <label class="label-title">週數</label>
+                     <label  class="label-title">週數</label>
                      <p>{{  course.weeks }}</p>
 
                 
@@ -176,6 +185,20 @@
         watch: {
             'version':'init'
         },
+        computed:{
+            isGroup(){
+              let credit_count=parseInt(this.course.credit_count)
+              return credit_count > 0
+               
+            },
+            hasParent(){
+                let parent=parseInt(this.course.parent)
+              return parent > 0
+            },
+            groupAndParent(){
+                return this.isGroup && !this.hasParent
+            }
+        }, 
         beforeMount() {
             this.init()
         },  

@@ -19,20 +19,37 @@ class CourseRequest extends FormRequest
 
     public function rules()
     {  
-
-        return [
+        $basicRules= [
             'course.name' => 'required|max:255',
          
             'course.begin_date'=> 'required',
             'course.end_date' => 'required',
-             'course.hours' => 'required|numeric',
+           
 
-            
-
-            'course.categories'  => 'required',
-            'course.teachers'  => 'required',
+           
+         //   'course.teachers'  => 'required',
           
         ];
+        
+
+        $request=$this->get('course');
+        $parent=(int)$request['parent'];
+
+        if(!$parent){
+            return $basicRules;
+        }else{
+           
+            $extraRules=[
+                'course.hours' => 'required|numeric',
+                'course.categories' => 'required',
+                'course.teachers'  => 'required',
+            ];
+            return array_merge($basicRules,$extraRules);
+        }
+
+        
+
+
     }
 
     public function messages()

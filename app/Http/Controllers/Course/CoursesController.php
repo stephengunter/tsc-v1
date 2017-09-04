@@ -55,15 +55,17 @@ class CoursesController extends BaseController
         $allCategories=$this->categories->getAll()->get();       
         $categoryOptions=$this->categories->optionsConverting($allCategories);
         $centerOptions=$this->centers->options();
-
         $weekdayOptions=$this->weekdays->options();
+
+        $groupCategory=$this->categories->groupCategory();
 
         return response()
             ->json([
                 'termOptions' => $termOptions,
                 'categoryOptions' => $categoryOptions,
                 'centerOptions' => $centerOptions,
-                'weekdayOptions' => $weekdayOptions
+                'weekdayOptions' => $weekdayOptions,
+                'groupCategory' => $groupCategory
 
             ]);
 
@@ -84,6 +86,7 @@ class CoursesController extends BaseController
         
         if(count($courseList)){
             foreach ($courseList as $course) {
+                $course->getParentCourse();
                 foreach ($course->classTimes as $classTime) {
                   $classTime->weekday;
                 }
@@ -181,10 +184,23 @@ class CoursesController extends BaseController
 
         $courseValues=$request->getCourseValues($updated_by,$removed);
         
-        $categoryIds = $request->getCategoryIds();
-        $teacherIds = $request->getTeacherIds();      
+        $parent=(int)$courseValues['parent'];
+        $credit_count=(int)$courseValues['credit_count'];
+        $categoryIds =[];
+        $teacherIds=[];
+        if($parent){
+            $teacherIds = $request->getTeacherIds(); 
+        }else{
+            $categoryIds = $request->getCategoryIds();
+            if($credit_count){
+                $courseValues['weeks'] = 0;
+                $courseValues['hours'] = 0;
+            }
+        }
+             
         
        
+        
         $course = $this->courses->store($courseValues , $categoryIds, $teacherIds);
        
         return response()->json($course); 
@@ -205,6 +221,8 @@ class CoursesController extends BaseController
         
         $course->canEdit=$course->canEditBy($current_user);
         $course->canDelete=$course->canDeleteBy($current_user);
+
+        $course->getParentCourse();
        
         foreach ($course->classTimes as $classTime) {
                 $classTime->weekday;
@@ -325,6 +343,23 @@ class CoursesController extends BaseController
         return response()->json([ 'deleted' => true ]);
            
     }
+    public function groupOptions()
+    {
+        $request = request();
+        $term_id=(int)$request->term; 
+        $center_id=(int)$request->center;
+        $options= $this->getGroupOptions($term_id,$center_id);
+        return response()->json(['options' => $options ]);     
+    }
+    private function getGroupOptions($term_id,$center_id)
+    {
+        $groupCourses= $this->courses->getGroupCourses($term_id,$center_id)
+                                     ->get();
+        $with_empty=true;
+        $options=$this->courses->optionsConverting($groupCourses,$with_empty);
+
+        return $options;
+    }
 
     public function options()
     {
@@ -342,6 +377,7 @@ class CoursesController extends BaseController
         $request = request();
         $term_id=(int)$request->term; 
         $center_id=(int)$request->center;
+        
 
         $courseList=$this->courses->getAll()->where('term_id',$term_id)
                                      ->where('center_id',$center_id)

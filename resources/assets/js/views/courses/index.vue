@@ -5,23 +5,29 @@
             <div class="form-inline">
                 
                 <div class="form-group">
-                    <select  v-model="params.term"    style="width:auto;" class="form-control selectWidth">
+                    <select @change="onParamChanged"  v-model="params.term"    style="width:auto;" class="form-control selectWidth">
                         <option v-for="item in termOptions" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <select  v-model="params.center" style="width:auto;" class="form-control selectWidth">
+                    <select @change="onParamChanged"  v-model="params.center" style="width:auto;" class="form-control selectWidth">
                          <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <select  v-model="params.category" style="width:auto;" class="form-control selectWidth">
+                    <select @change="onParamChanged"  v-model="params.category" style="width:auto;" class="form-control selectWidth">
                          <option v-for="item in categoryOptions" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <select  v-model="params.weekday" style="width:auto;" class="form-control selectWidth">
+                    <select @change="onParamChanged" v-model="params.weekday" style="width:auto;" class="form-control selectWidth">
                          <option v-for="item in weekdayOptions" :value="item.value" v-text="item.text"></option>
+                    </select>
+                </div>
+
+                <div v-if="groupReady"  class="form-group">群組課程
+                    <select @change="onParentChanged" style="width:auto;"  v-model="params.parent"  class="form-control selectWidth" >
+                         <option v-for="item in parentOptions" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 
@@ -30,8 +36,9 @@
         </div>
     </div>
      
-    <course-list v-if="ready" :search_params="params"  :hide_create="hide_create" :version="version"  
-        :can_select="can_select"
+    <course-list v-if="ready" :search_params="listSettings.params"  
+        :hide_create="listSettings.hide_create" :version="version"  
+        :can_select="listSettings.can_select"
         @selected="onSelected" @begin-create="onBeginCreate">
     </course-list>
 
@@ -61,27 +68,51 @@
         data() {
             return {
                 ready:false,
+                groupCategory:{},
+
+                groupReady:false,
+
                 termOptions:[],
                 categoryOptions:[],
                 centerOptions:[],
                 weekdayOptions:[],
+                parentOptions:[],
                 params:{
                     term:0,
                     center:0,
                     category:0,
                     weekday:0,
                 },
-               
-              
-                can_select:false,
+
+                listSettings:{
+                    can_select:false,
+                    hide_create:false,
+                    params:{
+                        term:0,
+                        center:0,
+                        category:0,
+                        weekday:0,
+                        parent:0
+                    },
+                }
+                
              
             }
         },
         beforeMount() {
              this.init()
         },
+        computed:{
+            isGroup(){
+                if(!this.groupCategory) return false
+                let category = parseInt(this.params.category)
+                return category==parseInt(this.groupCategory.id)
+            },
+            
+        }, 
         methods: {
             init(){
+                this.listSettings.hide_create=this.hide_create
                 let options=Course.indexOptions()
                 options.then(data=>{
                     this.termOptions=data.termOptions
@@ -102,6 +133,10 @@
                     this.weekdayOptions.splice(0, 0, allWeekdays);
                     this.params.weekday=this.weekdayOptions[0].value
 
+                    this.groupCategory=data.groupCategory
+
+                    this.onParamChanged()
+
                     this.ready=true
                 }).catch(error=>{
                     Helper.BusEmitError(error)
@@ -109,12 +144,64 @@
                 })
              
             },
+            onParamChanged(){
+                this.params.parent=0
+
+                if(this.isGroup){
+                    let center=this.params.center
+                    let term=this.params.term
+                    let params={ 
+                        center:center,
+                        term:term
+                    }
+                    let options=Course.groupOptions(params)
+                    options.then(data => {
+                        this.parentOptions=data.options
+                        this.groupReady=true
+                        this.setListParams()
+                    })
+                    .catch(error=>{
+                           Helper.BusEmitError(error)                         
+                    })   
+                }else{
+                     this.groupReady=false
+                    this.setListParams()
+                }
+              
+               
+            },
+            onParentChanged(){
+                this.setListParams()
+            },
+            setListParams(){
+                this.listSettings.params.term=this.params.term
+                this.listSettings.params.center=this.params.center
+                this.listSettings.params.category=this.params.category
+                this.listSettings.params.weekday=this.params.weekday
+                this.listSettings.params.parent=this.params.parent
+            },
             onSelected(id){
                 this.$emit('selected',id)
             },
             onBeginCreate(){
                 this.$emit('begin-create',this.course_id)
-            }
+            },
+            loadParentOptions(){
+                let center=this.params.center
+                let term=this.params.term
+                let params={ 
+                    center:center,
+                    term:term
+                }
+                let options=Course.groupOptions(params)
+                options.then(data => {
+                    this.parentOptions=data.options
+                })
+                .catch(error=>{
+                       Helper.BusEmitError(error) 
+                    
+                })   
+            },
             
             
         },

@@ -12,7 +12,8 @@ class Course extends Model
     use FilterPaginateOrder;
    
     
-	protected $fillable = [ 'term_id', 'center_id', 'name', 
+    protected $fillable = [ 'term_id', 'center_id', 'name', 
+                            'parent','must',
                             'credit_count' ,'net_signup' , 
                             'begin_date' ,  'end_date' , 'weeks', 'hours',
                             'tuition', 'cost' , 'materials',
@@ -34,6 +35,8 @@ class Course extends Model
         return [            
             'name' => '',
             'center_id' => $center_id,
+            'parent' => 0,
+            'must' => 0,
             'weeks' => 6,
             'hours' => null,
             'begin_date'=>Carbon::now()->toDateString(),
@@ -46,6 +49,8 @@ class Course extends Model
             
             'categories'=> [],
             'teachers'=> [],
+
+            'group' => 0
            
         ];
     }
@@ -262,6 +267,14 @@ class Course extends Model
              ];
 
          return $item;
+    }
+    public function getParentCourse()
+    {
+        $parent_id=(int)$this->parent;
+        $this->parentCourse=static::find($parent_id);
+       
+
+        return $this->parentCourse;
     }
 
 }

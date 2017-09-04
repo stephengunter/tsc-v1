@@ -12,7 +12,8 @@ class CreateCategoryTable extends Migration
             $table->increments('id');
             $table->integer('parent')->unsigned()->default(0);
             
-			$table->string('name');			
+            $table->string('name');		
+            $table->string('code')->nullable(); 	
             $table->integer('order')->default(0);
             $table->string('icon')->nullable(); 
 

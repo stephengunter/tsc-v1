@@ -174,6 +174,20 @@ class Course {
                     })
                 })  
     }
+    static groupOptions(searchParams){
+        let url =this.source() + '/group-options' 
+         url = Helper.buildQuery(url, searchParams)
+        return new Promise((resolve, reject) => {
+                     axios.get(url)
+                    .then(response => {
+                        resolve(response.data);
+                    })
+                    .catch(error => {
+                        reject(error);
+                    })
+                })  
+    }
+    
     static search(name,options){
         let url =this.source() + '/search' 
         url += '?name=' + name
@@ -215,8 +229,8 @@ class Course {
                     default:true
 
                 }, {
-                    title: '教師',
-                    key: 'teacherNames',
+                    title: '群組課程',
+                    key: 'group',
                     sort: false,
                     default:true
                 }, {
@@ -241,6 +255,11 @@ class Course {
                     sort: true,
                     default:true
                 },{
+                    title: '教師',
+                    key: 'teacherNames',
+                    sort: false,
+                    default:false
+                }, {
                     title: '學分數',
                     key: 'credit_count',
                     sort: true,
