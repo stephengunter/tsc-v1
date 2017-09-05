@@ -14,7 +14,7 @@ class Course extends Model
     
     protected $fillable = [ 'term_id', 'center_id', 'name', 
                             'parent','must',
-                            'credit_count' ,'net_signup' , 
+                            'credit_count' , 'credit_price' ,'net_signup' , 
                             'begin_date' ,  'end_date' , 'weeks', 'hours',
                             'tuition', 'cost' , 'materials',
                             'description','target',
@@ -25,32 +25,52 @@ class Course extends Model
                             ];
 	
     protected $filter =  [ 'name',  'weeks', 'hours', 'number',
-                           'net_signup' , 'credit_count' ,
+                           'net_signup' , 'credit_count' ,'credit_price' ,
                            'begin_date' ,   'tuition' , 'cost' , 
                            'open_date' ,  'limit' , 'active',	
                          ];
 
-    public static function initialize($center_id)
-    {
+    public static function initialize($center_id=0, Course $parent_course=null)
+    {   
+        $group=0;
+        $parent=0;
+        $term_id=0;
+        $begin_date=Carbon::now()->toDateString();
+        $end_date=Carbon::now()->addMonths(2)->toDateString();
+        $weeks=6;
+        $net_signup=1;
+        
+        if($parent_course){
+            $group = 1;
+            $parent=$parent_course->id;
+            $term_id = $parent_course->term_id;
+            $center_id = $parent_course->center_id;
+            $begin_date= $parent_course->begin_date;
+            $end_date = $parent_course->end_date;
+            $net_signup = $parent_course->net_signup;
+        }
         return [            
             'name' => '',
+            'group' => $group ,
             'center_id' => $center_id,
-            'parent' => 0,
+            'term_id' => $term_id,
+            'parent' => $parent,
             'must' => 0,
-            'weeks' => 6,
+            'weeks' => $weeks,
             'hours' => null,
-            'begin_date'=>Carbon::now()->toDateString(),
-            'end_date'=>Carbon::now()->addMonths(2)->toDateString(),
+            'begin_date'=> $begin_date,
+            'end_date'=> $end_date,
             'photo_id'=> null,
             'credit_count'=> 0 ,
+            'credit_price' => null,
            
-            'net_signup'=> 1 ,
+            'net_signup'=> $net_signup ,
             'active'=> 0 ,
             
             'categories'=> [],
             'teachers'=> [],
 
-            'group' => 0
+            
            
         ];
     }
@@ -275,6 +295,16 @@ class Course extends Model
        
 
         return $this->parentCourse;
+    }
+
+    public function isGroup()
+    {
+        return (int)$this->credit_count > 0;
+    }
+    public function groupAndParent()
+    {
+         if(!$this->isGroup()) return false;
+         return (int)$this->parent < 1;
     }
 
 }

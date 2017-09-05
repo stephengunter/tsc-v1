@@ -106,24 +106,56 @@ class CoursesController extends BaseController
             $menus=$this->menus($this->key);            
             return view('courses.create')
                     ->with(['menus' => $menus]);
-        }  
+        }
 
         $current_user=$this->currentUser();
         $validCenters=$current_user->admin->validCenters();
         $centerOptions=$this->centers->optionsConverting($validCenters);
-
-        $center_id=$centerOptions[0]['value'];
-        $course= Course::initialize($center_id);
+        
+        $request = request();
+        $parent=(int)$request->parent; 
+        
        
+
+        $parent_course=null;
+        if($parent){
+            $parent_course=Course::find($parent);            
+        }
 
         $publicCategories=false;
         $categoryOptions=$this->categories->options($publicCategories);
+        
+
+        $termOptions=$this->terms->options();
+        
+        $groupOptions=[];
+        $groupCourses=[];
+
+        $course=null;
+        $center_id=0;
+        if($parent_course){
+            $center_id=$parent_course->center_id;
+          
+            $course= Course::initialize( 0 ,$parent_course);
+
+            $term_id=$course['term_id'];
+            
+            
+            $groupCourses= $this->courses->getGroupCourses($term_id,$center_id)
+                                                        ->get();
+            $with_empty=true;
+            $groupOptions=$this->courses->optionsConverting($groupCourses,$with_empty);
+
+        }else{
+            $center_id=$centerOptions[0]['value'];
+            $course= Course::initialize($center_id);
+            $course['term_id']=$termOptions[0]['value'];
+        }
 
         $teacherOptions=$this->teachers->optionsByCenter($center_id);
 
-        $termOptions=$this->terms->options();
-        $course['term_id']=$termOptions[0]['value'];
-      
+       
+
        
         return response()
             ->json([
@@ -132,6 +164,8 @@ class CoursesController extends BaseController
                 'categoryOptions' => $categoryOptions,
                 'teacherOptions' => $teacherOptions,
                 'termOptions' => $termOptions,
+                'groupOptions' => $groupOptions,
+                'groupCourses' => $groupCourses
                 
             ]);
     }
@@ -180,32 +214,67 @@ class CoursesController extends BaseController
     public function store(CourseRequest $request)
     {
         $current_user=$this->currentUser();
-        $removed=false;
         $updated_by=$current_user->id;
-
+        $course= $this->createOrUpdate($request,$updated_by);
+        return response()->json($course); 
+      
+    }
+    private function createOrUpdate(CourseRequest $request, $updated_by,Course $course=null)
+    {
+        $removed=false;
         $courseValues=$request->getCourseValues($updated_by,$removed);
         
         $parent=(int)$courseValues['parent'];
         $credit_count=(int)$courseValues['credit_count'];
         $categoryIds =[];
         $teacherIds=[];
-        if($parent){
-            $teacherIds = $request->getTeacherIds(); 
-        }else{
-            $categoryIds = $request->getCategoryIds();
-            if($credit_count){
-                $courseValues['weeks'] = 0;
-                $courseValues['hours'] = 0;
+        $groupCategory=$this->courses->groupCategory();
+        if($credit_count){
+            if($parent){
+                $teacherIds = $request->getTeacherIds(); 
+                $parent_course=Course::find($parent);
+                $categoryIds =$parent_course->categories->pluck('id')->toArray();
+                $courseValues['term_id'] = $parent_course->term_id;
+                $courseValues['center_id'] = $parent_course->center_id;
+
+                $courseValues['credit_price'] = null;
+                if(!$course){
+                    if($parent_course->credit_price){
+                        $courseValues['tuition']=$parent_course->credit_price * $credit_count;
+                    }
+                    $courseValues['open_date']= $parent_course->open_date;
+                    $courseValues['close_date']= $parent_course->close_date;
+                    $courseValues['limit']= $parent_course->limit;
+                    $courseValues['min']= $parent_course->min;
+                    $courseValues['net_signup']= $parent_course->net_signup;
+                }
+                
+                
+            }else{
+                $courseValues['weeks'] = null;
+                $courseValues['hours'] = null;
+
+                $categoryIds = $request->getCategoryIds();
             }
+
+            if(!in_array($groupCategory->id, $categoryIds)){
+                array_push($categoryIds, $groupCategory->id);
+            }
+
+        }else{
+            $courseValues['credit_price'] = null;
+            $teacherIds = $request->getTeacherIds(); 
+            $categoryIds = $request->getCategoryIds();
         }
-             
+
+        if(!$course){
+            return $this->courses->store($courseValues , $categoryIds, $teacherIds);            
+           
+        }else{
+            return $this->courses->update($courseValues , $categoryIds, $teacherIds ,$course->id);
+        }
         
-       
         
-        $course = $this->courses->store($courseValues , $categoryIds, $teacherIds);
-       
-        return response()->json($course); 
-      
     }
     public function show($id)
     {
@@ -244,6 +313,9 @@ class CoursesController extends BaseController
         if(!$course->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
+
+        $course->group=(int)$course->credit_count > 0;
+
         $course->begin_date=Helper::checkDateString($course->begin_date);
         $course->end_date=Helper::checkDateString($course->end_date);
 
@@ -255,6 +327,12 @@ class CoursesController extends BaseController
         $categoryOptions=$this->categories->options($publicCategories);
         $teacherOptions=$this->teachers->optionsByCenter($course->center_id);
         $termOptions=$this->terms->options();
+
+       
+        $groupCourses= $this->courses->getGroupCourses($course->term_id,$course->center_id)
+                                     ->get();
+        $with_empty=true;
+        $groupOptions=$this->courses->optionsConverting($groupCourses,$with_empty);
 
         $course->categories;
         $course->teachers;
@@ -269,6 +347,8 @@ class CoursesController extends BaseController
                 'categoryOptions' => $categoryOptions,
                 'teacherOptions' => $teacherOptions,
                 'termOptions' => $termOptions,
+                'groupOptions' => $groupOptions,
+                'groupCourses' => $groupCourses
             ]);    
     }
     public function update(CourseRequest $request, $id)
@@ -278,20 +358,14 @@ class CoursesController extends BaseController
         if(!$course->canEditBy($current_user)){
             return  $this->unauthorized();         
         }
-        $removed=false;
+       
         $updated_by=$current_user->id;
 
-        $courseValues=$request->getCourseValues($updated_by,$removed);       
-        $categoryIds = $request->getCategoryIds();      
-        $teacherIds = $request->getTeacherIds();   
-       
-        $course = $this->courses->update($courseValues , $categoryIds, $teacherIds ,$id);
+        $course= $this->createOrUpdate($request,$updated_by,$course);
         
         event(new CourseUpdated($course, $current_user));
         
-        return response()->json(['course' => $course ]);
-                
-                    
+        return response()->json($course);     
                
     }
     // public function updateDisplayOrder(Request $request, $id)
@@ -349,18 +423,27 @@ class CoursesController extends BaseController
         $request = request();
         $term_id=(int)$request->term; 
         $center_id=(int)$request->center;
-        $options= $this->getGroupOptions($term_id,$center_id);
-        return response()->json(['options' => $options ]);     
-    }
-    private function getGroupOptions($term_id,$center_id)
-    {
+       
+
         $groupCourses= $this->courses->getGroupCourses($term_id,$center_id)
-                                     ->get();
+                                    ->get();
         $with_empty=true;
         $options=$this->courses->optionsConverting($groupCourses,$with_empty);
 
-        return $options;
+        return response()->json([
+                                    'options' => $options ,
+                                    'groupCourses' => $groupCourses
+                                ]);     
     }
+    // private function getGroupOptions($term_id,$center_id)
+    // {
+    //     $groupCourses= $this->courses->getGroupCourses($term_id,$center_id)
+    //                                  ->get();
+    //     $with_empty=true;
+    //     $options=$this->courses->optionsConverting($groupCourses,$with_empty);
+
+    //     return $options;
+    // }
 
     public function options()
     {

@@ -32,9 +32,15 @@ class Courses
 
     }
 
-    public function getGroupCourses(int $term_id,int $center_id)
+    public function groupCategory()
     {
-        $category=Category::where('code','group')->first();
+        return Category::where('code','group')->first();
+        
+    }
+
+    public function getGroupCourses(int $term_id,int $center_id,$top_only=true)
+    {
+        $category=$this->groupCategory();
         if(!$category) return null;
 
         $categoryId=$category->id;
@@ -48,6 +54,8 @@ class Courses
         {
              $q->where('id', $categoryId );
         });
+
+        if($top_only) $courseList=$courseList->where('parent',0);
 
         return $courseList;
     }
@@ -78,7 +86,7 @@ class Courses
 
         if($centerId) $courseList=$courseList->where('center_id',$centerId);
 
-        if($parentId) $courseList=$courseList->where('parent',$parentId);
+        $courseList=$courseList->where('parent',$parentId);
 
         if($categoryId){
              $courseList= $courseList->whereHas('categories', function($q)  use ($categoryId)

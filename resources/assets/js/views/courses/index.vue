@@ -25,10 +25,15 @@
                     </select>
                 </div>
 
-                <div v-if="groupReady"  class="form-group">群組課程
+                <div v-if="groupReady"  class="form-group">&nbsp;&nbsp;群組課程
                     <select @change="onParentChanged" style="width:auto;"  v-model="params.parent"  class="form-control selectWidth" >
                          <option v-for="item in parentOptions" :value="item.value" v-text="item.text"></option>
                     </select>
+                </div>
+                <div v-if="hasParent"  class="form-group">
+                   學分數：{{ parentCourse.credit_count }} &nbsp;
+                   學分單價：{{ parentCourse.credit_price |  formatMoney }} &nbsp;
+                   學費：{{ parentCourse.tuition |  formatMoney }}
                 </div>
                 
 
@@ -70,14 +75,16 @@
             return {
                 ready:false,
                 groupCategory:{},
-
+                groupCourses:[],
+                parentOptions:[],
+                parentCourse:{},
                 groupReady:false,
 
                 termOptions:[],
                 categoryOptions:[],
                 centerOptions:[],
                 weekdayOptions:[],
-                parentOptions:[],
+               
                 params:{
                     term:0,
                     center:0,
@@ -109,6 +116,12 @@
                 let category = parseInt(this.params.category)
                 return category==parseInt(this.groupCategory.id)
             },
+            hasParent(){
+                if(!this.isGroup) return false
+                if(!this.parentCourse) return false
+                  
+                return  Helper.tryParseInt(this.parentCourse.id) > 0
+            }
             
         }, 
         methods: {
@@ -163,6 +176,7 @@
                     let options=Course.groupOptions(params)
                     options.then(data => {
                         this.parentOptions=data.options
+                        this.groupCourses=data.groupCourses
                         this.groupReady=true
                         this.setListParams()
                     })
@@ -177,6 +191,7 @@
                
             },
             onParentChanged(){
+                
                 this.setListParams()
             },
             setListParams(){
@@ -185,6 +200,24 @@
                 this.listSettings.params.category=this.params.category
                 this.listSettings.params.weekday=this.params.weekday
                 this.listSettings.params.parent=this.params.parent
+
+                this.setParentCourse(this.listSettings.params.parent)
+            },
+            setParentCourse(id){
+                if(Helper.tryParseInt(id) < 1) {
+                   this.parentCourse={}
+                }else{
+                    for (let i = 0; i < this.groupCourses.length; i++) {
+                        let course=this.groupCourses[i]
+                        if(course.id==id){
+                            this.parentCourse=course
+                            break
+                        }
+                  
+                    }
+                }
+                
+                                   
             },
             onSelected(id){
                 this.$emit('selected',id)
@@ -196,7 +229,8 @@
                 
             },
             onBeginCreate(){
-                this.$emit('begin-create',this.course_id)
+                
+                this.$emit('begin-create',this.parentCourse.id)
             },
             loadParentOptions(){
                 let center=this.params.center

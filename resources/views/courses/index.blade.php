@@ -3,18 +3,23 @@
 
 @section('content')
         
-       <course-index v-show="!selected" :hide_create="indexSettings.hide_create" 
+       <course-index v-show="indexMode" :hide_create="indexSettings.hide_create" 
            :version="version"
          @begin-create="onBeginCreate"  @selected="onSelected"  >
        </course-index> 
 
        
 
-       <course-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
+       <course-details v-if="detailsMode"  :id="selected" :can_back="detailsSettings.can_back" 
           @btn-back-clicked="backToIndex" @course-deleted="onDeleted"
           @signup-selected="onSignupSelected" 
           @edit-user="onEditUser" >
        </course-details>
+
+       <course-create v-if="creating"  :parent="createSettings.parent"
+         @canceled="backToIndex" 
+         @saved="onCreated" @imported="backToIndex">
+        </course-create>
       
        
 @endsection
@@ -39,13 +44,23 @@
                detailsSettings:{
                   can_back:true
                },
+               createSettings:{
+                  parent:0,
+               },
+
+               creating:false
             }
         },
         computed: {
             indexMode() {
                  if(this.selected) return false
-                  return true
-            }
+                 return !this.creating
+            },
+            detailsMode() {
+                 if(!this.selected) return false
+                   return !this.creating
+            },
+
         },
         beforeMount() {
              
@@ -54,8 +69,11 @@
             init(){
              
             },
-            onBeginCreate(){
-                Helper.redirect('/courses/create')
+            onBeginCreate(parent){
+              this.createSettings.parent=parent
+
+              this.selected=0
+              this.creating=true
             },        
             onSelected(id){
                this.selected=id
@@ -63,9 +81,14 @@
             onDeleted(){
                 this.backToIndex()
             },
+            onCreated(course){
+                this.creating=false     
+                this.selected=course.id
+            },
             backToIndex(){
                 this.version+=1
-                this.selected=0                 
+                this.selected=0   
+                this.creating=false              
             },
             onSignupSelected(id){
                let url='/signups/' + id

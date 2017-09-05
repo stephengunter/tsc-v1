@@ -62,11 +62,9 @@
                     </div>
                     <div class="col-sm-3">
                          <label class="label-title">網路報名</label>
-                        <p v-if="signupinfo.net_signupinfo">
-                            可
-                        </p>
-                        <p v-else>
-                            否
+                        <p>
+                            {{ signupinfo.net_signup | boolText  }}
+                          
                         </p>
                      </div>
             </div>

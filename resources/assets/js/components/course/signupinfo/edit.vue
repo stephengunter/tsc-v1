@@ -17,6 +17,7 @@
                             <div>
                                 <date-picker :option="datePickerOption" :date="open_date" ></date-picker>
                             </div>
+                            <input type="hidden" v-model="form.signupinfo.open_date"  >
                              <small class="text-danger" v-if="form.errors.has('signupinfo.open_date')" v-text="form.errors.get('signupinfo.open_date')"></small>
                          </div>
                     </div>
@@ -26,6 +27,7 @@
                             <div>
                                 <date-picker :option="datePickerOption" :date="close_date" ></date-picker>
                             </div>
+                            <input  type="hidden" v-model="form.signupinfo.close_date"  >
                              <small class="text-danger" v-if="form.errors.has('signupinfo.close_date')" v-text="form.errors.get('signupinfo.close_date')"></small>
                          </div>
                     </div>
@@ -69,7 +71,7 @@
                         <div class="form-group">                           
                             <label>網路報名</label>
                             <div>
-                            <input type="hidden" v-model="form.signupinfo.net_signupinfo"  >
+                            <input type="hidden" v-model="form.signupinfo.net_signup"  >
                              <toggle :items="boolOptions"   :default_val="form.signupinfo.net_signup" @selected="setNetSignup"></toggle>
                             </div>
                           </div>
@@ -141,14 +143,14 @@
             open_date: {
               handler: function () {
                   this.form.signupinfo.open_date=this.open_date.time
-                  this.clearErrorMsg('course.open_date')
+                  this.clearErrorMsg('signupinfo.open_date')
               },
               deep: true
             },
             close_date: {
               handler: function () {
                   this.form.signupinfo.close_date=this.close_date.time
-                  this.clearErrorMsg('course.close_date')
+                  this.clearErrorMsg('signupinfo.close_date')
               },
               deep: true
             },

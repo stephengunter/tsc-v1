@@ -34,18 +34,33 @@ class CourseRequest extends FormRequest
 
         $request=$this->get('course');
         $parent=(int)$request['parent'];
+        $credit_count=(int)$request['credit_count'];
 
-        if(!$parent){
-            return $basicRules;
+        if($credit_count){
+            if($parent){
+                $extraRules=[
+                    'course.hours' => 'required|numeric',
+                    'course.teachers'  => 'required',
+                ];
+                return array_merge($basicRules,$extraRules);
+            }else{
+               
+                $extraRules=[
+                    'course.categories' => 'required',
+                ];
+                return array_merge($basicRules,$extraRules);
+            }
         }else{
-           
             $extraRules=[
                 'course.hours' => 'required|numeric',
-                'course.categories' => 'required',
                 'course.teachers'  => 'required',
+                'course.categories' => 'required',
             ];
             return array_merge($basicRules,$extraRules);
         }
+        
+
+        
 
         
 

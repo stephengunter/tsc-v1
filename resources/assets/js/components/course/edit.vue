@@ -73,6 +73,12 @@
                                <toggle :items="mustOptions"   :default_val="form.course.must" @selected=setMust></toggle>
                             </div>
                         </div>
+                        <div v-show="groupAndParent"  class="form-group">                           
+                            <label>學分單價</label>
+                            <div>
+                                <input type="text" name="course.credit_price" class="form-control" v-model="form.course.credit_price">
+                            </div>
+                        </div>
                     
                        
                     </div>
@@ -91,6 +97,9 @@
                     </div>
                 </div>
                 <div class="row">
+                     <div v-if="id" class="col-sm-3">
+                       
+                    </div>
                     <div  class="col-sm-3">
                         <div class="form-group">  
                             <label>課程分類</label>
@@ -262,6 +271,10 @@
               type: Number,
               default: 0
             },
+            parent: {
+              type: Number,
+              default: 0
+            },
         },
        
         data() {
@@ -350,8 +363,12 @@
                 return Helper.isTrue(this.form.course.parent)
             },
             hideTeacher(){
+                return this.groupAndParent
+            },
+            groupAndParent(){
                 return this.isGroup && !this.hasParent
             }
+
         }, 
         beforeMount() {
             this.init()
@@ -379,7 +396,7 @@
                 if(id){
                     getData=Course.edit(id)
                 }else{
-                    getData=Course.create()
+                    getData=Course.create(this.parent)
                 }
                 
                getData.then(data=>{
@@ -398,6 +415,10 @@
                     this.categoryOptions=data.categoryOptions
                     this.teacherOptions=data.teacherOptions
                     this.termOptions= data.termOptions
+
+                    if(data.groupOptions){
+                        this.parentOptions=data.groupOptions
+                    }
 
                     this.photo_id =Helper.tryParseInt(course.photo_id)
 
@@ -437,9 +458,12 @@
                 })     
             },     
             setGroup(val){
+                
                 this.form.course.group=val
                 if(Helper.isTrue(val)){
                     this.loadParentOptions()
+                    this.clearErrorMsg('course.teachers')
+                    this.clearErrorMsg('course.categories')
                 }else{
                     this.clearErrorMsg('course.credit_count')
                 }
@@ -477,13 +501,20 @@
                 this.form.errors.clear(name)
             },
             onSubmit() {
-                 let errors={}
+                let errors={}
                 if( this.isGroup) {
                     let credit_count=parseInt(this.form.course.credit_count)
                     if(credit_count < 1){
                          errors['course.credit_count']=['請選擇學分數']
                     }
                     
+                    let credit_price=this.form.course.credit_price
+                    if(isNaN(credit_price)){
+                        this.form.course.credit_price =''
+                    }
+                    
+                }else{
+                    this.form.course.credit_price =''
                 }
                this.form.onFail(errors)
                if(this.form.errors.any()){

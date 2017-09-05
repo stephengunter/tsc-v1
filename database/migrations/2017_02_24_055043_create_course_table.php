@@ -26,6 +26,7 @@ class CreateCourseTable extends Migration
             $table->string('number');
 
             $table->integer('credit_count')->default(0);   //學分數
+            $table->decimal('credit_price', 8, 2)->nullable();   //學分單價
             $table->boolean('net_signup')->default(true);
 
 		
@@ -34,7 +35,7 @@ class CreateCourseTable extends Migration
             $table->integer('weeks')->unsigned()->nullable();
             $table->integer('hours')->unsigned()->nullable();
             	
-
+            
             $table->decimal('tuition', 8, 2)->nullable();   //學費
             $table->decimal('cost', 8, 2)->nullable();  //材料費
             $table->string('materials')->nullable();   //材料    槌子,榔頭,電鑽

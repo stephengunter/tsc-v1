@@ -54,7 +54,7 @@ class SignupInfoesController extends BaseController
         if(!$course->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
-      
+
         $course->open_date=Helper::checkDateString($course->open_date);
         $course->close_date=Helper::checkDateString($course->close_date);
        

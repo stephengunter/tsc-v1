@@ -34,8 +34,11 @@
                     <label class="label-title">課程編號</label>
                     <p>{{course.number}}</p>
 
-                     <label class="label-title">起始日期</label>
-                    <p>{{course.begin_date}}</p>
+                     <label class="label-title">課程日期</label>
+                    <p>{{course.begin_date}}
+                        ~
+                       {{course.end_date}} 
+                    </p>
 
                    
                     
@@ -50,10 +53,10 @@
                     <label v-if="!hasParent" class="label-title">課程分類</label>
                     <p v-if="!hasParent" v-html="course.categoriesText"></p>
 
-                   
+                     <label class="label-title">學分數</label>
+                    <p v-html="creditCountText(course)">  </p>
 
-                    <label class="label-title">結束日期</label>
-                     <p>{{  course.end_date }}</p>
+                   
 
                      
 
@@ -74,10 +77,10 @@
 
 
                    
-                    <label class="label-title">學分數</label>
-                    <p>
-                         {{ course.credit_count }}
-                    </p> 
+                    <label v-if="groupAndParent" class="label-title">學分單價</label>
+                    <p v-if="groupAndParent"> {{ course.credit_price | formatMoney }} </p>
+                         
+                    
                     
                 </div>
             </div>  <!-- End row-->
@@ -223,7 +226,18 @@
                     Helper.BusEmitError(error)
                 })
             },   
-            
+            creditCountText(course){
+               let credit_count= Helper.tryParseInt(course.credit_count)
+               if(credit_count > 0){
+                   let parent=Helper.tryParseInt(course.parent)
+                   if(!parent) return  course.credit_count
+
+                   let text=Course.mustText(course.must)
+                  return   course.credit_count + ' (' + text + ')'
+               }else{
+                    return '0'
+               }
+            },
             btnEditCilcked(){
                this.$emit('begin-edit');
             },

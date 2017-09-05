@@ -40,8 +40,11 @@ class Course {
     static deleteUrl(id){
          return this.source() + '/' + id
     }
-    static create(){
+    static create(parent){
         let url = this.createUrl() 
+        if(parent){
+            url += '?parent=' + parent
+        }
       
         return new Promise((resolve, reject) => {
             axios.get(url)
@@ -216,6 +219,11 @@ class Course {
         let credit_count= parseInt(course.credit_count)
         let parent= parseInt(course.parent)
         return credit_count > 0  &&  parent > 0
+    }
+
+    static  mustText(mustVal){
+        if(Helper.isTrue(mustVal)) return '必修'
+        return  '選修'
     }
 
     static getThead(canSelect){

@@ -7,6 +7,7 @@
     </course-import>
 
     <edit-course v-else :course_id="course_id" 
+       :parent="parent"
       @import="beginImport"
       @canceled="onCanceled" @saved="onSaved">
     </edit-course>
@@ -25,6 +26,10 @@
         },
         props: {
             course_id:{
+               type: Number,
+               default: 0
+            },
+            parent:{
                type: Number,
                default: 0
             },
@@ -51,6 +56,7 @@
                 this.$emit('canceled')
             },
             onSaved(course){
+               
                 this.$emit('saved',course)
             },
             onImported(){
