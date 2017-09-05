@@ -11,10 +11,15 @@
             </select>
        </div>
        <div v-if="with_course" class="form-group">
-            <select  v-model="params.course" @change="onCourseChanged" style="width:auto;" class="form-control selectWidth">
-                 <option v-for="item in courseOptions" :value="item.value" v-text="item.text"></option>
+            <select  v-model="params.parent" @change="onParentCourseChanged" style="width:auto;" class="form-control selectWidth">
+                 <option v-for="item in parentCourseOptions" :value="item.value" v-text="item.text"></option>
             </select>
        </div>
+       <div v-if="groupReady"  class="form-group">&nbsp;&nbsp;群組課程
+             <select  v-model="params.sub"  @change="onSubCourseChanged" style="width:auto;"  class="form-control selectWidth" >
+                  <option v-for="item in subCourseOptions" :value="item.value" v-text="item.text"></option>
+             </select>
+        </div>
        
     </div>
 
@@ -42,23 +47,36 @@
                 ready:false,
                 termOptions:[],
                 centerOptions:[],
-                courseOptions:[],
+                parentCourseOptions:[],
+                subCourseOptions:[],
                 params:{
                     term:0,
                     center:0,
-                    course:0,
+                    parent:0,
+                    sub:0,
                 },
+
+                parentCourse:{}
              
             }
         },
-        watch: {
-          ready: function (val) {
-              if(this.ready){
-                 this.$emit('ready', this.params)
-              }
-          },
+        // watch: {
+        //   ready: function (val) {
+        //       if(this.ready){
+        //          this.$emit('ready', this.params)
+        //       }
+        //   },
           
-        },
+        // },
+        computed:{
+            groupReady(){
+                if(!this.with_course) return false
+                if(!this.parentCourse) return false
+                return  Helper.tryParseInt(this.parentCourse.credit_count) > 0
+                
+            },
+            
+        }, 
         beforeMount() {
              this.init()
         },
@@ -78,7 +96,7 @@
                     if(this.with_course){
                         this.loadCourses()
                     }else{
-                      this.ready=true
+                      this.onReady()
                     }
 
 
@@ -93,23 +111,38 @@
                 this.ready=false
                 let options=Course.options(this.params)
                 options.then(data => {
-                    this.courseOptions =data.options
-                    if(this.empty_course){
-                       let empty={
+                    this.parentCourseOptions =data.parentOptions
+                    this.subCourseOptions = data.subOptions
+                    this.parentCourse= data.parentCourse
+                     let empty={
                           text:'-------',
                           value: 0
                        }
-                       this.courseOptions.splice(0, 0, empty);
+                    this.subCourseOptions.splice(0, 0, empty)   
+                    if(this.empty_course){
+                       this.parentCourseOptions.splice(0, 0, empty)
                     }
 
-                    this.ready=true
-
-                    let course=this.courseOptions[0]
-                    if(course){
-                        this.params.course=course.value
-                    }else{
-                        this.params.course=0
+                    let parent =Helper.tryParseInt(this.params.parent)
+                    if(!parent){
+                        this.params.parent=this.parentCourseOptions[0].value
                     }
+
+                    let sub = Helper.tryParseInt(this.params.parent)
+                    if(!parent){
+                        this.params.parent=this.parentCourseOptions[0].value
+                    }
+
+                    // this.ready=true
+
+                    // let course=this.courseOptions[0]
+                    // if(course){
+                    //     this.params.course=course.value
+                    // }else{
+                    //     this.params.course=0
+                    // }
+
+                    this.onReady()
                    
                 })
                 .catch(error => {
@@ -117,6 +150,9 @@
                     Helper.BusEmitError(error)
                 })
                 
+            },
+            onReady(){
+                this.ready=true
             },
             onTermChanged(){
                this.$emit('term-changed', this.params.term)
@@ -128,10 +164,18 @@
                 this.$emit('center-changed', this.params.center)
                 if(this.with_course){
                    this.loadCourses()
-               }
+                }
             },
             onCourseChanged(){
                 this.$emit('course-changed', this.params.course)
+            },
+            onParentCourseChanged(){
+               if(this.with_course){
+                   this.loadCourses()
+                }
+            },
+            onSubCourseChanged(){
+
             }
             
             

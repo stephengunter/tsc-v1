@@ -37,6 +37,16 @@ class Courses
         return Category::where('code','group')->first();
         
     }
+    public function parentCourses()
+    {
+        return Course::where('parent',0);
+        
+    }
+    public function subCourses($parent)
+    {
+        return Course::where('parent',$parent);
+        
+    }
 
     public function getGroupCourses(int $term_id,int $center_id,$top_only=true)
     {

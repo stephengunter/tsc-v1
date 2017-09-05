@@ -461,13 +461,34 @@ class CoursesController extends BaseController
         $request = request();
         $term_id=(int)$request->term; 
         $center_id=(int)$request->center;
+        $parent_course_id=(int)$request->parent;
         
-
-        $courseList=$this->courses->getAll()->where('term_id',$term_id)
+        $sub_course_id=(int)$request->sub;
+        
+        $parentCourses=$this->courses->parentCourses();
+        $parentCourses=$parentCourses->where('term_id',$term_id)
                                      ->where('center_id',$center_id)
+                                     ->orderBy('credit_count')
                                      ->get();
-        $options=$this->courses->optionsConverting($courseList);    
-        return response()->json(['options' => $options ]);     
+        // $courseList=$this->courses->getAll()->where('term_id',$term_id)
+        //                              ->where('center_id',$center_id)
+        //                              ->get();
+        $parentOptions=$this->courses->optionsConverting($parentCourses);  
+
+        $subOptions=[];
+        $parent_Course=null;
+        if($parent_course_id){
+            $parent_Course=Course::find($parent_course_id);
+            $subCourses=$this->courses->subCourses($parent_course_id)
+                                       ->get();
+            $subOptions=$this->courses->optionsConverting($subCourses); 
+        }
+          
+        return response()->json([
+                                    'parentOptions' => $parentOptions ,
+                                    'subOptions' => $subOptions ,
+                                    'parentCourse' => $parent_Course 
+                               ]);     
     }
 
     // public function optionsByTeacher($teacher)
