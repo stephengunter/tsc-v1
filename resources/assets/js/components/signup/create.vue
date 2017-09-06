@@ -5,7 +5,13 @@
         <div class="panel-heading">           
              <span class="panel-title">
                    <h4 v-html="title"></h4>
-             </span>           
+             </span>  
+             <div>
+                <button   @click="canceled" class="btn btn-default btn-sm" >
+                     <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                     返回
+                </button>
+            </div>         
         </div>
         <div class="panel-body">
             <form v-if="initialized" @submit.prevent="onSubmit" class="form">
@@ -96,7 +102,7 @@
                          </div>  
                    </div>
                </div>
-                <div v-if="edittingUser" class="row">
+               <div v-if="edittingUser" class="row">
                    <div class="col-sm-3">
                         <div class="form-group"> 
                            <label>性別</label>
@@ -148,25 +154,39 @@
                    </div>
                    
                </div>  
-               <div class="row" v-show="canSubmit">
-                    <div class="col-sm-6">
-                         <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確定</button>
+               <div v-if="needSelect" class="row">
+                   <div class="col-sm-12" >
+                       <sub-course-selector :courses="subCourses"
+                        :show_submit="selectorSettings.show_submit" :version="selectorSettings.version"
+                         :default_selected="selectorSettings.default_selected"
+                         @submit-courses="onSubCourseSelected" >
+                       </sub-course-selector>
+                   
+                   </div> 
+               </div> 
+               <div class="row" >
+                    <div  class="col-sm-6">
+                         <button type="submit"  class="btn btn-success" :disabled="!canSubmit">確定</button>
+                         <small class="text-danger" v-if="subCourseError" >請選擇課程</small>
                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                          <button class="btn btn-default" @click.prevent="canceled">取消</button>
-                    </div>
-
-
+                    </div>  
 
                 </div>    
                   
-            </form>
+           </form>
         </div>
     </div>
     
 </template>
 <script>
+    import SubCourseSelector from '../../components/course/sub/selector.vue'
+
     export default {
         name: 'CreateSignup',
+        components: {
+             'sub-course-selector':SubCourseSelector
+        },
         props: {
             course_id:{
                type: Number,
@@ -183,6 +203,9 @@
                 initialized:false,
 
                 signup:{},
+
+                subCourses:[],
+
                 selectedUser:null,
                 user:null,
 
@@ -215,15 +238,25 @@
                    withCourse:true,
 
                 },
+                selectorSettings:{
+                   default_selected:[],
+                   show_submit:false,
+                   version:0,
+                },
+
+                subCourseError:false
 
             }
         },
         computed: {
-            canSubmit: function () {
+            canSubmit(){
                 if(this.edittingUser) return false
                   if(!this.user) return false
                     return true
-            }
+            },
+            needSelect(){
+                return this.subCourses.length > 0  
+            },
         },
         watch: {
             selectedUser: function () {
@@ -260,7 +293,10 @@
                      
                 getData.then(data => {
                     this.signup=data.signup
+                    this.subCourses=data.subCourses
                     this.date.time=this.signup.date
+
+                    this.selectorSettings.default_selected=data.signup.sub_courses
                     
                     if(data.course){
                         this.courseName= Course.getFormatedCourseName(data.course,true)                   
@@ -285,6 +321,7 @@
                 })
                 
             },
+
             getUser(){
                  let user_id=this.selectedUser.value
                  let user=User.edit(user_id)   
@@ -327,6 +364,15 @@
             setDiscount(val) {
                 this.signup.discount_id = val;
             },  
+            onSubCourseSelected(selectedIds){
+                this.signup.sub_courses=selectedIds
+                if(selectedIds.length){
+                   this.subCourseError=false
+                   this.submitForm()
+                }else{
+                    this.subCourseError=true
+                }
+            },
             onSubmit() {
               
                 if(this.course_id){
@@ -337,28 +383,37 @@
                     }
                 }
 
-                let errors={}
-                   let signup=this.signup
-                 
-                   if(!signup.course_id) {
-                      errors['signup.course_id']=['必須選擇報名課程']
-                   }
-                   if(!signup.user_id) {
-                      errors['signup.user_id']=['必須選擇姓名']
-                   }
-                   
-                   this.form.onFail(errors)
-                   if(this.form.errors.any()){
-                      return false
-                   }
+               let errors={}
+               let signup=this.signup
+             
+               if(!signup.course_id) {
+                  errors['signup.course_id']=['必須選擇報名課程']
+               }
+               if(!signup.user_id) {
+                  errors['signup.user_id']=['必須選擇姓名']
+               }
+               
+               this.form.onFail(errors)
+               if(this.form.errors.any()){
+                  return false
+               }
+
+               if(this.needSelect){
+                  this.selectorSettings.version +=1
+               }else{
+                  this.submitForm()
+               }
+
+            
                 
-                    this.submitForm()
             },
             clearErrorMsg(name) {
                 this.form.errors.clear(name)
             },
             submitForm() {
 
+                alert('submitForm')
+                return false
                 this.form = new Form({
                    signup:this.signup
                 })

@@ -47,12 +47,13 @@ class Status extends Model
     {
         $course=$this->course;
         if((int)$this->signup!=0 ){
-            $this->signup=Status::getSignupStatus($course);
+            $this->signup=static::getSignupStatus($course);
         }
         if((int)$this->class!=0 ){
-            $this->class=Status::getClassStatus($course);
+            $this->class=static::getClassStatus($course);
         }else{
             //停止開課
+           
             if($course->active){
                 $course->active=false;
                 $course->save();
@@ -77,23 +78,55 @@ class Status extends Model
 
     public static function getSignupStatus($course) {
        
-		$today=Carbon::today();
-        $open = Carbon::parse($course->open_date);
-        $close = Carbon::parse($course->close_date);
+        $today=Carbon::today();
+        $open_date=$course->open_date;
+        if(!$open_date){
+            if($course->getParentCourse())
+            {
+                $open_date=$course->parentCourse->open_date;
+            }
+        }
+        $close_date=$course->close_date;
+        if(!$close_date){
+            if($course->getParentCourse())
+            {
+                $close_date=$course->parentCourse->close_date;
+            }
+        }
+        $open = Carbon::parse($open_date);
+        $close = Carbon::parse($close_date);
 
         if($today->lt($open)) return -1;
         if($today->gt($close)) return 2;
         return 1;
 	}
-    public static function getClassStatus($course) {
-       
-		$today=Carbon::today();
-        $begin = Carbon::parse($course->begin_date);
-        $end = Carbon::parse($course->end_date);
+    public static function getClassStatus($course) 
+    {
+        $today=Carbon::today();
+        $begin_date=$course->begin_date;
+        if(!$begin_date){
+            if($course->getParentCourse())
+            {
+                $begin_date=$course->parentCourse->begin_date;
+            }
+        }
+        $end_date=$course->end_date;
+        if(!$end_date){
+            if($course->getParentCourse())
+            {
+                $end_date=$course->parentCourse->end_date;
+            }
+        }
 
-        if($today->lt($begin)) return -1;
-        if($today->gt($end)) return 2;
-        return 1;
+
+        $begin = Carbon::parse($begin_date);
+        $end = Carbon::parse($end_date);
+
+        if($today->lt($begin)) return -1;  //尚未開課
+        if($today->gt($end)) return 2;   //已結束
+        return 1;    //進行中
+
+      
 	}
 
     public function hasRemoved()

@@ -470,9 +470,7 @@ class CoursesController extends BaseController
                                      ->where('center_id',$center_id)
                                      ->orderBy('credit_count')
                                      ->get();
-        // $courseList=$this->courses->getAll()->where('term_id',$term_id)
-        //                              ->where('center_id',$center_id)
-        //                              ->get();
+                                     
         $parentOptions=$this->courses->optionsConverting($parentCourses);  
 
         $subOptions=[];

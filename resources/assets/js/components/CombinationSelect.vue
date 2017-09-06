@@ -1,5 +1,5 @@
 <template>
-    <div v-show="ready" class="form-inline">
+    <div  class="form-inline">
        <div class="form-group">
             <select  v-model="params.term" @change="onTermChanged"   style="width:auto;" class="form-control selectWidth">
                 <option v-for="item in termOptions" :value="item.value" v-text="item.text"></option>
@@ -44,7 +44,7 @@
         },
         data() {
             return {
-                ready:false,
+               
                 termOptions:[],
                 centerOptions:[],
                 parentCourseOptions:[],
@@ -55,6 +55,8 @@
                     parent:0,
                     sub:0,
                 },
+
+                course:0,
 
                 parentCourse:{}
              
@@ -96,23 +98,27 @@
                     if(this.with_course){
                         this.loadCourses()
                     }else{
-                      this.onReady()
+                        this.onReady()
                     }
 
 
                 })
                 .catch(error => {
                     Helper.BusEmitError(error)
-                    this.ready=false
                 })
              
             },
             loadCourses(){
-                this.ready=false
                 let options=Course.options(this.params)
                 options.then(data => {
                     this.parentCourseOptions =data.parentOptions
                     this.subCourseOptions = data.subOptions
+
+                    if(data.subOptions.length < 1){
+                        this.params.sub=0
+                    }
+
+
                     this.parentCourse= data.parentCourse
                      let empty={
                           text:'-------',
@@ -128,12 +134,7 @@
                         this.params.parent=this.parentCourseOptions[0].value
                     }
 
-                    let sub = Helper.tryParseInt(this.params.parent)
-                    if(!parent){
-                        this.params.parent=this.parentCourseOptions[0].value
-                    }
-
-                    // this.ready=true
+                    this.onReady()
 
                     // let course=this.courseOptions[0]
                     // if(course){
@@ -142,17 +143,23 @@
                     //     this.params.course=0
                     // }
 
-                    this.onReady()
+                  
                    
                 })
                 .catch(error => {
-                    this.ready=false
                     Helper.BusEmitError(error)
                 })
                 
             },
             onReady(){
-                this.ready=true
+                 let sub = Helper.tryParseInt(this.params.sub)
+                 if(sub > 0){
+                     this.course=sub
+                 }else{
+                    this.course=this.params.parent
+                 }
+
+                 this.$emit('ready' , this.course)
             },
             onTermChanged(){
                this.$emit('term-changed', this.params.term)
@@ -170,12 +177,10 @@
                 this.$emit('course-changed', this.params.course)
             },
             onParentCourseChanged(){
-               if(this.with_course){
-                   this.loadCourses()
-                }
+               this.loadCourses()
             },
             onSubCourseChanged(){
-
+                this.onReady()
             }
             
             

@@ -97,13 +97,24 @@ class SignupsController extends BaseController
          $user_id=(int)$request->user; 
 
          $course=null;
+         $subCourses=[];
+         $selectedSub=[];
          if($course_id>0){
             $course= $this->courses->findOrFail($course_id);
+            if($course->getParentCourse())
+            {
+                $course=$course->parentCourse;
+                $selectedSub=[$course_id];
+            }
+            
+            $subCourses=$this->courses->subCourses($course->id)
+                                        ->where('active',true)->get();
          }
          $courseOptions=$this->getCourseOptions($course);
          if(empty($courseOptions)) {
              return   response()->json(['msg' => '無課程可報名' ]  ,  422);   
          }
+         
          
          $userOptions =[];
          $user=null;
@@ -116,17 +127,22 @@ class SignupsController extends BaseController
          
 
          $signup=Signup::initialize($user_id,$course_id);
+
+         $signup['sub_courses']=$selectedSub;
+
+         
          
          $discountOptions=$this->getDiscountOptions();
 
          return response()
             ->json([
                 'courseOptions' => $courseOptions,
+                'subCourses' => $subCourses ,
                 'userOptions' => $userOptions,
                 'discountOptions' => $discountOptions,
                 'signup' => $signup,
                 'course' => $course,
-                'user' => $user
+                'user' => $user,
 
             ]);
          
@@ -143,7 +159,6 @@ class SignupsController extends BaseController
             ]);
 
     }
-    
    
     
     public function store(SignupRequest $request)

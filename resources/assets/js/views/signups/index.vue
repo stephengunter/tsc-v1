@@ -69,8 +69,8 @@
              
             },
             
-            onCombinationReady(params){
-                this.setCourse(params.course)
+            onCombinationReady(course){
+                this.setCourse(course)
                 this.ready=true
             },
            

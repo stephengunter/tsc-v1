@@ -32,6 +32,7 @@ class Signup extends Model
             'discount_id' => 0,
             'status' => 0,
             'net_signup' => 1,
+            'sub_courses' => []
             
         ];
     }                         
