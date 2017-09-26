@@ -152,6 +152,7 @@ class Courses
    
      public function store($courseValues , $categoryIds, $teacherIds)
      {
+        
         $term_id=$courseValues['term_id'];
         $number=$this->generateNumber($term_id); 
         $course= DB::transaction(function() 
@@ -161,7 +162,9 @@ class Courses
               $course->save();
 
               $statusValues=Status::initialize($course);
+             
               $status=new Status($statusValues);
+             
               $course->status()->save($status);
 
               return $course;

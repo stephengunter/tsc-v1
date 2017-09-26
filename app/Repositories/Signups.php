@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Signup;
+use App\Course;
+use App\Discount;
 use App\Support\Helper;
 use Carbon\Carbon;
 use DB;
@@ -55,78 +57,182 @@ class Signups
     }
     public function netSignup($course,$discount,$user_id,$updated_by)
     {
-        $values=[
-                'course_id' => $course->id,
-                'user_id' => $user_id,
-                'status' => 0,
-                'updated_by' => $updated_by,
-                'net_signup' => 1
-        ];
+        $values=$this->getSignupValues($course->id,$user_id,$updated_by);
+        $values['net_signup']=1;
+
+        $tuition=$course->tuition;
+        $cost=$course->cost;
+        $tuitionValues=$this->getTuitionValues($tuition, $cost , $discount);
+        $values=array_merge($values,$tuitionValues);
+        
+        
+        $discountValues=$this->getDiscountValues($discount);
+        $values=array_merge($values,$discountValues);
+
+        // $values=[
+        //         'course_id' => $course->id,
+        //         'user_id' => $user_id,
+        //         'status' => 0,
+        //         'updated_by' => $updated_by,
+        //         'net_signup' => 1
+        // ];
           
-        $values=array_add($values, 'date', Carbon::now()->toDateString());
+        // $values=array_add($values, 'date', Carbon::now()->toDateString());
         
 
-        $tuitionValues=$this->getTuitionValues($course,$discount);
-        $values=array_merge($values,$tuitionValues);
+        // $tuitionValues=$this->getTuitionValues($course,$discount);
+        // $values=array_merge($values,$tuitionValues);
 
+        // $discountValues=$this->getDiscountValues($discount);
+        // $values=array_merge($values,$discountValues);
+
+        $signup=Signup::create($values);
+        return $signup;
+    }
+
+    public function createGroupSignup(int $parent_course,array $sub_course_ids,$discount,$user_id,$updated_by,$date=null)
+    {
+        $values=$this->getSignupValues($parent_course,$user_id,$updated_by,$date);
+        $discountValues=$this->getDiscountValues($discount);
+        $values=array_merge($values,$discountValues);
+
+       
+
+        $sub_signup_values= collect([]);
+      
+        for($i = 0; $i < count($sub_course_ids); ++$i){
+            $sub_signup_values->push($this->getSignupValues($sub_course_ids[$i],$user_id,$updated_by,$date));
+        }
+
+        $signup=DB::transaction(function() 
+        use($values ,$sub_signup_values){
+            $signup=Signup::create($values);
+            for($i = 0; $i < count($sub_signup_values); ++$i){
+                $sub_signup=new Signup($sub_signup_values[$i]); 
+                $sub_signup->parent=$signup->id;
+                $sub_signup->save();
+            }
+
+            return $signup;
+
+        });
+        
+        
+        $sub_signups_courses= $signup->subSignupCourses();
+        $tuition=$sub_signups_courses->sum('tuition');
+        $cost=$sub_signups_courses->sum('cost');
+       
+        $tuitionValues=$this->getTuitionValues($tuition, $cost , $discount);
+       
+        
+
+        $signup->update($tuitionValues);
+        return $signup;
+       
+    }
+    public function updateGroupSignup(Signup $signup,$discount,$user_id,$updated_by,$date,$net_signup , array $sub_course_ids)
+    {
+        $values=$this->getSignupValues($signup->course_id,$user_id,$updated_by,$date);
+        $discountValues=$this->getDiscountValues($discount);
+        $values=array_merge($values,$discountValues);
+
+        $subSignups=$signup->subSignups()->get();
+        for($i = 0; $i < count($subSignups); ++$i){
+            $subSignup=$subSignups[$i];
+            if(!in_array( $subSignup->course_id , $sub_course_ids)){
+                $subSignup->delete();
+            }
+        }
+
+        $sub_signup_values= collect([]);
+
+        $subSignupCourseIds=$signup->subSignupCourseIds();
+        for($i = 0; $i < count($sub_course_ids); ++$i){
+            if(!in_array( $sub_course_ids[$i] , $subSignupCourseIds)){
+                $sub_signup_values->push($this->getSignupValues($sub_course_ids[$i],$user_id,$updated_by,$date));
+            }
+        }
+
+        if(count($sub_signup_values)){
+            for($i = 0; $i < count($sub_signup_values); ++$i){
+                $sub_signup=new Signup($sub_signup_values[$i]); 
+                $sub_signup->parent=$signup->id;
+                $sub_signup->save();
+            }
+        }
+       
+        
+        $sub_signups_courses= $signup->subSignupCourses();
+        $tuition=$sub_signups_courses->sum('tuition');
+        $cost=$sub_signups_courses->sum('cost');
+       
+        $tuitionValues=$this->getTuitionValues($tuition, $cost , $discount);
+       
+        
+
+        $signup->update($tuitionValues);
+        return $signup;
+       
+    }
+
+    private function getSignupValues($course_id,$user_id,$updated_by, $date=null)
+    {
+        
+        $values=[
+            'course_id' => $course_id,
+            'user_id' => $user_id,
+            'status' => 0,
+            'updated_by' => $updated_by,
+        ];
+
+        if($date){
+            $values=array_add($values, 'date', $date);
+        }else{
+            $values=array_add($values, 'date', Carbon::now()->toDateString());
+        }
+
+        return $values;
+
+        
+    }
+
+    public function store( $course, $discount,$user_id,$updated_by,$date=null)
+    {
+        $values=$this->getSignupValues($course->id,$user_id,$updated_by,$date);
+        $tuition=$course->tuition;
+        $cost=$course->cost;
+        $tuitionValues=$this->getTuitionValues($tuition, $cost , $discount);
+        $values=array_merge($values,$tuitionValues);
+        
+        
         $discountValues=$this->getDiscountValues($discount);
         $values=array_merge($values,$discountValues);
 
         $signup=Signup::create($values);
         return $signup;
-    }
-    public function store($course,$discount,$user_id,$updated_by,$date=null)
-    {
-          $values=[
-                'course_id' => $course->id,
-                'user_id' => $user_id,
-                'status' => 0,
-                'updated_by' => $updated_by,
-          ];
-
-          if($date){
-              $values=array_add($values, 'date', $date);
-          }else{
-              $values=array_add($values, 'date', Carbon::now()->toDateString());
-          }
-
-          $tuitionValues=$this->getTuitionValues($course,$discount);
-          $values=array_merge($values,$tuitionValues);
-
-          $discountValues=$this->getDiscountValues($discount);
-          $values=array_merge($values,$discountValues);
-
-          $signup=Signup::create($values);
-          return $signup;
      }
-     public function update($signup,$course,$discount,$user_id,$updated_by,$date,$net_signup)
+     public function update(Signup $signup,$discount,$user_id,$updated_by,$date,$net_signup)
      {
-          $values=[
-                'course_id' => $course->id,
-                'user_id' => $user_id,
-                'updated_by' => $updated_by,
-                'net_signup' => $net_signup
-          ];
-
-          if($date){
-              $values=array_add($values, 'date', $date);
-          }else{
-              $values=array_add($values, 'date', Carbon::now()->toDateString());
-          }
-
-          $tuitionValues=$this->getTuitionValues($course,$discount);
-          $values=array_merge($values,$tuitionValues);
-
-          
-          $discountValues=$this->getDiscountValues($discount);
-          $values=array_merge($values,$discountValues);
+        $course=$signup->course;
+        $values=$this->getSignupValues($signup->course_id,$user_id,$updated_by,$date);
+        $values['net_signup']=$net_signup;
+        
+       
+        $tuition=$course->tuition;
+        $cost=$course->cost;
+        $tuitionValues=$this->getTuitionValues($tuition, $cost , $discount);
+        $values=array_merge($values,$tuitionValues);
+        
+        
+        $discountValues=$this->getDiscountValues($discount);
+        $values=array_merge($values,$discountValues);
         
 
-          $signup->update($values);
+        $signup->update($values);
 
-          $signup->updateStatus();
+        $signup->updateStatus();
 
-          return $signup;
+        return $signup;
      }
      public function delete($id , $updated_by)
      {
@@ -207,10 +313,27 @@ class Signups
             return $summary;
      }
 
-     private function getTuitionValues($course,$discount)
+     private function countGroupTuitionValues($parent_course_id,$discount)
      {
-          $tuition=$course->tuition;
-          $cost=$course->cost;
+        $sub_signups=$this->getAll()->where('parent',$parent_course_id)->get();
+        $tuition=$sub_signups->sum('tuition');
+        $cost=$sub_signups->sum('cost');
+        $points=0;
+        if($discount){
+             $points=$discount->points;
+             $tuition=$tuition*$points/100;
+        }
+        $values=[
+                'tuition' => $tuition,
+                'cost' => $cost,
+                'points' => $points,
+        ];
+
+        return $values;
+     }  
+
+     private function getTuitionValues($tuition, $cost ,Discount $discount=null)
+     {
           $points=0;
           if($discount){
              $points=$discount->points;
@@ -224,7 +347,7 @@ class Signups
 
          return $values;
      }  
-     private function getDiscountValues($discount)
+     private function getDiscountValues(Discount $discount=null)
      {
          if(!$discount){
             return [

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Support\FilterPaginateOrder;
+use App\Course;
 use Carbon\Carbon;
 
 class Signup extends Model
@@ -15,7 +16,7 @@ class Signup extends Model
     ];
 
     use FilterPaginateOrder;
-    protected $fillable =  ['course_id',  'user_id', 'date',
+    protected $fillable =  ['course_id',  'user_id', 'date', 'parent',
                               'tuition','cost' ,'points' ,   'discount' ,
                              'identity' , 'discount_id', 'net_signup',
                              'status' ,  'removed' , 'updated_by'
@@ -29,6 +30,7 @@ class Signup extends Model
             'date' => Carbon::now()->toDateString(),
             'user_id' => $user_id,
             'course_id' => $course_id,
+            'parent' => 0,
             'discount_id' => 0,
             'status' => 0,
             'net_signup' => 1,
@@ -131,6 +133,27 @@ class Signup extends Model
         $strValue=(String)$this->points;
 
         return str_replace('0','',$strValue);
+    }
+
+    public function subSignups()
+    {
+        return static::where('removed',false)
+                     ->where('parent',$this->id);
+                    
+    }
+    public function subSignupCourseIds()
+    {
+        return $this->subSignups()->pluck('course_id')->toarray();
+    }
+    public function subSignupCourses()
+    {
+        $ids= $this->subSignups()->pluck('course_id')->toarray();
+        if(count($ids)){
+            return Course::whereIn('id',$ids)->get();
+        }else{
+            return [];
+        }
+        
     }
 
     

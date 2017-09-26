@@ -122,6 +122,8 @@ class CoursesController extends BaseController
             $parent_course=Course::find($parent);            
         }
 
+       
+
         $publicCategories=false;
         $categoryOptions=$this->categories->options($publicCategories);
         

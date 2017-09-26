@@ -55,6 +55,7 @@ class SignupsController extends BaseController
 
     public function index()
     {
+        
         $request = request();
           
         if(!$request->ajax()){
@@ -109,6 +110,12 @@ class SignupsController extends BaseController
             
             $subCourses=$this->courses->subCourses($course->id)
                                         ->where('active',true)->get();
+            
+            if(!count($selectedSub) && count($subCourses)){
+                for($i=0; $i<count($subCourses); $i++){
+                    array_push($selectedSub, $subCourses[$i]->id);
+                }
+            }
          }
          $courseOptions=$this->getCourseOptions($course);
          if(empty($courseOptions)) {
@@ -186,17 +193,37 @@ class SignupsController extends BaseController
          }
 
          $date=$values['date'];
-         
-         $signup=$this->signups->store($course,$discount,$user_id,$updated_by,$date);
+
+        $signup=null;
+        if($course->groupAndParent())
+        {
+            $sub_course_ids=$values['sub_courses'];
+          
+            $parent=$course->id;
+          
+            $signup=$this->signups->createGroupSignup($parent,$sub_course_ids,$discount,$user_id,$updated_by,$date);
+            
+           
+        }else{
+            $signup=$this->signups->store($course,$discount,$user_id,$updated_by,$date);
+            
+        }
 
          event(new SignupCreated($signup));
 
          return response()->json($signup);
+
             
     }
     public function edit($id)
     {
         $signup=$this->signups->findOrFail($id);  
+        if($signup->parent){
+            $signup=Signup::findOrFail($signup->parent);           
+        }
+
+        $signup->subCourses=$signup->subSignupCourses();
+
         $current_user=$this->currentUser();
         if(!$signup->canEditBy($current_user)){
             return  $this->unauthorized();  
@@ -231,8 +258,7 @@ class SignupsController extends BaseController
          $updated_by=$current_user->id;
          $values=$request->getValues($updated_by);
         
-         $course_id=$values['course_id'];
-         $course=$this->courses->findOrFail($course_id);
+         
 
          $user=null;
          $user_id=(int)$values['user_id'];
@@ -249,11 +275,21 @@ class SignupsController extends BaseController
 
          $date=$values['date'];
          $net_signup= $values['net_signup'];
-         
-         $signup=$this->signups->update($signup,$course,$discount,
-                                        $user_id,$updated_by,$date,$net_signup);
-         
-         
+
+         $course_id=$values['course_id'];
+         $course=$this->courses->findOrFail($course_id);
+         if($course->groupAndParent())
+         {
+             $sub_course_ids=$values['sub_courses'];
+           
+             $signup=$this->signups->updateGroupSignup($signup,$discount,$user_id,$updated_by,$date,
+                                                        $net_signup , $sub_course_ids);
+
+            
+         }else{
+             $signup=$this->signups->update($signup,$discount,
+                       $user_id,$updated_by,$date,$net_signup);
+         }
          
          
          event(new SignupChanged($signup));
@@ -273,8 +309,15 @@ class SignupsController extends BaseController
         }  
 
         $current_user=$this->currentUser();
-
         $signup=Signup::with('course','user.profile')->findOrFail($id);
+        if($signup->parent){
+            $signup=Signup::with('course','user.profile')->findOrFail($signup->parent);
+           
+        }
+
+        $signup->subCourses=$signup->subSignupCourses();
+        
+        
         if(!$signup->canViewBy($current_user)){
             return  $this->unauthorized(); 
         }

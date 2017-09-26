@@ -6,15 +6,7 @@
     
 //  });
 Route::get('test', function(){
-    $x=\Carbon\Carbon::now()->toDateString();
-
-    dd($x);
-    // Mail::raw('Text to e-mail', function($message)
-    // {
-    //     $message->from('us@example.com', 'Laravel');
-
-    //     $message->to('traders.com.tw@gmail.com');
-    // });
+    return view('test');
 });
 Route::get('/', 'HomeController@index');
 Route::get('errors', function(){

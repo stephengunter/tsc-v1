@@ -85,10 +85,21 @@
                            </div>
                        </div>
                   </div>
+                  <div class="form-group" >
+                       <label  class="col-sm-2 control-label">請選擇課程</label>
+                       <div class="col-sm-10">
+                          <sub-course-selector :courses="subCourses"
+                        :show_submit="selectorSettings.show_submit" :version="selectorSettings.version"
+                         :default_selected="selectorSettings.default_selected"
+                         @submit-courses="onSubCourseSelected" >
+                       </sub-course-selector>
+                       </div>
+                  </div>
                   <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
                       <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確定</button>
-                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <small class="text-danger" v-if="subCourseError" >請選擇課程</small>
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                       <button class="btn btn-default" @click.prevent="canceled">取消</button>
                     </div>
                   </div>
@@ -98,8 +109,13 @@
     
 </template>
 <script>
+    import SubCourseSelector from '../../components/course/sub/selector.vue'
+
     export default {
         name: 'EditSignup',
+        components: {
+             'sub-course-selector':SubCourseSelector
+        },
         props: {
             id: {
               type: Number,
@@ -126,6 +142,14 @@
                     time: ''
                 },
 
+                selectorSettings:{
+                   default_selected:[],
+                   show_submit:false,
+                   version:0,
+                },
+                subCourses:[],
+                subCourseError:false
+
             }
         },
         watch:{
@@ -135,6 +159,11 @@
                   this.clearErrorMsg('signup.date')
               },
               deep: true
+            },
+        },
+        computed: {
+            needSelect(){
+                return this.subCourses.length > 0  
             },
         },
         beforeMount() {
@@ -171,6 +200,15 @@
             },
             setSignup(data){
                let signup=data.signup
+               this.subCourses=signup.subCourses
+               let selected_sub_courses=[]
+               for(let i=0; i<signup.subCourses.length;i++){
+                   selected_sub_courses.push(signup.subCourses[i].id)
+               }
+               this.selectorSettings.default_selected=selected_sub_courses
+                    
+
+
                this.date.time=signup.date
                this.discount_id=Helper.tryParseInt(signup.discount_id)
 
@@ -187,14 +225,31 @@
             setDiscount(val) {
                 this.signup.discount_id = val;
             },  
+            onSubCourseSelected(selectedIds){
+              alert('onSubCourseSelected')
+                this.signup.sub_courses=selectedIds
+                if(selectedIds.length){
+                   this.subCourseError=false
+                   this.submitForm()
+                }else{
+                    this.subCourseError=true
+                }
+            },
             clearErrorMsg(name) {
                 this.form.errors.clear(name)
             },
             onSubmit() {
+                if(this.needSelect){
+
+                  this.selectorSettings.version +=1
+                }else{
+                  this.submitForm()
+                }
                
-                this.submitForm()
             },
             submitForm() {
+              alert('submit')
+              return false
                 this.form = new Form({
                    signup:this.signup
                 })

@@ -295,9 +295,9 @@
                     this.signup=data.signup
                     this.subCourses=data.subCourses
                     this.date.time=this.signup.date
-
                     this.selectorSettings.default_selected=data.signup.sub_courses
-                    
+                   
+
                     if(data.course){
                         this.courseName= Course.getFormatedCourseName(data.course,true)                   
                     }
@@ -411,9 +411,6 @@
                 this.form.errors.clear(name)
             },
             submitForm() {
-
-                alert('submitForm')
-                return false
                 this.form = new Form({
                    signup:this.signup
                 })
@@ -421,8 +418,9 @@
                 let store=Signup.store(this.form)
                 
                 store.then(data => {
-                   Helper.BusEmitOK()
-                   this.$emit('saved',data)                            
+
+                    Helper.BusEmitOK()
+                   // this.$emit('saved',data)                            
                 })
                 .catch(error => {
                     Helper.BusEmitError(error) 

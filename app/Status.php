@@ -10,8 +10,9 @@ class Status extends Model
     protected $primaryKey = 'course_id';
 
     protected $fillable = [
-	   'ps',
-       'updated_by'
+        'class','signup','register',
+	   'ps', 'updated_by'
+      
 	];
 
     public $signupStatusList=[
@@ -33,8 +34,10 @@ class Status extends Model
 
     public static function initialize($course)
     {
-        $signup=Status::getSignupStatus($course);
-        $class=Status::getClassStatus($course);
+        
+        $signup=static::getSignupStatus($course);
+        $class=static::getClassStatus($course);
+        
         return [            
             'signup' => $signup,
             'register' => 0,

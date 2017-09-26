@@ -19,6 +19,9 @@
                 <li class="">
                      <a @click="activeIndex=2" href="#tuitionsback" data-toggle="tab">退款紀錄</a>
                 </li>
+                <li v-if="showSubCourses" class="">
+                     <a @click="activeIndex=3" href="#subCourses" data-toggle="tab">報名課程</a>
+                </li>
             </ul>
         </div>
         <div class="panel-body">
@@ -43,7 +46,12 @@
                      @tuition-created="onTuitionChanged" @tuition-updated="onTuitionChanged"
                      @tuition-deleted="onTuitionChanged">
                    </tuition-view>
-                </div>                
+                </div>   
+                <div class="tab-pane fade" id="subCourses">
+                    <sub-course-selector v-if="activeIndex==3"
+                     :can_select="subCourseSettings.can_select" :courses="signup.subCourses"  >
+                    </sub-course-selector>
+                </div>               
             </div>
         </div>
   </div>
@@ -58,13 +66,13 @@
 
 <script>
     import Signup from '../../components/signup/signup.vue'
-    
+    import SubCourseSelector from '../../components/course/sub/selector.vue'
     
     export default {
         name: 'SignupDetails',
         components: {
             Signup,
-         
+           'sub-course-selector':SubCourseSelector
         },
         props: {
             id: {
@@ -98,7 +106,13 @@
                },
                backTuitionSettings:{
                   hide_create:false
-               }
+               },
+
+               showSubCourses:false,
+               subCourseSettings:{
+                   can_select:false,
+                },
+              
             }
         },
         computed:{
@@ -121,6 +135,10 @@
                return val=='true'
             },
             onDataLoaded(signup){
+                if(signup.subCourses.length){
+                   this.showSubCourses=true
+                }
+              
                 this.loaded=true
                 this.signup=signup
             },
@@ -153,6 +171,9 @@
             },
             onPrintInvoice(){
                 this.$emit('print-invoice',this.id)
+            },
+            loadSubCourses(){
+
             }
         }, 
 

@@ -9,7 +9,7 @@
                   </span>
             </span>
            
-            <div v-if="show_submit" class="form-inline">  
+            <div v-if="show_submit"  v-show="can_select" class="form-inline">  
                 <button type="submit" @click="submitCourses" class="btn btn-success" :disabled="!hasSelected">確認送出</button>
             </div>
         </div>
@@ -17,7 +17,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th> &nbsp; </th>
+                        <th v-if="can_select"> &nbsp; </th>
                         <th> 課程名稱 </th>
                         <th> 學分數 </th>
                         <th> 學費 </th>
@@ -27,7 +27,7 @@
                 <tbody>
                     <tr v-for="course in courses" :course="course" >
 
-                       <td>
+                       <td v-if="can_select">
                             <checkbox :default="beenSelected(course.id)"
                               @selected="selected(course.id)"
                               @unselected="unselected(course.id)" >
@@ -43,8 +43,9 @@
                         <td>
                             {{ course.tuition | formatMoney  }}
                         </td>
-                        <td>
-                            <span class="label label-info"> 必修 </span>
+                        <td v-html="isMust(course.must)">
+
+                           
                         </td>
                         
                     </tr>            
@@ -66,6 +67,10 @@
             courses: {
               type: Array,
               default: null
+            },
+            can_select:{
+                type: Boolean,
+                default: true
             },
             default_selected:{
                 type: Array,
@@ -115,12 +120,27 @@
             init(){
                 this.loaded=false  
                 this.selectedIds=[]
-                if(this.default_selected){
-                    for(let i=0; i<this.default_selected.length;i++){
-                        this.selectedIds.push(this.default_selected[i])
-                    }
+                
+                if(this.can_select){
+
+                    this.title=Helper.getIcon(Course.title()) + '  請選擇課程'
+                    if(this.default_selected){
+                        
+                        for(let i=0; i<this.default_selected.length;i++){
+                            this.selectedIds.push(this.default_selected[i])
+                        }
+                     }
+
+
+                }else{
+                    this.title=Helper.getIcon(Course.title()) + '  報名課程'
 
                 }
+
+               
+
+
+                
 
                
             },
@@ -133,9 +153,15 @@
             selected(id){
                 this.selectedIds.push(id)       
             },
+            isMust(must){
+                must=Helper.isTrue(must)
+                if(must) return ' <span class="label label-info"> 必修 </span>'
+                return ' <span class="label label-default"> 選修 </span>'
+            },
             unselected(id){
                 Helper.removeItem(this.selectedIds , id)          
             },
+
               
         }
      }
