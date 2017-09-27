@@ -146,5 +146,14 @@ class Teacher extends Model
        
         return   explode('<br>', $this->experiences);
     }
+
+    public function groupTeacherIds()
+    {
+        if($this->teacher_ids){
+            return explode( ',', $this->teacher_ids );
+        }else{
+            return [];
+        }
+    }
   
 }

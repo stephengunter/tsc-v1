@@ -57,81 +57,32 @@ class GroupTeachersController extends BaseController
         }
         return response()->json([ 'teachers' => $teachers ]); 
     }
-
-    public function create()
+    public function store(Request $request)
     {
-         $request = request();
-         $group_teacher_id=(int)$request->id;
-
-        $centerId=(int)$request->center;
-        $teacherList=[];
-        if($centerId){
-          
-            $teacherList=$this->teachers->getByCenter($centerId)
-                                        ->with('user.profile');
-                                       
-        }else{
-             $teacherList=$this->teachers->getAll()
-                                        ->with('user.profile');
-        }
-
-        $teacherList=$teacherList->filterPaginateOrder();   
-        if(count($teacherList)){
-            foreach($teacherList as $teacher){
-                $teacher->centerNames=$teacher->centerNames();
-            }
-        }
-                                    
-        return response()
-            ->json([
-               'model' => $teacherList                
-            ]);
-    }
-
-   
-
-    public function edit($id)
-    {
-        $current_user=request()->user();
-        $teacher=$this->teachers->findOrFail($id);
-        if(!$teacher->canEditBy($current_user)){
-            return  $this->unauthorized();    
-        }
-
-        $teacher->name=$teacher->getName();
-        return response()->json([
-            'teacher' => $teacher
-        ]);
-        
-    }
-    
-
-    
-    public function update(TeacherRequest $request,$id)
-    {
-        $current_user=$this->currentUser();
-        $teacher = Teacher::findOrFail($id);
-        if(!$teacher->canEditBy($current_user)){
-            return  $this->unauthorized();    
-        }
-
-        $updated_by=$current_user->id;
-        $removed=false;
-        $teacherValues=$request->getTeacherValues($updated_by,$removed);
-
-        if(!$teacher->reviewed){
-            if((int)$teacherValues['reviewed'] > 0){
-                $teacherValues['reviewed_by']= $updated_by;
-            }
-        }
-        
-        $teacher->update($teacherValues);
-        
-       
-        return response()->json($teacher); 
+         $group_id=$request['group_id'];
+         $teacher_id=$request['teacher_id'];
+         if(!$group_id) abort(500);
+         if(!$teacher_id) abort(500);
          
-           
+         $teacher_group=$this->teachers->findOrFail($group_id);        
+         if(!$teacher_group->teacher_ids) {
+            $teacher_group->teacher_ids=$teacher_id;
+            $teacher_group->save();
+            return response()->json([ 'success' => true ]);
+         }
+
+         $teacher_ids_array= explode( ',', $teacher_group->teacher_ids );
+         if(!in_array($teacher_id, $teacher_ids_array)){
+            $teacher_group->teacher_ids .= ',' .  $teacher_id;
+            $teacher_group->save();
+            
+         }
+         return response()->json([ 'success' => true ]);
+    
+              
+         
     }
+
 
     public function remove(Request $request,$id)
     {

@@ -54,6 +54,7 @@ class TeachersController extends BaseController
         $request = request();
         
         $centerId=(int)$request->center;
+        $group_teacher_id=(int)$request->group;
         $teacherList=[];
         if($centerId){
           
@@ -63,6 +64,16 @@ class TeachersController extends BaseController
         }else{
              $teacherList=$this->teachers->getAll()
                                         ->with('user.profile');
+        }
+
+        if($group_teacher_id){
+            $group_teacher=$this->teachers->findOrFail($group_teacher_id);
+            $groupTeacherIds=$group_teacher->groupTeacherIds();           
+            array_push($groupTeacherIds,$group_teacher_id);
+           
+          
+            $teacherList=$teacherList
+                       ->whereNotIn('user_id',$groupTeacherIds);
         }
 
         $teacherList=$teacherList->filterPaginateOrder();   

@@ -22,7 +22,9 @@
           </div>
         <div slot="modal-body" class="modal-body">
            
-            <teacher-list v-if="editSettings.show" :hide_create="editSettings.hide_create" >
+            <teacher-list v-if="editSettings.show" :group="teacherId"
+               :hide_create="editSettings.hide_create" 
+                @selected="onTeacherSelected">
             </teacher-list>
  
       
@@ -110,6 +112,25 @@
                 this.deleteConfirm.id=values.id
                 this.deleteConfirm.show=true                 
             },  
+            onTeacherSelected(id,isLink){
+                this.addTeacher(id)
+            },
+            addTeacher(add_teacher_id){
+                let form=new Form({
+                    group_id:this.teacherId,
+                    teacher_id:add_teacher_id
+                })
+                let save=GroupTeacher.store(form)
+                save.then(result => {
+                    Helper.BusEmitOK('新增成功')
+                    this.version += 1
+                    this.endEdit()
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error,'新增失敗')
+                    this.endEdit() 
+                })
+            },
             removeTeacher(){
                 let id = this.deleteConfirm.id 
                 let remove=GroupTeacher.delete(this.teacherId,id)

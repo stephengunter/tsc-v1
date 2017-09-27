@@ -19,7 +19,7 @@
                         選取
                     </button>
                 </td> 
-                <td><a herf="#" @click="selected(props.item.user_id)">{{props.item.user.profile.fullname}}</a> </td>
+                <td><a herf="#" @click="selected(props.item.user_id,true)">{{props.item.user.profile.fullname}}</a> </td>
                 <td>{{props.item.user.phone}}</td>
                 <td>{{props.item.specialty}}</td>
                 
@@ -51,6 +51,10 @@
                type: Boolean,
                default: true
             },
+            group:{
+               type: Number,
+               default: 0
+            }
         },
         beforeMount() {
            this.init()
@@ -79,6 +83,7 @@
                 centerOptions:[],
                 searchParams:{
                     center : 0,
+                    group:0
                 },
               
                 viewMore:false
@@ -99,6 +104,7 @@
 
                 this.searchParams={
                     center : 0,
+                    group:this.group
                 }
                 let options = this.loadCenterOptions()
                 options.then((value) => {
@@ -127,8 +133,14 @@
                
             }, 
             
-            selected(id){
-                this.$emit('selected',id)
+            selected(id,isLink){
+              if(isLink){
+                this.$emit('selected',id,true)
+              }else{
+                 this.$emit('selected',id)
+
+              }
+                
             },
             
             beginCreate(){

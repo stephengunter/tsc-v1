@@ -123,7 +123,8 @@ Route::resource('category-courses', '\App\Http\Controllers\Course\CategoryCourse
 
 
 Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');
-Route::resource('group-teachers', '\App\Http\Controllers\Teacher\GroupTeachersController');
+Route::resource('group-teachers', '\App\Http\Controllers\Teacher\GroupTeachersController',
+                                                                ['only' => ['show','store']]);   
 
 Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');
 Route::resource('identities', '\App\Http\Controllers\Discounts\IdentitiesController');
