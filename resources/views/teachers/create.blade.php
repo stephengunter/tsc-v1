@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('content')
-
+    
     <teacher-create :user_id="userId"
     @canceled="onCanceled" @saved="onSaved">
     </teacher-create>

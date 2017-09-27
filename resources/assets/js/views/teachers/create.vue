@@ -1,12 +1,14 @@
 <template>
 <div>
     <div class="panel panel-default">
-        <div class="panel-heading">           
-            <span class="panel-title">
-                <h4 v-html="title"></h4>
-            </span>           
+        <div class="panel-heading ">           
+       
+
+            <h4 v-html="title"></h4>
+            <toggle :items="typeOptions"   :default_val="1" @selected="onTypeSelected"></toggle>
+                         
         </div> <!--  panel  heading -->
-        <div class="panel-body">
+        <div v-if="type" class="panel-body">
             <user-checker v-if="newUser"
                :version="userCheckerSettings.version"
                :status="userCheckerSettings.status" :col_width="userCheckerSettings.col_width"
@@ -24,6 +26,15 @@
 
             </form>
            
+        </div> <!--  panel  body -->
+        <div v-else class="panel-body">
+            <form @keydown="clearErrorMsg($event.target.name)" @submit.prevent="onSubmit" class="form">
+                <group-inputs :form="form" 
+                  @active-selected="setActive"   @reviewed-selected="setReviewed"
+                  @gender-selected="setGender" @canceled="onCanceled" >
+                </group-inputs>
+
+            </form>
         </div> <!--  panel  body -->
     </div>  <!--  panel  -->
 
@@ -48,13 +59,17 @@
 </template>
 
 <script>
+    import EditTeacher from '../../components/teacher/edit.vue'
     import TeacherInputs from '../../components/teacher/inputs.vue'
+    import GroupInputs from '../../components/teacher/group-inputs.vue'
     import UserChecker from '../../components/user/checker.vue'
     import UserSelector from '../../components/user/selector.vue'
     export default {
         name: 'TeacherCreate',
         components: {
+            'edit-teacher':EditTeacher,
             'teacher-inputs':TeacherInputs,
+            'group-inputs':GroupInputs,
             'user-checker':UserChecker,
             'user-selector':UserSelector
         },
@@ -84,6 +99,7 @@
                     with_profile:true,
                 },
                 form : new Form({
+                    group:false,
                     user:{
                        email:'',
                        phone:'',
@@ -99,25 +115,38 @@
                 modalSettings:{
                    width:1200,
                 },
+
+                type:true,
+
+                typeOptions:[{
+                    text: '個人教師',
+                    value: '1'
+                }, {
+                    text: '教師群組',
+                    value: '0'
+                }]
+
+
              
             }
+        },
+        computed:{
+            isGroup(){
+               return !Helper.isTrue(this.type)
+            },
+        
         },
         beforeMount() {
              this.init()
         },
         methods: {
+            onTypeSelected(val){
+               this.type=Helper.isTrue(val)
+               this.form.group=this.isGroup
+               this.init()
+            },
             init(){
-                this.form = new Form({
-                    user:{
-                       email:'',
-                       phone:'',
-                       profile:{
-                          fullname:'',
-                       }
-                    },
-                    teacher:{
-                    }
-                })
+                
 
                 this.formSubmitting=false
                 this.user_checked= false
@@ -131,18 +160,43 @@
                 this.userList=[]
                 this.showUserList=false
 
-                let create=Teacher.create(this.user_id)
-                create.then(data=>{
-                     let user=data.user
-                     let teacher=data.teacher
+                if(this.isGroup) 
+                {
 
-                     this.setUser(user)
-                     this.form.teacher=teacher
-                     this.loaded=true
-                }).catch(error =>{
-                     Helper.BusEmitError(error)
-                     this.loaded=false
-                })
+                  this.form = new Form({
+                      
+                      user:{
+                         email:'',
+                         phone:'',
+                         profile:{
+                            fullname:'',
+                         }
+                      },
+                      teacher:{ 
+                        group:1,
+                        name:'',
+                        active:0,
+                        reviewed:0,
+                        experiences:'',
+                        group:1,
+                      }
+                   })
+                }else{
+                  let create=Teacher.create(this.user_id)
+                  create.then(data=>{
+                       let user=data.user
+                       let teacher=data.teacher
+
+                       this.setUser(user)
+                       this.form.teacher=teacher
+                       this.loaded=true
+                  }).catch(error =>{
+                       Helper.BusEmitError(error)
+                       this.loaded=false
+                  })
+                }
+
+                
              
             },
             setUser(user){
@@ -212,13 +266,22 @@
                 }
             },
             onSubmit() {
-                if(!this.form.user.id){
-                   this.form.user.name=this.form.user.profile.fullname
-                   this.formSubmitting=true
-                   this.userCheckerSettings.status+=1
+              
+                if(this.isGroup){
+                   let teacher=this.form.teacher
+                   this.form.user.name=teacher.name
+                   this.form.user.profile.fullname=teacher.name
+                 
+                   this.submitForm()
                 }else{
-                    this.submitForm()
-                }
+                    if(!this.form.user.id){
+                       this.form.user.name=this.form.user.profile.fullname
+                       this.formSubmitting=true
+                       this.userCheckerSettings.status+=1
+                    }else{
+                        this.submitForm()
+                    }
+                }   
                 
             },
             onCanceled(){

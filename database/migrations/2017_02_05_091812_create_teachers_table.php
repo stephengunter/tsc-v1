@@ -17,15 +17,18 @@ class CreateTeachersTable extends Migration {
 			$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 			
 			
-			$table->text('experiences');
+			$table->text('experiences')->nullable();
 			$table->string('education')->nullable();
 			$table->string('certificate')->nullable();;
-			$table->string('specialty');
+			$table->string('specialty')->nullable();
 			$table->string('job')->nullable();
             $table->string('jobtitle')->nullable();
 			$table->text('description')->nullable();
 			$table->boolean('active')->default(false);
 			$table->boolean('reviewed')->default(false);
+
+			$table->boolean('group')->default(false);
+			$table->text('teacher_ids')->nullable();
 
 			$table->boolean('removed')->default(false);
 			$table->date('join_date')->nullable();

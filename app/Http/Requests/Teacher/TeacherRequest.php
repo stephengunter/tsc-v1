@@ -16,12 +16,22 @@ class TeacherRequest extends FormRequest
     }
 
     public function rules()
-    {  
+    {   
+       
+        if($this->isGroup()){
+            return [
+                'teacher.name'=> 'required',
+               
+            ]; 
+        }
+       
         $rules=[
              'teacher.specialty'=> 'required',
              'teacher.experiences'=> 'required',
              'teacher.education'=> 'required',
         ];
+        
+        return $rules;
 
         $id=$this->getTeacherId();
         if($id){
@@ -42,6 +52,11 @@ class TeacherRequest extends FormRequest
        
     }
 
+    public function isGroup()
+    {
+        return $this['teacher']['group'];
+    }
+
     public function messages()
     {
         $messages=[
@@ -59,6 +74,7 @@ class TeacherRequest extends FormRequest
     }
     public function getTeacherId()
     {
+        
         $id=0;
         $teacherValues = $this['teacher'];        
         if(array_key_exists ( 'user_id' ,$teacherValues)){

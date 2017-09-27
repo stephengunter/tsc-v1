@@ -47,6 +47,22 @@ class Teachers
         return $teacher;
        
     }
+    public function groupTeachers($id)
+    {
+        $teacher = $this->findOrFail($id);
+        $teacher_ids=$teacher->teacher_ids;
+        $ids= explode( ',', $teacher_ids );
+        return $this->getAll()->whereIn('user_id',$ids)
+                              ->with('user.profile');
+        if($teacher_ids){
+           $ids= explode( ',', $teacher_ids );
+           return $this->getAll()->whereIn('user_id',$ids)
+                                 ->with('user.profile');
+        }
+
+        return null;
+       
+    }
     
     public function store($user ,$values)
     {

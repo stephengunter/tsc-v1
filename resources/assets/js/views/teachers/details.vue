@@ -9,10 +9,14 @@
   <div  id="tabTeacher" class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
             <ul class="nav nav-tabs">
-                <li class="active">
+                <li v-if="isGroup" class="active">
+                   
+                    <a @click="activeIndex=0" href="#group-teachers" data-toggle="tab">群組教師</a>
+                </li>
+                <li v-else class="active">
                     <a @click="activeIndex=0" href="#user" data-toggle="tab">個人資料</a>
                 </li>
-                <li>
+                <li v-if="!isGroup">
                      <a @click="activeIndex=1" href="#contactinfo" data-toggle="tab">聯絡資訊</a>
                 </li>
                 <li>
@@ -23,7 +27,10 @@
         </div>
         <div class="panel-body">
             <div class="tab-content">
-                <div class="tab-pane fade active in" id="user">
+                <div v-if="isGroup"  class="tab-pane fade active in" id="group-teachers">
+                    <group-teacher-view :teacher="teacher"></group-teacher-list>
+                </div>
+                <div v-else class="tab-pane fade active in" id="user">
                     <user v-if="activeIndex==0" :id="id" :can_edit="userSettings.can_edit" :can_back="userSettings.can_back"  
                       :hide_delete="userSettings.hide_delete"
                       @saved="onUserSaved"  :role="userSettings.role"
@@ -31,7 +38,7 @@
                       
                     </user>
                 </div>
-                <div class="tab-pane fade" id="contactinfo">
+                <div  v-if="!isGroup" class="tab-pane fade" id="contactinfo">
                     <contact-info v-if="activeIndex==1"  
                      :id="contactInfoSettings.id" :user_id="contactInfoSettings.user_id" 
                      :canEdit="contactInfoSettings.canEdit" :show_residence="contactInfoSettings.show_residence" 
@@ -59,7 +66,7 @@
     import UserComponent from '../../components/user/user.vue'
     import ContactInfoComponent from '../../components/contactInfo/contactInfo.vue'
     import UserCenterView from '../../components/user-center/view.vue'
-    
+    import GroupTeacherView from '../../components/teacher/group/view.vue'
     
     export default {
         name: 'TeacherDetails',
@@ -67,7 +74,8 @@
            'teacher' : TeacherComponent,
            'user' : UserComponent,
            'contact-info' : ContactInfoComponent,
-           'user-center':UserCenterView
+           'user-center':UserCenterView,
+           'group-teacher-view':GroupTeacherView
          
         },
         props: {
@@ -117,7 +125,10 @@
             }
         },
         computed:{
-          
+           isGroup(){
+            if(!this.teacher) return false
+              return Helper.isTrue(this.teacher.group)
+           }
         },
         beforeMount(){
            this.init()
@@ -139,6 +150,7 @@
                return val=='true'
             },
             onDataLoaded(teacher){
+                
                 this.loaded=true
                 this.teacher=teacher
             },

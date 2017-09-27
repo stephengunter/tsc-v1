@@ -118,7 +118,8 @@ class BaseController extends Controller
                     'id' => 2,
                     'text' => '新增教師',
                     'path' => '/teachers/create',
-                    'active' => $current=='teachers/create'
+                    'active' => $current=='teachers/create',
+                    
                 ],
                
             );

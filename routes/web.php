@@ -55,6 +55,7 @@ Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\Co
 Route::get('lessons/{id}/print', '\App\Http\Controllers\Course\LessonsController@print');
 
 Route::get('teachers/options', '\App\Http\Controllers\Teacher\TeachersController@options');
+Route::get('teachers/group-teachers', '\App\Http\Controllers\Teacher\TeachersController@groupTeachers');
 
 Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
 Route::put('centers/{id}/display-order',['uses'=>'\App\Http\Controllers\Settings\CentersController@updateDisplayOrder']);

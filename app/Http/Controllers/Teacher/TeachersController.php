@@ -59,11 +59,11 @@ class TeachersController extends BaseController
         if($centerId){
           
             $teacherList=$this->teachers->getByCenter($centerId)
-                                        ->with('user')->with('user.profile');
+                                        ->with('user.profile');
                                        
         }else{
              $teacherList=$this->teachers->getAll()
-                                        ->with('user')->with('user.profile');
+                                        ->with('user.profile');
         }
 
         $teacherList=$teacherList->filterPaginateOrder();   
@@ -160,6 +160,10 @@ class TeachersController extends BaseController
             'teacher' => $teacher
         ]);
         
+    }
+    private function storeTeacherGroup(TeacherRequest $request)
+    {
+
     }
     public function store(TeacherRequest $request)
     {
@@ -285,6 +289,24 @@ class TeachersController extends BaseController
         return response()->json([ 'options' => $options ]);  
           
         
+    }
+
+    public function groupTeachers()
+    {
+        $teachers=[];
+        $request=request();
+        $id=(int)$request->id;
+
+        if(!$id)  return response()->json([ 'teachers' => $teachers ]); 
+        
+        $teachers=$this->teachers->groupTeachers($id)->get();
+       
+        if(count($teachers)){
+            foreach($teachers as $teacher){
+                $teacher->centerNames=$teacher->centerNames();
+            }
+        }
+        return response()->json([ 'teachers' => $teachers ]);  
     }
 
     

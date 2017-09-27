@@ -21,6 +21,7 @@ Vue.component('date-picker', require('vue-datepicker') )
 Vue.component('time-picker', require('vue2-timepicker') )
 Vue.component('pager', require('vue-simple-pager') )
 
+Vue.component('main-nav', require('./components/MainNav'))
 Vue.component('html-editor', require('./components/HtmlEditor') )
 Vue.component('delete-confirm', require('./components/DeleteConfirm') )
 Vue.component('toggle', require('./components/Toggle') )

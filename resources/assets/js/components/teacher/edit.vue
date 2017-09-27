@@ -5,9 +5,13 @@
         <div class="panel-heading">    
              <span class="panel-title">
                    <h4 v-html="title"></h4>
-             </span>           
+             </span>   
+              <toggle :items="typeOptions"   :default_val="form.teacher.group" @selected=onTypeSelected></toggle>
+                     
         </div>
-        <div class="panel-body">
+        <div v-if="group" class="panel-body">group
+        </div>
+        <div v-else class="panel-body">
             <form v-if="loaded" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)" class="form">
                 <teacher-inputs :form="form"
                   :with_user="inputsSettings.with_user" :with_teacher_name="inputsSettings.with_teacher_name"
@@ -18,7 +22,7 @@
 
             </form>
         </div>
-        <div>{{ test }}</div>
+       
     </div>
     
 </template>
@@ -34,6 +38,11 @@
               type: Number,
               default: 0
             },
+            group:{
+               type:Boolean,
+               default:false
+
+            }
         },
         data() {
             return {
@@ -49,8 +58,14 @@
                    with_profile:false,
                    with_teacher_name:true
                 },
-
-                test:''
+                typeOptions:[{
+                    text: '個人教師',
+                    value: '0'
+                }, {
+                    text: '教師群組',
+                    value: '1'
+                }]
+               
 
             }
         },
@@ -60,10 +75,7 @@
         methods: {
             init() {
                 this.loaded=false
-                this.form = new Form({
-                    teacher: {
-                    }
-                })
+                
                 this.fetchData() 
             },
             fetchData() {
@@ -76,6 +88,11 @@
                        this.loaded=false
                    })  
             },
+            onTypeSelected(val){
+               this.form.teacher.group=Helper.isTrue(val)
+               
+               
+            },
             setActive(val){
                 this.form.teacher.active=val
             },
@@ -87,8 +104,11 @@
                 this.form.errors.clear(name)
             },
             onSubmit() {
+              if(this.form.teacher.experiences){
                 let experience=Helper.replaceAll( this.form.teacher.experiences, '\n','<br>')
                 this.form.teacher.experiences=experience
+              }
+                
              
                 this.submitForm()
             },

@@ -12,18 +12,15 @@
       
         <div id="navbar"  class="navbar-collapse collapse">
             <ul class="nav navbar-nav" style="font-weight:bold;font-size:1.2em">
-                
-                 @if(isset($menus))
+               
+                   @if(isset($menus))
 
-                    @for ($i = 0; $i < count($menus); $i++)
-                      <li class="{{ $menus[$i]['active'] ?  'active':'' }}">
-                         <a href="{{ $menus[$i]['path'] }}" >
-                            {{ $menus[$i]['text'] }}
-                         </a>  
-                      </li>
-                    @endfor
+                     <main-nav :menus="{{ json_encode($menus) }}"></main-nav>
 
-                 @endif
+                   @endif
+
+               
+                 
             </ul>
               @if(Auth::check())
             <ul class="nav navbar-nav navbar-right">
