@@ -536,6 +536,29 @@ class CoursesController extends BaseController
                 ]);  
 
     }
+
+    public function subCourses()
+    {
+        $request = request();
+        $parent=(int)$request->parent;    
+        $courseList=[];
+        if($parent){
+            $courseList=$this->courses->subCourses($parent)->get();
+
+        }
+      
+
+        foreach ($courseList as $course) {
+            $course->validSignups=count ($course->validSignups());
+             
+         }
+
+        return response()
+                ->json([
+                    'courseList' => $courseList
+                ]);  
+
+    }
     
     
     

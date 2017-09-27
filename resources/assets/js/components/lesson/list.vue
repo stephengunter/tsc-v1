@@ -123,6 +123,8 @@
             onDataLoaded(data){
                 this.hasData=data.model.total
                 this.canInit = data.canInit
+
+                this.$emit('loaded',data)
             },
             onRowSelected(id){
                 this.$emit('selected',id)

@@ -152,6 +152,19 @@ class Course {
         })
        
     }
+    static subCourses(parent){
+        let url =this.source() + '/sub-courses' 
+        url +='?parent=' + parent
+        return new Promise((resolve, reject) => {
+                     axios.get(url)
+                    .then(response => {
+                        resolve(response.data);
+                    })
+                    .catch(error => {
+                        reject(error);
+                    })
+                })  
+    }
     static indexOptions(){
         let url =this.source() + '/index-options' 
         return new Promise((resolve, reject) => {

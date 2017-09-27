@@ -2,20 +2,42 @@
 <div>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <div class="form-inline">
+           
                 
                 <combination-select :with_course="combinationSettings.withCourse"
                   @ready="onCombinationReady" @course-changed="setCourse">
                </combination-select>
 
-            </div>
+            <button @click="viewSub"  v-show="groupAndParent" type="button" class="btn-sm btn btn-warning">
+               <span aria-hidden="true" class="glyphicon glyphicon-search"></span>
+               學分
+            </button>
         </div>
      </div>
      
     <signup-list v-if="ready" :course_id="course_id" :hide_create="hide_create" 
         :version="version" :can_select="can_select" :for_refund="for_refund"
+        @loaded="onSignupListLoaded"
         @selected="onSelected" @begin-create="onBeginCreate">
     </signup-list>
+
+    <modal :showbtn="false" :width="subSettings.width" :show.sync="subSettings.show"  @closed="closeSub" 
+        effect="fade">
+          <div slot="modal-header" class="modal-header">
+           
+            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="closeSub">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </button>
+           
+          </div>
+        <div slot="modal-body" class="modal-body">
+           
+            <sub-course-list  :courses="subCourses">
+            </sub-course-list>
+
+      
+        </div>
+    </modal> 
 
 </div>
 
@@ -23,12 +45,14 @@
 
 <script>
     import SignupList from '../../components/signup/list.vue'
-    
+    import SubCourseList from '../../components/course/sub/list.vue'
+
 
     export default {
         name: 'SignupIndex',       
         components: {
-            'signup-list':SignupList
+            'signup-list':SignupList,
+            'sub-course-list':SubCourseList
         },
         props: {
             version: {
@@ -55,7 +79,15 @@
 
                 combinationSettings:{
                     withCourse:true,
-                }
+                },
+
+                groupAndParent:false,
+                subSettings:{
+                    width:800,
+                    show:false
+                },
+
+                subCourses:[]
 
              
             }
@@ -76,6 +108,24 @@
            
             setCourse(val){
                 this.course_id=val
+            },
+            onSignupListLoaded(data){
+               this.groupAndParent= data.groupAndParent
+            },
+            viewSub(){
+                let getData=Course.subCourses(this.course_id)
+                
+                getData.then(data=>{
+                    this.subCourses=data.courseList
+                    this.subSettings.show=true
+                }).catch(error=>{
+                    Helper.BusEmitError(error)  
+                 
+                }) 
+
+            },
+            closeSub(){
+                this.subSettings.show=false
             },
             onSelected(id){
                 this.$emit('selected',id)

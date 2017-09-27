@@ -156,6 +156,7 @@ class Course extends Model
     }
     public function canInitLessons()
     {
+        if( $this->groupAndParent() ) return false;
         if(  count($this->validLessons()) ) return false;
         return true;
     }
@@ -184,8 +185,10 @@ class Course extends Model
     }
     public function validSignups()
     {
-        return $this->signups()->where('removed',false);
+        return $this->signups()->where('removed',false)
+                                ->where('status' > -1);
     }
+    
    
     public function canCreateAdmit()
     {

@@ -12,8 +12,9 @@
         </div>
      </div>
      
-    <lesson-list v-if="ready" :course_id="course_id" :hide_create="hide_create" 
+    <lesson-list v-if="ready" :course_id="course_id" :hide_create="hideCreate" 
         :version="currenVersion" :can_select="can_select"
+        @loaded="onLessonsLoaded"
         @selected="onSelected" @begin-create="onBeginCreate"
         @begin-initialize="onBeginInitialize" >
     </lesson-list>
@@ -81,11 +82,24 @@
                     course_id:0,
                     show:false,
                     width:1000,
-                }
+                },
+
+                canCreate:true
+
+
 
              
             }
         },
+        computed:{
+            hideCreate(){
+                if(this.hide_create) return true
+
+                return !this.canCreate
+               
+            },
+            
+        }, 
         watch:{
             version: function () {
                this.currenVersion+=1
@@ -96,6 +110,7 @@
         },
         methods: {
             init(){
+                this.canCreate=!this.hide_create
 
                 this.initializeSettings={
                     course_id:0,
@@ -105,8 +120,9 @@
              
             },
             
-            onCombinationReady(params){
-                this.setCourse(params.course)
+            onCombinationReady(course){
+                
+                this.setCourse(course)
                 this.ready=true
             },
            
@@ -119,7 +135,9 @@
             onBeginCreate(){
                 this.$emit('begin-create',this.course_id)
             },
-
+            onLessonsLoaded(data){
+                this.canCreate = data.canCreate
+            },
             onBeginInitialize(){
                  this.initializeSettings.show=true
             },

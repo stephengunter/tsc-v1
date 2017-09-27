@@ -62,6 +62,8 @@ class LessonsController extends BaseController
         $course=$this->courses->findOrFail($course_id);
         
         $canInit=$course->canInitLessons();
+        $canCreateLesson=true;
+        if($course->groupAndParent()) $canCreateLesson=false;
        
         $lessonList=$this->lessons->getAll()   
                                   ->with('classroom')
@@ -86,7 +88,8 @@ class LessonsController extends BaseController
         
          return response() ->json([
                                     'model' => $lessonList,
-                                    'canInit' => $canInit  
+                                    'canInit' => $canInit ,
+                                    'canCreate' => $canCreateLesson 
                                   ]);  
        
        

@@ -106,7 +106,9 @@
                     status : 0
                 },
                 hasData:false,
-                viewMore:false
+                viewMore:false,
+
+
              
             }
         },
@@ -172,6 +174,8 @@
             onDataLoaded(data){
                 if(data.summary)  this.summary=data.summary
                 else this.summary=null
+
+                this.$emit('loaded',data)
             }, 
             isTrue(val){
             

@@ -39,12 +39,12 @@ class Courses
     }
     public function parentCourses()
     {
-        return Course::where('parent',0);
+        return $this->getAll()->where('parent',0);
         
     }
     public function subCourses($parent)
     {
-        return Course::where('parent',$parent);
+        return $this->getAll()->where('parent',$parent);
         
     }
 

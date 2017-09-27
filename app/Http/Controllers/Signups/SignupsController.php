@@ -63,10 +63,14 @@ class SignupsController extends BaseController
             return view('signups.index')
                     ->with(['menus' => $menus]);
         }  
-
+        
         $signupList=[];
         $course_id=(int)$request->course; 
         if($course_id > 0){
+            $groupAndParent=false;
+            $course=Course::find($course_id);
+            if($course) $groupAndParent=$course->groupAndParent();
+
             $signupList= $this->signups->getByCourse($course_id);
             $status=(int)$request->status;
             if( $status >= -1  && $status <=1 ){
@@ -77,7 +81,8 @@ class SignupsController extends BaseController
             $summary=$this->signups->getSummary($course_id);   
 
             return response() ->json([ 'model' => $signupList,
-                                       'summary' => $summary
+                                       'summary' => $summary,
+                                       'groupAndParent' => $groupAndParent
                                       ]); 
         }
 
