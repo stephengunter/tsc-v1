@@ -112,7 +112,7 @@
             },  
             removeTeacher(){
                 let id = this.deleteConfirm.id 
-                let remove=Teacher.removeTeacherFromGroup(this.teacherId,id)
+                let remove=GroupTeacher.delete(this.teacherId,id)
                 remove.then(result => {
                     Helper.BusEmitOK('移除成功')
                     this.version += 1

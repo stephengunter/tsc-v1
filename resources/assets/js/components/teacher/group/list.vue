@@ -107,7 +107,7 @@
                 this.fetchData()
             },
             fetchData(){
-                let getData=Teacher.groupTeachers(this.group_id)
+                let getData=GroupTeacher.show(this.group_id)
                     getData.then(data => {
                         this.teachers = data.teachers
                     })

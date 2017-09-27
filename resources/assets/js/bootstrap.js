@@ -163,6 +163,7 @@ import Tuition from './models/tuition.js'
 import Refund from './models/refund.js'
 import Center from './models/center.js'
 import Teacher from './models/teacher.js'
+import GroupTeacher from './models/group-teacher.js'
 import Volunteer from './models/volunteer.js'
 import Admin from './models/admin.js'
 import Discount from './models/discount.js'
@@ -213,6 +214,7 @@ window.Signup=Signup
 window.Tuition=Tuition
 window.Refund=Refund
 window.Teacher=Teacher
+window.GroupTeacher=GroupTeacher
 window.Volunteer=Volunteer
 window.Admin=Admin
 window.Center=Center

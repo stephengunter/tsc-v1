@@ -44,13 +44,9 @@ class GroupTeachersController extends BaseController
         $this->setCheckAdmin($checkAdmin);
          
 	}
-	public function index()
+    public function show($id)
     {
         $teachers=[];
-        $request=request();
-        $id=(int)$request->id;
-
-        if(!$id)  return response()->json([ 'teachers' => $teachers ]); 
         
         $teachers=$this->teachers->groupTeachers($id)->get();
        
@@ -59,77 +55,40 @@ class GroupTeachersController extends BaseController
                 $teacher->centerNames=$teacher->centerNames();
             }
         }
-        return response()->json([ 'teachers' => $teachers ]);  
+        return response()->json([ 'teachers' => $teachers ]); 
     }
 
     public function create()
     {
          $request = request();
-         $user_id=(int)$request->user;
-         
-         if(!$request->ajax()){
-            $menus=$this->menus($this->key);            
-            return view('teachers.create')
-                   ->with([ 'menus' => $menus,
-                              'id' => $user_id     
-                        ]);
-         }  
+         $group_teacher_id=(int)$request->id;
 
-         $user=null;
-         $teacher=null;
+        $centerId=(int)$request->center;
+        $teacherList=[];
+        if($centerId){
+          
+            $teacherList=$this->teachers->getByCenter($centerId)
+                                        ->with('user.profile');
+                                       
+        }else{
+             $teacherList=$this->teachers->getAll()
+                                        ->with('user.profile');
+        }
 
-         if($user_id){
-            $current_user=$this->currentUser();
-            $user=$this->users->findOrFail($user_id);
-            if(!$user->canViewBy($current_user)){
-                return  $this->unauthorized();     
+        $teacherList=$teacherList->filterPaginateOrder();   
+        if(count($teacherList)){
+            foreach($teacherList as $teacher){
+                $teacher->centerNames=$teacher->centerNames();
             }
-
-            
-            $user->profile;
-            $teacher=$user->teacher;
-            if(!$teacher){
-                 $teacher=$this->teachers->initialize();
-            }
-           
-         }else{
-             $user=User::initialize();
-             $teacher=$this->teachers->initialize();
-         }
-
-          return response()->json([
-                'user' => $user,
-                'teacher' => $teacher
+        }
+                                    
+        return response()
+            ->json([
+               'model' => $teacherList                
             ]);
     }
 
-    public function show($id)
-    {
-        
-
-        if(!request()->ajax()){
-            $menus=$this->menus($this->key);            
-            return view('teachers.details')
-                    ->with([ 'menus' => $menus,
-                              'id' => $id     
-                        ]);
-        }  
-
-        $current_user=$this->currentUser();
-        $teacher=$this->teachers->findOrFail($id);
-        if(!$teacher->canViewBy($current_user)){
-           return  $this->unauthorized();  
-        }
-        $teacher->name=$teacher->getName();
-        $teacher->canEdit=$teacher->canEditBy($current_user);
-        $teacher->canDelete=$teacher->canDeleteBy($current_user);
-        
-
-         return response()
-                ->json([
-                    'teacher' => $teacher
-                ]);
-    }
+   
 
     public function edit($id)
     {
@@ -174,46 +133,24 @@ class GroupTeachersController extends BaseController
            
     }
 
-    public function destroy($id)
+    public function remove(Request $request,$id)
     {
-        $removed_id=$request['teacher_id'];
+        $removed_id=$request['remove_id'];      
         if(!$removed_id) abort(500);
-        $teacher_group=$this->teachers->findOrFail($id);
+
+        $teacher_group=$this->teachers->findOrFail($id);        
         if(!$teacher_group->teacher_ids) abort(500);
        
         $teacher_ids_array=explode( ',', $teacher_group->teacher_ids );
+        $teacher_ids_array=Helper::removeValueFromArray($teacher_ids_array,$removed_id);       
        
-        $teacher_ids_array=Helper::removeValueFromArray($teacher_ids_array,$removed_id);
-        $teacher_group->teacher_ids = Helper::strFromArray($teacher_ids_array);
+       
+        $teacher_group->teacher_ids = Helper::strFromArray($teacher_ids_array);       
         $teacher_group->save();
 
         return response()->json([ 'success' => true ]);
     }
    
-
-    public function options()
-    {
-        $request=request();
-        $options=[];
-        $centerId=(int)$request->center;
-        if($centerId){
-            $options=$this->teachers->optionsByCenter($centerId);
-            return response()->json([ 'options' => $options ]);  
-        }
-
-        $courseId=(int)$request->course;
-        if($courseId){
-            $course=$this->courses->findOrFail($courseId);
-            $options=$this->teachers->optionsConverting($course->teachers);
-            return response()->json([ 'options' => $options ]);  
-        }
-
-        $teachers=$this->teachers->getAll()->get();
-        $options=$this->teachers->optionsConverting($teachers);
-        return response()->json([ 'options' => $options ]);  
-          
-        
-    }
 
     
 

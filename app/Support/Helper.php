@@ -198,12 +198,12 @@ class Helper
     {
         $str='';
         for($i = 0; $i < count($arrVal); ++$i) {
-            if($i>0){
-                $str .= ',' ;
-            }
-            $str .=  $arrVal[$i];
+            if(isset($arrVal[$i])) {
+                $str .=  $arrVal[$i] . ',';
+            } 
+            
         }
-        return $str;
+        return static::removeLastComma($str);
     }
 
     public static function removeLastComma($str_val)
@@ -217,8 +217,7 @@ class Helper
         if(($key = array_search($val, $array)) !== false) {
            
             unset($array[$key]);
-
-             
+            $array = array_values($array);
            
         }
 
