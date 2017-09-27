@@ -1,33 +1,46 @@
 <template>
 <div>
     
-    <list v-if="readOnly"  :group_id="teacherId" :hide_create="!can_edit"  
-         @begin-edit="beginEdit" 
-       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" >                 
+    <list   :group_id="teacherId" :can_edit="can_edit"  
+       :version="version"
+         @begin-edit="beginEdit"  @begin-delete="beginDelete" >                 
+     
     </list>
 
-   <!--  <edit v-else :id="id" 
-       @saved="onSaved"   @canceled="onEditCanceled" >                 
-    </edit> 
-
     <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
-      @close="onDeleteCanceled" @confirmed="deleteAdmin">        
-    </delete-confirm> -->
+      @close="onDeleteCanceled" @confirmed="removeTeacher">        
+    </delete-confirm>
+
+     <modal :showbtn="false" :width="editSettings.width" :show.sync="editSettings.show"  @closed="endEdit" 
+        effect="fade">
+          <div slot="modal-header" class="modal-header">
+           
+            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="endEdit">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </button>
+           
+          </div>
+        <div slot="modal-body" class="modal-body">
+           
+            <teacher-list v-if="editSettings.show" :hide_create="editSettings.hide_create" >
+            </teacher-list>
+ 
+      
+        </div>
+    </modal> 
     
 
 </div>
 </template>
 <script>
     import List from './list.vue'
-    //import Edit from './edit.vue'
-
-
+    import TeacherList from '../../../components/teacher/list.vue'
 
     export default {
         name:'GroupTeacherView',
         components: {
             List,
-            //Edit,
+            'teacher-list':TeacherList
         },
         props: {
             teacher: {
@@ -38,7 +51,8 @@
         },
         data() {
             return {
-                readOnly:true,
+              
+                version:0,
                 can_edit:false,
                 teacherId:0,
                 deleteConfirm:{
@@ -46,9 +60,15 @@
                     show:false,
                     msg:'',
 
+                },
+                editSettings:{
+                    width:1200,
+                    show:false,
+                    hide_create:true
                 }   
             }
         },
+
         beforeMount(){
             this.init()
         },
@@ -62,13 +82,17 @@
                     msg:''
                },
                this.teacherId=this.teacher.user_id
-               this.can_edit=this.teacher.canEdit
+               this.can_edit= Helper.isTrue(this.teacher.canEdit)
             },      
             onDataLoaded(admin){
                 this.$emit('data-loaded',admin)
             },        
             beginEdit() {
-                this.readOnly=false
+                this.editSettings.show=true
+               // this.readOnly=false
+            },
+            endEdit(){
+                this.editSettings.show=false
             },
             onEditCanceled(){
                 this.init()
@@ -81,27 +105,29 @@
             onBtnBackClicked(){
                 this.$emit('btn-back-clicked')
             },
+            beginDelete(values){
+                this.deleteConfirm.msg='確定要將 ' + values.name + ' 從群組中移除嗎？'
+                this.deleteConfirm.id=values.id
+                this.deleteConfirm.show=true                 
+            },  
+            removeTeacher(){
+                let id = this.deleteConfirm.id 
+                let remove=Teacher.removeTeacherFromGroup(this.teacherId,id)
+                remove.then(result => {
+                    Helper.BusEmitOK('移除成功')
+                    this.version += 1
+                    this.deleteConfirm.show=false
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error,'移除失敗')
+                    this.deleteConfirm.show=false   
+                })
+            },
             onDeleteCanceled(){
                 this.deleteConfirm.show=false
             },
-            beginDelete(values){
-                this.deleteConfirm.msg='確定要刪除 ' + values.name + ' 的系統管理員資料嗎？'
-                this.deleteConfirm.id=values.id
-                this.deleteConfirm.show=true                 
-            },
-            deleteAdmin(){
-                let id = this.deleteConfirm.id 
-                let remove= Admin.delete(id)
-                remove.then(result => {
-                    Helper.BusEmitOK('刪除成功')
-                    this.init()
-                    this.$emit('deleted')
-                })
-                .catch(error => {
-                    Helper.BusEmitError(error,'刪除失敗')
-                    this.closeConfirm()   
-                })
-            },
+            
+           
             
             
             

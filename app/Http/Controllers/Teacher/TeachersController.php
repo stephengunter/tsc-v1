@@ -46,7 +46,6 @@ class TeachersController extends BaseController
 	}
 	public function index()
     {
-       
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('teachers.index')
@@ -123,6 +122,8 @@ class TeachersController extends BaseController
 
     public function show($id)
     {
+        
+
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('teachers.details')
@@ -307,6 +308,22 @@ class TeachersController extends BaseController
             }
         }
         return response()->json([ 'teachers' => $teachers ]);  
+    }
+    public function removeTeacherFromGroup(Request $request,$id)
+    {
+           $removed_id=$request['teacher_id'];
+           if(!$removed_id) abort(500);
+           $teacher_group=$this->teachers->findOrFail($id);
+           if(!$teacher_group->teacher_ids) abort(500);
+          
+           $teacher_ids_array=explode( ',', $teacher_group->teacher_ids );
+          
+           $teacher_ids_array=Helper::removeValueFromArray($teacher_ids_array,$removed_id);
+           $teacher_group->teacher_ids = Helper::strFromArray($teacher_ids_array);
+           $teacher_group->save();
+
+           return response()->json([ 'success' => true ]);
+           
     }
 
     

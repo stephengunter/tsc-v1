@@ -116,7 +116,36 @@ class Teacher {
                 })
         })
     }
-    
+    static groupTeachers(id){
+        let url =this.source() + '/group-teachers' 
+        url += '?id=' + id
+        return new Promise((resolve, reject) => {
+                     axios.get(url)
+                    .then(response => {
+                        resolve(response.data);
+                    })
+                    .catch(error => {
+                        reject(error);
+                    })
+                })   //End Promise
+    }
+    static removeTeacherFromGroup(group_id, teacher_id){
+        let url =this.updateUrl(group_id) 
+        url +='/remove-group-teacher'
+        let method='put'
+        let form = new Form({
+            teacher_id:teacher_id
+        })
+        return new Promise((resolve, reject) => {
+            form.submit(method,url)
+                .then(data => {
+                    resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+    }
     static options(params){
         let url =this.source() + '/options' 
         if(params.course){

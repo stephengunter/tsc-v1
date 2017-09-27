@@ -130,7 +130,7 @@
                title:Helper.getIcon('Teachers')  + '  教師資料',
                loaded:false,
                teacher:null,
-            }
+             }
         },
         watch:{
           'version' : 'init'

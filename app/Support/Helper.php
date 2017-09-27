@@ -203,12 +203,26 @@ class Helper
             }
             $str .=  $arrVal[$i];
         }
+        return $str;
     }
 
     public static function removeLastComma($str_val)
     {
           $last=strrpos($str_val, ',');
           return substr($str_val, 0, $last);
+    }
+
+    public static function removeValueFromArray(Array $array, $val)
+    {
+        if(($key = array_search($val, $array)) !== false) {
+           
+            unset($array[$key]);
+
+             
+           
+        }
+
+        return $array;
     }
     
     
