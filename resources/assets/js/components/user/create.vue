@@ -1,4 +1,5 @@
-<template>
+<template> 
+ <div>   
     <div class="panel panel-default">
         
         <div class="panel-heading">
@@ -6,7 +7,10 @@
              <span class="panel-title">
                    <h4 v-html="title"></h4>  
              </span> 
-           
+             <a href="#" @click.prevent="introSettings.show=true">
+                  <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                  說明
+             </a>
         </div>
         <div v-if="loaded" class="panel-body">
             <form class="form" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
@@ -62,6 +66,26 @@
             </form>
         </div>
     </div>
+
+    <modal :showbtn="false" :width="introSettings.width" :show.sync="introSettings.show"  @closed="introSettings.show=false" 
+        effect="fade">
+          <div slot="modal-header" class="modal-header">
+           
+            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="introSettings.show=false">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </button>
+           <h3>新增使用者說明</h3>
+          </div>
+        <div slot="modal-body" class="modal-body show-data">
+          <ul>
+            <li>Email或手機至少要填一個</li>
+            <li>預設密碼是六個0 &nbsp; 使用者日後可自行變更</li>
+          </ul>
+            
+      
+        </div>
+    </modal> 
+  </div>   
 </template>
 <script>
 
@@ -80,7 +104,13 @@
                     },
                 }),
                 genderOptions: User.genderOptions(),
-                title: '新增使用者資料',
+               introSettings:
+                {
+                    show:false,
+                    width:600,
+                    
+
+                }
 
             }
         },

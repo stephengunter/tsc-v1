@@ -20,6 +20,7 @@
            <div class="form-group"> 
               <label>手機</label>
               <input type="text" name="user.phone" class="form-control" v-model="form.user.phone" >
+             
               <small v-if="form.errors.has('user.phone')" v-text="form.errors.get('user.phone')" class="text-danger"></small>
             </div> 
        </div>
@@ -44,11 +45,20 @@
        </div>
        <div  class="col-sm-4"> 
            <div class="form-group">
-                <label>生日</label>
-                <div>
+                <label>生日xxx</label>
+                <div class="input-group">
+                    <date-picker  :date="dob" :option="datePickerOption"></date-picker>
+                    <span v-show="hasDOB" class="input-group-btn">
+                        <button @click.prevent="clearDOB" class="btn btn-default" type="button">
+                            <i class="fa fa-times-circle-o" aria-hidden="true"></i>
+                        </button>
+                    </span>
+                </div>
+                <!-- <div>
                     <input type="hidden" name="user.profile.dob" v-model="form.user.profile.dob">
                     <date-picker  :date="dob" :option="datePickerOption"></date-picker>
-                </div>
+                </div> -->
+                <input type="hidden" name="user.profile.dob" class="form-control" v-model="form.user.profile.dob"  >
                 <small class="text-danger" v-if="form.errors.has('user.profile.dob')" v-text="form.errors.get('user.profile.dob')"></small>
             </div>
        </div>
@@ -84,6 +94,13 @@
                 datePickerOption: Helper.datetimePickerOption(),
             }
       },
+      computed:{
+            hasDOB(){
+                if(this.form.user.profile.dob) return true
+                    return false
+            }
+
+        },
       watch:{
             dob: {
               handler: function () {
