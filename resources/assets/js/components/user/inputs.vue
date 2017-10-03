@@ -45,9 +45,10 @@
        </div>
        <div  class="col-sm-4"> 
            <div class="form-group">
-                <label>生日xxx</label>
+                <label>生日</label>
                 <div class="input-group">
                     <date-picker  :date="dob" :option="datePickerOption"></date-picker>
+                 
                     <span v-show="hasDOB" class="input-group-btn">
                         <button @click.prevent="clearDOB" class="btn btn-default" type="button">
                             <i class="fa fa-times-circle-o" aria-hidden="true"></i>
@@ -123,6 +124,9 @@
           },
           onDOBSelected(val){
              this.$emit('dob-selected',val)
+          },
+          clearDOB(){
+                this.dob.time=''
           },
       }
   }
