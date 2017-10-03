@@ -78,6 +78,7 @@ Route::resource('reset-password', '\App\Http\Controllers\Auth\ResetPasswordContr
 Route::resource('users', '\App\Http\Controllers\User\UsersController');
 Route::resource('user-roles', '\App\Http\Controllers\User\UserRolesController');
 Route::resource('user-centers', '\App\Http\Controllers\User\UserCenterController');
+Route::resource('titles', '\App\Http\Controllers\User\TitlesController');
 Route::resource('photoes', 'PhotoesController');
 
 Route::resource('volunteers', '\App\Http\Controllers\User\VolunteersController');
@@ -133,7 +134,6 @@ Route::resource('terms', '\App\Http\Controllers\Settings\TermsController');
 Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
 Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController');
 Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
-Route::resource('titles', '\App\Http\Controllers\Settings\TitlesController');
 
 Route::resource('courses-report', '\App\Http\Controllers\Reports\CourseListController',
                                      ['only' => ['index','store']]);  

@@ -19,7 +19,7 @@
             
         </div>  <!-- End panel-heading-->
         <div v-if="loaded" class="panel-body">
-            <table v-show="hasData" class="table table-striped" style="width: 95%;">
+            <table  class="table table-striped" style="width: 95%;">
              <thead> 
                 <tr> 
                     <th style="width:15%"></th> 

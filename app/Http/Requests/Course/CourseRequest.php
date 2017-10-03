@@ -21,14 +21,9 @@ class CourseRequest extends FormRequest
     {  
         $basicRules= [
             'course.name' => 'required|max:255',
-         
             'course.begin_date'=> 'required',
             'course.end_date' => 'required',
-           
-
-           
-         //   'course.teachers'  => 'required',
-          
+         //   'course.teachers'  => 'required',          
         ];
         
 
@@ -46,6 +41,7 @@ class CourseRequest extends FormRequest
             }else{
                
                 $extraRules=[
+                    'course.credit_price' => 'required|numeric',
                     'course.categories' => 'required',
                 ];
                 return array_merge($basicRules,$extraRules);
@@ -73,12 +69,13 @@ class CourseRequest extends FormRequest
             'course.name.required' => '必須填寫課程名稱',
             'course.begin_date.required' => '必須填寫開始日期',
             'course.end_date.required' => '必須填寫結束日期',
-             'course.hours.required' => '必須填寫時數',
-              'course.hours.numeric' => '時數必須為數字',
-
+            'course.hours.required' => '必須填寫時數',
+            'course.hours.numeric' => '時數必須為數字',
+            'course.credit_price.required' => '必須填寫學分單價',
+            'course.credit_price.numeric' => '學分單價必須為數字',
          
 
-             'course.categories.required' => '必須選擇課程分類',
+            'course.categories.required' => '必須選擇課程分類',
             'course.teachers.required' => '必須選擇教師',
          
         ];

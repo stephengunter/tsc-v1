@@ -26,7 +26,20 @@ class Teacher extends Model
          'user.profile.fullname','specialty', 'active','reviewed', 'education','updated_at'
     ];
     
- 
+    public static function initialize()
+    {
+        return [
+            'group' => 0,
+            'experiences' => '',
+            'certificate' => '',
+            'specialty' => '',
+            'active' => 0,
+			'reviewed' => 0,
+			'education' => '',
+            'job' => '',
+			'jobtitle' => '',
+        ];
+    }
     
     public function user() {
 		return $this->belongsTo('App\User');

@@ -35,9 +35,20 @@
                  </div>
                 
             </div>   <!-- End row-->
-            <div class="row">
+            <div v-if="isGroup" class="row">
+                 <div class="col-sm-4">
+                      <label class="label-title">群組</label>
+                      <p>
+                        <span v-html="$options.filters.okSign(true)"></span>
+                      </p>
+                      
+                                          
+                 </div>
+             </div>   <!-- End row-->
+            <div v-else class="row">
                  <div class="col-sm-4">
                       <label class="label-title">現職</label>
+
                       <p v-text="teacher.job"></p>                     
                  </div>
                   <div class="col-sm-4">
@@ -131,6 +142,12 @@
                loaded:false,
                teacher:null,
              }
+        },
+        computed:{
+            isGroup(){
+                if(!this.teacher) return false
+                  return Helper.isTrue(this.teacher.group)
+            }
         },
         watch:{
           'version' : 'init'

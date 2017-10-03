@@ -45,10 +45,20 @@
        <div  class="col-sm-4"> 
            <div class="form-group">
                 <label>生日</label>
-                <div>
+                <!-- <div>
                     <input type="hidden" name="user.profile.dob" v-model="form.user.profile.dob">
                     <date-picker  :date="dob" :option="datePickerOption"></date-picker>
+                </div> -->
+                <div class="input-group">
+                    <date-picker  :date="dob" :option="datePickerOption"></date-picker>
+                    <span v-show="hasDOB" class="input-group-btn">
+                        <button @click.prevent="clearDOB" class="btn btn-default" type="button">
+                            <i class="fa fa-times-circle-o" aria-hidden="true"></i>
+                        </button>
+                    </span>
                 </div>
+                <input type="hidden" name="user.profile.dob" v-model="form.user.profile.dob">
+                                
                 <small class="text-danger" v-if="form.errors.has('user.profile.dob')" v-text="form.errors.get('user.profile.dob')"></small>
             </div>
        </div>
@@ -198,6 +208,10 @@
               if(this.form.teacher.user_id) return true
                   return false
           },
+          hasDOB(){
+              if(this.form.user.profile.dob) return true
+              return false
+          }
         
       },
       watch:{
@@ -231,7 +245,10 @@
           },
           onCanceled(){
              this.$emit('canceled')
-          }
+          },
+          clearDOB(){
+                this.dob.time=''
+          },
       }
   }
 </script>

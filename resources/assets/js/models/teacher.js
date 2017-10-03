@@ -196,6 +196,11 @@ class Teacher {
                         key: 'name',
                         sort: false,
                         default:true
+                    },{
+                        title: '群組',
+                        key: 'group',
+                        sort: true,
+                        default:true
                     }, {
                         title: '手機',
                         key: 'user.phone',

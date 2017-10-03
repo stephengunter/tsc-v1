@@ -18,6 +18,7 @@ use DB;
 
 class CentersController extends BaseController
 {
+    protected $key='settings';
     public function __construct(Centers $centers, Users $users,CheckAdmin $checkAdmin)
      {
         // $exceptAdmin=['index','show','activeCenters'];
@@ -36,7 +37,10 @@ class CentersController extends BaseController
     public function index()
     {
         if(!request()->ajax()){
-            return view('centers.index');                   
+            
+            $menus=$this->menus($this->key);            
+            return view('centers.index')
+                    ->with(['menus' => $menus]);                
         }  
         $centers=$this->centers->getAll()->orderBy('active','desc')->filterPaginateOrder();
       

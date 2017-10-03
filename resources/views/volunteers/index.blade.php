@@ -28,7 +28,7 @@
                creating:false,
                
                indexSettings:{
-                  hide_create:true, 
+                  hide_create:false, 
                },
                detailsSettings:{
                   can_back:true

@@ -12,7 +12,7 @@ use App\Repositories\Titles;
 use App\Repositories\Centers;
 use App\Repositories\Users;
 use App\Repositories\Roles;
-use App\Http\Requests\VolunteerRequest;
+use App\Http\Requests\User\VolunteerRequest;
 use App\Http\Requests\VolunteerUserRequest;
 
 use App\Http\Middleware\CheckAdmin;

@@ -20,6 +20,11 @@
                     </button>
                 </td> 
                 <td><a herf="#" @click="selected(props.item.user_id,true)">{{props.item.user.profile.fullname}}</a> </td>
+                <td>
+                  
+                  <span v-if="isGroup(props.item)" v-html="$options.filters.okSign(true)"></span>
+
+                </td>
                 <td>{{props.item.user.phone}}</td>
                 <td>{{props.item.specialty}}</td>
                 
@@ -132,7 +137,9 @@
             onDataLoaded(data){
                
             }, 
-            
+            isGroup(teacher){
+                return Helper.isTrue(teacher.group)
+            },
             selected(id,isLink){
               if(isLink){
                 this.$emit('selected',id,true)

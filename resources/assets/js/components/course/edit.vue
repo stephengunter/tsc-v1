@@ -77,6 +77,7 @@
                             <label>學分單價</label>
                             <div>
                                 <input type="text" name="course.credit_price" class="form-control" v-model="form.course.credit_price">
+                                <small class="text-danger" v-if="form.errors.has('course.credit_price')" v-text="form.errors.get('course.credit_price')"></small>
                             </div>
                         </div>
                     

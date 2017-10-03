@@ -73,7 +73,8 @@ class TeachersController extends BaseController
            
           
             $teacherList=$teacherList
-                       ->whereNotIn('user_id',$groupTeacherIds);
+                        ->where('group',false)
+                        ->whereNotIn('user_id',$groupTeacherIds);
         }
 
         $teacherList=$teacherList->filterPaginateOrder();   

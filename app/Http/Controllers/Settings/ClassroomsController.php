@@ -16,6 +16,7 @@ use App\Support\Helper;
 
 class ClassroomsController extends BaseController
 {
+    protected $key='settings';
     public function __construct(Classrooms $classrooms, Centers $centers ,
                                 CheckAdmin $checkAdmin) 
     {
@@ -34,7 +35,10 @@ class ClassroomsController extends BaseController
     public function index()
     {
         if(!request()->ajax()){
-            return view('settings.classroom');
+            
+            $menus=$this->menus($this->key);            
+            return view('settings.classroom')
+                    ->with(['menus' => $menus]);  
                     
         }
         $center=request()->get('center');

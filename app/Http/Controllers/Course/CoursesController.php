@@ -253,6 +253,8 @@ class CoursesController extends BaseController
                 
                 
             }else{
+                $credit_price=$courseValues['credit_price'];
+                $courseValues['tuition'] = $credit_price * $credit_count;
                 $courseValues['weeks'] = null;
                 $courseValues['hours'] = null;
 

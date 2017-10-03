@@ -15,7 +15,7 @@ use App\Support\Helper;
 
 class TermsController extends BaseController
 {
-   
+    protected $key='settings';
     public function __construct(Terms $terms, CheckAdmin $checkAdmin)
     {
 	    $exceptAdmin=[];
@@ -32,8 +32,10 @@ class TermsController extends BaseController
     {
         
         if(!request()->ajax()){
-              
-            return view('settings.term');
+            $menus=$this->menus($this->key);            
+            
+            return view('settings.term')
+                      ->with(['menus' => $menus]);  
                     
         }
         

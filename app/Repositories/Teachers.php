@@ -18,16 +18,7 @@ class Teachers
     }
     public function initialize()
     {
-        return [
-            'experiences' => '',
-            'certificate' => '',
-            'specialty' => '',
-            'active' => 0,
-			'reviewed' => 0,
-			'education' => '',
-            'job' => '',
-			'jobtitle' => '',
-        ];
+        return Teacher::initialize();
     }
     public function getAll()
     {

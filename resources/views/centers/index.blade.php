@@ -3,7 +3,7 @@
 
 @section('content')
 
-       <center-index v-show="!selected" 
+       <center-index 
          @selected="onSelected"  @begin-create="onBeginCreate">
        </center-index> 
 

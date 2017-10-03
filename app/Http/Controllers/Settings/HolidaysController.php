@@ -13,6 +13,7 @@ use App\Support\Helper;
 
 class HolidaysController extends BaseController
 {
+    protected $key='settings';
     public function __construct(CheckAdmin $checkAdmin) {
         
 		$exceptAdmin=[];
@@ -26,8 +27,9 @@ class HolidaysController extends BaseController
    public function index()
     {
         if(!request()->ajax()){
-              
-            return view('settings.holiday');
+            $menus=$this->menus($this->key);            
+            return view('settings.holiday')
+                    ->with(['menus' => $menus]);  
                     
         }
 

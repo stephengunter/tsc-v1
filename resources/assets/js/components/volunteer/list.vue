@@ -83,7 +83,7 @@
         computed: {
             createText(){
                 if(this.hide_create) return ''
-                return '新增報名'
+                return '新增志工'
             },
         },
         methods: {

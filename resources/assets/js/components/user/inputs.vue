@@ -55,10 +55,6 @@
                         </button>
                     </span>
                 </div>
-                <!-- <div>
-                    <input type="hidden" name="user.profile.dob" v-model="form.user.profile.dob">
-                    <date-picker  :date="dob" :option="datePickerOption"></date-picker>
-                </div> -->
                 <input type="hidden" name="user.profile.dob" class="form-control" v-model="form.user.profile.dob"  >
                 <small class="text-danger" v-if="form.errors.has('user.profile.dob')" v-text="form.errors.get('user.profile.dob')"></small>
             </div>

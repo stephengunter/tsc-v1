@@ -1,13 +1,9 @@
 <template>
-<div>
-     
     <center-list  :hide_create="hide_create" :version="version"  
         :can_select="can_select"
        
         @selected="onSelected" @begin-create="onBeginCreate">
     </center-list>
-
-</div>
 
 </template>
 

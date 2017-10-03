@@ -95,13 +95,13 @@ class BaseController extends Controller
                     'id' => 3,
                     'text' => '志工管理',
                     'path' => '/volunteers',
-                    'active' => $current=='volunteers'
+                    'active' => $current=='volunteers' || $current=='volunteers/create'
                 ],
                 [
                     'id' => 4,
-                    'text' => '新增志工',
-                    'path' => '/volunteers/create',
-                    'active' => $current=='volunteers/create'
+                    'text' => '稱謂設定',
+                    'path' => '/titles',
+                    'active' => $current=='titles'
                 ],
                
             );
