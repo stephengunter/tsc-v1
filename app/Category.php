@@ -53,7 +53,7 @@ class Category extends Model
 
     public function canDelete()
     {
-        if(count($this->validCourses())) return false;
+        if(count($this->validCourses()->get())) return false;
          return  true;
     }
     public function canEditBy($user)

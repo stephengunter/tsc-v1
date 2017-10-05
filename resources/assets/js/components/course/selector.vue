@@ -86,6 +86,7 @@
         },
         methods: {
             init(){
+                
                 this.loaded=false  
                 this.viewMore=false
                 this.selectedIds=[]

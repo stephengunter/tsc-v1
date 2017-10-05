@@ -184,35 +184,50 @@ class CoursesController extends BaseController
         $selected_courses=Course::whereIn('id',$selected_ids)->get();
 
         foreach ($selected_courses as $old_course) {
-            $courseValues=$old_course->toArray();
-
-            $courseValues['term_id']=$defaultTerm->id;
-            $courseValues['center_id']=$defaultCenter->id;
-
-            $courseValues['begin_date']='';
-            $courseValues['end_date']='';
-            $courseValues['open_date']='';
-            $courseValues['close_date']='';
-
-            $courseValues['reviewed']=false;
-            $courseValues['active']=false;
-            $courseValues['removed']=false;
-            $courseValues['updated_by']=$updated_by;
-           
-
-            $categoryIds = $old_course->privateCategories()
-                                        ->pluck('id')->toArray();
-            
-            $teacherIds = $old_course->teachers()->get()
-                                        ->pluck('user_id')->toArray(); 
-
-            $course = $this->courses->store($courseValues , $categoryIds, $teacherIds);
-                                   
+            $new_course=$this->copyCourse($old_course,$defaultTerm->id, $defaultCenter->id,$updated_by); 
+            if($old_course->groupAndParent()){
+               $subCourses = $this->courses->subCourses($old_course->id)->get();
+               foreach ($subCourses as $sub_course){
+                   $this->copyCourse($sub_course,$new_course->term_id, $new_course->center_id,$updated_by,$new_course->id); 
+               }
+            }
+                                            
         }
         
         return response()->json(['saved' => true ]);  
 
     }
+
+    private function copyCourse(Course $old_course,$term_id, $center_id , $updated_by , $parent_id=0)
+    {
+        $courseValues=$old_course->toArray();
+        
+        $courseValues['term_id']=$term_id;
+        $courseValues['center_id']=$center_id;
+
+        $courseValues['begin_date']='';
+        $courseValues['end_date']='';
+        $courseValues['open_date']='';
+        $courseValues['close_date']='';
+
+        $courseValues['reviewed']=false;
+        $courseValues['active']=false;
+        $courseValues['removed']=false;
+        $courseValues['updated_by']=$updated_by;
+        $courseValues['parent']=$parent_id;
+        
+
+        $categoryIds = $old_course->privateCategories()
+                                    ->pluck('id')->toArray();
+        
+        $teacherIds = $old_course->teachers()->get()
+                                    ->pluck('user_id')->toArray(); 
+
+        $course = $this->courses->store($courseValues , $categoryIds, $teacherIds);
+
+        return $course;
+    }
+
     public function store(CourseRequest $request)
     {
         $current_user=$this->currentUser();

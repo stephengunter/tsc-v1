@@ -22,7 +22,8 @@
             <a v-if="isParentGroup(course)" @click="onGroupSelected(course.id)" 
             v-html="$options.filters.okSign(true)" class="btn">
             </a>   
-            <span v-if="isGroupSubCourse(course)" >{{ course.parentCourse.name }}</span>
+            <span v-if="isGroupSubCourse(course)" v-text="parentCourseName(course)" ></span>
+  
 
         </td> 
         <td v-if="!more" v-html="getClassTimesText(course.class_times)"></td> 
@@ -92,7 +93,10 @@
             isGroupSubCourse(course){
                  return Course.isGroupSubCourse(course)
             },
-            
+            parentCourseName(course){
+                 if(course.parentCourse) return course.parentCourse.name
+                    return ''
+            },
             onGroupSelected(id){
                this.$emit('group-selected',id)
             },

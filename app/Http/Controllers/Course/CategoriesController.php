@@ -71,6 +71,7 @@ class CategoriesController extends BaseController
     public function show($id)
     {
         $category=$this->categories->findOrFail($id);
+       
         $category->canEdit=true;
         $category->canDelete=$category->canDelete();
 

@@ -146,7 +146,6 @@
                this.init()
             },
             init(){
-                
 
                 this.formSubmitting=false
                 this.user_checked= false
@@ -162,7 +161,7 @@
 
                 if(this.isGroup) 
                 {
-
+                  alert('group')
                   this.form = new Form({
                       
                       user:{
@@ -182,6 +181,7 @@
                       }
                    })
                 }else{
+                   alert('not group')
                   let create=Teacher.create(this.user_id)
                   create.then(data=>{
                        let user=data.user
@@ -261,8 +261,9 @@
             },
             clearErrorMsg(name) {
                 this.form.errors.clear(name)
+
                 if(name=='user.profile.fullname'){
-                    this.form.errors.clear(user.name)
+                  this.form.errors.clear('user.name')
                 }
             },
             onSubmit() {

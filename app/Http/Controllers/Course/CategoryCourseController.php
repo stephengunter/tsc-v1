@@ -88,6 +88,7 @@ class CategoryCourseController extends BaseController
        
         if(count($courseList)){
             foreach ($courseList as $course) {
+                $course->getParentCourse();
                 foreach ($course->classTimes as $classTime) {
                   $classTime->weekday;
                 }

@@ -174,10 +174,7 @@ class TeachersController extends BaseController
         ]);
         
     }
-    private function storeTeacherGroup(TeacherRequest $request)
-    {
-
-    }
+    
     public function store(TeacherRequest $request)
     {
          $current_user=$this->currentUser();
@@ -190,6 +187,8 @@ class TeachersController extends BaseController
 
          $user_id=$request->getUserId();
          $teacherId=$request->getTeacherId();
+
+         
 
          $user= DB::transaction(function() 
                 use($userValues,$profileValues,$teacherValues,$user_id,$teacherId)
@@ -209,7 +208,7 @@ class TeachersController extends BaseController
 
                     
                     if($teacherId){
-                        $teacher = Teacher::findOrFail($id);
+                        $teacher = Teacher::findOrFail($teacherId);
                         $teacher->update($teacherValues);
                     }else{
                         $teacher=$user->teacher;
@@ -222,7 +221,7 @@ class TeachersController extends BaseController
                     }
                  
                     return $user;
-                });
+            });
 
          $teacher= Teacher::findOrFail($user->id);
          event(new TeacherCreated($teacher, $current_user));
