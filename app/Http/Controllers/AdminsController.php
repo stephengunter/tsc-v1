@@ -23,6 +23,8 @@ use App\Support\Helper;
 
 use App\Events\AdminCreated;
 use App\Events\AdminDeleted;
+use App\Events\UserRegistered;
+
 
 use DB;
 
@@ -154,7 +156,10 @@ class AdminsController extends BaseController
          $userValues=$request->getUserValues($updated_by,$removed);
          $profileValues=$request->getProfileValues($updated_by,$removed);
 
-         $user_id=$request->getUserId();
+         $user_id=$request->getUserId();   
+         $is_new_user=true;
+         if($user_id)  $is_new_user=false;
+
          $adminId=$request->getAdminId();
 
          $user= DB::transaction(function() 
@@ -192,6 +197,10 @@ class AdminsController extends BaseController
 
          $admin= Admin::findOrFail($user->id);
          event(new AdminCreated($admin, $current_user));
+
+         if($is_new_user){
+            event(new UserRegistered($user));            
+         }
         
          return response()->json($admin); 
     }

@@ -115,6 +115,7 @@ class UsersController extends BaseController
 
     public function show($id)
     {
+        
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('users.details')
@@ -123,7 +124,7 @@ class UsersController extends BaseController
                         ]);
         }  
 
-        $current_user=request()->user();
+        $current_user=$this->currentUser();
         
         $user = User::with('profile.title','roles')->findOrFail($id);
         if(!$user->canViewBy($current_user)){
@@ -146,8 +147,9 @@ class UsersController extends BaseController
     }
 
     public function edit($id)
-    {
-        $current_user=request()->user();
+    {        
+        $current_user=$this->currentUser();
+
         $user = User::with('profile')->findOrFail($id);
         if(!$user->canEditBy($current_user)){
             return  $this->unauthorized();       
@@ -165,24 +167,25 @@ class UsersController extends BaseController
     public function update(UserRequest $request, $id)
     {
         
-         $current_user=request()->user();        
-         $user = User::findOrFail($id);
-         if(!$user->canEditBy($current_user)){
+        $current_user=$this->currentUser();
+
+        $user = User::findOrFail($id);
+        if(!$user->canEditBy($current_user)){
             return  $this->unauthorized();       
-         }
-         $updated_by=$current_user->id;
-         $removed=false;
-         $userValues=$request->getUserValues($updated_by,$removed);       
-         $profileValues=$request->getProfileValues($updated_by);
+        }
+        $updated_by=$current_user->id;
+        $removed=false;
+        $userValues=$request->getUserValues($updated_by,$removed);       
+        $profileValues=$request->getProfileValues($updated_by);
        
-         $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
+        $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
         
-         return response()->json($user);
+        return response()->json($user);
     }
 
     public function destroy($id)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
         
         $deleted=$this->users->delete($id ,$current_user);
         if(!$deleted){
@@ -218,8 +221,7 @@ class UsersController extends BaseController
     public function updateContactInfo(Request $request, $userId)
     {
         $user =$this->users->findOrFail($userId);
-
-        $current_user=request()->user();
+        $current_user=$this->currentUser();
         if(!$user->canEditBy($current_user)){
               return  $this->unauthorized();
         }
@@ -238,7 +240,7 @@ class UsersController extends BaseController
     {
         $user =$this->users->findOrFail($userId);
 
-        $current_user=request()->user();
+        $current_user=$this->currentUser();
         if(!$user->canEditBy($current_user)){
               return  $this->unauthorized();
         }
