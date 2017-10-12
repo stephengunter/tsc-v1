@@ -93,5 +93,13 @@ class TeacherUserRequest extends FormRequest
         return Helper::setUpdatedBy($values,$updated_by);
         
     }
+    public function getTeacherValues($updated_by,$removed)
+    {
+        $values=$this->get('teacher');   
+        $values=array_except($values, ['user','name']);  
+        $values= Helper::setUpdatedBy($values,$updated_by);
+        return Helper::setRemoved($values,$removed);
+        
+    }
 
 }

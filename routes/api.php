@@ -4,15 +4,20 @@ use Illuminate\Http\Request;
 
 Route::get('/user', function (Request $request) {
      $user=$request->user();
-     $user->isTeacher=$user->isTeacher();
-     $user->isStudent=$user->isStudent();
+    // $user->isTeacher=$user->isTeacher();
+     //$user->isStudent=$user->isStudent();
      return $user;
 })->middleware('auth:api');
 
 Route::resource('/users', '\App\Http\Controllers\Api\UsersController',
                                      ['except' => ['index','destroy']]);
+
+Route::resource('/resumes', '\App\Http\Controllers\Api\ResumesController',
+                                     ['except' => ['edit','create']]);
 Route::resource('/signups', '\App\Http\Controllers\Api\SignupsController',
-                                     ['except' => ['edit','update']]);                                     
+                                     ['except' => ['edit','update']]);  
+                                     
+                                   
 
 Route::put('/users/{user}/update-photo',['uses'=>'\App\Http\Controllers\Api\UsersController@updatePhoto']);
                                      
@@ -40,6 +45,20 @@ Route::post('/reset-password',['uses'=>'\App\Http\Controllers\Api\PasswordsContr
             
 
 Route::post('/photoes',['uses'=>'\App\Http\Controllers\Api\PhotoesController@store']);
+
+ 
+
+Route::group(['middleware' => 'auth:api'], function()
+{
+    Route::resource('/teacher', '\App\Http\Controllers\Api\Teachers\TeachersController',
+    ['only' => ['index','store']]);
+    Route::resource('/teacher/courses', '\App\Http\Controllers\Api\Teachers\CoursesController',
+    ['only' => ['index','show']]);
+    Route::resource('/import-schedules', '\App\Http\Controllers\Api\Teachers\ImportSchedulesController',
+    ['only' => ['create','store']]);
+    Route::resource('/schedules', '\App\Http\Controllers\Api\Teachers\SchedulesController');
+      
+});
 
 
 // Route::post('/password/forgot', array('uses' => '\App\Http\Controllers\Auth\ResetPasswordController@forgot'));

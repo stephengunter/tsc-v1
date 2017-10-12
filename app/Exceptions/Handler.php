@@ -61,9 +61,9 @@ class Handler extends ExceptionHandler
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-       
+        
         if ($request->expectsJson()) {
-            return response()->json(['error' => '權限不足'], 401);
+             return response()->json(['error' => '權限不足','code' => 401 ], 401);
         }
 
         return redirect()->guest(route('login'));
@@ -72,7 +72,8 @@ class Handler extends ExceptionHandler
     {
        
         if ($request->expectsJson()) {
-            return response()->json(['error' => 'email unconfirmed'], 439);
+            return response()->json(['error' => 'email unconfirmed','code' => 439 ], 439);
+           
         }
         return redirect()->route('email-unconfirmed', ['email' => $e->email]);
         

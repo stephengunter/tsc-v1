@@ -38,6 +38,11 @@ class Teachers
         return $teacher;
        
     }
+    public function getById($id)
+    {
+        return $this->getAll()->where('user_id',$id)->first();
+       
+    }
     public function groupTeachers($id)
     {
         $teacher = $this->findOrFail($id);

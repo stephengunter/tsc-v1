@@ -158,6 +158,10 @@ class User extends Authenticatable {
 	{
 		return $this->hasOne(Admin::class);
 	}
+	public function resume()
+	{
+		return $this->hasOne(Resume::class);
+	}
 	
 	public function photoes()
 	{

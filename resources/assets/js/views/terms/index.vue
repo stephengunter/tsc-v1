@@ -26,10 +26,11 @@
                 </tr> 
             </thead>
             <tbody> 
+                <edit v-if="creating"  @saved="onCreated"  @canceled="onCreateCanceled" > </edit>
                 <edit v-for="term in termList"  :term="term" @canceled="onEditCanceled"
                      @saved="onUpdated"  @btn-delete-clicked="onBtnDeleteClicked" >
                 </edit>
-                <edit v-if="creating"  @saved="onCreated"  @canceled="onCreateCanceled" > </edit> 
+                 
             </tbody> 
             </table>
 

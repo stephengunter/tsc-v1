@@ -57,6 +57,8 @@ new Vue({
 
             this.showUpdatedBy=false
             this.updated_by=''
+
+          
         },
         setAuth(auth){
             this.isAuth=auth

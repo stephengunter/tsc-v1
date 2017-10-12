@@ -249,7 +249,7 @@
               this.user={
                   contact_info:0,
                }
-
+              
 
             },
             toBoolean(val){

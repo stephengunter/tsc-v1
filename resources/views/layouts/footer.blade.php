@@ -2,5 +2,4 @@
 <footer>
       
 </footer>
-
 @yield('scripts')

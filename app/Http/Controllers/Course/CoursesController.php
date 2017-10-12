@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Course;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use App\Course;
+use App\Schedule;
 
 use App\Repositories\Courses;
 use App\Repositories\Teachers;
@@ -215,7 +216,6 @@ class CoursesController extends BaseController
         $courseValues['removed']=false;
         $courseValues['updated_by']=$updated_by;
         $courseValues['parent']=$parent_id;
-        
 
         $categoryIds = $old_course->privateCategories()
                                     ->pluck('id')->toArray();
@@ -224,6 +224,16 @@ class CoursesController extends BaseController
                                     ->pluck('user_id')->toArray(); 
 
         $course = $this->courses->store($courseValues , $categoryIds, $teacherIds);
+
+        if(count($old_course->schedules)){
+            foreach ($old_course->schedules as $schedule) {
+                $scheduleValues=$schedule->toArray();
+                $scheduleValues['course_id']=$course->id;
+                Schedule::create($scheduleValues);
+            }
+
+        }
+
 
         return $course;
     }
@@ -297,6 +307,7 @@ class CoursesController extends BaseController
     }
     public function show($id)
     {
+        
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('courses.details')
@@ -317,7 +328,7 @@ class CoursesController extends BaseController
                 $classTime->weekday;
         }
         $course->classTimes= $course->classTimes->sortBy('weekday_id')
-                                                ->sortBy('on')->values()->all();;
+                                                ->sortBy('on')->values()->all();
         
         
         foreach ($course->teachers as $teacher) {

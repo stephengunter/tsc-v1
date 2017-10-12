@@ -9,7 +9,7 @@
 
 
     </head>
-    <body style="display:none"> 
+    <body  style="display:none"> 
             <div id="app">
                 @include('layouts.navbar')
                 <alert v-show="showAlert" :show="showAlert"  :type="alertSetting.type"

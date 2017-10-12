@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Route;
+use Auth;
 
 class BaseController extends Controller
 {
@@ -13,18 +14,22 @@ class BaseController extends Controller
     public function __construct()
     {
 		  
-          
-	}
-   
+        
+    }
+    
     
     protected function unauthorized()
     {
-        return  response()->json(['msg' => '權限不足' ]  ,  401);  
+        throw new \Illuminate\Auth\AuthenticationException();
+        //return  response()->json(['msg' => '權限不足','code' => 401 ]  ,  401);  
+                                   
     }
     protected function currentUser()
     {
-        return request()->user();
+        return Auth::user();
+      
         
     }
+    
    
 }

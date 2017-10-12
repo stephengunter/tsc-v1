@@ -29,7 +29,7 @@ class UsersController extends BaseController
 	}
     public function edit($id)
     {
-        $current_user=request()->user();
+        $current_user=$this->currentUser();
         $user = User::findOrFail($id);
         if(!$user->canEditBy($current_user)){
             return  $this->unauthorized();       
@@ -42,7 +42,7 @@ class UsersController extends BaseController
     }
     public function show($id)
     {
-        $current_user=request()->user();
+        $current_user=$this->currentUser();
         $user = User::findOrFail($id);
         if(!$user->canEditBy($current_user)){
             return  $this->unauthorized();       
@@ -57,7 +57,7 @@ class UsersController extends BaseController
     public function update(UserRequest $request, $id)
     {
         
-         $current_user=request()->user();        
+         $current_user=$this->currentUser();      
          $user = User::findOrFail($id);
          if(!$user->canEditBy($current_user)){
             return  $this->unauthorized();       
@@ -76,7 +76,7 @@ class UsersController extends BaseController
     {
         $user =$this->users->findOrFail($id);
 
-        $current_user=request()->user();
+        $current_user=$this->currentUser(); 
         if(!$user->canEditBy($current_user)){
               return  $this->unauthorized();
         }
