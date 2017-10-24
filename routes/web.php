@@ -29,6 +29,10 @@ Route::group(['middleware' => 'admin'], function()
 {
     Route::get('/', 'HomeController@index');
 
+    Route::get('admins/index-options', 'AdminsController@indexOptions');
+    Route::post('admins/import', 'AdminsController@import');
+    Route::resource('admins', 'AdminsController');
+
     Route::resource('teachers/review', '\App\Http\Controllers\Teacher\TeachersReviewController');
 
     Route::get('teachers/import', '\App\Http\Controllers\Teacher\TeachersController@import');
@@ -50,7 +54,7 @@ Route::group(['middleware' => 'admin'], function()
     Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
     Route::get('refunds/{id}/print', '\App\Http\Controllers\Signups\RefundsController@print');
 
-    Route::get('admins/index-options', 'AdminsController@indexOptions');
+   
 
     Route::post('categories/display-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
     
@@ -95,7 +99,7 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::resource('volunteers', '\App\Http\Controllers\User\VolunteersController');
 
-    Route::resource('admins', 'AdminsController');
+   
 
     Route::resource('contactinfoes', '\App\Http\Controllers\Contact\ContactInfoesController');
     Route::resource('address', '\App\Http\Controllers\Contact\AddressController');

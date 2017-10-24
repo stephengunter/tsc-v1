@@ -30,6 +30,9 @@ class Admin extends Model
                ];      
        
     }
+    
+
+
     public function centers()
     {
         return $this->belongsToMany('App\Center','center_admin','admin_id','center_id');
@@ -55,12 +58,22 @@ class Admin extends Model
             $role=Role::where('name',$roleName)->first();
             $user->attachRole($role);       
         } 
+
+        $user=$this->user;
+        if($roleName==Role::adminRoleName()){
+            $role=Role::where('name',Role::ownerRoleName())->first();
+            $user->detachRole($role); 
+        }else{
+            $role=Role::where('name',Role::adminRoleName())->first();
+            $user->detachRole($role); 
+        }
     }
 
 	public function removeRole()
 	{
-        $user=$this->user;
-		$roleName=Role::adminRoleName();		
+        
+        $roleName=Role::adminRoleName();	
+			
 		if($user->hasRole($roleName)){
             $role=Role::where('name',$roleName)->first();
             $user->detachRole($role);       

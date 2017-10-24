@@ -71,5 +71,10 @@ class Profile extends Model {
 
         return $item;
     }
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+    
 
 }

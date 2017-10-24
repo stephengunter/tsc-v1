@@ -99,8 +99,8 @@
 
                 let store=Teacher.import(form)
                 store.then(result => {
-                        // Helper.BusEmitOK()
-                        // this.$emit('saved')  
+                        Helper.BusEmitOK()
+                        this.$emit('saved')  
                     })
                     .catch(error => {
                          Helper.BusEmitError(error,'存檔失敗')

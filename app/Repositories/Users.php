@@ -90,7 +90,7 @@ class Users
    
     public function findBySID($sid,$withUser=false)
     {
-        $profile =Profile::where('SID',  $sid);
+        $profile = Profile::where('SID',  $sid);
         if($withUser) return $profile->with('user')->first();
        
         return $profile->first();      

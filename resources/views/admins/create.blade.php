@@ -3,7 +3,7 @@
 @section('content')
 
     <admin-create :user_id="userId"
-    @canceled="onCanceled" @saved="onSaved">
+    @canceled="onCanceled" @saved="onSaved" @imported="onImported">
     </admin-create>
 
 @endsection
@@ -33,7 +33,11 @@
             onSaved(admin){
                let url='/admins/' + admin.user_id
                Helper.redirect(url)
-            },            
+            },     
+            onImported(){
+                
+                this.backToIndex()
+            },       
             backToIndex(){
                 Helper.redirect('/admins')
             }

@@ -4,7 +4,13 @@
         <div class="panel-heading">           
             <span class="panel-title">
                 <h4 v-html="title"></h4>
-            </span>           
+            </span> 
+            <label  class="btn  btn-success btn-file" @click="resetImport">
+                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                Excel 匯入cccc
+                <input type="file"  ref="fileinput"  name="teachers_file" style="display: none;"  
+                @change="onFileChange" >
+            </label>          
         </div> <!--  panel  heading -->
         <div class="panel-body">
             <user-checker v-if="newUser"
@@ -128,7 +134,7 @@
                    width:1200,
                 },
 
-
+                files: [],
              
             }
         },
@@ -270,6 +276,36 @@
                     })
                     .catch(error => {
                         Helper.BusEmitError(error,'存檔失敗') 
+                    })
+            },
+            resetImport(){
+               this.$refs.fileinput.value = null
+            },
+            onFileChange(e) {
+              
+                var files = e.target.files || e.dataTransfer.files
+                if (!files.length)  return
+                   
+                this.files = e.target.files
+
+                this.submitImport()
+            },
+            submitImport() {
+                
+
+                let form = new FormData()
+                for (let i = 0; i < this.files.length; i++) {
+                    form.append('admins_file', this.files[i])
+                    
+                }
+
+                let store=Admin.import(form)
+                store.then(result => {
+                        Helper.BusEmitOK()
+                        this.$emit('imported')  
+                    })
+                    .catch(error => {
+                         Helper.BusEmitError(error,'存檔失敗')
                     })
             },
            

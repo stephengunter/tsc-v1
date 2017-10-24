@@ -25,7 +25,7 @@ use App\Events\AdminCreated;
 use App\Events\AdminDeleted;
 use App\Events\UserRegistered;
 
-
+use Illuminate\Support\Facades\Input;
 use DB;
 
 class AdminsController extends BaseController
@@ -183,59 +183,15 @@ class AdminsController extends BaseController
          $userValues=$request->getUserValues($updated_by,$removed);
          $profileValues=$request->getProfileValues($updated_by,$removed);
 
-         $user_id=$request->getUserId();   
-         $is_new_user=true;
-         if($user_id)  $is_new_user=false;
-
+         $user_id=$request->getUserId(); 
          $adminId=$request->getAdminId();
-
-         $user= DB::transaction(function() 
-                use($userValues,$profileValues,$adminValues,$user_id,$adminId)
-                {
-                    $user=null;
-                    if($user_id){
-                        $user=User::findOrFail($user_id);
-                        $user->update($userValues);
-                        $user->profile->update($profileValues);
-                    }else{
-                        $user=new User($userValues);
-                        $user->password= config('app.default_password');
-                        $user->save();
-                        $profile=new Profile($profileValues);
-                        $user->profile()->save($profile);
-                    }
-
-                    
-                    if($adminId){
-                        $admin = Admin::findOrFail($id);
-                        $admin->update($adminValues);
-                    }else{
-                        $admin=$user->admin;
-                        if(!$admin){
-                            $admin=new Admin($adminValues);  
-                            $user->admin()->save($admin);
-                        }else{
-                            $user->admin->update($adminValues);
-                        }
-                    }
-
-                   
-                    return $user;
-                });
-
-
-         $admin= Admin::findOrFail($user->id);
-
          $center_id=$adminValues['center_id'];
-         $admin->attachCenter($center_id);
 
-         event(new AdminCreated($admin, $current_user));
+         $admin=$this->admins->storeAdmin($userValues,$profileValues,$adminValues,$user_id,$adminId,$current_user,$center_id);
 
-         if($is_new_user){
-            event(new UserRegistered($user));            
-         }
-        
          return response()->json($admin); 
+
+         
     }
 
     public function show($id)
@@ -316,6 +272,43 @@ class AdminsController extends BaseController
         event(new AdminDeleted($admin, $current_user));
 
         return response()->json([ 'deleted' => true  ]);
+    }
+
+    public function import(Request $form)
+    {
+        $current_user=$this->currentUser();
+        $center_id=0;
+        if(!$current_user->isDev()){
+            $defaultCenter=$this->defaultCenter();
+            if($defaultCenter) $center_id=$defaultCenter->id;
+            else return  $this->unauthorized();  
+        }
+
+
+        
+        if($current_user->admin){
+             $center=$current_user->admin->defaultCenter();
+             if($center){
+                 $center_id=$center->id;
+             }
+        }
+
+        if(!$form->hasFile('admins_file')){
+            return   response()
+                        ->json(['admins_file' => ['無法取得上傳檔案'] 
+                            ]  ,  422);      
+        }
+
+        $current_user=$this->currentUser();
+
+        $file=Input::file('admins_file');
+      
+
+        $this->admins->importAdmins($file,$current_user);
+
+        return response()->json(['success' => true]);
+
+       
     }
     
 

@@ -64,6 +64,19 @@ class Admin {
                 })
         })
     }
+    static import(form){
+        let url = this.source() + '/import'
+        return new Promise((resolve, reject) => {
+             axios.post(url, form)
+                .then(response => {
+                     resolve(response.data);
+                })
+                .catch(error => {
+                     reject(error);
+                })
+          
+        })
+    }
     static show(id) {
         return new Promise((resolve, reject) => {
             let url = this.showUrl(id)

@@ -297,6 +297,7 @@ class Teachers
                 $sid=trim($row['id']);
                 if($sid){
                     $exist_user=$this->users->findBySID(strtoupper($sid));
+                   
                 }
 
                 
@@ -366,11 +367,11 @@ class Teachers
                 ];
                 
                 $user_id=0;
-                if($exist_user) $user_id=$exist_user->user_id;
+                if($exist_user) $user_id=$exist_user->getUserId();
 
                 $teacher_id=0;
                 if($exist_user){
-                    if($exist_user->teacher) $teacher_id=$exist_user->user_id;
+                    if($exist_user->teacher) $teacher_id=$exist_user->getUserId();
                 }
 
                 $teacher=$this->storeTeacher($userValues,$profileValues,$teacherValues,$user_id,$teacher_id,$current_user);

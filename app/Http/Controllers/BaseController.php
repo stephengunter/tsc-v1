@@ -28,6 +28,13 @@ class BaseController extends Controller
         return null;
         
     }
+    protected function defaultCenter()
+    {        
+        $admin=auth()->user()->admin;
+        if($admin) return $admin->defaultCenter();
+        return null;
+        
+    }
 
 
     protected function unauthorized()

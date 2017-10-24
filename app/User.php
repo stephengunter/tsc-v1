@@ -345,6 +345,11 @@ class User extends Authenticatable {
 		
 	}
 
+	public function getUserId()
+	{
+		return $this->id;
+	}
+
 	
 
 	
