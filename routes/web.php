@@ -8,7 +8,7 @@
 Route::get('test', function(){
     return view('test');
 });
-Route::get('/', 'HomeController@index');
+
 Route::get('errors', function(){
      return view('errors');
 });
@@ -24,152 +24,148 @@ Route::get('email-confirmation/user/{user}/token/{token}','\App\Http\Controllers
 
 Route::get('reset-password/user/{user}/token/{token}','\App\Http\Controllers\Auth\ResetPasswordController@create');
 
-Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
-Route::put('users/{user}/update-photo',['uses'=>'\App\Http\Controllers\User\UsersController@updatePhoto']);
-Route::post('users/find-users', ['uses' => '\App\Http\Controllers\User\UsersController@findUsers']);
 
-Route::get('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@create');
-Route::post('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@store');
-Route::post('signups/update-user', '\App\Http\Controllers\Signups\SignupsController@updateUser');
-Route::get('signups/index-options', '\App\Http\Controllers\Signups\SignupsController@indexOptions');
-Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsController@statusOptions');
-Route::get('signups/{id}/print', '\App\Http\Controllers\Signups\SignupsController@print');
+Route::group(['middleware' => 'admin'], function()
+{
+    Route::get('/', 'HomeController@index');
 
-Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
-Route::get('refunds/{id}/print', '\App\Http\Controllers\Signups\RefundsController@print');
+    Route::resource('teachers/review', '\App\Http\Controllers\Teacher\TeachersReviewController');
 
-Route::put('categories/{id}/update-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
+    Route::get('teachers/import', '\App\Http\Controllers\Teacher\TeachersController@import');
+    Route::post('teachers/import', '\App\Http\Controllers\Teacher\TeachersController@importTeachers');
+    Route::post('teachers/update-review', '\App\Http\Controllers\Teacher\TeachersController@updateReview');
+    
 
-Route::get('admins/index-options', 'AdminsController@indexOptions');
+    Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
+    Route::put('users/{user}/update-photo',['uses'=>'\App\Http\Controllers\User\UsersController@updatePhoto']);
+    Route::post('users/find-users', ['uses' => '\App\Http\Controllers\User\UsersController@findUsers']);
 
+    Route::get('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@create');
+    Route::post('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@store');
+    Route::post('signups/update-user', '\App\Http\Controllers\Signups\SignupsController@updateUser');
+    Route::get('signups/index-options', '\App\Http\Controllers\Signups\SignupsController@indexOptions');
+    Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsController@statusOptions');
+    Route::get('signups/{id}/print', '\App\Http\Controllers\Signups\SignupsController@print');
 
-Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
-Route::get('courses/sub-courses', '\App\Http\Controllers\Course\CoursesController@subCourses');
-Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
-Route::get('courses/group-options', '\App\Http\Controllers\Course\CoursesController@groupOptions');
-Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
+    Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
+    Route::get('refunds/{id}/print', '\App\Http\Controllers\Signups\RefundsController@print');
 
-Route::post('courses/import', '\App\Http\Controllers\Course\CoursesController@import');
-Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);
+    Route::get('admins/index-options', 'AdminsController@indexOptions');
 
-Route::get('lessons/{id}/print', '\App\Http\Controllers\Course\LessonsController@print');
+    Route::post('categories/display-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
+    
 
-Route::get('teachers/options', '\App\Http\Controllers\Teacher\TeachersController@options');
-
-Route::put('group-teachers/{id}/remove', '\App\Http\Controllers\Teacher\GroupTeachersController@remove');
-
-Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
-Route::put('centers/{id}/display-order',['uses'=>'\App\Http\Controllers\Settings\CentersController@updateDisplayOrder']);
-Route::put('centers/{id}/update-photo',['uses'=>'\App\Http\Controllers\Settings\CentersController@updatePhoto']);
-
-Route::post('scores/export', '\App\Http\Controllers\Students\ScoresController@export');
-Route::post('scores/import', '\App\Http\Controllers\Students\ScoresController@import');
-Route::post('files/upload', '\App\Http\Controllers\FilesController@upload');
-
-Route::get('notices-email', '\App\Http\Controllers\Notice\NoticesController@email');
+    Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
+    Route::get('courses/sub-courses', '\App\Http\Controllers\Course\CoursesController@subCourses');
+    Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
+    Route::get('courses/group-options', '\App\Http\Controllers\Course\CoursesController@groupOptions');
+    Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
 
 
-Route::resource('home', 'HomeController');
+    Route::post('courses/import', '\App\Http\Controllers\Course\CoursesController@import');
+    Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);
 
-Route::resource('change-password', '\App\Http\Controllers\Auth\ChangePasswordController',['only' => ['index','store']]);
-Route::resource('forgot-password', '\App\Http\Controllers\Auth\ForgotPasswordController',['only' => ['index','store']]);
-Route::resource('reset-password', '\App\Http\Controllers\Auth\ResetPasswordController',['only' => ['store']]);
+    Route::get('lessons/{id}/print', '\App\Http\Controllers\Course\LessonsController@print');
 
-Route::resource('users', '\App\Http\Controllers\User\UsersController');
-Route::resource('user-roles', '\App\Http\Controllers\User\UserRolesController');
-Route::resource('user-centers', '\App\Http\Controllers\User\UserCenterController');
-Route::resource('titles', '\App\Http\Controllers\User\TitlesController');
-Route::resource('photoes', 'PhotoesController');
+    Route::get('teachers/options', '\App\Http\Controllers\Teacher\TeachersController@options');
 
-Route::resource('volunteers', '\App\Http\Controllers\User\VolunteersController');
+    Route::put('group-teachers/{id}/remove', '\App\Http\Controllers\Teacher\GroupTeachersController@remove');
 
-Route::resource('admins', 'AdminsController');
+    Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
+    Route::post('centers/display-order',['uses'=>'\App\Http\Controllers\Settings\CentersController@updateDisplayOrder']);
+    Route::put('centers/{id}/update-photo',['uses'=>'\App\Http\Controllers\Settings\CentersController@updatePhoto']);
 
-Route::resource('contactinfoes', '\App\Http\Controllers\Contact\ContactInfoesController');
-Route::resource('address', '\App\Http\Controllers\Contact\AddressController');
-Route::resource('cities', '\App\Http\Controllers\Contact\CitiesController', ['only' => ['index']]);
-Route::resource('districts', '\App\Http\Controllers\Contact\DistrictsController', ['only' => ['index']]);
+    Route::post('scores/export', '\App\Http\Controllers\Students\ScoresController@export');
+    Route::post('scores/import', '\App\Http\Controllers\Students\ScoresController@import');
+    Route::post('files/upload', '\App\Http\Controllers\FilesController@upload');
 
-Route::resource('signups', '\App\Http\Controllers\Signups\SignupsController');
-Route::resource('tuitions', '\App\Http\Controllers\Signups\TuitionsController');
-Route::resource('back-tuitions', '\App\Http\Controllers\Signups\BackTuitionsController');
-Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
-
-Route::resource('notices', '\App\Http\Controllers\Notice\NoticesController');
-
-Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
-Route::resource('statuses', '\App\Http\Controllers\Course\StatusesController',
-                                 ['only' => ['index','show','edit','update']]);
-Route::resource('admissions', '\App\Http\Controllers\Course\AdmissionsController');  
-Route::resource('course-registers', '\App\Http\Controllers\Course\RegistersController');  
-Route::resource('students', '\App\Http\Controllers\Course\StudentsController');  
-Route::resource('scores', '\App\Http\Controllers\Students\ScoresController',
-                                        ['only' => ['index','store']]);   
-
-Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
-                                        ['only' => ['show','edit','update']]);
-Route::resource('classtimes', '\App\Http\Controllers\Course\ClassTimesController');
-Route::resource('schedules', '\App\Http\Controllers\Course\SchedulesController');
-Route::resource('import-schedules', '\App\Http\Controllers\Course\ImportSchedulesController', 
-                                     ['only' => ['create','store']]);
-Route::resource('lessons', '\App\Http\Controllers\Course\LessonsController');
-Route::resource('lessons-initialize', '\App\Http\Controllers\Course\LessonsInitializeController', 
-                                     ['only' => ['create','store']]);   
-Route::resource('lesson-participants', '\App\Http\Controllers\Course\LessonParticipantsController',
-                                     ['only' => ['index','update']]);   
-Route::resource('leaves', '\App\Http\Controllers\Course\LeavesController');
-
-Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController');                                                                  
-Route::resource('category-courses', '\App\Http\Controllers\Course\CategoryCourseController');                                                                  
+    Route::get('notices-email', '\App\Http\Controllers\Notice\NoticesController@email');
 
 
-Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');
-Route::resource('group-teachers', '\App\Http\Controllers\Teacher\GroupTeachersController',
-                                                                ['only' => ['show','store']]);   
+    
 
-Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');
-Route::resource('identities', '\App\Http\Controllers\Discounts\IdentitiesController');
+    Route::resource('change-password', '\App\Http\Controllers\Auth\ChangePasswordController',['only' => ['index','store']]);
+    Route::resource('forgot-password', '\App\Http\Controllers\Auth\ForgotPasswordController',['only' => ['index','store']]);
+    Route::resource('reset-password', '\App\Http\Controllers\Auth\ResetPasswordController',['only' => ['store']]);
 
-Route::resource('terms', '\App\Http\Controllers\Settings\TermsController');
-Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
-Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController');
-Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
 
-Route::resource('courses-report', '\App\Http\Controllers\Reports\CourseListController',
-                                     ['only' => ['index','store']]);  
 
-// Route::group(['prefix' => 'api/'], function() {
-//     Route::resource('sessions', '\App\Http\Controllers\Auth\SessionsController');
-//     Route::resource('home', 'HomeController');
-//     Route::resource('users', 'UsersController');
-//     Route::resource('user-roles', 'UserRolesController');
-//     Route::resource('teachers', 'TeachersController');
-//     Route::resource('photoes', 'PhotoesController');
-//     Route::resource('address', 'AddressController');
-//     Route::resource('contactinfo', 'ContactInfoController');
-//     Route::resource('centers', 'CentersController');
-//     Route::resource('categories', 'CategoriesController');
-//     Route::resource('courses', 'CoursesController');
-//     Route::resource('classtimes', 'ClassTimesController');
-//     Route::resource('schedules', 'SchedulesController');
-//     Route::resource('terms', 'TermsController');
-//     Route::resource('classrooms', 'ClassroomsController');
-//     Route::resource('lessons', 'LessonsController');
-//     Route::resource('titles', 'TitlesController');
-//     Route::resource('volunteers', 'VolunteersController'); 
-//     Route::resource('admins', 'AdminsController');   
-//     Route::resource('holidays', 'HolidaysController');
-//     Route::resource('centerteacher', 'CenterTeacherController');
-//     Route::resource('centervolunteer', 'CenterVolunteerController');
-//     Route::resource('centeradmin', 'CenterAdminController');
-//     Route::resource('category-course', 'CategoryCourseController');
-//     Route::resource('discounts', 'DiscountsController');
-//     Route::resource('identities', 'IdentitiesController');
-//     Route::resource('signups', 'SignupsController');
-//     Route::resource('tuitions', 'TuitionsController');
-//     Route::resource('back-tuitions', 'BackTuitionsController');
-//     Route::resource('refunds', 'RefundsController');
-// });
+    Route::resource('titles', '\App\Http\Controllers\User\TitlesController');
+    Route::resource('photoes', 'PhotoesController');
+
+    Route::resource('volunteers', '\App\Http\Controllers\User\VolunteersController');
+
+    Route::resource('admins', 'AdminsController');
+
+    Route::resource('contactinfoes', '\App\Http\Controllers\Contact\ContactInfoesController');
+    Route::resource('address', '\App\Http\Controllers\Contact\AddressController');
+    Route::resource('cities', '\App\Http\Controllers\Contact\CitiesController', ['only' => ['index']]);
+    Route::resource('districts', '\App\Http\Controllers\Contact\DistrictsController', ['only' => ['index']]);
+
+    Route::resource('signups', '\App\Http\Controllers\Signups\SignupsController');
+    Route::resource('tuitions', '\App\Http\Controllers\Signups\TuitionsController');
+    Route::resource('back-tuitions', '\App\Http\Controllers\Signups\BackTuitionsController');
+    Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
+
+    Route::resource('notices', '\App\Http\Controllers\Notice\NoticesController');
+
+    Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
+    Route::resource('statuses', '\App\Http\Controllers\Course\StatusesController',
+                                    ['only' => ['index','show','edit','update']]);
+    Route::resource('admissions', '\App\Http\Controllers\Course\AdmissionsController');  
+    Route::resource('course-registers', '\App\Http\Controllers\Course\RegistersController');  
+    Route::resource('students', '\App\Http\Controllers\Course\StudentsController');  
+    Route::resource('scores', '\App\Http\Controllers\Students\ScoresController',
+                                            ['only' => ['index','store']]);   
+
+    Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
+                                            ['only' => ['show','edit','update']]);
+    Route::resource('classtimes', '\App\Http\Controllers\Course\ClassTimesController');
+    Route::resource('schedules', '\App\Http\Controllers\Course\SchedulesController');
+    Route::resource('import-schedules', '\App\Http\Controllers\Course\ImportSchedulesController', 
+                                        ['only' => ['create','store']]);
+    Route::resource('lessons', '\App\Http\Controllers\Course\LessonsController');
+    Route::resource('lessons-initialize', '\App\Http\Controllers\Course\LessonsInitializeController', 
+                                        ['only' => ['create','store']]);   
+    Route::resource('lesson-participants', '\App\Http\Controllers\Course\LessonParticipantsController',
+                                        ['only' => ['index','update']]);   
+    Route::resource('leaves', '\App\Http\Controllers\Course\LeavesController');
+
+    Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController');                                                                  
+    
+    
+    
+    Route::resource('category-courses', '\App\Http\Controllers\Course\CategoryCourseController');                                                                  
+
+
+    Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');
+    Route::resource('group-teachers', '\App\Http\Controllers\Teacher\GroupTeachersController',
+                                                                    ['only' => ['show','store']]);   
+
+    Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');
+    Route::resource('identities', '\App\Http\Controllers\Discounts\IdentitiesController');
+
+    Route::resource('terms', '\App\Http\Controllers\Settings\TermsController');
+    Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
+    Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController');
+    Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
+
+    Route::resource('courses-report', '\App\Http\Controllers\Reports\CourseListController',
+                                        ['only' => ['index','store']]);  
+
+
+    Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
+    Route::resource('user-centers', '\App\Http\Controllers\User\UserCenterController');
+    Route::resource('users', '\App\Http\Controllers\User\UsersController');
+    Route::resource('user-roles', '\App\Http\Controllers\User\UserRolesController');
+                                           
+});
+
+Route::group(['middleware' => 'owner'], function()
+{
+    Route::resource('admins', '\App\Http\Controllers\AdminsController');
+                                           
+});
 
 
 

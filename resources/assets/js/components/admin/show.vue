@@ -35,7 +35,7 @@
                  </div>
                  <div class="col-sm-3">
                       <label class="label-title">狀態</label>
-                      <p v-html="$options.filters.activeLabel(admin.active)">                       
+                      <p v-html="statusLabel(admin.active)">                       
                       </p>                      
                  </div>
                  <div class="col-sm-3">
@@ -46,7 +46,13 @@
                  </div>
                 
             </div>   <!-- End row-->
-       
+            <div class="row">
+               <div class="col-sm-12">
+                    <label class="label-title">所屬中心</label>
+                    <p v-html="getCenterNames(admin.centers)"></p> 
+                                    
+                </div>
+            </div>   <!-- End row-->
         </div><!-- End panel-body-->
     </div>
   
@@ -111,6 +117,12 @@
                 .catch(error=> {
                     Helper.BusEmitError(error)
                 })
+            },
+            getCenterNames(centers){
+                return Admin.getCenterNames(centers)
+            },
+            statusLabel(active){
+               return Admin.statusLabel(active)
             },
             onBtnEditClicked(){   
               this.$emit('begin-edit') 

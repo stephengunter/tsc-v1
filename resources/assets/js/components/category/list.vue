@@ -1,67 +1,88 @@
 <template>
-    <data-viewer v-if="loaded"  :default_search="defaultSearch" 
-      :default_order="defaultOrder"  :default_direction="defaultDirection"
-      :source="source"   :thead="thead" :no_search="can_select"  
-      :filter="filter"  :title="title" :create_text="createText" 
-      :no_page="no_page"
-      @refresh="init" :version="current_version"   @beginCreate="beginCreate"
-       @dataLoaded="onDataLoaded">
-         
-        
-        
-        <template scope="props">
-            <row :category="props.item" 
-               @selected="onRowSelected"
-               @display-up="onDisplayUp" @display-down="onDisplayDown">
+    <div class="panel panel-default">
+        <div  class="panel-heading">
+            <div class="panel-title">
+                <h4 v-html="title">
+                </h4>
+            </div>
+            <div>
+                <a @click="beginCreate" class="btn btn-primary">
+                    新增課程分類
+                </a>
                 
-            </row>
-        </template>
-
-    </data-viewer>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th> 分類名稱 </th>
+                        <th> 類型</th>
+                        <th> 小圖 </th>
+                        <th> 狀態 </th>
+                       
+                        <th v-show="!edittingOrder">
+                            順序
+                            <button v-show="hasData" @click="beginEditOrder" class="btn btn-primary btn-xs">
+                                <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                        </th>
+                        <th v-show="edittingOrder">
+                            順序
+                            <button @click="onSubmitDisplayOrders" class="btn btn-success btn-xs">
+                                <span aria-hidden="true" class="glyphicon glyphicon-floppy-disk" ></span>
+                            </button>
+                            <button @click="cancelEditOrder" class="btn btn-default btn-xs">
+                                <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                   
+	                    <row  v-for="(category, index) in categories" 
+	                     :category="category" :index="index" :editting_order="edittingOrder"
+			               @selected="onRowSelected" @clear-error="clearErrorMsg" >
+			            </row>  
+                   
+                </tbody>  
+            </table>
+        </div>
+    </div>
 
 </template>
 
 <script>
-    import Row from './row.vue'
+    import Row from './row.vue' 
     export default {
         name: 'CategoryList',
         components: {
             Row
         },
         props: {
-            hide_create: {
-              type: Boolean,
-              default: false
+            can_create:{
+               type: Boolean,
+               default: false
+            },
+            can_edit:{
+               type: Boolean,
+               default: false
             },
             version:{
                type: Number,
                default: 0
-            },
-            can_select:{
-               type: Boolean,
-               default: true
-            },
-            no_page:{
-               type: Boolean,
-               default: true
-            },
+            }
         },
-        beforeMount() {
-           this.init()
+        watch: {
+            version: function () {
+               this.current_version += 1
+            }
         },
         data() {
             return {
-                title:Helper.getIcon(Category.title())  + '  課程分類',
-                loaded:false,
-                source: Category.source(),
+                 title:Helper.getIcon(Category.title())  + '  課程分類',
                 
-                defaultSearch:'name',
-                defaultOrder:'order',   
-                defaultDirection:'desc',   
-
-                create: Category.createUrl(),
-                
-                thead: [{
+                 thead: [{
                         title: '分類名稱',
                         key: 'name',
                         sort: false,
@@ -83,65 +104,107 @@
                         key: 'active',
                         sort: false,
                         default:true
-                    }, {
-                        title: '顯示順序',
-                        key: 'order',
-                        sort: false,
-                        default:true
                     }],
-               
+                
+                edittingOrder: false,
 
-                filter:[],
-
-                current_version:0,
-
-                hasData:false,
+                categories:[],
+                canEdit:false
+                
              
             }
         },
-        watch: {
-            version: function () {
-               this.current_version += 1
-            }
-        },
         computed: {
-            createText(){
-                if(this.hide_create) return ''
-                return '新增分類'
+            hasData() {
+              return this.categories.length > 0
             },
+        },
+        beforeMount() {
+           this.init()
         },
         methods: {
             init() {
-                this.loaded=true
+                this.edittingOrder=false
+                this.categories=[]
+                this.canEdit=false
+                this.fetchData()
             },
+            fetchData(){
+                let getData=Category.index()
+                getData.then(data => {
+                    this.canEdit = data.canEdit
+                    for(let i=0; i<data.categories.length ; i++){
+	                    let category=data.categories[i]
+	                    category.error=''
+	                   
+	                }
+                    this.categories=data.categories
 
-            onDataLoaded(data){
-                this.hasData=data.model.total
+                    
+                    this.loaded=true
+                    
+                })
+                .catch(error=> {
+                    Helper.BusEmitError(error)
+                })
             },
-            onRowSelected(id){
+            
+            onSelected(id){
                 this.$emit('selected',id)
+            },
+            clearErrorMsg(index){
+                let category=this.categories[index]
+                category.error= ''
             },
             
             beginCreate(){
                  this.$emit('begin-create')
             },
-            onDisplayUp(id){
-                this.updateDisplayOrder(id,true)
-            },  
-            onDisplayDown(id){
-                this.updateDisplayOrder(id,false)
+            beginEditOrder(){
+                this.edittingOrder=true
             },
-            updateDisplayOrder(id,up){
-                let update=Category.updateDisplayOrder(id,up) 
-              
-                update.then(data => {
-                   this.current_version += 1                           
-                })
-                .catch(error => {
-                    Helper.BusEmitError(error) 
-                })
+            cancelEditOrder(){
+                 this.init()
+            },
+            onRowSelected(id){
+                this.$emit('selected',id)
             },
            
+            onSubmitDisplayOrders(){
+               this.hasError=true
+               let errors=0
+               for(let i=0; i<this.categories.length ; i++){
+                    let category=this.categories[i]
+                    let val=category.order
+                    if(isNaN(val) || val.length < 1){
+                          category.error= '必須為數字'
+                          errors+=1
+                    }else{
+                        category.error= ''
+                    }
+                   
+                }
+              
+                if(errors==0) {
+                    this.updateDisplayOrder()
+                }
+            },
+            updateDisplayOrder(){
+               
+                let form=new Form({
+                    categories:this.categories
+                })
+                let save=Category.updateDisplayOrder(form)
+                save.then(result => {
+                        Helper.BusEmitOK()
+                        this.init()
+                    })
+                    .catch(error => {
+                         Helper.BusEmitError(error,'存檔失敗')
+                    })
+            },
+            
+            
         },
 
     }

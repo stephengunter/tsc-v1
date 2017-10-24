@@ -25,22 +25,53 @@ class ContactInfo extends Model {
         ];
     }
 
-	public function addressA()
+	public function addressA($with_full_text=true)
 	{
 		if(!$this->contactAddress) return null;
 		$address=Address::find($this->contactAddress);
 		if(!$address) return null;
-		$address['fullText'] = $address->fullText();
+
+		if($with_full_text)  $address['fullText'] = $address->fullText();
+		
 		return $address;
 
 	}
-	public function addressB()
+	public function addressB($with_full_text=true)
 	{
 		if(!$this->residenceAddress) return null;
 		$address=Address::find($this->residenceAddress);	
 		if(!$address) return null;
-		$address['fullText'] = $address->fullText();	
+		if($with_full_text)  $address['fullText'] = $address->fullText();	
 		return $address;
+	}
+
+	public function updateAddress($zipcode, $street , $updated_by)
+	{
+		$addressA=$this->addressA(false);
+		if($addressA){
+			$addressA->updateByZipcode($zipcode,$street,$updated_by);
+			$this->updated_by=$updated_by;
+			$this->save();
+		}else{
+			$address=Address::createByZipcode($zipcode,$street,$updated_by);
+			if($address) {
+				$this->contactAddress=$address->id;
+				$this->updated_by=$updated_by;
+				$this->save();
+			}
+		}
+	}
+	public static function createByAddress($zipcode, $street, $updated_by)
+	{
+		$address=Address::createByZipcode($zipcode,$street,$updated_by);
+		if($address){
+			$values=static::initialize();
+			$values['contactAddress']=$address->id;
+			return static::create($values);
+		}else{
+			return null;
+		}
+		
 	}
 
 	public function getUser()
@@ -56,6 +87,7 @@ class ContactInfo extends Model {
 	}
 	public function canViewBy($user)
 	{
+		
 		if(!$user) return false;
 		if($this->getUser()){
 			return $this->getUser()->canViewBy($user);

@@ -2,7 +2,7 @@
     <div class="panel panel-default show-data">
         <div class="panel-heading">
             <span class="panel-title">
-                <h4 v-html="getTitle()">
+                <h4 v-html="titleHtml">
                 </h4>
             </span> 
         </div>  <!-- End panel-heading-->
@@ -12,7 +12,12 @@
                     <ul style="list-style-type: square;">
                         <li> 
                             <a :href="item.path"> {{ item.text  }} </a>
+                            <span v-if="hasUnReviewTeachers(item.path)" class="badge badge-pill  badge-primary">
+                               {{ badges.unreviewTeachers  }}
+                            </span>
+                           
                         </li> 
+                        
                     </ul>                 
                 </div>
                
@@ -24,12 +29,38 @@
 
 <script>
     export default {
-        name: 'MenuItem',
-        props:['title','items'],
-        
+        name: 'MenuItem',       
+        props: {
+            title: {
+                type: String,
+                default: ''
+            },
+            items:{
+                type: Array,
+                default: []
+            },
+            badges: {
+                type: Object,
+                default: null
+            },
+            
+        },
+        data() {
+            return {
+                titleHtml:'',
+                unReviewTeachers:0
+            }
+        },
+        beforeMount(){
+            this.init()
+        },
         methods: {
-            getTitle() {
+            init(){
                 let title=this.title.toLowerCase()
+                this.titleHtml=this.getTitle(title)
+               
+            },
+            getTitle(title) {
                 let html= Helper.getIcon(title) 
                 switch (title) {
                     case 'users':
@@ -68,10 +99,14 @@
                 }
 
                 return html
-            
-
                 
             },
+            
+            hasUnReviewTeachers(path){
+                if(path!='/teachers/review') return false
+                if(!this.badges)  return false
+                return this.badges.unreviewTeachers > 0
+            }
         },
 
     }

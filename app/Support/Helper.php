@@ -88,17 +88,17 @@ class Helper
     }
     public static function centersCanAddByAdmin($entity,$admin)
 	{
-        $centerIds=[];
-        if($entity->centers()->count()){
-			 $centerIds = Center::where('removed',false)
-                            ->whereNotIn('id' , $entity->centers()->pluck('id'))
-                             ->pluck('id')->toArray();
-
-		}else{
-          	$centerIds= Center::where('removed',false)->pluck('id')->toArray();
-		}
+        $centersCanAdd=static::centersCanAdd($entity)->pluck('id')->toArray();        
+        
+        $admin_center_ids=[];
+        $admin_centers=$admin->centersCanAdmin();
+        if($admin_centers){
+            $admin_center_ids=$admin_centers->pluck('id')->toArray();
+        }
 		
-        $canAddIds= array_intersect($centerIds, $admin->centers()->pluck('id')->toArray());
+        $canAddIds= array_intersect($centersCanAdd, $admin_center_ids);
+        
+        
         if(!count($canAddIds)) return null;
         return Center::where('removed',false)->whereIn('id' , $canAddIds)->get();
 	}

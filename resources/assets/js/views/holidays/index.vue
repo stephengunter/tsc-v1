@@ -11,7 +11,7 @@
                 </select>
             </div>
             <div>
-                <button class="btn btn-primary btn-sm" @click.prevent="beginCreate">
+                <button :disabled="creating" v-if="can_edit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
                 </button>
             </div>
@@ -85,6 +85,8 @@
             return {
                 loaded:false,
                 creating:false,
+
+                can_edit:false,
                 year:0,
                 yearOptions:[],
                 
@@ -103,6 +105,7 @@
             init() {
                 this.loaded=false
                 this.creating=false
+                this.can_edit=false
 
                 this.deleteConfirm={
                     id:0,
@@ -122,7 +125,7 @@
             fetchData() {
                 let getData=Holiday.index(this.year)
                     getData.then(data => {
-                      
+                      this.can_edit=data.canEdit
                        this.holidayList=data.holidayList
                        this.loaded = true
                         

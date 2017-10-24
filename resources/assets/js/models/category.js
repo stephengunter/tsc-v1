@@ -48,6 +48,19 @@ class Category {
            
         })
     }
+    static index(){
+        let url = this.source() 
+        return new Promise((resolve, reject) => {
+            axios.get(url)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
     static store(form){
         let url =this.storeUrl() 
         let method='post'
@@ -100,21 +113,19 @@ class Category {
                 })
         })
     }
-    static updateDisplayOrder(id,up){
-        let url =this.updateUrl(id) + '/update-order'
-        let method='put'
-        let form = new Form({                        
-                         up: up
-                    })
+    static updateDisplayOrder(form){
         return new Promise((resolve, reject) => {
-            form.submit(method,url)
-                .then(data => {
-                    resolve(data);
-                })
-                .catch(error => {
-                    reject(error);
-                })
+            
+            let url=this.storeUrl() + '/display-order'
+            form.post(url)
+            .then(data => {
+                resolve(data);
+            })
+            .catch(error => {
+                reject(error);
+            })
         })
+        
     }
     static delete(id) {
         return new Promise((resolve, reject) => {

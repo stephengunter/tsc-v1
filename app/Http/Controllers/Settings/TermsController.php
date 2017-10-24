@@ -16,16 +16,10 @@ use App\Support\Helper;
 class TermsController extends BaseController
 {
     protected $key='settings';
-    public function __construct(Terms $terms, CheckAdmin $checkAdmin)
+    public function __construct(Terms $terms)
     {
-	    $exceptAdmin=[];
-        $allowVisitors=[];
-		$this->setMiddleware( $exceptAdmin, $allowVisitors);
-
 
 		$this->terms=$terms;
-        
-        $this->setCheckAdmin($checkAdmin);
 	}
 
     public function index()
@@ -38,6 +32,8 @@ class TermsController extends BaseController
                       ->with(['menus' => $menus]);  
                     
         }
+        $current_user=$this->currentUser();
+        $can_edit=Term::canEdit($current_user);
         
         $termList=$this->terms->getAll()
                               ->orderBy('active','desc')->orderBy('number','desc')
@@ -47,12 +43,15 @@ class TermsController extends BaseController
             $current_user=$this->currentUser();
             foreach ($termList as $term) {
                 $term->canDelete = $term->canDeleteBy($current_user);
-                $term->canEdit = $term->canEditBy($current_user);
+                $term->canEdit = $can_edit;
             }
         }
         
         
-        return response() ->json(['termList' => $termList ]);          
+        return response() ->json([
+                'termList' => $termList,
+                'can_edit' => $can_edit
+            ]);          
     }
 
     public function create()
@@ -78,6 +77,7 @@ class TermsController extends BaseController
                              ]  ,  422);
         }
 
+        
         $term= $this->terms->store($values);
         return response() ->json($term);
     }
@@ -116,6 +116,7 @@ class TermsController extends BaseController
                              ]  ,  422);
         }
 
+       
         $term= $this->terms->update($values,$id);
 
         return response() ->json($term);

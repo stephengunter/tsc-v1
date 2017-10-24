@@ -6,6 +6,7 @@ use DB;
 use App\User;
 use App\Role;
 use App\Profile;
+use App\ContactInfo;
 
 use App\Support\Helper;
 
@@ -87,7 +88,7 @@ class Users
     }
     
    
-    public function findBySID($sid,$withUser)
+    public function findBySID($sid,$withUser=false)
     {
         $profile =Profile::where('SID',  $sid);
         if($withUser) return $profile->with('user')->first();
@@ -190,6 +191,34 @@ class Users
         return true;
         
     }
+
+    public function findUsers($email, $phone)
+    {
+        $allUsers = $this->getAll();
+        $userList=[];
+        $users=[];
+        if(!$email){
+            $users = $allUsers->where('phone',$phone);
+        }else{
+            $users = $allUsers->where('phone',$phone)
+                    ->orWhere('email',$email);
+        };
+
+        if($users->count()){
+            $userList=$users->with('profile')->get();
+        }
+
+        return $userList;
+    }
+
+    public function updateAddress($user_id, $zipcode, $street,$updated_by)
+    {
+        $user=$this->findOrFail($user_id);
+        $user->updateAddress($user_id, $zipcode, $street,$updated_by);
+       
+    }
+
+    
 
     
    

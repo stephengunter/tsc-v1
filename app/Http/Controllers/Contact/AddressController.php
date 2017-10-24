@@ -13,17 +13,7 @@ use App\Http\Middleware\CheckAdmin;
 
 class AddressController extends BaseController
 {
-    public function __construct(CheckAdmin $checkAdmin)
-    {
-        
-          $exceptAdmin=[];
-          $allowVisitors=[];
-
-          $this->setMiddleware( $exceptAdmin, $allowVisitors);
-        
-          $this->setCheckAdmin($checkAdmin);
-          
-	}
+    
     public function create()
     {
         

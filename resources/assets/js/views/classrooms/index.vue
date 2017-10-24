@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="panel panel-default show-data">
+    <div class="panel panel-default">
         <div class="panel-heading">
             <span class="panel-title">
                 <h4><i class="fa fa-bell-o" aria-hidden="true"></i> 教室管理</h4>
@@ -12,7 +12,7 @@
                 </select>
             </div>
             <div>
-                <button class="btn btn-primary btn-sm" @click.prevent="beginCreate">
+                <button :disabled="creating" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
                 </button>
             </div>
@@ -70,14 +70,7 @@
              Edit,
         },
         beforeMount() {
-           let options=this.loadOptions()
-           options.then(value => {
-                       this.center=value
-                       this.init()
-                    })
-                    .catch(error => {
-                        Helper.BusEmitError(error)
-                    })
+            this.init()
            
         },
         computed:{
@@ -95,7 +88,6 @@
                 centerOptions:[],
                 
                 classroomList:[],
-
                 
 
                 deleteConfirm:{
@@ -111,32 +103,27 @@
                 this.loaded=false
                 this.creating=false
 
+                this.center=0
+
                 this.deleteConfirm={
                     id:0,
                     show:false,
                     msg:''
                 }
+                this.centerOptions=[]
                 this.classroomList=[]
 
 
                 this.fetchData()
             }, 
-            loadOptions(){
-                return new Promise((resolve, reject) => {
-                    let options=Center.options()
-                    options.then(data => {
-                        this.centerOptions=data.options
-                        resolve(this.centerOptions[0].value);
-                    })
-                    .catch(error => {
-                        reject(error);
-                    })
-                })   //End Promise
-            },
             fetchData() {
                 let getData=Classroom.index(this.center)
                     getData.then(data => {
-                      
+                       
+                       if(data.centerOptions){
+                           this.centerOptions=data.centerOptions
+                           this.center=this.centerOptions[0].value
+                       }
                        this.classroomList=data.classroomList
                        this.loaded = true
                         

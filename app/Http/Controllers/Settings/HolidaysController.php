@@ -14,18 +14,11 @@ use App\Support\Helper;
 class HolidaysController extends BaseController
 {
     protected $key='settings';
-    public function __construct(CheckAdmin $checkAdmin) {
-        
-		$exceptAdmin=[];
-        $allowVisitors=[];
-		$this->setMiddleware( $exceptAdmin, $allowVisitors);
-
-
-        $this->setCheckAdmin($checkAdmin);
-	}
+    
    
-   public function index()
+    public function index()
     {
+       
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('settings.holiday')
@@ -33,19 +26,26 @@ class HolidaysController extends BaseController
                     
         }
 
+        $current_user=$this->currentUser();
+        $canEdit=Holiday::canEdit($current_user);
+        
+
         $year=request()->get('year');
         $holidayList=Holiday::whereYear('date',$year)->orderBy('date')->get();
        
         if(count($holidayList)){
-            $current_user=$this->currentUser();
             foreach ($holidayList as $holiday) {
-                $holiday->canDelete = $holiday->canDeleteBy($current_user);
-                $holiday->canEdit = $holiday->canEditBy($current_user);
+                $holiday->canDelete = $canEdit;
+                $holiday->canEdit = $canEdit;
             }
         }
         
        
-        return response() ->json([ 'holidayList' => $holidayList ]);
+        return response() ->json([ 
+                                    'holidayList' => $holidayList,
+                                    'canEdit' => $canEdit
+                                    
+                                 ]);
     }
     public function create()
     {
@@ -55,6 +55,9 @@ class HolidaysController extends BaseController
     public function store(HolidayRequest $request)
     {
         $current_user=$this->currentUser();
+        $canEdit=Holiday::canEdit($current_user);
+        if(!$canEdit) return  $this->unauthorized();    
+       
         $updated_by=$current_user->id;
         $values=$request->getValues($updated_by);
       

@@ -168,7 +168,7 @@
             },
             onUnselected(signup_id){
                let index= this.selectedSignups.indexOf(signup_id)
-               if(index >= 0)  this.selectedSignups.splice(index, 1);
+               if(index >= 0)  this.selectedSignups.splice(index, 1)
                
             },
             onSubmit(){

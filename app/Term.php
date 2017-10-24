@@ -9,16 +9,27 @@ use Illuminate\Database\Eloquent\Model;
 class Term extends Model
 {
 	protected $fillable = [  'year', 'order', 'name',
-							 'number','active','removed',
-							 'updated_by'
+							 'number','open_date','close_date',
+							 'active','removed', 'updated_by'
+							
 						  ];
-	
+	public static function canEdit($user)
+	{
+		if($user->isDev()) return true;
+		
+		if(!$user->isAdmin()) return false;
+		
+		return 	$user->admin->fromHeadCenter();
+	}
+
 	public static function initialize()
     {
         return [
              'year' => '', 
 			 'order' => '',
 			 'name' => '',
+			 'open_date' => '',
+			 'close_date' => '',
 			 'active' => 1
         ];
     }
@@ -37,7 +48,7 @@ class Term extends Model
 
 	public function canEditBy($user)
 	{
-        return $user->isAdmin();
+		return  static::canEdit($user);
           
 	}
 	public function canDeleteBy($user)

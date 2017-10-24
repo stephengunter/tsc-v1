@@ -32,14 +32,9 @@ class AdminsController extends BaseController
 {
     protected $key='admins';
     public function __construct(Admins $admins, Centers $centers,
-                                 Users $users, Roles $roles, CheckOwner $checkOwner)
+                                 Users $users, Roles $roles)
     {   
-        $exceptAdmin=[];
-        $allowVisitors=[];
-		$this->setMiddleware( $exceptAdmin, $allowVisitors,'owner');
-
-        $this->setCheckAdmin($checkOwner);
-                 
+        
 		$this->admins=$admins;
         $this->centers=$centers;
         $this->users=$users;
@@ -49,6 +44,17 @@ class AdminsController extends BaseController
     {
         $adminRoles=$this->roles->getAdminRoles()->get();
         $roleOptions=$this->roles->optionsConverting($adminRoles);
+
+        $centerOptions=[];
+
+        if($this->headCenterAdmin()){
+            $empty_item=true;
+            $centerOptions=$this->centers->options($empty_item);
+        }else{
+
+            $centerOptions=$this->centers->optionsConverting($this->canAdminCenters());
+        }
+
 
         $centerOptions=$this->centers->options();
         return response()
@@ -61,6 +67,7 @@ class AdminsController extends BaseController
 
     public function index()
     {
+        
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('admins.index')
@@ -68,9 +75,9 @@ class AdminsController extends BaseController
         }
 
         $adminList=[];
-        $center=intval(request()->get('center'));
+        $center=(int)request()->get('center');
         if($center){
-            $adminList=$this->admins->getByCenter($center);
+             $adminList=$this->admins->getByCenter($center);
         }else{
              $adminList=$this->admins->getAll();
         }
@@ -80,19 +87,27 @@ class AdminsController extends BaseController
             $adminList=$adminList->where('role',$role);
         }
 
-        $ids=$adminList->select('user_id')->get()->pluck('user_id')->toArray();
+        $active=(int)request()->get('active');
+        if($active){
+            $adminList=$adminList->where('active',true);
+        }else{
+            $adminList=$adminList->where('active',false);
+        }
+
+        $adminList=$adminList->with('user.profile')->with('centers')->filterPaginateOrder();
         
-        $users= $this->users->getByIds($ids)->with('profile')-> filterPaginateOrder();
-        
-        foreach ($users as $user) {
-            $user->admin->centers;
-            $user->admin->roleModel=$user->admin->roleModel();
+        foreach ($adminList as $admin) {
+           
+            $admin->roleModel=$admin->roleModel();
         }
 
         return response()
             ->json([
-                'model' => $users,
-            ]);
+                'model' => $adminList,
+            ]);  
+        
+
+    
     }
 
     public function create()
@@ -111,11 +126,20 @@ class AdminsController extends BaseController
         $adminRoles=$this->roles->getAdminRoles()->get();
         $roleOptions=$this->roles->optionsConverting($adminRoles);
 
+        $current_user=$this->currentUser();
+
+        $centerOptions=[];
+        if($this->headCenterAdmin()){           
+            $centerOptions=$this->centers->options();
+        }else{
+            $centerOptions=$this->centers->optionsConverting($this->canAdminCenters());
+        }
+
         $user=null;
         $admin=null;
 
         if($user_id){
-            $current_user=$this->currentUser();
+            
             $user=$this->users->findOrFail($user_id);
             if(!$user->canViewBy($current_user)){
                 return  $this->unauthorized();     
@@ -126,12 +150,14 @@ class AdminsController extends BaseController
             if(!$admin){
                  $admin=Admin::initialize();
                  $admin['role']=$roleOptions[0]['value'];
+                 $admin['center_id']=$centerOptions[0]['value'];
             }
            
         }else{
             $user=User::initialize();
             $admin=Admin::initialize();
             $admin['role']=$roleOptions[0]['value'];
+            $admin['center_id']=$centerOptions[0]['value'];
         }
 
 
@@ -141,7 +167,8 @@ class AdminsController extends BaseController
             ->json([
                 'user' => $user,
                 'admin' => $admin,
-                'roleOptions' => $roleOptions,               
+                'roleOptions' => $roleOptions,   
+                'centerOptions' => $centerOptions,               
             ]);
 
     
@@ -191,11 +218,17 @@ class AdminsController extends BaseController
                             $user->admin->update($adminValues);
                         }
                     }
-                 
+
+                   
                     return $user;
                 });
 
+
          $admin= Admin::findOrFail($user->id);
+
+         $center_id=$adminValues['center_id'];
+         $admin->attachCenter($center_id);
+
          event(new AdminCreated($admin, $current_user));
 
          if($is_new_user){
@@ -216,8 +249,8 @@ class AdminsController extends BaseController
         }  
         $current_user=$this->currentUser();
 
-        $admin=$this->admins->findOrFail($id);
-        $admin->user->profile;
+        $admin=Admin::with('user.profile')->with('centers')->findOrFail($id);
+       
         $canEdit=$admin->canEditBy($current_user);
         $admin->canEdit=$canEdit;
         $admin->canDelete=$canEdit;
@@ -264,6 +297,10 @@ class AdminsController extends BaseController
         $adminValues=array_except($request, ['user']);       
         $adminValues=Helper::setUpdatedBy($adminValues,$updated_by);
         $admin->update($adminValues);
+
+        if(!$admin->active){
+            event(new AdminDeleted($admin, $current_user));
+        }
 
         return response()->json($admin);
     }

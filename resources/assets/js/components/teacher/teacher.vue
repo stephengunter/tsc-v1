@@ -3,7 +3,8 @@
     
     <show v-if="readOnly"  :id="id" can_edit="can_edit"  :can_back="can_back"  
        :version="version"  @begin-edit="beginEdit" @dataLoaded="onDataLoaded"
-       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" >                 
+       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" 
+       @edit-review="onEditReview">                 
     </show>
 
     <edit v-else :id="id" 
@@ -13,6 +14,10 @@
     <delete-confirm :showing="showConfirm" :message="confirmMsg"
       @close="closeConfirm" @confirmed="deleteTeacher">        
     </delete-confirm>
+
+    <review-editor :showing="showReviewEditor" :reviewed="teacherReviewed"
+      @close="showReviewEditor=false" @save="updateReview">
+    </review-editor>
     
 
 </div>
@@ -52,6 +57,13 @@
                 confirmMsg:'',
                 deleteId:0,
                 showConfirm:false,    
+
+                teacher_id:0,
+
+                
+                showReviewEditor:false,
+                teacherReviewed:false,
+                
             }
         },
         beforeMount(){
@@ -64,11 +76,17 @@
         methods: {
             init() {
                this.readOnly=true
+               this.teacher_id=0
                this.confirmMsg=''
                this.deleteId=0
                this.showConfirm=false
+
+               this.showReviewEditor=false
+               this.teacherReviewed=false
             },      
             onDataLoaded(teacher){
+                this.teacher_id=teacher.user_id
+                this.teacherReviewed=Helper.isTrue(teacher.reviewed)
                 this.$emit('data-loaded',teacher)
             },        
             beginEdit() {
@@ -105,6 +123,25 @@
                     this.closeConfirm()   
                 })
             },
+            onEditReview(){
+                this.showReviewEditor=true     
+            },
+            updateReview(val){
+                let id = this.teacher_id 
+                let review= val
+                let save= Teacher.updateReview(id,review)
+
+                save.then(teacher => {
+                    Helper.BusEmitOK('存檔成功')
+                    this.init()
+                   
+                    this.$emit('review-updated')
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error,'存檔失敗')
+                    this.showReviewEditor=false   
+                })
+            }
             
         }
     }

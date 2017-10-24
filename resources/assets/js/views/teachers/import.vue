@@ -1,0 +1,115 @@
+<template>
+
+    <div class="panel panel-default">
+        <div class="panel-heading ">           
+       
+
+            <h4 v-html="title"></h4>
+            
+             
+            
+            
+        </div> <!--  panel  heading -->
+        <div  class="panel-body">
+         
+            <div class="row">
+                <div class="col-sm-4">
+                      <toggle :items="typeOptions"   :default_val="1" @selected="onTypeSelected"></toggle>
+                </div>
+                <div class="col-sm-4">
+                     <label  class="btn  btn-success btn-file" @click="reset">
+                       <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                       Excel 匯入
+                       <input type="file"  ref="fileinput"  name="teachers_file" style="display: none;"  
+                       @change="onFileChange" >
+                    </label>
+                </div>
+            </div>
+            
+
+        </div> <!--  panel  body -->
+       
+    </div>  <!--  panel  -->
+
+   
+</template>
+
+<script>
+    
+    export default {
+        name: 'TeacherImport',
+        
+        data() {
+            return {
+                title:Helper.getIcon('Teachers')  + '  Excel 匯入教師',
+                
+                loaded:false,
+
+                type:true,
+
+                files: [],
+
+                typeOptions:[{
+                    text: '個人教師',
+                    value: '1'
+                }, {
+                    text: '教師群組',
+                    value: '0'
+                }]
+
+
+               
+            }
+        },
+        computed:{
+            isGroup(){
+               return !Helper.isTrue(this.type)
+            },
+        
+        },
+        beforeMount() {
+             
+        },
+        methods: {
+            reset(){
+               this.$refs.fileinput.value = null
+            },
+            onTypeSelected(val){
+               this.type=val
+              
+            },
+            onFileChange(e) {
+              
+                var files = e.target.files || e.dataTransfer.files
+                if (!files.length)  return
+                   
+                this.files = e.target.files
+
+                this.submitImport()
+            },
+            submitImport() {
+                let type=1
+                if(!Helper.isTrue(this.type)) type=0
+
+                let form = new FormData()
+                for (let i = 0; i < this.files.length; i++) {
+                    form.append('teachers_file', this.files[i])
+                    form.append('type', type)
+                }
+
+                let store=Teacher.import(form)
+                store.then(result => {
+                        // Helper.BusEmitOK()
+                        // this.$emit('saved')  
+                    })
+                    .catch(error => {
+                         Helper.BusEmitError(error,'存檔失敗')
+                    })
+            },
+           
+            
+            
+        },
+
+    }
+</script>

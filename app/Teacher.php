@@ -26,6 +26,7 @@ class Teacher extends Model
          'user.profile.fullname','specialty', 'active','reviewed', 'education','updated_at'
     ];
     
+    
     public static function initialize()
     {
         return [
@@ -137,17 +138,25 @@ class Teacher extends Model
     }
     public function canViewBy($user)
 	{
-		if($user->id==$this->user_id) return true;
+        if($user->id==$this->user_id) return true;
+        if($user->isDev())  return true;
 		return $user->isAdmin();
 	}
 	
 	public function canEditBy($user)
 	{
+        if($user->isDev()) return true;
 		if($user->id==$this->user_id) return true;
 
         if(!$user->isAdmin()) return false;
         return Helper::centersIntersect($this,$user->admin);
           
+    }
+    public function canReviewBy($user)
+	{
+        if($user->isDev()) return true;
+        if(!$user->isOwner()) return false;
+		return Helper::centersIntersect($this,$user->admin);
 	}
 	public function canDeleteBy($user)
 	{
@@ -167,6 +176,21 @@ class Teacher extends Model
         }else{
             return [];
         }
+    }
+
+    public function updateReview($reviewed,$reviewed_by)
+    {
+         
+         $this->reviewed=$reviewed;
+         if($reviewed){
+             $this->reviewed_by=$reviewed_by;
+         }else{
+             $this->reviewed_by='';
+         }
+         
+         $this->save();
+
+         return $this;
     }
   
 }

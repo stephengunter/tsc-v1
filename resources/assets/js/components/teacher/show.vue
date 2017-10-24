@@ -1,4 +1,5 @@
 <template>
+  
     <div v-if="loaded" class="panel panel-default show-data">
         <div class="panel-heading">
             <span class="panel-title">
@@ -74,12 +75,22 @@
                   <div class="col-sm-4">
                       <label class="label-title">資料審核</label>
                       
-                      <p v-if="teacher.reviewed_by" >
-                        <a @click.prevent="showReviewedBy" href="#" v-html="$options.filters.reviewedLabel(teacher.reviewed)">                         
-                        </a>
+                      <p v-if="hasReviewedBy" >
+                          <a @click.prevent="showReviewedBy" href="#" v-html="$options.filters.reviewedLabel(teacher.reviewed)">                         
+                          </a>
+                          &nbsp;     
+                          <button v-if="teacher.canReview" class="btn btn-primary btn-xs" @click.prevent="editReview" >
+                              <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
+                          </button>  
                       </p>
-                      <p v-else v-html="$options.filters.reviewedLabel(teacher.reviewed)">                        
+                      <p v-else > 
+                          <span v-html="$options.filters.reviewedLabel(teacher.reviewed)"></span>     
+                          &nbsp;     
+                          <button class="btn btn-primary btn-xs" @click.prevent="editReview" >
+                              <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
+                          </button>             
                       </p>
+                      
                   </div>
              </div>   <!-- End row-->
              <div class="row">
@@ -97,7 +108,7 @@
                         
                       </p> 
                   </div>
-                  <div class="col-sm-4">
+                  <div v-show="false" class="col-sm-4">
                       <label class="label-title">狀態</label>
                       <p v-html="$options.filters.activeLabel(teacher.active)">                       
                       </p>
@@ -108,8 +119,7 @@
     </div>
   
 
-
-  
+   
 
 
 </template>
@@ -141,12 +151,19 @@
                title:Helper.getIcon('Teachers')  + '  教師資料',
                loaded:false,
                teacher:null,
+
+               
              }
         },
         computed:{
             isGroup(){
                 if(!this.teacher) return false
                   return Helper.isTrue(this.teacher.group)
+            },
+            hasReviewedBy(){
+                if(!this.teacher) return false
+                if(!this.teacher.reviewed_by) return false
+                return parseInt(this.teacher.reviewed_by)
             }
         },
         watch:{
@@ -193,8 +210,11 @@
                 Bus.$emit('onShowEditor',parseInt(this.teacher.updated_by))
             },
             showReviewedBy(){
-             Bus.$emit('onShowEditor', parseInt(this.teacher.reviewed_by) , '審核者')
+                Bus.$emit('onShowEditor', parseInt(this.teacher.reviewed_by) , '審核者')
             },
+            editReview(){
+                this.$emit('edit-review')
+            }
           
         }, 
     }

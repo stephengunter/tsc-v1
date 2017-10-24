@@ -30,7 +30,7 @@
                             <input type="text" name="center.name" class="form-control" v-model="form.center.name">
                             <small class="text-danger" v-if="form.errors.has('center.name')" v-text="form.errors.get('center.name')"></small>
                         </div>
-                        <div class="form-group">
+                        <div v-show="false" class="form-group">
                             <label>狀態</label>
                             <div>
                             <input type="hidden" v-model="form.center.active">

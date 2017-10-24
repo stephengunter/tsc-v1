@@ -1,12 +1,12 @@
 <template>
 <div>
-    <div class="panel panel-default show-data">
+    <div class="panel panel-default">
         <div class="panel-heading">
             <span class="panel-title">
                 <h4><i class="fa fa-calendar" aria-hidden="true"></i> 學期管理</h4>
             </span>
             <div>
-                <button class="btn btn-primary btn-sm" @click.prevent="beginCreate">
+                <button v-if="can_edit" :disabled="creating" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
                 </button>
             </div>
@@ -17,12 +17,12 @@
              <thead> 
                 <tr> 
                     <th style="width:10%">年度</th> 
-                    <th style="width:10%">順序</th> 
-                    <th style="width:20%">名稱</th> 
-                    <th style="width:20%">編號</th>
-                    <th style="width:15%">狀態</th>
-                    <th style="width:15%">最後更新</th> 
-                    <th style="width:10%"></th>
+                    <th style="width:7%">順序</th> 
+                    <th style="width:12%">名稱</th> 
+                    <th >報名期間</th>
+                    <th style="width:10%">狀態</th>
+                    <th style="width:10%">最後更新</th> 
+                    <th style="width:7%"></th>
                 </tr> 
             </thead>
             <tbody> 
@@ -70,6 +70,7 @@
         data() {
             return {
                 loaded:false,
+                can_edit:false,
                 creating:false,
                 termList:[],
               
@@ -103,7 +104,7 @@
             fetchData() {
                 let index=Term.index()
                 index.then(data => {
-                   
+                   this.can_edit=data.can_edit
                    this.termList=data.termList
                    this.loaded = true
                     

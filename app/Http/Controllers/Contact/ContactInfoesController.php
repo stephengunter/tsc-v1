@@ -14,23 +14,13 @@ use App\Events\ContactInfoCreated;
 
 class ContactInfoesController extends BaseController
 {
-    public function __construct(CheckAdmin $checkAdmin)                               
-    {    
-        $exceptAdmin=[];
-        $allowVisitors=[];
-
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
-        
-        $this->setCheckAdmin($checkAdmin);
-        
-          
-	}
+    
     public function show($id)
     {   
         
         $contactInfo=ContactInfo::findOrFail($id);
-
-        $current_user=request()->user();
+        
+        $current_user=$this->currentUser();
         if(!$contactInfo->canViewBy($current_user)){
               return $this->unauthorized();;
         }

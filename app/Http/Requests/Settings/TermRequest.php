@@ -26,13 +26,15 @@ class TermRequest extends FormRequest
     {
        
         return [
-            'term.name' => 'required|max:255',            
+            'term.open_date' => 'required',
+            'term.close_date'=> 'required', 
         ];
     }
     public function messages()
     {
         return [
-            'term.name.required' => '必須填寫名稱',            
+            'term.open_date.required' => '必須填寫報名起始日',
+            'term.close_date.required' => '必須填寫報名截止日',     
         ];
     }
 
@@ -50,6 +52,7 @@ class TermRequest extends FormRequest
        
         $values=array_except($this->get('term'), ['canDelete']); 
         $values['number']=$values['year'] . $values['order'];
+        $values['name']=$values['number'];
         $values= Helper::setUpdatedBy($values,$updated_by);
         return Helper::setRemoved($values,$removed);
         

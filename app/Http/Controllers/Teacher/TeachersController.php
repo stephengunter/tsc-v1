@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Teacher;
 use App\User;
 use App\Profile;
+use App\Address;
 
 use App\Repositories\Teachers;
 use App\Repositories\Courses;
@@ -19,33 +20,33 @@ use App\Repositories\Roles;
 use App\Http\Middleware\CheckAdmin;
 use App\Support\Helper;
 
+use Illuminate\Support\Facades\Input;
+
 use DB;
-use App\Events\TeacherCreated;
-use App\Events\TeacherDeleted;
+
+use Storage;
 
 class TeachersController extends BaseController
  {
     protected $key='teachers';
 
     public function __construct(Teachers $teachers ,Users $users, Courses $courses,
-                                Centers $centers, CheckAdmin $checkAdmin)                               
+                                Centers $centers)                               
     {
-        //  $exceptAdmin=['create','edit','store','show','edit','update','updateUser'];
-		$exceptAdmin=[];
-        $allowVisitors=[];
-
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
         
-		$this->teachers=$teachers;       
+        
+        $this->teachers=$teachers;
+           
         $this->users=$users;  
         $this->courses=$courses; 
         $this->centers=$centers; 
 
-        $this->setCheckAdmin($checkAdmin);
+       
          
 	}
 	public function index()
     {
+       
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('teachers.index')
@@ -62,7 +63,7 @@ class TeachersController extends BaseController
                                         ->with('user.profile');
                                        
         }else{
-             $teacherList=$this->teachers->getAll()
+            $teacherList=$this->teachers->getAll()
                                         ->with('user.profile');
         }
 
@@ -134,8 +135,6 @@ class TeachersController extends BaseController
 
     public function show($id)
     {
-        
-
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('teachers.details')
@@ -151,6 +150,7 @@ class TeachersController extends BaseController
         }
         $teacher->name=$teacher->getName();
         $teacher->canEdit=$teacher->canEditBy($current_user);
+        $teacher->canReview=$teacher->canReviewBy($current_user);
         $teacher->canDelete=$teacher->canDeleteBy($current_user);
         
 
@@ -177,61 +177,82 @@ class TeachersController extends BaseController
     
     public function store(TeacherRequest $request)
     {
-         $current_user=$this->currentUser();
-         $updated_by=$current_user->id;
-         $removed=false;
+       
+        $current_user=$this->currentUser();
+        $updated_by=$current_user->id;
+        $removed=false;
 
-         $teacherValues=$request->getTeacherValues($updated_by,$removed);
-         $userValues=$request->getUserValues($updated_by,$removed);
-         $profileValues=$request->getProfileValues($updated_by,$removed);
+        
+        $teacher=null;
+        if($request->isGroup()){
+            $teacherValues=$request->get('teacher');
+            $name=$teacherValues['name'];
+            $description=$teacherValues['description'];
 
-         $user_id=$request->getUserId();
-         $teacherId=$request->getTeacherId();
+            $teacher=$this->teachers->storeTeacherGroup($name,$description,$current_user);
+        }else{
 
-         
+            $teacherValues=$request->getTeacherValues($updated_by,$removed);
+            
+            $userValues=$request->getUserValues($updated_by,$removed);
+            $profileValues=$request->getProfileValues($updated_by,$removed);
+    
+            $user_id=$request->getUserId();
+            $teacherId=$request->getTeacherId();
+    
+            $teacher=$this->teachers->storeTeacher($userValues,$profileValues,$teacherValues,$user_id,$teacherId,$current_user);
+    
+           
+        }
 
-         $user= DB::transaction(function() 
-                use($userValues,$profileValues,$teacherValues,$user_id,$teacherId)
-                {
-                    $user=null;
-                    if($user_id){
-                        $user=User::findOrFail($user_id);
-                        $user->update($userValues);
-                        $user->profile->update($profileValues);
-                    }else{
-                        $user=new User($userValues);
-                        $user->password= config('app.default_password');
-                        $user->save();
-                        $profile=new Profile($profileValues);
-                        $user->profile()->save($profile);
-                    }
-
-                    
-                    if($teacherId){
-                        $teacher = Teacher::findOrFail($teacherId);
-                        $teacher->update($teacherValues);
-                    }else{
-                        $teacher=$user->teacher;
-                        if(!$teacher){
-                            $teacher=new Teacher($teacherValues);  
-                            $user->teacher()->save($teacher);
-                        }else{
-                            $user->teacher->update($teacherValues);
-                        }
-                    }
-                 
-                    return $user;
-            });
-
-         $teacher= Teacher::findOrFail($user->id);
-         event(new TeacherCreated($teacher, $current_user));
         
        
-       
-         return response()->json($teacher); 
+        return response()->json($teacher); 
             
     }
 
+    
+    public function import()
+    {
+        // $disk = Storage::disk('local');
+        // $contents = $disk->get('/seed/test.jpg');
+
+        // dd($contents);
+
+        $menus=$this->menus($this->key);     
+       
+        return view('teachers.import')
+                ->with(['menus' => $menus]);
+    }
+    public function importTeachers(Request $form)
+    {
+
+        if(!$form->hasFile('teachers_file')){
+            return   response()
+                        ->json(['teachers_file' => ['無法取得上傳檔案'] 
+                            ]  ,  422);      
+        }
+
+        $current_user=$this->currentUser();
+
+        $file=Input::file('teachers_file');
+        $type=(int)$form['type'];
+
+       
+
+        if($type){
+            $this->teachers->importTeachers($file,$current_user);
+           
+        }else{
+            $this->teachers->importGroupTeachers($file,$current_user);
+        }   
+
+        return response()->json(['success' => true]);
+
+       
+    }
+
+    
     
     public function update(TeacherRequest $request,$id)
     {
@@ -244,11 +265,10 @@ class TeachersController extends BaseController
         $updated_by=$current_user->id;
         $removed=false;
         $teacherValues=$request->getTeacherValues($updated_by,$removed);
-
-        if(!$teacher->reviewed){
-            if((int)$teacherValues['reviewed'] > 0){
-                $teacherValues['reviewed_by']= $updated_by;
-            }
+      
+        if(!$teacher->canReviewBy($current_user)){
+            $teacherValues['reviewed'] = 0;
+            $teacherValues['reviewed_by'] = '';
         }
         
         $teacher->update($teacherValues);
@@ -258,19 +278,31 @@ class TeachersController extends BaseController
          
            
     }
+    public function updateReview(Request $form)
+    {
+        $id=$form['id'];
+        $reviewed=$form['reviewed'];
+
+        $current_user=$this->currentUser();
+        // if(!$teacher->canReviewBy($current_user)){
+        //     return  $this->unauthorized();    
+        // }
+        $teacher=$this->teachers->updateReview($id,$reviewed,$current_user->id);    
+
+        return response()->json($teacher); 
+
+        
+    }
 
     public function destroy($id)
     {
-       $teacher=$this->teachers->findOrFail($id);
-       $current_user=$this->currentUser();
-       if(!$teacher->canDeleteBy($current_user)){
+        $teacher=$this->teachers->findOrFail($id);
+        $current_user=$this->currentUser();
+        if(!$teacher->canDeleteBy($current_user)){
             return  $this->unauthorized();     
-       }
+        }
        
-       $this->teachers->delete($id, $current_user->id);
-       
-       
-       event(new TeacherDeleted($teacher, $current_user));
+        $this->teachers->delete($id, $current_user);
 
         return response()
             ->json([

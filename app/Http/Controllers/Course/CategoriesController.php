@@ -4,25 +4,17 @@ namespace App\Http\Controllers\Course;
 
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
-
+use App\Category;
 use App\Repositories\Categories;
 use App\Http\Requests\Course\CategoryRequest;
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 class CategoriesController extends BaseController
 {
     protected $key='categories';
-    public function __construct(Categories $categories,CheckAdmin $checkAdmin) 
+    public function __construct(Categories $categories) 
     {
-        // $exceptAdmin=['index','activeCategories'];
-		$exceptAdmin=[];
-        $allowVisitors=[];
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
-         
         $this->categories=$categories;
-         
-        $this->setCheckAdmin($checkAdmin);
 		
 	}
 
@@ -34,19 +26,28 @@ class CategoriesController extends BaseController
                     ->with(['menus' => $menus]);
         } 
 
+        $current_user=$this->currentUser();
+        $canEdit=Category::canEdit($current_user);
+
         $categories=$this->categories->getAll()
                                      ->orderBy('public','desc')
                                      ->orderBy('active','desc')
-                                     ->orderBy('order','desc');
+                                     ->orderBy('order','desc')->get();
        
+
         return response()
             ->json([
-                'model' => $categories->paginate(request()->per_page)
+                'categories' => $categories,
+                'canEdit' => $canEdit
             ]);
        
     }
     public function create()
     {
+        $current_user=$this->currentUser();
+        if(!Category::canEdit($current_user)){
+            return  $this->unauthorized(); 
+        } 
         $category= $this->categories->initialize();
        
         return response()
@@ -56,7 +57,12 @@ class CategoriesController extends BaseController
     }
     public function store(CategoryRequest $request)
     {
-        $current_user=$this->checkAdmin->getAdmin();
+        $current_user=$this->currentUser();
+        if(!Category::canEdit($current_user)){
+            return  $this->unauthorized(); 
+        }
+
+       
         $updated_by=$current_user->id;
         $removed=false;
 
@@ -70,10 +76,11 @@ class CategoriesController extends BaseController
     }
     public function show($id)
     {
+        $current_user=$this->currentUser();
         $category=$this->categories->findOrFail($id);
        
-        $category->canEdit=true;
-        $category->canDelete=$category->canDelete();
+        $category->canEdit=$category->canEditBy($current_user);
+        $category->canDelete=$category->canDeleteBy($current_user);
 
          return response()
                 ->json([
@@ -111,23 +118,24 @@ class CategoriesController extends BaseController
                     'category' => $category
                 ]);   
     }
-    public function updateDisplayOrder(Request $request, $id)
+    public function updateDisplayOrder(Request $form)
     {
-        $category=$this->categories->findOrFail($id);
         $current_user=$this->currentUser();
-        if(!$category->canEditBy($current_user)){
-            return  $this->unauthorized();         
+
+        $categories=$form['categories'];
+        for($i = 0; $i < count($categories); ++$i) {
+            $category=$categories[$i];
+
+            $id=$category['id'];
+            $order=$category['order'];
+            $updated_by=$current_user->id;
+
+            $this->categories->updateDisplayOrder($id,$order,$updated_by);
+            
         }
 
-        $updated_by=$current_user->id;
-        $up=$request['up'];
-        
-        $category=$this->categories->updateDisplayOrder($category ,$up, $updated_by);
-        
-        return response()
-            ->json([
-                'category' => $category
-            ]);    
+
+        return response()->json(['success' => true]);
 
     }
 

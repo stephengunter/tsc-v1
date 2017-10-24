@@ -29,7 +29,7 @@
                 <td>{{props.item.specialty}}</td>
                 
                 <td v-html="$options.filters.namesText(props.item.centerNames)"></td>
-                <td v-html="$options.filters.activeLabel(props.item.active)" ></td>
+                <td v-if="false" v-html="$options.filters.activeLabel(props.item.active)" ></td>
                 <td v-html="$options.filters.reviewedLabel(props.item.reviewed)" ></td> 
                 <td>{{ props.item.updated_at | tpeTime}}</td> 
             </tr>

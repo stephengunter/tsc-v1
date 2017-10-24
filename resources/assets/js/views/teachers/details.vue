@@ -2,7 +2,8 @@
 <div>
   <teacher v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
      @saved="teacherUpdated" @data-loaded="onDataLoaded" :version="version"
-     @btn-back-clicked="onBtnBackClicked" @teacher-deleted="onTeacherDeleted" > 
+     @btn-back-clicked="onBtnBackClicked" @teacher-deleted="onTeacherDeleted"
+     @review-updated="teacherReviewUpdated" > 
 
   </teacher>
 
@@ -28,7 +29,7 @@
         <div class="panel-body">
             <div class="tab-content">
                 <div v-if="isGroup"  class="tab-pane fade active in" id="group-teachers">
-                    <group-teacher-view :teacher="teacher"></group-teacher-list>
+                    <group-teacher-view :teacher="teacher"></group-teacher-view>
                 </div>
                 <div v-else class="tab-pane fade active in" id="user">
                     <user v-if="activeIndex==0" :id="id" :can_edit="userSettings.can_edit" :can_back="userSettings.can_back"  
@@ -51,7 +52,7 @@
                 </div>                 
             </div>
         </div>
-  </div>
+   </div>
 
 
 
@@ -165,6 +166,10 @@
             },
             teacherUpdated(){
                this.init()
+            },
+            teacherReviewUpdated(){
+               
+               this.version+=1
             },
             onBtnBackClicked(){
                 this.$emit('btn-back-clicked')

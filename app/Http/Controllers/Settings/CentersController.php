@@ -19,19 +19,12 @@ use DB;
 class CentersController extends BaseController
 {
     protected $key='settings';
-    public function __construct(Centers $centers, Users $users,CheckAdmin $checkAdmin)
-     {
-        // $exceptAdmin=['index','show','activeCenters'];
-		
-        $exceptAdmin=[];
-        $allowVisitors=[];
-
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
+    public function __construct(Centers $centers, Users $users)
+    {
 
         $this->centers=$centers;
         $this->users=$users;
-
-        $this->setCheckAdmin($checkAdmin);
+       
 	}
 
     public function index()
@@ -42,20 +35,22 @@ class CentersController extends BaseController
             return view('centers.index')
                     ->with(['menus' => $menus]);                
         }  
-        $centers=$this->centers->getAll()->orderBy('active','desc')->filterPaginateOrder();
+        $centers=$this->centers->getAll()->orderBy('display_order','desc')->get();
       
-        foreach ($centers as $item) {
-             $item->contactInfo= $item->contactInfo();
-             if($item->contactInfo)
-             {
-                 $item->contactInfo->addressA=$item->contactInfo->addressA();
-             }
+        foreach ($centers as $center) {
+            $center->contactInfo= $center->contactInfo();
+            if($center->contactInfo)
+            {
+                 $center->contactInfo->addressA=$center->contactInfo->addressA();
+            }
+
+            $center->error='';
             
         }
         
         return response()
             ->json([
-                'model' => $centers
+                'centers' => $centers
             ]);
        
     }
@@ -80,17 +75,8 @@ class CentersController extends BaseController
 
         $values=$request->getValues($updated_by,$removed);
         
-        $center= DB::transaction(function() 
-        use($values,$current_user){
-              $center=Center::create($values);
-            
-              $center->admins()->attach($current_user->id);
-              return $center;
-              
-        });
+        $center=Center::create($values);
 
-       
-       
         return response()->json($center);
       
     }
@@ -136,16 +122,28 @@ class CentersController extends BaseController
          $updated_by=$current_user->id;
          $removed=false;
          $values= $request->getValues($updated_by,$removed);
+
          $center->update($values);
 
           return response()->json($center);
     }
-    public function updateDisplayOrder(Request $request, $id)
+    public function updateDisplayOrder(Request $form)
     {
-            $up=$request['up'];
-            $center=$this->centers->updateDisplayOrder($up, $id);
+        $current_user=$this->currentUser();
+        $centers=$form['centers'];
+        for($i = 0; $i < count($centers); ++$i) {
+            $center=$centers[$i];
 
-            return response()->json($center);
+            $id=$center['id'];
+            $order=$center['display_order'];
+            $updated_by=$current_user->id;
+
+            $this->centers->updateDisplayOrder($id,$order,$updated_by);
+            
+        }
+
+
+        return response()->json(['success' => true]);
 
     }
     public function updatePhoto(Request $request, $id)

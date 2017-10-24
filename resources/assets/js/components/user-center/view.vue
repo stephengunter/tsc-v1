@@ -1,56 +1,48 @@
 <template>
-<div>
-    <div class="panel panel-default show-data">
-        <div class="panel-heading">
-            <span class="panel-title">
-                <h4>
-                <i class="fa fa-university" aria-hidden="true"></i>              
-                所屬中心
-                </h4>
-            </span>
+    <div>
+        <div class="panel panel-default show-data">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    <h4>
+                        <i class="fa fa-university" aria-hidden="true"></i>              
+                        所屬中心
+                    </h4>
+                </span>
             
-            <div>
-                <button v-if="can_edit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
-                   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
-                </button>
-            </div>
+                <div>
+                    <button v-if="can_edit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
+                       <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
+                    </button>
+                </div>
             
-        </div>  <!-- End panel-heading-->
-        <div v-if="loaded" class="panel-body">
-            <table class="table table-striped" style="width: 50%;">
-             <thead> 
-                <tr>                    
-                    <th style="width:80%"></th> 
-                    <th style="width:20%"></th>
-                </tr> 
-            </thead>
-            <tbody> 
-                <edit v-for="center in centers"  :center="center" 
-                   :UserCenters="UserCenters" :can_edit="can_edit"  
-                    @btn-delete-clicked="onBtnDeleteClicked" >
-                </edit>
-                <edit   v-if="creating"  :UserCenters="UserCenters"
-                  @saved="onCreated"  
-                  @cancel="onCreateCanceled" > 
-                </edit-teacher-center> 
-            
-            </tbody> 
-            </table>
-
-
-           
-
-        </div><!-- End panel-body-->
-
-    </div>   
-                   
-    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
-      @close="closeConfirm" @confirmed="deleteUserCenter">        
-    </delete-confirm>       
-
-   
-
-</div>
+            </div>  
+            <div v-if="loaded" class="panel-body">
+                 <table class="table table-striped" style="width: 50%;">
+                     <thead> 
+                        <tr>                    
+                            <th style="width:80%"></th> 
+                            <th style="width:20%"></th>
+                        </tr> 
+                    </thead>
+                    <tbody> 
+                        <edit v-for="center in centers"  :center="center" 
+                           :UserCenters="UserCenters" :can_edit="can_edit"  
+                            @btn-delete-clicked="onBtnDeleteClicked" >
+                        </edit>
+                        <edit   v-if="creating"  :UserCenters="UserCenters"
+                          @saved="onCreated"  
+                          @cancel="onCreateCanceled" > 
+                        </edit> 
+                    
+                    </tbody> 
+                </table>
+            </div>     
+        </div>   <!--  Panel  --> 
+        <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+          @close="closeConfirm" @confirmed="deleteUserCenter">        
+        </delete-confirm>     
+    </div>
+    
 
 </template>
 
@@ -70,10 +62,7 @@
               type: String,
               default: ''
             },
-            can_edit:{
-               type: Boolean,
-               default: true
-            },
+            
             
         },
         
@@ -90,6 +79,8 @@
                 creating:false,
                 
                 centers:[],
+
+                can_edit:false,
 
                 deleteConfirm:{
                     id:0,
@@ -109,7 +100,7 @@
                 this.creating=false
                 
                 this.centers=[]
-              
+                this.can_edit=false
               
                 this.deleteConfirm={
                     id:0,
@@ -122,10 +113,25 @@
             
             fetchData() {
                 let index=this.UserCenters.index()
-                
+               
                 index.then(data => {
-                   this.centers=data.centers
-                   this.loaded = true
+                    
+                    this.can_edit=data.canEdit
+                    
+
+                    if(data.centers) {
+                        let can_delete=this.can_edit
+                        if(data.centers.length==1) can_delete=false
+                        for (var i = data.centers.length - 1; i >= 0; i--) {
+                            data.centers[i].canDelete=can_delete
+                        }
+                        this.centers=data.centers
+                    }else{
+                        this.centers=[]
+                    }
+                
+                    
+                    this.loaded = true
                     
                 })
                 .catch(error=> {

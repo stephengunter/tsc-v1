@@ -90,6 +90,19 @@ class Teacher {
            
         })
     }
+    static import(form){
+        let url = this.source() + '/import'
+        return new Promise((resolve, reject) => {
+             axios.post(url, form)
+                .then(response => {
+                     resolve(response.data);
+                })
+                .catch(error => {
+                     reject(error);
+                })
+          
+        })
+    }
     static update(form , id){
          let url =this.updateUrl(id) 
          let method='put'
@@ -102,6 +115,23 @@ class Teacher {
                     reject(error);
                 })
         })
+    }
+    static updateReview(id,reviewed){
+        let url =this.storeUrl() + '/update-review' 
+        let form=new Form({
+            id:id,
+            reviewed:reviewed
+        })
+        let method='post'
+        return new Promise((resolve, reject) => {
+           form.submit(method,url)
+               .then(data => {
+                   resolve(data);
+               })
+               .catch(error => {
+                   reject(error);
+               })
+       })
     }
     static delete(id) {
         return new Promise((resolve, reject) => {
@@ -190,8 +220,38 @@ class Teacher {
         })
     }
 
-  static getThead(canSelect){
-    let thead=  [{
+    static unreviewedList(center){
+        let url =this.source() + '/review' 
+        url += '?center=' + center
+        return new Promise((resolve, reject) => {
+                     axios.get(url)
+                    .then(response => {
+                        resolve(response.data);
+                    })
+                    .catch(error => {
+                        reject(error);
+                    })
+                })   //End Promise
+    }
+    static updateReviewList(teachers){
+        let url =this.source() + '/review' 
+        let form=new Form({
+            teachers:teachers
+        })
+        let method='post'
+        return new Promise((resolve, reject) => {
+           form.submit(method,url)
+               .then(data => {
+                   resolve(data);
+               })
+               .catch(error => {
+                   reject(error);
+               })
+       })
+    }
+
+    static getThead(canSelect){
+        let thead=  [{
                         title: '姓名',
                         key: 'name',
                         sort: false,
@@ -218,11 +278,6 @@ class Teacher {
                         default:true
 
                     }, {
-                        title: '狀態',
-                        key: 'active',
-                        sort: true,
-                        default:true
-                    },{
                         title: '審核',
                         key: 'reviewed',
                         sort: true,

@@ -7,26 +7,34 @@
      
          
          <div class="form-inline"   slot="header">
+            開課中心
             <select  v-model="searchParams.center" style="width:auto;" class="form-control selectWidth">
                 <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
             </select>
             &nbsp;&nbsp;
+            角色
             <select  v-model="searchParams.role"    style="width:auto;" class="form-control selectWidth">
                 <option v-for="item in roleOptions" :value="item.value" v-text="item.text"></option>
+            </select>
+            &nbsp;&nbsp;
+            狀態
+            <select  v-model="searchParams.active"    style="width:auto;" class="form-control selectWidth">
+                <option value="1" >使用中</option>
+                <option value="0" >已停用</option>
             </select>
 
         </div>
          <template scope="props">
             <tr>
-                <td><a herf="#" @click="selected(props.item.id)">{{props.item.profile.fullname}}</a> </td>
+                <td><a herf="#" @click="selected(props.item.user_id)">{{props.item.user.profile.fullname}}</a> </td>
                 <td>
-                    <role-label :labelstyle="props.item.admin.roleModel.style" 
-                        :labeltext="props.item.admin.roleModel.display_name">                        
+                    <role-label :labelstyle="props.item.roleModel.style" 
+                        :labeltext="props.item.roleModel.display_name">                        
                     </role-label>
                 </td>               
-                <td v-text="props.item.phone"></td>
-                <td v-html="getCenterNames(props.item.admin.centers)"></td> 
-                <td v-html="$options.filters.activeLabel(props.item.active)" ></td>
+                <td v-text="props.item.user.phone"></td>
+                <td v-html="getCenterNames(props.item.centers)"></td> 
+                <td v-html="statusLabel(props.item.active)" ></td>
                 <td>
                     <updated :entity="props.item"></updated>
                 </td>
@@ -64,8 +72,8 @@
                 loaded:false,
                 source: Admin.source(),
                 
-                defaultSearch:'profile.fullname',
-                defaultOrder:'updated_at',                
+                defaultSearch:'user.profile.fullname',
+                defaultOrder:'role',                
                 create: Admin.createUrl(),
                 
                 thead:[],
@@ -80,7 +88,8 @@
                 roleOptions:[],
                 searchParams:{
                     center : 0,
-                    role:''
+                    role:'',
+                    active:1
                 },
               
               
@@ -102,7 +111,8 @@
 
                 this.searchParams={
                     center : 0,
-                    role:''
+                    role:'',
+                    active:1
                 }
                 let options = this.loadOptions()
                 options.then(() => {
@@ -116,10 +126,7 @@
                     let options = Admin.indexOptions()
                   
                     options.then(data => {
-
-                        this.centerOptions = data.centerOptions
-                        let allCenters={ text:'全部開課中心' , value:'0' }
-                        this.centerOptions.splice(0, 0, allCenters);
+                        this.centerOptions=data.centerOptions
                         let center=this.centerOptions[0].value
                         this.searchParams.center=center
 
@@ -136,6 +143,11 @@
                     })
                 })//End Promise
             },
+            statusLabel(active) {
+               
+                return Admin.statusLabel(active)
+              
+            },
             getCenterNames(centers){
                 if(centers.length){
 
@@ -151,7 +163,7 @@
                
             },
             selected(id){
-              
+               
                 this.$emit('selected',id)
             },
             

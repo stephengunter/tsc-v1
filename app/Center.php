@@ -22,10 +22,28 @@ class Center extends Model
     {
          return [
 			 'name' => '',
-			 'active' => 1
+			 'active' => 0,
+			 'display_order' => -1
 			 
         ];
-    }
+	}
+	
+	public static function canEdit($user)
+	{
+		if($user->isDev()) return true;
+
+		if(!$user->isAdmin()) return false;
+		
+		
+		return 	$user->admin->fromHeadCenter();
+          
+	} 
+
+	
+	public static function getHeadCenter()
+	{
+		return static::where('head',true)->where('removed',false)->get();
+	}
 
     public function courses() 
 	{
@@ -100,14 +118,14 @@ class Center extends Model
 
 	public function canEditBy($user)
 	{
-		if(!$user->isAdmin()) return false;
-		if(!$this->isValid()) return true;
 		
-		return 	$user->admin->centers->contains($this);
+		return 	static::canEdit($user);
           
 	} 
 	public function canDeleteBy($user)
 	{
+		if($this->head) return false;
+		if($this->active) return false;
 		return $this->canEditBy($user);
 	}
 	

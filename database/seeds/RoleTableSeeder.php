@@ -12,8 +12,16 @@ class RoleTableSeeder extends Seeder {
 	public function run() {
 		$role = [
 			[
+				'name' => 'Dev',
+				'hide' => 1,
+				'display_name' => '開發者',
+				'importance' => 106,
+				'style'=>'info'
+
+			],
+			[
 				'name' => 'Owner',
-				'display_name' => '老闆',
+				'display_name' => '組長',
 				'importance' => 99,
 				'style'=>'danger'
 

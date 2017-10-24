@@ -11,7 +11,7 @@
           </div>
       </div>
       <div class="col-sm-4">
-          <div class="form-group">
+          <div v-show="false" class="form-group">
               <label>狀態</label>
               <div>
                   <toggle :items="activeOptions"   :default_val="form.teacher.active" @selected=onActiveSelected></toggle>
@@ -19,7 +19,7 @@
           </div>
       </div>
       <div class="col-sm-4">
-          <div class="form-group">
+          <div v-show="false" class="form-group">
               <label>資料審核</label>
               <div>
               <input type="hidden" v-model="form.teacher.reviewed"  >

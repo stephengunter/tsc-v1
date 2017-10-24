@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Course;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
+use App\Category;
+
 use App\Repositories\Categories;
 use App\Repositories\Courses;
 use App\Repositories\Terms;
@@ -16,44 +18,30 @@ use App\Http\Middleware\CheckAdmin;
 class CategoryCourseController extends BaseController
 {
     public function __construct(Categories $categories,Courses $courses,
-                           Centers $centers, Terms $terms,CheckAdmin $checkAdmin) 
+                           Centers $centers, Terms $terms) 
     {
-		 $exceptAdmin=[];
-         $allowVisitors=[];
-         $this->setMiddleware( $exceptAdmin, $allowVisitors);
-         
+		
 		 $this->categories=$categories;
          $this->terms=$terms;
          $this->courses=$courses;
          $this->centers=$centers;
-
-         $this->setCheckAdmin($checkAdmin);
 	}
 
-    // public function indexOptions()
-    // {
-    //     $activeTerms=$this->terms->activeTerms()->get();
-    //     $termOptions=$this->terms->optionsConverting($activeTerms);
-
-    //     $centerOptions=$this->centers->options();
-
-    //     return response()
-    //         ->json([
-    //             'termOptions' => $termOptions,
-    //             'centerOptions' => $centerOptions
-    //         ]);
-    // }
+    
     public function index()
     {
         $request = request();
         $category_id=(int)$request->category;       
         $center_id=(int)$request->center;
 
+        $current_user=$this->currentUser();
+        $canEdit=Category::canEdit($current_user);
+
         $category=$this->categories->findOrFail($category_id);
         $courseList=$category->activeCourses();
 
-        $activeTerms=$this->terms->activeTerms()->get()->pluck('id');
-        $courseList=$courseList->whereIn('term_id' , $activeTerms);
+        $activeTerms=$this->terms->activeTerms()->get();
+        $courseList=$courseList->whereIn('term_id' , $activeTerms->pluck('id'));
                                
         if($center_id){
             $courseList=$courseList->where('center_id',$center_id);
@@ -68,12 +56,26 @@ class CategoryCourseController extends BaseController
                 }
             }
         }
+
+
+
+        return response()
+        ->json([
+            'courseList' => $courseList,
+            'terms' => $activeTerms,
+            'canEdit' => $canEdit
+        ]);
         
-        return response()->json(['courseList' => $courseList  ]); 
+        
        
     }
     public function create()
     {
+        $current_user=$this->currentUser();
+        $canEdit=Category::canEdit($current_user);
+
+        if(!$canEdit)  return  $this->unauthorized(); 
+
         $request = request();
         $category_id=(int)$request->category;
         $category=$this->categories->findOrFail($category_id);
@@ -99,31 +101,15 @@ class CategoryCourseController extends BaseController
         }                       
         return response()->json(['courseList' => $courseList  ]);
     }
-    // public function courseNotInCategory()
-    // {
-    //      $request = request();
-    //      $termId=(int)$request->term; 
-    //      $categoryId=(int)$request->category;       
-    //      $centerId=(int)$request->center;
-    //      $active=(int)$request->active;
-
-    //      $courseList=$this->courses->courseNotInCategory($termId,$categoryId,$centerId,$active)->get();
-                                        
-        
-    //      foreach ($courseList as $course) {
-            
-    //           foreach ($course->classTimes as $classTime) {
-    //             $classTime->weekday;
-    //          }
-    //      }
-    //        return response()
-    //         ->json([
-    //             'courseList' => $courseList
-    //         ]);
-    // }
+   
 
     public function store(Request $request)
     {
+        $current_user=$this->currentUser();
+        $canEdit=Category::canEdit($current_user);
+
+        if(!$canEdit)  return  $this->unauthorized(); 
+
         $category= $this->categories->findOrFail($request['category']);
         $courseIds=$request['courses'];
         for($i = 0; $i < count($courseIds); ++$i) {
@@ -135,6 +121,9 @@ class CategoryCourseController extends BaseController
 
     public function destroy($id)
     {
+        $current_user=$this->currentUser();
+        $canEdit=Category::canEdit($current_user);
+
         $request = request();
         $course_id = $request->course;
 

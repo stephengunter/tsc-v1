@@ -8,45 +8,47 @@ use App\Exceptions\EmailUnconfirmed;
 
 class CheckOwner
 {
-    protected $user;
-   
-
-    public function getOwner() {
-        return   $this->user;
-    }
-    public function currentUser() {
-        return   $this->user;
-    }
-    public function adminId() {
-        return   $this->user->id;
-    }
-    public function canAdminCenter($center_id) {
-        return $this->user->admin->centers->pluck('id')->contains($center_id);
-    }
-    public function centersCanAdmin()
+    public static function canLogin($user)
     {
-         return $this->user->admin->validCenters();
+        if(!$user) return false;
+
+        if($user->isDev()) return true;
+        if($user->isOwner()) return true;
+
+        return false;
     }
+    
 
     public function handle($request, Closure $next)
     {
         $user=request()->user();
-        if(!$user){
-           throw new AuthenticationException();
-        }  
-        if(!$user->isOwner()){
-           throw new AuthenticationException();
-        }
-        if(!$user->email_confirmed){
-            $email=$user->email;
-            auth()->logout();
-            throw new EmailUnconfirmed($email);
-        }
 
-        $user->admin->centers;
-        $this->user=$user;
-       
-      
-        return $next($request);
+        $can_login= static::canLogin($user);
+        if($can_login){
+            $this->user=$user;
+           
+            return $next($request);
+        }else{
+
+            return static::exceptions($user);
+
+        }
+        
+        
+        
     }
+    public static function exceptions($user=null)
+    {
+        $email='';
+        if($user){
+            if(!$user->email_confirmed) $email=$user->email;
+            auth()->logout();
+        } 
+
+        if($email)  throw new EmailUnconfirmed($email);
+
+        throw new AuthenticationException();
+    }
+
+    
 }

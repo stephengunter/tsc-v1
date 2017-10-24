@@ -38,7 +38,7 @@
                         </div>  
                     </div>
                     <div class="col-sm-3">
-                         <div class="form-group">                           
+                         <div v-show="false" class="form-group">                           
                             <label>狀態</label>
                             <div>
                                <input type="hidden" v-model="form.category.active"  >

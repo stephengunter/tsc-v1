@@ -6,7 +6,7 @@
 
   </category>
 
-  <category-courses v-if="loaded" :category="category"
+  <category-courses v-if="topCategory" :category="category"
      :version="current_version"
      @add-course="onAddCourse" @remove="beginRemove">
     
@@ -56,7 +56,7 @@
     export default {
         name: 'CategoryDetails',
         components: {
-            'category':CategoryComponent,
+           'category':CategoryComponent,
            'category-courses':CategoryCoursesComponent,
            'course-selector':CourseSelector
         },
@@ -112,6 +112,10 @@
             }
         },
         computed:{
+           topCategory(){
+               if(!this.category) return false
+                return Helper.isTrue(this.category.public)
+           },
            hasAddCourses(){
                return this.addCourses.length > 0
            },
@@ -131,7 +135,7 @@
             toBoolean(val){
                return val=='true'
             },
-            onDataLoaded(category){
+            onDataLoaded(category){              
                 this.loaded=true
                 this.category=category
             },

@@ -3,7 +3,7 @@
      <th  scope="row" v-text="term.year"></th> 
      <td  v-text="term.order"></td> 
      <td  v-text="term.name"></td>
-     <td  v-text="term.number"></td> 
+     <td v-html="period(term.open_date , term.close_date)"></td> 
      <td  v-html="$options.filters.activeLabel(term.active)" ></td>
      <td> 
         <a v-if="term.updated_by"  href="#" @click.prevent="showUpdatedBy" >
@@ -33,14 +33,19 @@
                <option v-for="item in orderOptions" :value="item.value" v-text="item.text"></option>
            </select>
     </td> 
-    <td v-if="loaded">
-          <input type="text" name="term.name" @keydown="clearErrorMsg('term.name')" class="form-control" v-model="form.term.name">
-          <small class="text-danger" v-if="form.errors.has('term.name')" v-text="form.errors.get('term.name')"></small>
     
-    </td>
     <td v-if="loaded">
       <small class="text-danger" v-if="form.errors.has('term.number')" v-text="form.errors.get('term.number')"></small>
    
+    </td>
+    <td v-if="loaded">
+         <date-picker :option="datePickerOption" :date="open_date" ></date-picker>
+         <input  type="hidden" v-model="form.term.open_date"  >
+          <small class="text-danger" v-if="form.errors.has('term.open_date')" v-text="form.errors.get('term.open_date')"></small>
+         起至
+         <date-picker :option="datePickerOption" :date="close_date" ></date-picker>
+          <input  type="hidden" v-model="form.term.close_date"  >
+          <small class="text-danger" v-if="form.errors.has('term.close_date')" v-text="form.errors.get('term.close_date')"></small>
     </td>
     <td v-if="loaded">
           <input type="hidden" v-model="form.term.active"  >
@@ -50,6 +55,7 @@
     <td v-if="loaded">
          
     </td>
+    
     <td v-if="loaded">
          
         <button @click.prevent="onSubmit"  class="btn btn-success btn-xs">
@@ -88,9 +94,33 @@
 
                 loaded:false,
                 form:{},
+
+                datePickerOption:Helper.datetimePickerOption(),
+                open_date: {
+                    time: ''
+                },
+                close_date: {
+                    time: ''
+                },
                  
            
             }
+        },
+         watch:{
+            open_date: {
+              handler: function () {
+                  this.form.term.open_date=this.open_date.time
+                  this.clearErrorMsg('term.open_date')
+              },
+              deep: true
+            },
+            close_date: {
+              handler: function () {
+                  this.form.term.close_date=this.close_date.time
+                  this.clearErrorMsg('term.close_date')
+              },
+              deep: true
+            },
         },
         beforeMount() {
            this.init();
@@ -119,15 +149,24 @@
                     getData=Term.create()
                 }
                 getData.then(data => {
+                    let term=data.term
                     this.form=new Form({
-                        term:data.term
+                        term:term
                     }) 
+
+                    this.open_date.time=term.open_date
+                    this.close_date.time=term.close_date
+
+
                     this.loadOptions(id)
                     
                 })
                 .catch(error=> {
                     Helper.BusEmitError(error)
                 })
+            },
+            period(begin,end){
+               return Helper.period(begin,end)
             },
             loadOptions(id){
                 this.activeOptions=Helper.activeOptions()
@@ -143,6 +182,8 @@
            
             beginEdit(){
                 this.loaded=false
+                
+               
                 this.isReadOnly=false
                 this.fetchData()
             },

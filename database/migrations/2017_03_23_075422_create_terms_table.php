@@ -19,6 +19,9 @@ class CreateTermsTable extends Migration
             $table->integer('order');
             $table->string('name');
             $table->integer('number');
+
+            $table->date('open_date')->nullable();  
+            $table->date('close_date')->nullable();  
             
             $table->boolean('active')->default(false);
             $table->boolean('removed')->default(false);

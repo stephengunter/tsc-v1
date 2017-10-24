@@ -69,7 +69,7 @@
                 form: new Form({
                     admin: {}
                 }),
-                activeOptions:Helper.activeOptions(),
+                activeOptions:Admin.statusOptions(),
                 roleOptions:[],
 
             }

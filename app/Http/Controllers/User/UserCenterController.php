@@ -25,23 +25,15 @@ class UserCenterController extends BaseController
  {
     
     
-    public function __construct(Users $users,Centers $centers, CheckAdmin $checkAdmin)
+    public function __construct(Users $users,Centers $centers)
     {
-        $exceptAdmin=[];
-        $allowVisitors=[];
-
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
-        
         $this->users=$users;
         $this->centers=$centers;
-         
-
-        $this->setCheckAdmin($checkAdmin);
-          
 	}
 
 	public function index()
     {
+       
         $current_user=$this->currentUser();
         $request = request();
         
@@ -54,19 +46,21 @@ class UserCenterController extends BaseController
         $role=strtolower($role);
         $centers=[];
         if( $role == strtolower(Role::teacherRoleName()) ){
-            $centers=$user->teacher->validCenters();
+            $centers=$user->teacher->validCenters();   
+            $canEdit=true;   
+            return response()->json([
+                'centers' => $centers ,
+                'canEdit' => $canEdit
+            ]);
         }else if( $role == strtolower(Role::volunteerRoleName()) ){
             $centers=$user->volunteer->validCenters();
         }else if(in_array($role, Role::adminRoleNames(true))){
             $centers=$user->admin->validCenters();
-        }
-       
-        if(count($centers)){
-            foreach($centers as $center)
-            {
-                $center->canDelete=$center->canDeleteBy($current_user);
-            }
-            
+            $canEdit=$this->headCenterAdmin();
+            return response()->json([
+                                        'centers' => $centers ,
+                                        'canEdit' => $canEdit
+                                    ]);
         }
         
 
@@ -108,6 +102,8 @@ class UserCenterController extends BaseController
     
     public function store(Request $request)
     {
+        $current_user=$this->currentUser();
+        
         $user_id=$request['id'];
         $center_id=$request['center'];
         $role=$request['role'];
@@ -121,6 +117,8 @@ class UserCenterController extends BaseController
         }else if( $role == strtolower(Role::volunteerRoleName()) ){
             $user->volunteer->attachCenter($center_id);
         }else if(in_array($role, Role::adminRoleNames(true))){
+            if(!$current_user->admin->isHeadCenterBoss())   return  $this->unauthorized();  
+            
             $user->admin->attachCenter($center_id);
         }else{
             abort(404);
@@ -132,6 +130,8 @@ class UserCenterController extends BaseController
    
     public function destroy($id)
     {
+        $current_user=$this->currentUser();
+
         $request = request();
         $role=$request->role;
         $center_id=$request->center;
@@ -144,6 +144,9 @@ class UserCenterController extends BaseController
             $volunteer=Volunteer::findOrFail($id);
             $volunteer->detachCenter($center_id);
         }else if(in_array($role, Role::adminRoleNames(true))){
+            if(!$current_user->admin->isHeadCenterBoss())   return  $this->unauthorized();  
+
+
             $admin=Admin::findOrFail($id);
             $admin->detachCenter($center_id);
         }else{

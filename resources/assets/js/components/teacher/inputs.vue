@@ -45,10 +45,7 @@
        <div  class="col-sm-4"> 
            <div class="form-group">
                 <label>生日</label>
-                <!-- <div>
-                    <input type="hidden" name="user.profile.dob" v-model="form.user.profile.dob">
-                    <date-picker  :date="dob" :option="datePickerOption"></date-picker>
-                </div> -->
+               
                 <div class="input-group">
                     <date-picker  :date="dob" :option="datePickerOption"></date-picker>
                     <span v-show="hasDOB" class="input-group-btn">
@@ -70,7 +67,7 @@
               <input type="text" name="teacher.name" class="form-control" v-model="form.teacher.name" disabled >
           </div>
       </div>
-      <div class="col-sm-4">
+      <div v-show="false" class="col-sm-4">
           <div class="form-group">
               <label>狀態</label>
               <div>
@@ -78,7 +75,7 @@
               </div>
           </div>
       </div>
-      <div class="col-sm-4">
+      <div v-show="false" class="col-sm-4">
           <div class="form-group">
               <label>資料審核</label>
               <div>

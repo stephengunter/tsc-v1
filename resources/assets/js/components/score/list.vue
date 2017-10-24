@@ -202,8 +202,8 @@
             },
             submitImport() {
                 this.submitting = true
-                let form = new FormData();
-                form.append('course', this.course_id);
+                let form = new FormData()
+                form.append('course', this.course_id)
 
                 for (let i = 0; i < this.files.length; i++) {
                     form.append('score_file', this.files[i])

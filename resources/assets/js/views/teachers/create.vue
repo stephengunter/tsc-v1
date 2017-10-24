@@ -1,10 +1,10 @@
 <template>
 <div>
     <div class="panel panel-default">
-        <div class="panel-heading ">           
-       
-
+        <div class="panel-heading ">     
             <h4 v-html="title"></h4>
+            
+            
             <toggle :items="typeOptions"   :default_val="1" @selected="onTypeSelected"></toggle>
                          
         </div> <!--  panel  heading -->
@@ -161,7 +161,7 @@
 
                 if(this.isGroup) 
                 {
-                  alert('group')
+                  
                   this.form = new Form({
                       
                       user:{
@@ -181,7 +181,7 @@
                       }
                    })
                 }else{
-                   alert('not group')
+                  
                   let create=Teacher.create(this.user_id)
                   create.then(data=>{
                        let user=data.user
@@ -269,12 +269,14 @@
             onSubmit() {
               
                 if(this.isGroup){
+                   this.form.group=1
                    let teacher=this.form.teacher
                    this.form.user.name=teacher.name
                    this.form.user.profile.fullname=teacher.name
                  
                    this.submitForm()
                 }else{
+                    this.form.group=0
                     if(!this.form.user.id){
                        this.form.user.name=this.form.user.profile.fullname
                        this.formSubmitting=true
@@ -294,18 +296,19 @@
                 
                 let store=Teacher.store(this.form)
                     .then(data => {
-                       Helper.BusEmitOK()
-                       this.$emit('saved',data)                            
+                    //    Helper.BusEmitOK()
+                    //    this.$emit('saved',data)                            
                     })
                     .catch(error => {
                         if(error.status==422){
-                           // this.dobError=this.form.errors.has('user.profile.dob') 
+                           
                         }else{
                             Helper.BusEmitError(error,'存檔失敗') 
                         }
                        
                     })
             },
+            
            
             
             

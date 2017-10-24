@@ -11,12 +11,15 @@ class TeacherEventListener
     {
         
          $teacher=$event->teacher;
-         $teacher->addToRole();
+         if(!$teacher->group){
+             $teacher->addToRole();
+         }
+         
 
          $current_user=$event->current_user;
 
          if($current_user->isAdmin()){
-             $center=$current_user->admin->validCenters()->first();
+             $center=$current_user->admin->defaultCenter();
              if($center){
                  $teacher->attachCenter($center->id);
              }
@@ -27,7 +30,10 @@ class TeacherEventListener
     public function onTeacherDeleted($event) 
     {
         $teacher=$event->teacher;
-        $teacher->removeRole();      
+        if(!$teacher->group){
+            $teacher->removeRole();   
+        }
+           
         
     }
     

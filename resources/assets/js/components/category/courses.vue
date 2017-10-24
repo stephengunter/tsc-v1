@@ -5,10 +5,12 @@
             <span class="panel-title">
                 <h4 v-html="title"></h4>
             </span>    
-            <div>
+            <div class="form-inline"   >
+              
                <select  v-model="center" @change="fetchData"  class="form-control">
                   <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
                </select>
+                學年度：<span v-html="termsText"></span>
             </div>
             <div v-if="category.canEdit">
                 
@@ -74,6 +76,8 @@
                loaded:false,
 
                center:0,
+
+               termsText:'',
               
                centerOptions:[],
                courseList:[],
@@ -122,6 +126,17 @@
                 let getData=CategoryCourses.index(category,center)
                 getData.then(data=>{
                    this.courseList=data.courseList
+                   if(data.terms.length){
+
+                     let termsText=''
+                     for (var i =0 ; i < data.terms.length; i++) {
+                         termsText +=data.terms[i].name + ' &nbsp;&nbsp; '
+
+                     }
+
+                     this.termsText= termsText
+                  }
+                   
                    this.loaded=true
                 }).catch(error=>{
                    Helper.BusEmitError(error)

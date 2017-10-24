@@ -17,18 +17,12 @@ use App\Support\Helper;
 class ClassroomsController extends BaseController
 {
     protected $key='settings';
-    public function __construct(Classrooms $classrooms, Centers $centers ,
-                                CheckAdmin $checkAdmin) 
+    public function __construct(Classrooms $classrooms, Centers $centers )                                
     {
-        $exceptAdmin=[];
-        $allowVisitors=[];
-		$this->setMiddleware( $exceptAdmin, $allowVisitors);
-
-        
+       
 		$this->classrooms=$classrooms;
         $this->centers=$centers;
          
-        $this->setCheckAdmin($checkAdmin);
         
 	}
 
@@ -41,13 +35,27 @@ class ClassroomsController extends BaseController
                     ->with(['menus' => $menus]);  
                     
         }
-        $center=request()->get('center');
-        $withCenter=true;
 
+        $centerOptions=[];
+        $classroomList=[];
+        
+        $center=(int)request()->get('center');
+
+        if(!$center){
+
+            $current_user=$this->currentUser();
+            $centers_can_admin=$current_user->admin->centersCanAdmin();
+            if(!$centers_can_admin)  return  $this->unauthorized();
+
+            $centerOptions=$this->centers->optionsConverting($centers_can_admin);
+
+            $center=$centerOptions[0]['value'];
+        }
+
+        $withCenter=true;
         $classroomList = $this->classrooms->getByCenter($center,$withCenter)
                                             ->orderBy('active','desc')->get();
 
-        
         if(count($classroomList)){
             $current_user=$this->currentUser();
             foreach ($classroomList as $classroom) {
@@ -55,9 +63,18 @@ class ClassroomsController extends BaseController
                 $classroom->canDelete=$classroom->canDeleteBy($current_user);
             }
         }
+
+        if(count($centerOptions)){
+            return response()->json([
+                                        'centerOptions' => $centerOptions,
+                                        'classroomList' => $classroomList
+                                    ]);   
+        }else{
+            return response() ->json([ 'classroomList' => $classroomList ]);
+        }
        
        
-        return response()->json(['classroomList' => $classroomList  ]);       
+           
                   
     }
     

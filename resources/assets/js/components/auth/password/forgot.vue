@@ -1,21 +1,16 @@
 
 <template>
-
-<div style="width:600px">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <span class="panel-title">
-
-                 <h4>
-                    <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
-                     忘記密碼
-                 </h4>
-            </span>
-            <div>
-               
+    <div style="width:600px">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    <h4>
+                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                         忘記密碼
+                    </h4>
+                </span>
             </div>
-            
-        </div>  <!-- End panel-heading-->
+        </div>
         <div class="panel-body">
             <form class="form-horizontal" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
                 <div class="form-group">
@@ -36,10 +31,8 @@
                     
                 </div>
             </form>
-        </div><!-- End panel-body-->
-
+        </div>   
     </div>
-<div>
 </template>
 
 <script>

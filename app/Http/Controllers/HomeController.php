@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\BaseController;
-
-use App\Http\Middleware\CheckAdmin;
+use App\Repositories\Teachers;
 use Illuminate\Http\Request;
 use Hash;
 use Auth;
@@ -13,18 +12,13 @@ use App\User;
 class HomeController extends BaseController
 {
     
-    public function __construct(CheckAdmin $checkAdmin)
+    public function __construct(Teachers $teachers)                                   
     {
-        $exceptAdmin=[];
-        $allowVisitors=[];
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
-          
-        $this->setCheckAdmin($checkAdmin);
-    }
+        $this->teachers=$teachers;
 
-   
+    }
     public function index()
-    {
+    {  
         if(!request()->ajax()){
             return view('app');
         }
@@ -36,7 +30,7 @@ class HomeController extends BaseController
                 'teachers','discounts','settings',
                 'notices','reports'];
                 
-        if($current_user->isOwner()){
+        if($current_user->isOwner() ||  $current_user->isDev()){
             array_push($keys, 'admins');
         }
         $systems=[];
@@ -47,9 +41,29 @@ class HomeController extends BaseController
            $systems = array_merge($systems,$menus);
            
         }
+
+        $badges=[
+            'unreviewTeachers' => $this->unreviewTeachers()
+        ];
         return response()
             ->json([
                 'model' => $systems,
+                'badges' => $badges
             ]);
+    }
+
+    private function unreviewTeachers()
+    {
+        $admin_centers=$this->canAdminCenters();
+
+        if(!$admin_centers) return 0;
+
+        $admin_center_ids=$admin_centers->pluck('id')->toArray();
+        if(!count($admin_center_ids)) return 0;
+
+        return $this->teachers->getByCenters($admin_center_ids)
+                        ->where('reviewed',false)->count();
+       
+        
     }
 }

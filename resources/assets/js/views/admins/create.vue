@@ -28,7 +28,10 @@
                         </div>
                     </div>
                     <div class="col-sm-4">
-                        
+                        <label>所屬中心</label>
+                        <select v-model="form.admin.center_id"  name="admin.center_id" class="form-control" >
+                            <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
+                        </select>
                     </div>
                     <div class="col-sm-4">
                         
@@ -117,6 +120,7 @@
                 
                
                 roleOptions:[],
+                centerOptions:[],
 
                 userList:[],
                 showUserList:false,
@@ -173,6 +177,7 @@
                      this.form.admin=admin
 
                      this.roleOptions=data.roleOptions
+                     this.centerOptions=data.centerOptions
                      this.loaded=true
 
                 }).catch(error =>{

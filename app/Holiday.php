@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Holiday extends Model
 {
     protected $fillable = ['date',  'name','updated_by'];
-
+	public static function canEdit($user)
+	{
+		if(!$user->isAdmin()) return false;
+		return $user->admin->fromHeadCenter();
+	}
     public static function initialize()
     {
         return [
@@ -19,7 +23,7 @@ class Holiday extends Model
 
     public function canEditBy($user)
 	{
-		return $user->isAdmin();   
+		return static::canEdit($user);
 	}
 	public function canDeleteBy($user)
 	{

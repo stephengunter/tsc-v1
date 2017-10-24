@@ -1,31 +1,73 @@
 <template>
-
-<data-viewer :source="source" :thead="thead" :filter="filter"  :title="title" 
-    :default_order="defaultOrder" :default_search="defaultSearch" :version="current_version"
-     :create_text="createText" 
-      @beginCreate="beginCreate" >
-       
-        <template scope="props">
-            <tr>    
-                <td><a herf="#" @click.prevent="onSelected(props.item.id)">{{props.item.name}}</a> </td>
+    <div class="panel panel-default">
+        <div  class="panel-heading">
+            <div class="panel-title">
+                <h4 v-html="title">
+                </h4>
+            </div>
+            <div>
+                <label  class="btn  btn-success btn-file" @click="resetImport">
+                       <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                       Excel 匯入
+                       <input type="file"  ref="fileinput"  name="teachers_file" style="display: none;"  
+                       @change="onFileChange" >
+                    </label>
+                <a @click="beginCreate" class="btn btn-primary">
+                    新增開課中心
+                </a>
                 
-                <td v-text="addressText(props.item.contactInfo)"></td>
-                <td v-text="telText(props.item.contactInfo)"></td>
-                <td v-text="faxText(props.item.contactInfo)"></td>   
-                <td v-html="$options.filters.activeLabel(props.item.active)" ></td>
-                <td>
-                    <button @click="displayUp(props.item.id)" class="btn btn-default btn-xs">
-                        <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
-                    </button>
-                    <button @click="displayDown(props.item.id)" class="btn btn-default btn-xs">
-                        <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
-                    </button>
-                </td>    
-            </tr>
-        </template>
-
-</data-viewer>
-
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                         
+                        <th v-for="(item,index) in thead" :key="index" >
+                            {{item.title}}
+                        </th>
+                        <th v-show="!edittingOrder">
+                            順序
+                            <button v-show="hasData" @click="beginEditOrder" class="btn btn-primary btn-xs">
+                                <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                        </th>
+                        <th v-show="edittingOrder">
+                            順序
+                            <button @click="onSubmitDisplayOrders" class="btn btn-success btn-xs">
+                                <span aria-hidden="true" class="glyphicon glyphicon-floppy-disk" ></span>
+                            </button>
+                            <button @click="cancelEditOrder" class="btn btn-default btn-xs">
+                                <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(center, index) in centers" :key="center.id">    
+                        <td>
+                            <a herf="#" @click.prevent="onSelected(center.id)"> {{center.name}}
+                            </a> 
+                        </td>
+                        
+                        <td v-text="addressText(center.contactInfo)"></td>
+                        <td v-text="telText(center.contactInfo)"></td>
+                        <td v-text="faxText(center.contactInfo)"></td>   
+                        <td v-html="$options.filters.activeLabel(center.active)" ></td>
+                        
+                        <td v-show="!edittingOrder" v-text="center.display_order">
+                            
+                        </td> 
+                        <td v-show="edittingOrder">
+                            <input @keydown="clearErrorMsg(index)" type="text" name="center.display_order" class="form-control" v-model="center.display_order">
+                  
+                            <small class="text-danger" v-text="center.error"></small>
+                        </td>   
+                    </tr>
+                </tbody>  
+            </table>
+        </div>
+    </div>
 
 </template>
 
@@ -34,7 +76,11 @@
     export default {
         name: 'CenterList',
         props: {
-            hide_create:{
+            can_create:{
+               type: Boolean,
+               default: false
+            },
+            can_edit:{
                type: Boolean,
                default: false
             },
@@ -51,13 +97,7 @@
         data() {
             return {
                 title:Helper.getIcon('Centers')  + '  開課中心管理',
-                current_version:0,
-                defaultOrder:'display_order',
-                defaultSearch:'name',
                 
-                createText:'新增開課中心',
-                
-                source: Center.source(),
                 thead: [{
                         title: '名稱',
                         key: 'name',
@@ -84,35 +124,45 @@
                         key: 'active',
                         sort: false,
                         default:true
-                    }, {
-                        title: '顯示順序',
-                        key: 'display_order',
-                        sort: false,
-                        default:true
                     }],
-
-
-                filter: [{
-                            title: '名稱',
-                            key: 'name',
-                         }
-                        ],
-
-               
-
                 
-                selected: 0,
+                edittingOrder: false,
+
+                centers:[]
                 
              
             }
+        },
+        computed: {
+            hasData() {
+              return this.centers.length > 0
+            },
         },
         beforeMount() {
            this.init()
         },
         methods: {
             init() {
-                
-                if(this.hide_create) this.createText=''
+                this.edittingOrder=false
+                this.centers=[]
+
+              
+
+                this.fetchData()
+            },
+            fetchData(){
+                let getData=Center.index()
+                getData.then(data => {
+                    let centers = data.centers
+                    this.centers=centers
+
+                    
+                    this.loaded=true
+                    
+                })
+                .catch(error=> {
+                    Helper.BusEmitError(error)
+                })
             },
             addressText(contactInfo) {
                 if(!contactInfo) return ''
@@ -130,23 +180,83 @@
             onSelected(id){
                 this.$emit('selected',id)
             },
+            clearErrorMsg(index){
+                let center=this.centers[index]
+                center.error= ''
+            },
             
             beginCreate(){
                  this.$emit('begin-create')
             },
-            displayUp(id){
-                 this.updateDisplayOrder(id,true)
+            beginEditOrder(){
+                this.edittingOrder=true
             },
-            displayDown(id){
-                 this.updateDisplayOrder(id,false)
+            cancelEditOrder(){
+                 this.init()
             },
-            updateDisplayOrder(id,up){
-                let update=Center.updateDisplayOrder(id,up)
-                    update.then(data => {
-                        this.current_version += 1
+            
+            onSubmitDisplayOrders(){
+               this.hasError=true
+               let errors=0
+               for(let i=0; i<this.centers.length ; i++){
+                    let center=this.centers[i]
+                    let val=center.display_order
+                    if(isNaN(val) || val.length < 1){
+                          center.error= '必須為數字'
+                          errors+=1
+                    }else{
+                        center.error= ''
+                    }
+                   
+                }
+              
+                if(errors==0) {
+                    this.updateDisplayOrder()
+                }
+            },
+            updateDisplayOrder(){
+               
+                let form=new Form({
+                    centers:this.centers
+                })
+                let save=Center.updateDisplayOrder(form)
+                save.then(result => {
+                        Helper.BusEmitOK()
+                        this.init()
                     })
                     .catch(error => {
-                        Helper.BusEmitError(error,'更新排序失敗')
+                         Helper.BusEmitError(error,'存檔失敗')
+                    })
+            },
+            resetImport(){
+               this.$refs.fileinput.value = null
+            },
+            onFileChange(e) {
+              
+                var files = e.target.files || e.dataTransfer.files
+                if (!files.length)  return
+                   
+                this.files = e.target.files
+
+                this.submitImport()
+            },
+            submitImport() {
+                let type=1
+                if(!Helper.isTrue(this.type)) type=0
+
+                let form = new FormData()
+                for (let i = 0; i < this.files.length; i++) {
+                    form.append('teachers_file', this.files[i])
+                    form.append('type', type)
+                }
+
+                let store=Teacher.import(form)
+                store.then(result => {
+                        // Helper.BusEmitOK()
+                        // this.$emit('saved')  
+                    })
+                    .catch(error => {
+                         Helper.BusEmitError(error,'存檔失敗')
                     })
             },
             

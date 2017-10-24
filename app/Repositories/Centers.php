@@ -28,15 +28,19 @@ class Centers
       
     }
    
-     public function updateDisplayOrder($up, $id)
+    public function updateDisplayOrder($id,$order,$updated_by)
     {
             $center=$this->findOrFail($id);          
-            $num= rand(1, 10);
-            if($up){
-                $center->display_order += $num;
+           
+            $center->display_order= (int)$order;           
+            $center->updated_by= $updated_by;
+
+            if($order>=0){
+                $center->active=true;
             }else{
-                $center->display_order -= $num;
+                $center->active=false;
             }
+            
             
             $center->save();
            
@@ -46,16 +50,24 @@ class Centers
     
    
 
-    public function options()
+    public function options($empty_item=false)
     {
         $centerList=$this->getAll()->get();
-        return $this->optionsConverting($centerList);
+        return $this->optionsConverting($centerList,$empty_item);
        
     }
 
-    public function optionsConverting($centerList)
+    public function optionsConverting($centerList,$empty_item=false)
     {
         $centerOptions=[];
+
+        if($empty_item){
+            $item=[ 'text' => '全部開課中心' , 
+                    'value' => 0 , 
+                  ];
+            array_push($centerOptions,  $item);
+        }
+
         foreach($centerList as $center)
         {
             $item=[ 'text' => $center->name , 

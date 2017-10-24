@@ -5,6 +5,8 @@ class Admin {
             this[property] = data[property];
         }
 
+        
+
     }
     static role() {
         return 'Admin'
@@ -165,14 +167,14 @@ class Admin {
                 },{
                     title: '角色',
                     key: 'admin.role',
-                    sort: true,
+                    sort: false,
                     default:true,
                     width:'10%'
                 }, {
                     title: '手機',
                     key: 'phone',
                     default:true,
-                    sort: true
+                    sort: false
                    
                 }, {
                      title: '所屬中心',
@@ -195,6 +197,37 @@ class Admin {
 
 
         return thead
+    }
+    static statusOptions(){
+      return  [{
+                    text: '使用中',
+                    value: '1'
+                }, {
+                    text: '已停用',
+                    value: '0'
+                }]
+    } 
+    static statusLabel(active) {
+        let style='label label-default'
+        let text= '已停用'
+        if (parseInt(active)){
+           style = 'label label-success'
+           text='使用中'
+        }
+       
+        return `<span class="${style}" > ${text} </span>`
+              
+    }
+    static getCenterNames(centers){
+        if(centers.length){
+
+           let names=''
+           for (var i =0 ; i < centers.length; i++) {
+               names +=centers[i].name + '&nbsp;&nbsp;'
+           }
+
+           return names
+        }
     }
 
 

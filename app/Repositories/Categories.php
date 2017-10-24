@@ -76,20 +76,23 @@ class Categories
     {
        return $this->getAll()->where('public',false)->orderBy('order','desc');
     }
-    public function updateDisplayOrder($category ,$up,$updated_by)
+    public function updateDisplayOrder($id,$order,$updated_by)
     {
-            $num= rand(1, 10);
-            if($up){
-                $category->order += $num;
-            }else{
-                $category->order -= $num;
-            }
+        $category = Category::findOrFail($id);        
 
-            $category->updated_by=$updated_by;
-            
-            $category->save();
-           
-            return $category;
+        $category->order= (int)$order;           
+        $category->updated_by= $updated_by;
+
+        if($order>=0){
+            $category->active=true;
+        }else{
+            $category->active=false;
+        }
+        
+        
+        $category->save();
+       
+        return $category;
 
     }
 

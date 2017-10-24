@@ -8,14 +8,14 @@
         <td v-html="$options.filters.showIcon(category.icon)"></td> 
         <td v-html="$options.filters.activeLabel(category.active)"></td> 
 
-        <td>
-            <button @click="displayUp(category.id)" class="btn btn-default btn-xs">
-                <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
-            </button>
-            <button @click="displayDown(category.id)" class="btn btn-default btn-xs">
-                <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
-            </button>
-        </td>   
+        <td v-show="!editting_order" v-text="category.order">
+                            
+        </td> 
+        <td v-show="editting_order">
+            <input @keydown="clearErrorMsg" type="text" name="category.display_order" class="form-control" v-model="category.order">
+  
+            <small class="text-danger" v-text="category.error"></small>
+        </td>     
     </tr>                   
        
 </template>
@@ -28,6 +28,10 @@
                type: Object,
                default: null
             },
+            index: {
+               type: Number,
+               default: -1
+            },
             more:{
                type: Boolean,
                default: false
@@ -37,6 +41,10 @@
                default: false
             },
             select:{
+               type: Boolean,
+               default: false
+            },
+            editting_order:{
                type: Boolean,
                default: false
             },
@@ -59,12 +67,10 @@
              
                 this.$emit('selected',id)
             },
-            displayUp(id){
-                this.$emit('display-up',id)
+            clearErrorMsg(){
+                this.$emit('clear-error', this.index)
             },
-            displayDown(id){
-                this.$emit('display-down',id)
-            }
+           
 
         },
         

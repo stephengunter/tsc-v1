@@ -27,27 +27,17 @@ class UsersController extends BaseController
  {
     protected $key='users';
     
-    public function __construct(Users $users, Titles $titles, 
-                                Registrations $registrations, CheckAdmin $checkAdmin)
+    public function __construct(Users $users, Titles $titles,Registrations $registrations)                               
     {
-        //   $exceptAdmin=['show','edit','update','updateContactInfo','updatePhoto'];
-          $exceptAdmin=[];
-          $allowVisitors=[];
-
-          $this->setMiddleware( $exceptAdmin, $allowVisitors);
-        
           $this->users=$users;
           $this->titles=$titles;
          
           $this->registrations=$registrations;
-
-          $this->setCheckAdmin($checkAdmin);
           
 	}
 
 	public function index()
     {
-         
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('users.index')
@@ -129,10 +119,6 @@ class UsersController extends BaseController
         $user = User::with('profile.title','roles')->findOrFail($id);
         if(!$user->canViewBy($current_user)){
             return  $this->unauthorized();   
-        }
-
-        if($user->admin){
-           $user->admin->validCenters = $user->admin->validCenters();
         }
         
 
@@ -262,20 +248,10 @@ class UsersController extends BaseController
         $values=$request->getValues();
         $email=$values['email'];
         $phone=$values['phone'];
-        
-        $allUsers = $this->users->getAll();
-        $userList=[];
-        $users=[];
-        if(!$email){
-            $users = $allUsers->where('phone',$phone);
-        }else{
-            $users = $allUsers->where('phone',$phone)
-                    ->orWhere('email',$email);
-        };
 
-        if($users->count()){
-            $userList=$users->with('profile')->get();
-        }
+        $userList=$this->users->findUsers($email, $phone);
+        
+        
         return response()
                     ->json([
                         'userList' => $userList

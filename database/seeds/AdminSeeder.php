@@ -16,11 +16,13 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-         $roleName='Owner';
+         $roleName='Dev';
          $user=User::where('email','traders.com.tw@gmail.com')->firstOrFail();
 
          $role=Role::where('name',$roleName)->firstOrFail();
          $user->attachRole($role);
+
+         
 
          $adminValues = [
 		     'role' => $roleName,	
@@ -29,12 +31,7 @@ class AdminSeeder extends Seeder
          Admin::create($adminValues);
         
 
-         $admin=Admin::find($user->id);
-
-         $centerIds=Center::all()->pluck('id')->toArray();
-         for($i=0; $i< count($centerIds); $i++){
-             $admin->centers()->attach($centerIds[$i]);
-         }
+         
         
     }
 }

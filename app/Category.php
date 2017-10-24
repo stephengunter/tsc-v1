@@ -13,10 +13,19 @@ class Category extends Model
 
 	// protected $fillable = ['name', 'parent', 'order', 'active'	, 'icon'];
 
-    // whitelist of filter-able columns
+    
     protected $filter = [
         'name', 'order','active'
     ];
+
+    public static function canEdit($user)
+    {
+        if($user->isDev()) return true;
+
+        if(!$user->isAdmin()) return false;
+
+        return 	$user->admin->fromHeadCenter();
+    }
 
     public function courses()
     {
@@ -58,7 +67,7 @@ class Category extends Model
     }
     public function canEditBy($user)
 	{
-		return $user->isAdmin();
+		return 	static::canEdit($user);
           
 	} 
 	public function canDeleteBy($user)

@@ -7,6 +7,7 @@ use App\Teacher;
 use App\Volunteer;
 use App\Photo;
 use App\Role;
+use App\ContactInfo;
 
 use App\Support\FilterPaginateOrder;
 use App\Support\Helper;
@@ -176,6 +177,30 @@ class User extends Authenticatable {
 		return $this->hasMany('App\Student');
 	}
 
+	public function getContactInfo() 
+	{
+		if(!$this->contact_info) return null;
+		return ContactInfo::find($this->contact_info);
+	}
+
+	public function updateAddress($zipcode, $street,$updated_by)
+    {
+        
+        $contact_info=$this->getContactInfo();
+        if($contact_info){
+            $contact_info->updateAddress($zipcode, $street,$updated_by);
+        }else{
+            $contact_info=ContactInfo::createByAddress($zipcode, $street,$updated_by);
+            if($contact_info) {
+                $this->contact_info=$contact_info->id;
+                $this->updated_by=$updated_by;
+                $this->save();
+            }
+        }
+    }
+
+
+
 	
 
 	
@@ -195,7 +220,16 @@ class User extends Authenticatable {
           	return $roles->get();
 		}
 	}
+	public function isDev()
+	{
+		if(!$this->roles->count()){
+			return false;
+		}
+		
+		if($this->hasRole('Dev')) return true;
 
+		return false;
+	}
 	public function isAdmin()
 	{
 		if(!$this->roles->count()){
@@ -246,6 +280,7 @@ class User extends Authenticatable {
 	public function canViewBy($user)
 	{
 		if($user->id==$this->id) return true;
+		if($user->isDev()) return true;
 		return $user->isAdmin();
 	}
 
@@ -254,23 +289,14 @@ class User extends Authenticatable {
 	{
 		if($user->id==$this->id) return true;
 
-		if($this->isAdmin()){
-			if(!$user->isOwner()) return false;	
-			$admin=$this->admin;
-			if(!$admin->centers()->count()) return true;
-			return Helper::centersIntersect($admin,$user->admin);		
+		if($this->isAdmin()){			
+			return	$this->admin->canEditBy($user);
 		}
-		if($this->isTeacher()){
-			if(!$user->isAdmin()) return false;	
-			$teacher=$this->teacher;
-			if(!$teacher->centers()->count()) return true;
-			return Helper::centersIntersect($teacher,$user->admin);		
+		if($this->isTeacher()){			
+			return	$this->teacher->canEditBy($user);		
 		}
 		if($this->isVolunteer()){
-			if(!$user->isAdmin()) return false;	
-			$volunteer=$this->volunteer;
-			if(!$volunteer->centers()->count()) return true;
-			return Helper::centersIntersect($volunteer,$user->admin);		
+			return	$this->volunteer->canEditBy($user);			
 		}
 
 		return $user->isAdmin();

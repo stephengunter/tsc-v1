@@ -17,8 +17,6 @@ use App\Repositories\Weekdays;
 use App\Http\Requests\Course\CourseRequest;
 
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
-
 use App\Events\CourseUpdated;
 use Carbon\Carbon;
 
@@ -29,15 +27,12 @@ class CoursesController extends BaseController
 {
     protected $key='courses';
     public function __construct(Courses $courses, Categories $categories, Teachers $teachers,
-                                 Terms $terms , Centers $centers, Weekdays $weekdays,CheckAdmin $checkAdmin)
+                                 Terms $terms , Centers $centers, Weekdays $weekdays)
                                
     {
        
-        //  $exceptAdmin=['activeCourses','details'];
-        $exceptAdmin=[];
-        $allowVisitors=[];
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
         
+       
         $this->courses=$courses;
         $this->categories=$categories;
         $this->teachers=$teachers;
@@ -45,7 +40,7 @@ class CoursesController extends BaseController
         $this->centers=$centers;
         $this->weekdays=$weekdays;
 
-        $this->setCheckAdmin($checkAdmin);
+       
        
       
 

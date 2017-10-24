@@ -4,42 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Route;
-use App\Http\Middleware\CheckAdmin;
-use App\Http\Middleware\CheckOwner;
+
+use Illuminate\Auth\AuthenticationException;
 
 class BaseController extends Controller
 {
-    protected $checkAdmin;
-    public function __construct()
-    {
-          
-          
-	}
-    protected function setMiddleware(array $exceptAdmin, array $allowVisitors,$key='admin')
-    {
-       
-        $this->middleware($key, ['except' => array_merge($exceptAdmin,$allowVisitors) ]);
-
-        if(count($exceptAdmin)) $this->middleware('auth', ['only' => $exceptAdmin]);
-        
-    }
-    protected function setCheckAdmin($checkAdmin)
-    {
-        $this->checkAdmin=$checkAdmin;
-    }
-   
     protected function currentUser()
-    {
-        if($this->checkAdmin){
-            return $this->checkAdmin->currentUser();
-        }else{
-           return request()->user();
-        }
+    {        
+        return auth()->user();
+    }
+    protected function headCenterAdmin()
+    {   
+        $currentUser=$this->currentUser();
+        if($currentUser->isDev())  return true;
+            
+        $admin=auth()->user()->admin;
+        return $admin->fromHeadCenter();
+    }
+    protected function canAdminCenters()
+    {        
+        $admin=auth()->user()->admin;
+        if($admin) return $admin->centers;
+        return null;
         
     }
+
+
     protected function unauthorized()
     {
-        return  response()->json(['msg' => '權限不足' ]  ,  401);  
+         throw new AuthenticationException();
     }
     protected function menus($key)
     {
@@ -112,13 +105,27 @@ class BaseController extends Controller
                     'id' => 1,
                     'text' => '教師管理',
                     'path' => '/teachers',
-                    'active' => $current!='teachers/create'
+                    'active' => $current=='teachers'
                 ],
                 [
                     'id' => 2,
                     'text' => '新增教師',
                     'path' => '/teachers/create',
                     'active' => $current=='teachers/create',
+                    
+                ],
+                [
+                    'id' => 3,
+                    'text' => '匯入教師',
+                    'path' => '/teachers/import',
+                    'active' => $current=='teachers/import',
+                    
+                ],
+                [
+                    'id' => 4,
+                    'text' => '教師審核',
+                    'path' => '/teachers/review',
+                    'active' => $current=='teachers/review',
                     
                 ],
                

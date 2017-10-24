@@ -5,7 +5,7 @@
      
      <td v-if="isReadOnly">
          
-        <button v-if="center.canDelete"  class="btn btn-danger btn-xs" @click.prevent="btnDeleteClicked">
+        <button v-if="can_edit" v-show="center.canDelete"  class="btn btn-danger btn-xs" @click.prevent="btnDeleteClicked">
            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
         </button>
      </td> 

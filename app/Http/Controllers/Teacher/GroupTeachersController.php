@@ -27,25 +27,19 @@ class GroupTeachersController extends BaseController
  {
    
 
-    public function __construct(Teachers $teachers ,Users $users, Courses $courses,
-                                Centers $centers, CheckAdmin $checkAdmin)                               
+    public function __construct(Teachers $teachers ,Users $users, Courses $courses, Centers $centers)                                                              
     {
-        //  $exceptAdmin=['create','edit','store','show','edit','update','updateUser'];
-		$exceptAdmin=[];
-        $allowVisitors=[];
-
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
+        
         
 		$this->teachers=$teachers;       
         $this->users=$users;  
         $this->courses=$courses; 
         $this->centers=$centers; 
-
-        $this->setCheckAdmin($checkAdmin);
          
 	}
     public function show($id)
     {
+       
         $teachers=[];
         
         $teachers=$this->teachers->groupTeachers($id)->get();

@@ -8,43 +8,49 @@ use App\Exceptions\EmailUnconfirmed;
 
 class CheckAdmin
 {
-    protected $user;
+    public static function canLogin($user)
+    {
+        if(!$user) return false;
 
-    public function getAdmin() {
-        return   $this->user->admin;
+        if(!$user->email_confirmed) return false;
+
+        if($user->isDev()) return true;
+        if($user->isAdmin()) return true;
+
+        return false;
     }
-    public function currentUser() {
-        return   $this->user;
-    }
-    public function getAdminId() {
-        return   $this->user->id;
-    }
-    public function isOwner() {
-        return   $this->user->isOwner();
-    }
-    public function canAdminCenter($center_id) {
-        return $this->user->admin->centers->pluck('id')->contains($center_id);
-    }
+    
 
     public function handle($request, Closure $next)
     {
         $user=request()->user();
-        if(!$user){
-           throw new AuthenticationException();
-        }  
-        if(!$user->isAdmin()){
-            throw new AuthenticationException();
-        }
-        if(!$user->email_confirmed){
-            $email=$user->email;
-            auth()->logout();
-            throw new EmailUnconfirmed($email);
-        }
 
-        $user->admin->centers;
-        $this->user=$user;
-       
-        return $next($request);
+        $can_login= static::canLogin($user);
+        if($can_login){
+           
+            $this->user=$user;
+           
+            return $next($request);
+        }else{
+
+            return static::exceptions($user);
+
+        }
+        
+        
+        
+    }
+    public static function exceptions($user=null)
+    {
+        $email='';
+        if($user){
+            if(!$user->email_confirmed) $email=$user->email;
+            auth()->logout();
+        } 
+
+        if($email)  throw new EmailUnconfirmed($email);
+
+        throw new AuthenticationException();
     }
 
     

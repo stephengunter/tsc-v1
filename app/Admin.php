@@ -5,11 +5,20 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Profile;
 use App\Role;
+use App\Center;
 
 use App\Support\Helper;
 
+use App\Support\FilterPaginateOrder;
+
 class Admin extends Model
 {
+    use FilterPaginateOrder;
+    protected $filter = [
+        'role', 'updated_at' , 'user.profile.fullname'
+    ];
+
+
 	protected $primaryKey = 'user_id';
 	protected $fillable = ['role', 'active', 'removed','updated_by' ];			 
     
@@ -17,6 +26,7 @@ class Admin extends Model
     {
         return [ 
                  'active' => 1,
+                 'center_id' => 0
                ];      
        
     }
@@ -61,7 +71,18 @@ class Admin extends Model
             $user->detachRole($role);       
         } 
 	}
-	
+    
+    public function isHeadCenterBoss()
+    {
+        if(!$this->user->isOwner()) return false;
+        return $this->fromHeadCenter();
+    }
+    public function fromHeadCenter()
+    {
+        if(!$this->centers) return false;
+        $head=Center::getHeadCenter()->first();
+        return $this->centers->contains($head);
+    }
 	
 	public function canViewBy($user)
 	{
@@ -72,6 +93,7 @@ class Admin extends Model
 	{
 		if(!$user->isOwner()) return false;
 
+        if($user->admin->fromHeadCenter()) return true;
 		if(!$user->admin->centers()->count()) return false;
 
 		return Helper::centersIntersect($this ,$user->admin);	
@@ -87,6 +109,15 @@ class Admin extends Model
       
     }
 
+    public function centersCanAdmin()
+	{
+        if($this->isHeadCenterBoss()){
+            return Center::where('removed',false)->get();
+        }
+
+        return $this->validCenters();
+	}
+
     public function canAdminCenter($center)
 	{
         if(!$center->isValid()) return true;
@@ -95,14 +126,16 @@ class Admin extends Model
 
 	public function validCenters()
 	{
-      
 		 return Helper::validCenters($this);
 	}
 
     public function defaultCenter()
     {
           if(!$this->validCenters()) return null;
-          return $this->validCenters()->first();
+
+          $sorted = $this->validCenters()->sortBy('head');
+          
+          return $sorted->values()->all()[0];
     }
 
 	public function centersCanAdd()
@@ -116,10 +149,10 @@ class Admin extends Model
 
 	public function attachCenter($center_id)
     {
-            if(!$this->centers->contains($center_id)) 
-            {
-                $this->centers()->attach($center_id);
-            }
+        if(!$this->centers->contains($center_id)) 
+        {
+            $this->centers()->attach($center_id);
+        }
            
     }
     public function detachCenter($center_id)
