@@ -214,10 +214,7 @@ class TeachersController extends BaseController
     
     public function import()
     {
-        // $disk = Storage::disk('local');
-        // $contents = $disk->get('/seed/test.jpg');
-
-        // dd($contents);
+        
 
         $menus=$this->menus($this->key);     
        
@@ -284,10 +281,8 @@ class TeachersController extends BaseController
         $reviewed=$form['reviewed'];
 
         $current_user=$this->currentUser();
-        // if(!$teacher->canReviewBy($current_user)){
-        //     return  $this->unauthorized();    
-        // }
-        $teacher=$this->teachers->updateReview($id,$reviewed,$current_user->id);    
+       
+        $teacher=$this->teachers->updateReview($id,$reviewed,$current_user);    
 
         return response()->json($teacher); 
 

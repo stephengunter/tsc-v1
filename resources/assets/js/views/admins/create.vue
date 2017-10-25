@@ -7,7 +7,7 @@
             </span> 
             <label  class="btn  btn-success btn-file" @click="resetImport">
                 <i class="fa fa-file-excel-o" aria-hidden="true"></i>
-                Excel 匯入cccc
+                Excel 匯入
                 <input type="file"  ref="fileinput"  name="teachers_file" style="display: none;"  
                 @change="onFileChange" >
             </label>          

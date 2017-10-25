@@ -6,7 +6,9 @@
 
             <h4 v-html="title"></h4>
             
-             
+            <a href="/downloads?type=import&key=teachers" target="_blank" class="btn btn-default btn-primary">
+                <i class="fa fa-download" aria-hidden="true"></i>下載範例檔
+            </a> 
             
             
         </div> <!--  panel  heading -->

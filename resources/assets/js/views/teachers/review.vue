@@ -1,4 +1,5 @@
 <template>
+<div>
     <div class="panel panel-default">
         <div  class="panel-heading">
             <div class="panel-title">
@@ -28,23 +29,6 @@
                             </checkbox>
                         </th>
                         <th v-for="item in thead"> {{ item.title }} </th>
-                        
-                       
-                        <!-- <th v-show="!edittingOrder">
-                            順序
-                            <button v-show="hasData" @click="beginEditOrder" class="btn btn-primary btn-xs">
-                                <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
-                            </button>
-                        </th>
-                        <th v-show="edittingOrder">
-                            順序
-                            <button @click="onSubmitDisplayOrders" class="btn btn-success btn-xs">
-                                <span aria-hidden="true" class="glyphicon glyphicon-floppy-disk" ></span>
-                            </button>
-                            <button @click="cancelEditOrder" class="btn btn-default btn-xs">
-                                <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
-                            </button>
-                        </th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -56,7 +40,7 @@
                              
                             </checkbox>
                         </td> 
-                        <td><a herf="#" @click="onSelected(teacher.user_id,true)">{{teacher.user.profile.fullname}}</a> </td>
+                        <td><a herf="#" @click="onSelected(teacher.user_id)">{{teacher.user.profile.fullname}}</a> </td>
                         <td>
                           
                           <span v-if="isGroup(teacher)" v-html="$options.filters.okSign(true)"></span>
@@ -76,12 +60,39 @@
             </table>
         </div>
     </div>
+
+    <modal :showbtn="modalSettings.showBtn"  :show.sync="modalSettings.show" :large="true"  @closed="onCloseModal" effect="fade" width="800">   
     
+        <div slot="modal-header" class="modal-header">
+       
+            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="onCloseModal">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </button>
+            
+        </div>
+        <div slot="modal-body" class="modal-body">
+            <show v-if="selected"  :id="selected"
+                :can_back="showSettings.can_back" :can_edit="showSettings.can_edit"
+                @edit-review="onEditReview">      
+                           
+            </show>
+        </div>
+    </modal>
+
+    <review-editor :showing="reviewEditor.show" :reviewed="reviewEditor.reviewed"
+      @close="reviewEditor.show=false" @save="updateReview">
+    </review-editor>
+
+</div>    
 </template>
     
 <script>
+    import Show from '../../components/teacher/show.vue'
     export default {
         name: 'TeacherReview',  
+        components: {
+            Show          
+        },
         props: {
             version: {
                 type: Number,
@@ -104,7 +115,25 @@
                 teacherList:[],
                 centerOptions:[],
 
-                isCheckAll:false
+                
+
+                modalSettings:{
+                    show:false,
+                    showBtn:false
+
+                },
+                showSettings:{
+                    can_edit:false,
+                    can_back:false
+
+                },
+
+                reviewEditor:{
+                    show:false,
+                    reviewed:false
+                },
+
+                selected:0
                 
             }
         },
@@ -126,9 +155,13 @@
         methods: {
             init(){
                 this.loaded=false
+                this.selected=0
                 this.checked_ids=[]
                 this.teacherList=[]
-                this.isCheckAll=false
+
+                this.modalSettings.show=false
+                this.reviewEditor.show=false
+                
                 this.fetchData()                
             },
             fetchData(){
@@ -173,7 +206,8 @@
                 this.checked_ids=[]
             },
             onSelected(id){
-                
+                this.selected=id
+                this.modalSettings.show=true
                
             },
             submit(){
@@ -183,7 +217,28 @@
                     }).catch( error => {
                         Helper.BusEmitError(error,'存檔失敗')           
                     })
-        }
+            },
+            onCloseModal(){
+                this.modalSettings.show=false
+            },
+            onEditReview(){
+                this.reviewEditor.show=true     
+            },
+            updateReview(val){
+                let id = this.selected 
+                let review= val
+                let save= Teacher.updateReview(id,review)
+
+                save.then(teacher => {
+                    Helper.BusEmitOK('存檔成功')
+                    this.init()
+                   
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error,'存檔失敗')
+                    this.showReviewEditor=false   
+                })
+            }
             
             
         },

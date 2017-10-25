@@ -18,10 +18,8 @@
 </div>
 </template>
 <script>
-    import Show from './show.vue'
-  
+    import Show from './show.vue'  
     import Edit from './edit.vue'
-
 
     export default {
         name:'AdmissionView',

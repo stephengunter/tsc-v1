@@ -6,7 +6,8 @@
     
 //  });
 Route::get('test', function(){
-    return view('test');
+
+    
 });
 
 Route::get('errors', function(){
@@ -28,8 +29,9 @@ Route::get('reset-password/user/{user}/token/{token}','\App\Http\Controllers\Aut
 Route::group(['middleware' => 'admin'], function()
 {
     Route::get('/', 'HomeController@index');
+    Route::get('/downloads', 'DownloadsController@index');
 
-    Route::get('admins/index-options', 'AdminsController@indexOptions');
+    //Route::get('admins/index-options', 'AdminsController@indexOptions');
     Route::post('admins/import', 'AdminsController@import');
     Route::resource('admins', 'AdminsController');
 
