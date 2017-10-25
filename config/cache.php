@@ -14,8 +14,8 @@ return [
     | Supported: "apc", "array", "database", "file", "memcached", "redis"
     |
     */
-    'default' => env('CACHE_DRIVER', 'array'),
-   // 'default' => env('CACHE_DRIVER', 'file'),
+    
+    'default' => env('CACHE_DRIVER', 'file'),
 
     /*
     |--------------------------------------------------------------------------

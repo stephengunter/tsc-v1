@@ -1,58 +1,58 @@
 class Helper {
-    static newWindow(path){
-        window.open(window.location.origin +  path)
+    static newWindow(path) {
+        window.open(window.location.origin + path)
     }
-    static redirect(url){
+    static redirect(url) {
         document.location = url;
     }
-    static tryParseInt(val){
-        if(!val) return 0
+    static tryParseInt(val) {
+        if (!val) return 0
         return parseInt(val)
     }
-    static isTrue(val){
-        if(typeof val=='number'){
-             return val > 0
-        }else if(typeof val=='string'){
-            if(val.toLowerCase()=='true') return true
-            if(val=='1') return true
-                  return false
-        }else if(typeof val=='boolean'){
-              return val
+    static isTrue(val) {
+        if (typeof val == 'number') {
+            return val > 0
+        } else if (typeof val == 'string') {
+            if (val.toLowerCase() == 'true') return true
+            if (val == '1') return true
+            return false
+        } else if (typeof val == 'boolean') {
+            return val
         }
-      
+
         return false
     }
-    static replaceAll(strVal, oldVal, newVal){
-      
-       return strVal.replace( new RegExp(oldVal,'g'), newVal)
+    static replaceAll(strVal, oldVal, newVal) {
+
+        return strVal.replace(new RegExp(oldVal, 'g'), newVal)
     }
-    static boolText(val){
-        if(this.isTrue(val)) return '是'
-            return '否'
+    static boolText(val) {
+        if (this.isTrue(val)) return '是'
+        return '否'
     }
-    static getOptions(list, valueKey, textKey){
-        let options=[]
-        if(list.length<1) return []
-        for(let i=0; i<list.length; i++){
-            let item={
-                value:list[i][valueKey],
-                text:list[i][textKey]
+    static getOptions(list, valueKey, textKey) {
+        let options = []
+        if (list.length < 1) return []
+        for (let i = 0; i < list.length; i++) {
+            let item = {
+                value: list[i][valueKey],
+                text: list[i][textKey]
             }
             options.push(item)
         }
         return options
 
     }
-    static getIcon(title){
-        title=title.toLowerCase()
+    static getIcon(title) {
+        title = title.toLowerCase()
         let html = ''
         switch (title) {
             case 'users':
                 html = '<i class="fa fa-user" aria-hidden="true"></i>'
                 break;
             case 'contactinfo':
-            html = '<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>'
-                break;  
+                html = '<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>'
+                break;
             case 'teachers':
                 html = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
                 break;
@@ -70,57 +70,60 @@ class Helper {
                 break;
             case 'lessons':
                 html = '<i class="fa fa-calendar-check-o" aria-hidden="true"></i>'
-                break;    
+                break;
             case 'signups':
                 html = '<i class="fa fa-file-text-o" aria-hidden="true"></i>'
-            break;
+                break;
             case 'tuitions':
                 html = '<i class="fa fa-money" aria-hidden="true"></i>'
-            break;
+                break;
             case 'refunds':
                 html = '<i class="fa fa-arrow-circle-left" aria-hidden="true"></i>'
-            break;
+                break;
+            case 'main_settings':
+                html = '<i class="fa fa-cogs" aria-hidden="true"></i>'
+                break;
             case 'settings':
                 html = '<i class="fa fa-cog" aria-hidden="true"></i>'
-            break;
+                break;
             case 'discounts':
                 html = '<span class="glyphicon glyphicon-euro" aria-hidden="true"></span>'
-            break;
+                break;
             case 'admins':
                 html = '<i class="fa fa-key" aria-hidden="true"></i>'
-            break;
+                break;
             case 'admissions':
                 html = '<i class="fa fa-list-alt" aria-hidden="true"></i>'
-            break;
+                break;
             case 'registers':
                 html = '<i class="fa fa-registered" aria-hidden="true"></i>'
-            break;
+                break;
             case 'students':
                 html = '<i class="fa fa-user-circle" aria-hidden="true"></i>'
-            break;
+                break;
             case 'leaves':
                 html = '<i class="fa fa-calendar-o" aria-hidden="true"></i>'
-            break;
+                break;
             case 'statuses':
                 html = '<i class="fa fa-check-circle" aria-hidden="true"></i>'
-            break;
+                break;
             case 'notices':
                 html = '<i class="fa fa-comments-o" aria-hidden="true"></i>'
-            break;
+                break;
             case 'reports':
                 html = '<i class="fa fa-file-word-o" aria-hidden="true"></i>'
-            break;
+                break;
             case 'scores':
                 html = '<i class="fa fa-check-square-o" aria-hidden="true"></i>'
-            break;
-               
+                break;
+
         }
 
         return html
     }
     static getTitleHtml(title) {
         let html = ''
-        title=title.toLowerCase()
+        title = title.toLowerCase()
         switch (title) {
             case 'users':
                 html = '<i class="fa fa-user" aria-hidden="true"></i> 使用者管理'
@@ -150,8 +153,8 @@ class Helper {
                 html = '<i class="fa fa-arrow-circle-left" aria-hidden="true"></i> 退費申請'
                 break;
             case 'notices':
-            html = '<i class="fa fa-comments-o" aria-hidden="true"></i> 公告管理'
-            break;
+                html = '<i class="fa fa-comments-o" aria-hidden="true"></i> 公告管理'
+                break;
             case 'admins':
                 html = '<i class="fa fa-key" aria-hidden="true"></i> 權限管理'
                 break;
@@ -159,7 +162,7 @@ class Helper {
 
         return html
     }
-    static todayString(){
+    static todayString() {
         let now = Moment()
         return this.tpeDate(now)
     }
@@ -169,34 +172,34 @@ class Helper {
     static tpeTime(datetime) {
         return MomentTimeZone.utc(datetime).tz("Asia/Taipei").format('YYYY-MM-DD HH:mm:ss')
     }
-    static tpeDate(datetime){
-          return MomentTimeZone.utc(datetime).tz("Asia/Taipei").format('YYYY-MM-DD')
+    static tpeDate(datetime) {
+        return MomentTimeZone.utc(datetime).tz("Asia/Taipei").format('YYYY-MM-DD')
     }
     static activeText(active) {
-         return CommonService.activeText(active)
+        return CommonService.activeText(active)
     }
     static activeLabel(active) {
         return CommonService.activeLabel(active)
     }
 
     static reviewedText(reviewed) {
-         return CommonService.reviewedText(reviewed)
-       
+        return CommonService.reviewedText(reviewed)
+
     }
-    static reviewedOptions(){
+    static reviewedOptions() {
         return CommonService.reviewedOptions()
     }
     static reviewedLabel(reviewed) {
-       return CommonService.reviewedLabel(reviewed)
+        return CommonService.reviewedLabel(reviewed)
     }
-    static activeOptions(){
+    static activeOptions() {
         return CommonService.activeOptions()
     }
     static genderOptions() {
-         return CommonService.genderOptions()
+        return CommonService.genderOptions()
     }
     static boolOptions() {
-         return CommonService.boolOptions()
+        return CommonService.boolOptions()
     }
     static datetimePickerOption() {
         return TimeService.datetimePickerOption()
@@ -209,7 +212,7 @@ class Helper {
         return TimeService.getTimeobj(val)
     }
     static defaultTimeObj(hour, minute) {
-        return TimeService.defaultTimeObj(hour, minute) 
+        return TimeService.defaultTimeObj(hour, minute)
     }
     static getTimeSelected(val) {
         return TimeService.getTimeSelected(val)
@@ -235,16 +238,16 @@ class Helper {
         return html
     }
     static classTimeFullText(data) {
-        
-        return Classtime.classTimeFullText(data) 
+
+        return Classtime.classTimeFullText(data)
     }
-    
-    static formatMoney(money,wantInt) {
-        if (!money){
-            if(wantInt) return 0
-              return ''
+
+    static formatMoney(money, wantInt) {
+        if (!money) {
+            if (wantInt) return 0
+            return ''
         }
-        money=String(money)
+        money = String(money)
         let pos = money.indexOf(".")
         if (pos < 0) return money
 
@@ -257,7 +260,7 @@ class Helper {
 
         return TimeService.yearOptions()
     }
-    
+
 
     static chineseDayofWeek(val, formated) {
         return TimeService.chineseDayofWeek(val, formated)
@@ -287,7 +290,7 @@ class Helper {
 
         Bus.$emit('okmsg', msg);
     }
-    static dataNotFound(){
+    static dataNotFound() {
         Bus.$emit('errors', {
             title: '查無資料',
             status: 404
@@ -306,8 +309,8 @@ class Helper {
                 url = '/admins/' + user_id + '/create'
                 break;
             case 'Owner':
-            url = '/admins/' + user_id + '/create'
-            break;
+                url = '/admins/' + user_id + '/create'
+                break;
         }
 
         return url
@@ -341,38 +344,38 @@ class Helper {
     static removeItem(list, item) {
         list.splice(list.indexOf(item), 1);
     }
-    static splitToArray(strVal){
-        if(!strVal) return []
+    static splitToArray(strVal) {
+        if (!strVal) return []
         return strVal.split(',')
     }
-    static arrayToSplit(arrVal){
-        if(!arrVal) return ''
-        if(!arrVal.length) return ''
-        let str=''
+    static arrayToSplit(arrVal) {
+        if (!arrVal) return ''
+        if (!arrVal.length) return ''
+        let str = ''
         for (let i = 0; i < arrVal.length; ++i) {
-            str+=arrVal[i]
-            if(i < arrVal.length-1){
-                str+= ','
+            str += arrVal[i]
+            if (i < arrVal.length - 1) {
+                str += ','
             }
         }
 
         return str
     }
-    static okSign(val){
+    static okSign(val) {
 
-        if(this.isTrue(val)){
+        if (this.isTrue(val)) {
             return '<span class="glyphicon glyphicon-ok-sign text-success"></span>'
-        }else{
+        } else {
             return ''
         }
     }
-    static removeHTML(strText){
+    static removeHTML(strText) {
         let regEx = /<[^>]*>/g;
- 
-        strText= strText.replace(regEx, '')
+
+        strText = strText.replace(regEx, '')
         return strText.replace('&nbsp;', ' ')
     }
-   
+
 
 }
 

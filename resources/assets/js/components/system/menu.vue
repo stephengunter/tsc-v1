@@ -8,7 +8,7 @@
         </div>  <!-- End panel-heading-->
         <div class="panel-body" >
             <div class="row">
-                <div v-for="item in items" class="col-md-6">
+                <div v-for="(item,index) in items" :key="index" class="col-md-6">
                     <ul style="list-style-type: square;">
                         <li> 
                             <a :href="item.path"> {{ item.text  }} </a>
@@ -84,6 +84,9 @@
                     case 'discounts':
                          html += ' 折扣管理'
                          break
+                    case 'main_settings':
+                         html += ' 主要設定'
+                    break
                     case 'settings':
                         html += ' 基本設定'
                          break

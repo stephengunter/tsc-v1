@@ -32,8 +32,12 @@ class SendEmailNotice  //implements ShouldQueue
             $students=$course->students;
             foreach ($students as $student) {
                 $user=$student->user;
-                $receivers .= $user->id . ',';
-                dispatch(new \App\Jobs\SendEmail($notice, $user));  
+                $email=filter_var($user->email, FILTER_VALIDATE_EMAIL);
+                if($email){
+                    $receivers .= $user->id . ',';
+                    dispatch(new \App\Jobs\SendEmail($notice, $user));  
+                }
+                
             }
 
         }

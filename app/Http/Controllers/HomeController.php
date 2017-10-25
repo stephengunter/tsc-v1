@@ -25,9 +25,12 @@ class HomeController extends BaseController
 
         $current_user=$this->currentUser(); 
 
-        $keys=['signups','refunds','courses',
-                'students','users',
-                'teachers','discounts','settings',
+        $keys=[ 
+                'signups','refunds',
+                'courses','students',
+                'users','teachers',
+                'main_settings','settings',
+                'discounts',
                 'notices','reports'];
                 
         if($current_user->isOwner() ||  $current_user->isDev()){

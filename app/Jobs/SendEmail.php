@@ -35,7 +35,12 @@ class SendEmail implements ShouldQueue
     {
         $notice=$this->notice;
         $user=$this->user;
+
+        $email=filter_var($user->email, FILTER_VALIDATE_EMAIL);
+        if($email){
+            Mail::to($user)->send(new NoticeMail($notice));
+        }
         
-        Mail::to($user)->send(new NoticeMail($notice));
+        
     }
 }

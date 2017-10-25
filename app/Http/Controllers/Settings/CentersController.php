@@ -18,7 +18,7 @@ use DB;
 
 class CentersController extends BaseController
 {
-    protected $key='settings';
+    protected $key='main_settings';
     public function __construct(Centers $centers, Users $users)
     {
 
@@ -28,7 +28,7 @@ class CentersController extends BaseController
 	}
 
     public function index()
-    {
+    { 
         if(!request()->ajax()){
             
             $menus=$this->menus($this->key);            

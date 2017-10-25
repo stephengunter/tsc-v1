@@ -32,7 +32,8 @@ class SendActivationToken  implements ShouldQueue
     public function handle(UserRegistered $event)
     {
         $user=$event->user;
-        if($user->email){
+        $email=filter_var($user->email, FILTER_VALIDATE_EMAIL);
+        if($email){
             dispatch(new SendEmailConfirmationMail($event->user));
         }
          

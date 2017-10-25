@@ -159,12 +159,7 @@ class BaseController extends Controller
                     'path' => '/statuses',
                     'active' => $current=='statuses'
                 ],
-                [
-                    'id' => 4,
-                    'text' => '課程分類',
-                    'path' => '/categories',
-                    'active' => $current=='categories'
-                ],
+                
             );
         }
         if($key =='students'|| $key =='admissions'|| $key =='registers' 
@@ -198,6 +193,35 @@ class BaseController extends Controller
                 
             );
         }
+        if($key=='main_settings'){
+            return array(
+                [
+                    'id' => 1,
+                    'text' => '開課中心',
+                    'path' => '/centers',
+                    'active' => $current=='centers'
+                ],
+                [
+                    'id' => 2,
+                    'text' => '匯入開課中心',
+                    'path' => '/centers/import',
+                    'active' => $current=='centers/import'
+                ],
+                [
+                    'id' => 3,
+                    'text' => '課程分類',
+                    'path' => '/categories',
+                    'active' => $current=='categories'
+                ],
+                [
+                    'id' => 4,
+                    'text' => '匯入課程分類',
+                    'path' => '/categories/import',
+                    'active' => $current=='categories/import'
+                ],
+                 
+             );
+         }
         if($key=='settings'){
            return array(
                 [
@@ -212,12 +236,7 @@ class BaseController extends Controller
                     'path' => '/holidays',
                     'active' => $current=='holidays'
                 ],
-                [
-                    'id' => 3,
-                    'text' => '開課中心',
-                    'path' => '/centers',
-                    'active' => $current=='centers'
-                ],
+                
                 [
                     'id' => 4,
                     'text' => '教室管理',
@@ -259,6 +278,12 @@ class BaseController extends Controller
                     'text' => '新增管理員',
                     'path' => '/admins/create',
                     'active' => $current=='admins/create'
+                ],
+                [
+                    'id' => 3,
+                    'text' => '匯入管理員',
+                    'path' => '/admins-import',
+                    'active' => $current=='admins-import'
                 ],
                 
                 

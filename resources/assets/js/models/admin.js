@@ -5,7 +5,7 @@ class Admin {
             this[property] = data[property];
         }
 
-        
+
 
     }
     static role() {
@@ -64,17 +64,18 @@ class Admin {
                 })
         })
     }
-    static import(form){
-        let url = this.source() + '/import'
+    static
+    import (form) {
+        let url = this.source() + '-import'
         return new Promise((resolve, reject) => {
-             axios.post(url, form)
+            axios.post(url, form)
                 .then(response => {
-                     resolve(response.data);
+                    resolve(response.data);
                 })
                 .catch(error => {
-                     reject(error);
+                    reject(error);
                 })
-          
+
         })
     }
     static show(id) {
@@ -171,75 +172,75 @@ class Admin {
     }
 
     static getThead() {
-        let thead= [{
-                    title: '姓名',
-                    key: 'profile.fullname',
-                    sort: false,
-                    default:true,
-                    width:'20%'
-                },{
-                    title: '角色',
-                    key: 'admin.role',
-                    sort: false,
-                    default:true,
-                    width:'10%'
-                }, {
-                    title: '手機',
-                    key: 'phone',
-                    default:true,
-                    sort: false
-                   
-                }, {
-                     title: '所屬中心',
-                     key: 'centers',
-                     default:true,
-                     sort: false
-                }, {
-                     title: '狀態',
-                     key: 'active',
-                     default:true,
-                     sort: false
-                }, {
-                     title: '最後更新',
-                     key: 'updated_at',
-                     default:true,
-                     sort: false
-                }]
+        let thead = [{
+            title: '姓名',
+            key: 'profile.fullname',
+            sort: false,
+            default: true,
+            width: '20%'
+        }, {
+            title: '角色',
+            key: 'admin.role',
+            sort: false,
+            default: true,
+            width: '10%'
+        }, {
+            title: '手機',
+            key: 'phone',
+            default: true,
+            sort: false
 
-        
+        }, {
+            title: '所屬中心',
+            key: 'centers',
+            default: true,
+            sort: false
+        }, {
+            title: '狀態',
+            key: 'active',
+            default: true,
+            sort: false
+        }, {
+            title: '最後更新',
+            key: 'updated_at',
+            default: true,
+            sort: false
+        }]
+
+
 
 
         return thead
     }
-    static statusOptions(){
-      return  [{
-                    text: '使用中',
-                    value: '1'
-                }, {
-                    text: '已停用',
-                    value: '0'
-                }]
-    } 
-    static statusLabel(active) {
-        let style='label label-default'
-        let text= '已停用'
-        if (parseInt(active)){
-           style = 'label label-success'
-           text='使用中'
-        }
-       
-        return `<span class="${style}" > ${text} </span>`
-              
+    static statusOptions() {
+        return [{
+            text: '使用中',
+            value: '1'
+        }, {
+            text: '已停用',
+            value: '0'
+        }]
     }
-    static getCenterNames(centers){
-        if(centers.length){
+    static statusLabel(active) {
+        let style = 'label label-default'
+        let text = '已停用'
+        if (parseInt(active)) {
+            style = 'label label-success'
+            text = '使用中'
+        }
 
-           let names=''
-           for (var i =0 ; i < centers.length; i++) {
-               names +=centers[i].name + '&nbsp;&nbsp;'
-           }
+        return `<span class="${style}" > ${text} </span>`
 
-           return names
+    }
+    static getCenterNames(centers) {
+        if (centers.length) {
+
+            let names = ''
+            for (var i = 0; i < centers.length; i++) {
+                names += centers[i].name + '&nbsp;&nbsp;'
+            }
+
+            return names
         }
     }
 

@@ -5,12 +5,7 @@
             <span class="panel-title">
                 <h4 v-html="title"></h4>
             </span> 
-            <label  class="btn  btn-success btn-file" @click="resetImport">
-                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
-                Excel 匯入
-                <input type="file"  ref="fileinput"  name="teachers_file" style="display: none;"  
-                @change="onFileChange" >
-            </label>          
+                    
         </div> <!--  panel  heading -->
         <div class="panel-body">
             <user-checker v-if="newUser"
@@ -29,14 +24,14 @@
                         <div class="form-group">
                             <label>角色</label>
                             <div>
-                                <toggle :items="roleOptions"   :default_val="form.admin.role" @selected=setRole></toggle>
+                                <toggle :items="roleOptions"   :default_val="form.admin.role" @selected="setRole"></toggle>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <label>所屬中心</label>
                         <select v-model="form.admin.center_id"  name="admin.center_id" class="form-control" >
-                            <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
+                            <option v-for="item in centerOptions" :key="item.id" :value="item.value" v-text="item.text"></option>
                         </select>
                     </div>
                     <div class="col-sm-4">
@@ -134,7 +129,7 @@
                    width:1200,
                 },
 
-                files: [],
+               
              
             }
         },
@@ -278,36 +273,7 @@
                         Helper.BusEmitError(error,'存檔失敗') 
                     })
             },
-            resetImport(){
-               this.$refs.fileinput.value = null
-            },
-            onFileChange(e) {
-              
-                var files = e.target.files || e.dataTransfer.files
-                if (!files.length)  return
-                   
-                this.files = e.target.files
-
-                this.submitImport()
-            },
-            submitImport() {
-                
-
-                let form = new FormData()
-                for (let i = 0; i < this.files.length; i++) {
-                    form.append('admins_file', this.files[i])
-                    
-                }
-
-                let store=Admin.import(form)
-                store.then(result => {
-                        Helper.BusEmitOK()
-                        this.$emit('imported')  
-                    })
-                    .catch(error => {
-                         Helper.BusEmitError(error,'存檔失敗')
-                    })
-            },
+            
            
             
             

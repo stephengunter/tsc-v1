@@ -5,10 +5,12 @@
 //   Artisan::call('db:seed');
     
 //  });
-Route::get('test', function(){
 
+Route::get('admins/index-options', '\App\Http\Controllers\Admin\AdminsController@indexOptions');
+// Route::get('admins/index-options', function(){
+//    dd('dd');
     
-});
+// });
 
 Route::get('errors', function(){
      return view('errors');
@@ -31,12 +33,19 @@ Route::group(['middleware' => 'admin'], function()
     Route::get('/', 'HomeController@index');
     Route::get('/downloads', 'DownloadsController@index');
 
-    //Route::get('admins/index-options', 'AdminsController@indexOptions');
-    Route::post('admins/import', 'AdminsController@import');
-    Route::resource('admins', 'AdminsController');
+    Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
+    Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
+    Route::post('centers/display-order','\App\Http\Controllers\Settings\CentersController@updateDisplayOrder');
+    Route::put('centers/{id}/update-photo','\App\Http\Controllers\Settings\CentersController@updatePhoto');
+
+    Route::resource('centers-import', '\App\Http\Controllers\Settings\CentersImportController');
+    
+
+
+    
+    
 
     Route::resource('teachers/review', '\App\Http\Controllers\Teacher\TeachersReviewController');
-
     Route::get('teachers/import', '\App\Http\Controllers\Teacher\TeachersController@import');
     Route::post('teachers/import', '\App\Http\Controllers\Teacher\TeachersController@importTeachers');
     Route::post('teachers/update-review', '\App\Http\Controllers\Teacher\TeachersController@updateReview');
@@ -77,9 +86,7 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::put('group-teachers/{id}/remove', '\App\Http\Controllers\Teacher\GroupTeachersController@remove');
 
-    Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
-    Route::post('centers/display-order',['uses'=>'\App\Http\Controllers\Settings\CentersController@updateDisplayOrder']);
-    Route::put('centers/{id}/update-photo',['uses'=>'\App\Http\Controllers\Settings\CentersController@updatePhoto']);
+    
 
     Route::post('scores/export', '\App\Http\Controllers\Students\ScoresController@export');
     Route::post('scores/import', '\App\Http\Controllers\Students\ScoresController@import');
@@ -152,7 +159,7 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('identities', '\App\Http\Controllers\Discounts\IdentitiesController');
 
     Route::resource('terms', '\App\Http\Controllers\Settings\TermsController');
-    Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
+    
     Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController');
     Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
 
@@ -160,7 +167,7 @@ Route::group(['middleware' => 'admin'], function()
                                         ['only' => ['index','store']]);  
 
 
-    Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
+    
     Route::resource('user-centers', '\App\Http\Controllers\User\UserCenterController');
     Route::resource('users', '\App\Http\Controllers\User\UsersController');
     Route::resource('user-roles', '\App\Http\Controllers\User\UserRolesController');
@@ -169,7 +176,9 @@ Route::group(['middleware' => 'admin'], function()
 
 Route::group(['middleware' => 'owner'], function()
 {
-    Route::resource('admins', '\App\Http\Controllers\AdminsController');
+    Route::resource('admins', '\App\Http\Controllers\Admin\AdminsController'); 
+
+    Route::resource('admins-import', '\App\Http\Controllers\Admin\AdminsImportController');
                                            
 });
 

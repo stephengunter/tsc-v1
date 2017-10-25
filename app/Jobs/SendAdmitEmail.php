@@ -40,8 +40,12 @@ class SendAdmitEmail implements ShouldQueue
         $signup->course->center->addressText=$signup->course->center->addressText();
         $signup->course->center->phone=$signup->course->center->phoneText(); 
 
-        
+        $user=$signup->user;
+        $email=filter_var($user->email, FILTER_VALIDATE_EMAIL);
+        if($email){
+            Mail::to($user)->send(new AdmitEmail($signup));
+        }
        
-        Mail::to($signup->user)->send(new AdmitEmail($signup));
+        
     }
 }

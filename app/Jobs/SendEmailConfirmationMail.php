@@ -32,6 +32,10 @@ class SendEmailConfirmationMail implements ShouldQueue
     public function handle()
     {
         $user=$this->user;
-        \Mail::to($user)->send(new EmailConfirmation($user));
+        $email=filter_var($user->email, FILTER_VALIDATE_EMAIL);
+        if($email){
+            Mail::to($user)->send(new EmailConfirmation($user));
+        }
+        
     }
 }
