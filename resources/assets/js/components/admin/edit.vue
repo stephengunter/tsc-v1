@@ -22,7 +22,7 @@
                         <div class="form-group">
                             <label>角色</label>
                             <div>
-                                <toggle :items="roleOptions"   :default_val="form.admin.role" @selected=setRole></toggle>
+                                <toggle :items="roleOptions"   :default_val="form.admin.role" @selected="setRole"></toggle>
                             </div>
                         </div>
                     </div>
@@ -30,7 +30,7 @@
                         <div class="form-group">
                             <label>狀態</label>
                             <div>
-                                <toggle :items="activeOptions"   :default_val="form.admin.active" @selected=setActive></toggle>
+                                <toggle :items="activeOptions"   :default_val="form.admin.active" @selected="setActive"></toggle>
                             </div>
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                         </div>
                     </div>
       
-                </div><!-- row    -->
+                </div>  <!-- row    -->
             </form>
         </div>
     </div>
