@@ -9,12 +9,12 @@
          <div class="form-inline"   slot="header">
             開課中心
             <select  v-model="searchParams.center" style="width:auto;" class="form-control selectWidth">
-                <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
+                <option v-for="(item,index) in centerOptions" :key="index" :value="item.value" v-text="item.text"></option>
             </select>
             &nbsp;&nbsp;
             角色
             <select  v-model="searchParams.role"    style="width:auto;" class="form-control selectWidth">
-                <option v-for="item in roleOptions" :value="item.value" v-text="item.text"></option>
+                <option v-for="(item,index) in roleOptions" :key="index"  :value="item.value" v-text="item.text"></option>
             </select>
             &nbsp;&nbsp;
             狀態
@@ -50,6 +50,10 @@
     export default {
         name: 'AdminList',
         props: {
+            options:{
+                type:Object,
+                default:null
+            },
             hide_create: {
               type: Boolean,
               default: false
@@ -77,12 +81,10 @@
                 create: Admin.createUrl(),
                 
                 thead:[],
-                filter: [
-                         {
+                filter: [{
                             title: '姓名',
-                            key: 'profile.fullname',
-                         }
-                        ],
+                            key: 'profile.fullname'                        
+                         }],
 
                 centerOptions:[],
                 roleOptions:[],
@@ -114,34 +116,48 @@
                     role:'',
                     active:1
                 }
-                let options = this.loadOptions()
-                options.then(() => {
+
+                if(this.options){
+                    this.setOptions(this.options.centers,this.options.roles)
+                    this.loaded=true
+                }else{
+                    let options = this.loadOptions()
+                    options.then(() => {
                           this.loaded=true
                        }).catch( error=> {
                           Helper.BusEmitError(error)           
                        })
+                }
+               
             },
             loadOptions(){
                 return new Promise((resolve, reject) => {
                     let options = Admin.indexOptions()
                   
                     options.then(data => {
-                        this.centerOptions=data.centerOptions
-                        let center=this.centerOptions[0].value
-                        this.searchParams.center=center
-
-                        this.roleOptions = data.roleOptions
-                        let allRoles={ text:'所有角色' , value:'' }
-                        this.roleOptions.splice(0, 0, allRoles);
-                        let role=this.roleOptions[0].value
-                        this.searchParams.role=role
-
+                        this.setOptions(data.centerOptions,data.roleOptions)
+                        
                         resolve(true);
                     })
                     .catch(error => {
                         reject(error.response);
                     })
                 })//End Promise
+            },
+            setOptions(centerOptions,roleOptions){
+                if(centerOptions){
+                    this.centerOptions=centerOptions
+                    let center=this.centerOptions[0].value
+                    this.searchParams.center=center
+                }
+                if(roleOptions){
+                    this.roleOptions = roleOptions
+                    let allRoles={ text:'所有角色' , value:'' }
+                    this.roleOptions.splice(0, 0, allRoles);
+                    let role=this.roleOptions[0].value
+                    this.searchParams.role=role
+                }
+                
             },
             statusLabel(active) {
                

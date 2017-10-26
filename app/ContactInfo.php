@@ -61,12 +61,15 @@ class ContactInfo extends Model {
 			}
 		}
 	}
-	public static function createByAddress($zipcode, $street, $updated_by)
+	
+	public static function createByAddress($zipcode, $street, $updated_by,$tel='',$fax='')
 	{
 		$address=Address::createByZipcode($zipcode,$street,$updated_by);
 		if($address){
 			$values=static::initialize();
 			$values['contactAddress']=$address->id;
+			$values['tel']=$tel;
+			$values['fax']=$fax;
 			return static::create($values);
 		}else{
 			return null;

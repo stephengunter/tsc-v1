@@ -74,6 +74,11 @@ Vue.component('admin-create', require('./views/admins/create'))
 Vue.component('admin-details', require('./views/admins/details'))
 Vue.component('admin-import', require('./views/admins/import'))
 
+Vue.component('center-index', require('./views/centers/index'))
+Vue.component('center-create', require('./views/centers/create'))
+Vue.component('center-details', require('./views/centers/details'))
+Vue.component('center-import', require('./views/centers/import'))
+
 
 Vue.component('teacher-index', require('./views/teachers/index'))
 Vue.component('teacher-create', require('./views/teachers/create'))
@@ -102,9 +107,7 @@ Vue.component('notice-index', require('./views/notices/index'))
 Vue.component('notice-details', require('./views/notices/details'))
 Vue.component('notice-create', require('./views/notices/create'))
 
-Vue.component('center-index', require('./views/centers/index'))
-Vue.component('center-create', require('./views/centers/create'))
-Vue.component('center-details', require('./views/centers/details'))
+
 
 Vue.component('discount-index', require('./views/discounts/index'))
 Vue.component('identity-index', require('./views/identities/index'))

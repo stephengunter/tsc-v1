@@ -42,11 +42,26 @@ class AdminsController extends BaseController
 	}
     public function indexOptions()
     {
+        $roleOptions=$this->getRoleOptions();
+        $centerOptions=$this->getCenterOptions();
+        
+        return response()
+            ->json([
+                'roleOptions' => $roleOptions,
+                'centerOptions' => $centerOptions
+            ]);
+
+    }
+    private function getRoleOptions()
+    {
         $adminRoles=$this->roles->getAdminRoles()->get();
-        $roleOptions=$this->roles->optionsConverting($adminRoles);
+        return $this->roles->optionsConverting($adminRoles);
+    }
 
+    private function getCenterOptions()
+    {
         $centerOptions=[];
-
+        
         if($this->headCenterAdmin()){
             $empty_item=true;
             $centerOptions=$this->centers->options($empty_item);
@@ -55,23 +70,23 @@ class AdminsController extends BaseController
             $centerOptions=$this->centers->optionsConverting($this->canAdminCenters());
         }
 
-
-        $centerOptions=$this->centers->options();
-        return response()
-            ->json([
-                'roleOptions' => $roleOptions,
-                'centerOptions' => $centerOptions
-            ]);
-
+        return $centerOptions;
     }
 
     public function index()
     {
         
         if(!request()->ajax()){
+
+            $roleOptions=$this->getRoleOptions();
+            $centerOptions=$this->getCenterOptions();
             $menus=$this->menus($this->key);            
             return view('admins.index')
-                    ->with(['menus' => $menus]);
+                    ->with([
+                            'menus' => $menus,
+                            'centerOptions' => $centerOptions,
+                            'roleOptions' => $roleOptions
+                          ]);
         }
 
         $adminList=[];

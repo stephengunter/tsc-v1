@@ -6,12 +6,7 @@
                 </h4>
             </div>
             <div>
-                <label  class="btn  btn-success btn-file" @click="resetImport">
-                       <i class="fa fa-file-excel-o" aria-hidden="true"></i>
-                       Excel 匯入
-                       <input type="file"  ref="fileinput"  name="teachers_file" style="display: none;"  
-                       @change="onFileChange" >
-                    </label>
+                
                 <a @click="beginCreate" class="btn btn-primary">
                     新增開課中心
                 </a>
@@ -49,7 +44,7 @@
                             <a herf="#" @click.prevent="onSelected(center.id)"> {{center.name}}
                             </a> 
                         </td>
-                        
+                        <td>{{ center.code }}</td>
                         <td v-text="addressText(center.contactInfo)"></td>
                         <td v-text="telText(center.contactInfo)"></td>
                         <td v-text="faxText(center.contactInfo)"></td>   
@@ -104,6 +99,11 @@
                         sort: false,
                         default:true
                     }, {
+                        title: '代碼',
+                        key: 'code',
+                        sort: false,
+                        default:true
+                    },{
                         title: '地址',
                         key: 'name',
                         sort: false,

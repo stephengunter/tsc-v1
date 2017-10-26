@@ -1,8 +1,8 @@
 <template>
 <div>
      
-     <admin-list  :hide_create="hide_create" :version="version"  
-        :can_select="can_select"
+    <admin-list    :can_select="can_select" 
+        :hide_create="hide_create" :version="version" 
         @selected="onSelected" @begin-create="onBeginCreate">
     </admin-list>
 
@@ -20,6 +20,10 @@
             'admin-list':AdminList
         },
         props: {
+            options:{
+                type:Object,
+                default:null
+            },
             version: {
               type: Number,
               default: 0

@@ -12,7 +12,8 @@ class Center extends Model
 {
 	use FilterPaginateOrder;
 	
-	protected $fillable = ['name', 'active'	, 'display_order','removed','updated_by'];
+	protected $fillable = ['name', 'code' , 'active'	, 'display_order',
+							'removed','updated_by'];
 	
     protected $filter = [
         'name', 'updated_at','display_order'
@@ -38,6 +39,12 @@ class Center extends Model
 		return 	$user->admin->fromHeadCenter();
           
 	} 
+	public static function canImport($user)
+	{
+		
+		return 	static::canEdit($user);
+          
+	} 
 
 	
 	public static function getHeadCenter()
@@ -61,6 +68,8 @@ class Center extends Model
 
 
 	}
+
+
 
 	public function classrooms() 
 	{
@@ -127,6 +136,26 @@ class Center extends Model
 		if($this->head) return false;
 		if($this->active) return false;
 		return $this->canEditBy($user);
+	}
+
+	public function updateContactInfo($tel ,$fax, $zipcode, $street,$updated_by)
+	{
+		$contact_info=$this->contactInfo();
+		if($contact_info){
+			$contact_info->updateAddress($zipcode, $street,$updated_by);
+			$contact_info->update([
+				'tel' => $tel,
+				'fax' => $fax,
+				'updated_by' => $updated_by
+			]);
+        }else{
+            $contact_info=ContactInfo::createByAddress($zipcode, $street,$updated_by);
+            if($contact_info) {
+                $this->contact_info=$contact_info->id;
+                $this->updated_by=$updated_by;
+                $this->save();
+            }
+        }
 	}
 	
 }

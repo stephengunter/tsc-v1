@@ -204,8 +204,8 @@ class BaseController extends Controller
                 [
                     'id' => 2,
                     'text' => '匯入開課中心',
-                    'path' => '/centers/import',
-                    'active' => $current=='centers/import'
+                    'path' => '/centers-import',
+                    'active' => $current=='centers-import'
                 ],
                 [
                     'id' => 3,

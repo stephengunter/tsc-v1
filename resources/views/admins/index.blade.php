@@ -3,11 +3,12 @@
 
 @section('content')
 
-       <admin-index v-show="!selected" :hide_create="indexSettings.hide_create" :version="version"
+       <admin-index :options="options" 
+           v-show="!selected" :hide_create="indexSettings.hide_create" :version="version"
            @selected="onSelected"  @begin-create="onBeginCreate">
        </admin-index> 
        <admin-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
-        @btn-back-clicked="backToIndex" @admin-deleted="onAdminDeleted">
+           @btn-back-clicked="backToIndex" @admin-deleted="onAdminDeleted">
        </admin-details>
        
 @endsection
@@ -33,6 +34,11 @@
                detailsSettings:{
                   can_back:true
                },
+
+               options:{
+                   centers:[],
+                   roles:[]
+               }
             }
         },
         computed: {
@@ -43,7 +49,18 @@
             }
         },
         beforeMount() {
-             
+
+            @if(isset($roleOptions))
+
+                    this.options.roles={!! json_encode($roleOptions) !!}
+
+            @endif
+           
+            @if(isset($centerOptions))
+
+                    this.options.centers={!! json_encode($centerOptions) !!}
+
+            @endif
         },
         methods: {
             init(){

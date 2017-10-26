@@ -38,21 +38,11 @@ class AdminsImportController extends BaseController
     public function store(Request $form)
     {
         $current_user=$this->currentUser();
-        $center_id=0;
-        if(!$current_user->isDev()){
-            $defaultCenter=$this->defaultCenter();
-            if($defaultCenter) $center_id=$defaultCenter->id;
-            else return  $this->unauthorized();  
-        }
-
-
         
-        if($current_user->admin){
-             $center=$current_user->admin->defaultCenter();
-             if($center){
-                 $center_id=$center->id;
-             }
+        if(!$current_user->isDev()){
+            if(!$this->defaultCenter()) return  $this->unauthorized(); 
         }
+        
 
         if(!$form->hasFile('admins_file')){
             return   response()
@@ -60,10 +50,9 @@ class AdminsImportController extends BaseController
                             ]  ,  422);      
         }
 
-        $current_user=$this->currentUser();
+        
 
-        $file=Input::file('admins_file');
-      
+        $file=Input::file('admins_file');      
 
         $this->admins->importAdmins($file,$current_user);
 

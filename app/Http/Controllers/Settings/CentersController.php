@@ -29,6 +29,7 @@ class CentersController extends BaseController
 
     public function index()
     { 
+        
         if(!request()->ajax()){
             
             $menus=$this->menus($this->key);            
@@ -214,16 +215,16 @@ class CentersController extends BaseController
             ]);
     }
 
-    public function adminCenterOptions()
-    {
-        $current_user=$this->checkAdmin->getAdmin();
-        $validCenters=$current_user->admin->validCenters();
-        $options=$this->centers->optionsConverting($validCenters);
-              return response()
-            ->json([
-                'options' => $options
-            ]);
-    }
+    // public function adminCenterOptions()
+    // {
+    //     $current_user=$this->checkAdmin->getAdmin();
+    //     $validCenters=$current_user->admin->validCenters();
+    //     $options=$this->centers->optionsConverting($validCenters);
+    //           return response()
+    //         ->json([
+    //             'options' => $options
+    //         ]);
+    // }
 
     public function activeCenters()
     {

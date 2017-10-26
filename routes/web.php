@@ -6,7 +6,7 @@
     
 //  });
 
-Route::get('admins/index-options', '\App\Http\Controllers\Admin\AdminsController@indexOptions');
+
 // Route::get('admins/index-options', function(){
 //    dd('dd');
     
@@ -33,13 +33,13 @@ Route::group(['middleware' => 'admin'], function()
     Route::get('/', 'HomeController@index');
     Route::get('/downloads', 'DownloadsController@index');
 
-    Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
+    
     Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
     Route::post('centers/display-order','\App\Http\Controllers\Settings\CentersController@updateDisplayOrder');
     Route::put('centers/{id}/update-photo','\App\Http\Controllers\Settings\CentersController@updatePhoto');
+    Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
 
     Route::resource('centers-import', '\App\Http\Controllers\Settings\CentersImportController');
-    
 
 
     
@@ -176,6 +176,7 @@ Route::group(['middleware' => 'admin'], function()
 
 Route::group(['middleware' => 'owner'], function()
 {
+    Route::get('admins/index-options', '\App\Http\Controllers\Admin\AdminsController@indexOptions');
     Route::resource('admins', '\App\Http\Controllers\Admin\AdminsController'); 
 
     Route::resource('admins-import', '\App\Http\Controllers\Admin\AdminsImportController');

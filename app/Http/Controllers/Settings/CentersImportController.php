@@ -6,12 +6,9 @@ use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
 use App\Repositories\Centers;
-use App\Repositories\Users;
-use App\Http\Requests\Settings\CenterRequest;
 
 use App\Center;
-
-use App\Http\Middleware\CheckAdmin;
+use Illuminate\Support\Facades\Input;
 use App\Support\Helper;
 
 use DB;
@@ -19,11 +16,11 @@ use DB;
 class CentersImportController extends BaseController
 {
     protected $key='main_settings';
-    public function __construct(Centers $centers, Users $users)
+    public function __construct(Centers $centers)
     {
 
         $this->centers=$centers;
-        $this->users=$users;
+       
        
 	}
 
@@ -31,7 +28,7 @@ class CentersImportController extends BaseController
 
     public function index()
     {
-        dd('yyy');
+        
         if(request()->ajax()) abort(404);
        
         $menus=$this->menus($this->key);            
@@ -41,36 +38,25 @@ class CentersImportController extends BaseController
     }
 
     public function store(Request $form)
-    {
+    { 
         $current_user=$this->currentUser();
-        $center_id=0;
-        if(!$current_user->isDev()){
-            $defaultCenter=$this->defaultCenter();
-            if($defaultCenter) $center_id=$defaultCenter->id;
-            else return  $this->unauthorized();  
-        }
-
-
+       
         
-        if($current_user->admin){
-             $center=$current_user->admin->defaultCenter();
-             if($center){
-                 $center_id=$center->id;
-             }
+        if(!Center::canImport($current_user)){
+            return  $this->unauthorized();  
         }
 
-        if(!$form->hasFile('admins_file')){
+        if(!$form->hasFile('centers_file')){
             return   response()
-                        ->json(['admins_file' => ['無法取得上傳檔案'] 
+                        ->json(['centers_file' => ['無法取得上傳檔案'] 
                             ]  ,  422);      
         }
 
-        $current_user=$this->currentUser();
+       
+       
+        $file=Input::file('centers_file');      
 
-        $file=Input::file('admins_file');
-      
-
-        $this->admins->importAdmins($file,$current_user);
+        $this->centers->importCenters($file,$current_user);
 
         return response()->json(['success' => true]);
 

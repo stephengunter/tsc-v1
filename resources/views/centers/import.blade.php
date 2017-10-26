@@ -1,10 +1,10 @@
 @extends('layouts.master')
 
 @section('content')
-   center-import
-    <!-- <center-import 
-    @canceled="onCanceled" @saved="onSaved">
-    </center-import> -->
+   
+    <center-import 
+    @canceled="onCanceled" @imported="onImported">
+    </center-import>
 
 @endsection
 
@@ -25,10 +25,10 @@
         },
         methods: {
             onCanceled(){
-               this.backToIndex()
+                this.backToIndex()
             },
-            onSaved(){
-               this.backToIndex()
+            onImported(){
+                this.backToIndex()
             },            
             backToIndex(){
                 Helper.redirect('/centers')
