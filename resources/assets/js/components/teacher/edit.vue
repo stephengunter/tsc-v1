@@ -3,10 +3,10 @@
     <div class="panel panel-default">
         
         <div class="panel-heading">    
-             <span class="panel-title">
+            <span class="panel-title">
                    <h4 v-html="title"></h4>
-             </span>   
-              <toggle :items="typeOptions"   :default_val="form.teacher.group" @selected=onTypeSelected></toggle>
+            </span>   
+            <toggle :items="typeOptions"   :default_val="form.teacher.group" @selected="onTypeSelected"></toggle>
                      
         </div>
         <div v-if="group" class="panel-body">group

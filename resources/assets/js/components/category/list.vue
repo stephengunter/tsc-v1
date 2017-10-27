@@ -17,6 +17,7 @@
                 <thead>
                     <tr>
                         <th> 分類名稱 </th>
+                        <th> 代碼 </th>
                         <th> 類型</th>
                         <th> 小圖 </th>
                         <th> 狀態 </th>
@@ -40,10 +41,10 @@
                 </thead>
                 <tbody>
                    
-	                    <row  v-for="(category, index) in categories" 
-	                     :category="category" :index="index" :editting_order="edittingOrder"
-			               @selected="onRowSelected" @clear-error="clearErrorMsg" >
-			            </row>  
+                    <row  v-for="(category, index) in categories" :key="index"
+                        :category="category" :index="index" :editting_order="edittingOrder"
+                        @selected="onRowSelected" @clear-error="clearErrorMsg" >
+                    </row>  
                    
                 </tbody>  
             </table>
@@ -74,15 +75,15 @@
             }
         },
         watch: {
-            version: function () {
-               this.current_version += 1
+            version() {
+                this.fetchData()               
             }
         },
         data() {
             return {
-                 title:Helper.getIcon(Category.title())  + '  課程分類',
-                
-                 thead: [{
+                title:Helper.getIcon(Category.title())  + '  課程分類',
+                currenVersion:0,
+                thead: [{
                         title: '分類名稱',
                         key: 'name',
                         sort: false,

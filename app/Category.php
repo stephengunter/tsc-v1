@@ -68,8 +68,10 @@ class Category extends Model
 
     public function canDelete()
     {
+        if($this->code='latest' && $this->public) return false;
+        if($this->code='recommend' && $this->public) return false;
         if(count($this->validCourses()->get())) return false;
-         return  true;
+        return  true;
     }
     public function canEditBy($user)
 	{

@@ -79,6 +79,7 @@
                  this.selected=0
                  this.creating=false
                  this.version +=1
+               
             }
 
         },

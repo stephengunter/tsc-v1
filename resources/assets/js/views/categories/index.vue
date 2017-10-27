@@ -48,7 +48,7 @@
             }
         },
         watch:{
-            version: function () {
+            version(){
                this.currenVersion+=1
             },
         },

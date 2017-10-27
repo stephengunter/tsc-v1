@@ -22,34 +22,41 @@
                         </div>
                     </div>
                     <div class="col-sm-3">
+                        <div v-show="!isServedCategory" class="form-group">                           
+                            <label>代碼</label>
+                            <input type="text" name="category.code" class="form-control" v-model="form.category.code"  >
+                            <small class="text-danger" v-if="form.errors.has('category.code')" v-text="form.errors.get('category.code')"></small>
+                        </div>
+                    </div>
+                    <div v-show="!isServedCategory" class="col-sm-3">
                          <div class="form-group">                           
                             <label>小圖樣式</label>
                             <input type="text" name="category.icon" class="form-control" v-model="form.category.icon"  >
                             <small class="text-danger" v-if="form.errors.has('category.icon')" v-text="form.errors.get('category.icon')"></small>
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <div v-show="!isServedCategory" class="col-sm-3">
                         <div class="form-group">                           
                             <label>置頂</label>
                             <div>
                                <input type="hidden" v-model="form.category.public"  >
-                               <toggle :items="publicOptions"   :default_val="form.category.public" @selected=setPublic></toggle>
+                               <toggle :items="publicOptions"   :default_val="form.category.public" @selected="setPublic"></toggle>
                             </div>
                         </div>  
                     </div>
+                    
+                </div>
+                <div  v-show="false"  class="row">
                     <div class="col-sm-3">
-                         <div v-show="false" class="form-group">                           
+                        <div class="form-group">                           
                             <label>狀態</label>
                             <div>
                                <input type="hidden" v-model="form.category.active"  >
-                               <toggle :items="activeOptions"   :default_val="form.category.active" @selected=setActive></toggle>
+                               <toggle :items="activeOptions"   :default_val="form.category.active" @selected="setActive"></toggle>
                             </div>
                         </div>
                     </div>
-                </div>
-             
-                    
-            
+                </div>   
                 <div class="row">
                      <div class="col-sm-4">
                         <div class="form-group">                           
@@ -84,7 +91,7 @@
         },
         data() {
             return {
-                 title:'',
+                title:'',
                 loaded:false,
                 course:{},
                 form: new Form({
@@ -92,6 +99,8 @@
                       
                     }
                 }),
+
+                isServedCategory:false,
                 
                 activeOptions: Helper.activeOptions(),
 
@@ -109,6 +118,9 @@
                     category: {}
                     
                 })
+
+                this.isServedCategory=false
+
                 if(this.id){
                     this.title='  編輯課程分類'
                 }else{
@@ -125,7 +137,13 @@
                 }
                 getData.then(data=>{
                     let category=data.category
-                    this.form.category=data.category
+                    this.form.category=category
+
+                    if(category.public){
+                        if(category.code=='latest' || category.code=='recommend'){
+                            this.isServedCategory=true
+                        }
+                    }
 
                     this.loaded=true
                 }).catch(error=>{

@@ -3,11 +3,9 @@
     <div class="panel panel-default">
         <div class="panel-heading ">     
             <h4 v-html="title"></h4>
-            
-            
             <toggle :items="typeOptions"   :default_val="1" @selected="onTypeSelected"></toggle>
                          
-        </div> <!--  panel  heading -->
+        </div>
         <div v-if="type" class="panel-body">
             <user-checker v-if="newUser"
                :version="userCheckerSettings.version"
@@ -40,14 +38,14 @@
 
     <modal :showbtn="false"  :show="showUserList" effect="fade" :width="modalSettings.width">
         
-          <div slot="modal-header" class="modal-header modal-header-danger">
-             <button id="close-button" type="button" class="close" data-dismiss="modal" @click="showUserList=false">
+        <div slot="modal-header" class="modal-header modal-header-danger">
+            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="showUserList=false">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-             </button>
-             <h3>
-                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            </button>
+            <h3>
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                  相同資料的使用者已經存在
-             </h3>
+            </h3>
           </div>
         <div slot="modal-body" class="modal-body">
             <user-selector :users=userList @selected="onUserSelected"></user-selector>

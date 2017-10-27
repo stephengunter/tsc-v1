@@ -20,30 +20,34 @@
       <div v-if="loaded" class="panel-body">
        
             <div class="row">
-                 <div class="col-sm-3">
+                <div class="col-sm-3">
                       <label class="label-title">分類名稱</label>
                       <p v-text="category.name"></p>                      
-                 </div>
-                 <div class="col-sm-2">
+                </div>
+                <div class="col-sm-2">
+                      <label class="label-title">代碼</label>
+                      <p>{{  category.category_code  }}</p>                      
+                </div>
+                <div class="col-sm-1">
                       <label class="label-title">類型</label>
                       <p v-html="category.type">                       
                       </p>
-                  </div>
-                 <div class="col-sm-2">
+                </div>
+                <div class="col-sm-2">
                       <label class="label-title">小圖</label>
                      
                       <p v-html="$options.filters.showIcon(category.icon)">                       
                       </p>                     
-                 </div>
-                  <div class="col-sm-2">
+                </div>
+                <div class="col-sm-1">
                       <label class="label-title">狀態</label>
                       <p v-html="$options.filters.activeLabel(category.active)">                       
                       </p>
-                  </div>
-                  <div class="col-sm-3">
+                </div>
+                <div class="col-sm-2">
                       <label class="label-title">最後更新</label>
                       <updated :entity="category"></updated>
-                  </div>
+                </div>
             </div>   <!-- End row-->
             
            

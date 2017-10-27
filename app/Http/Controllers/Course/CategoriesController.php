@@ -76,9 +76,12 @@ class CategoriesController extends BaseController
     }
     public function show($id)
     {
+        
         $current_user=$this->currentUser();
         $category=$this->categories->findOrFail($id);
-       
+        
+        $category->category_code=$category->code;
+        
         $category->canEdit=$category->canEditBy($current_user);
         $category->canDelete=$category->canDeleteBy($current_user);
 

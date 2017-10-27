@@ -3,43 +3,43 @@
 <div v-if="form">
    <div class="row" v-if="with_user">
        <div  class="col-sm-4"> 
-           <div class="form-group"> 
-              <label>姓名</label>
-              <input type="text" name="user.profile.fullname" class="form-control" v-model="form.user.profile.fullname" >
-              <small v-if="form.errors.has('user.profile.fullname')" v-text="form.errors.get('user.profile.fullname')" class="text-danger"></small>
+            <div class="form-group"> 
+                <label>姓名</label>
+                <input type="text" name="user.profile.fullname" class="form-control" v-model="form.user.profile.fullname" >
+                <small v-if="form.errors.has('user.profile.fullname')" v-text="form.errors.get('user.profile.fullname')" class="text-danger"></small>
             </div> 
        </div>  
        <div  class="col-sm-4"> 
             <div class="form-group"> 
-              <label>Email</label>
-              <input type="text" name="user.email" class="form-control" v-model="form.user.email" >
-              <small v-if="form.errors.has('user.email')" v-text="form.errors.get('user.email')" class="text-danger"></small>
+                <label>Email</label>
+                <input type="text" name="user.email" class="form-control" v-model="form.user.email" >
+                <small v-if="form.errors.has('user.email')" v-text="form.errors.get('user.email')" class="text-danger"></small>
             </div> 
        </div>
        <div  class="col-sm-4"> 
            <div class="form-group"> 
-              <label>手機</label>
-              <input type="text" name="user.phone" class="form-control" v-model="form.user.phone" >
-              <small v-if="form.errors.has('user.phone')" v-text="form.errors.get('user.phone')" class="text-danger"></small>
+                <label>手機</label>
+                <input type="text" name="user.phone" class="form-control" v-model="form.user.phone" >
+                <small v-if="form.errors.has('user.phone')" v-text="form.errors.get('user.phone')" class="text-danger"></small>
             </div> 
        </div>
    </div>
    <div class="row" v-if="with_profile">
-       <div  class="col-sm-4"> 
-           <div class="form-group">                          
-              <label>性別</label>
-               <div>
-                  <toggle :items="genderOptions"   :default_val="form.user.profile.gender" @selected=onGenderSelected></toggle>
+        <div  class="col-sm-4"> 
+            <div class="form-group">                          
+                <label>性別</label>
+                <div>
+                    <toggle :items="genderOptions"   :default_val="form.user.profile.gender" @selected="onGenderSelected"></toggle>
                 </div>
-           </div>
-       </div>  
+            </div>
+        </div>  
        <div  class="col-sm-4"> 
-           <div class="form-group">                          
-              <label>身分證號</label>
-              <input type="text" name="user.profile.SID" class="form-control" v-model="form.user.profile.SID" >
-              
-              <small v-if="form.errors.has('user.profile.SID')" v-text="form.errors.get('user.profile.SID')" class="text-danger" >身分證號</small>
-                 
+            <div class="form-group">                          
+                <label>身分證號</label>
+                <input type="text" name="user.profile.SID" class="form-control" v-model="form.user.profile.SID" >
+                
+                <small v-if="form.errors.has('user.profile.SID')" v-text="form.errors.get('user.profile.SID')" class="text-danger" >身分證號</small>
+                    
             </div>
        </div>
        <div  class="col-sm-4"> 
@@ -62,26 +62,26 @@
    </div>
    <div class="row">
       <div v-if="with_teacher_name" class="col-sm-4">
-          <div class="form-group">                           
-              <label>姓名</label>
-              <input type="text" name="teacher.name" class="form-control" v-model="form.teacher.name" disabled >
+            <div class="form-group">                           
+                <label>姓名</label>
+                <input type="text" name="teacher.name" class="form-control" v-model="form.teacher.name" disabled >
+            </div>
+      </div>
+      <div v-show="false" class="col-sm-4">
+          <div class="form-group">
+                <label>狀態</label>
+                <div>
+                    <toggle :items="activeOptions"   :default_val="form.teacher.active" @selected="onActiveSelected"></toggle>
+                </div>
           </div>
       </div>
       <div v-show="false" class="col-sm-4">
           <div class="form-group">
-              <label>狀態</label>
-              <div>
-                  <toggle :items="activeOptions"   :default_val="form.teacher.active" @selected=onActiveSelected></toggle>
-              </div>
-          </div>
-      </div>
-      <div v-show="false" class="col-sm-4">
-          <div class="form-group">
-              <label>資料審核</label>
-              <div>
-              <input type="hidden" v-model="form.teacher.reviewed"  >
-              <toggle :items="reviewedOptions"   :default_val="form.teacher.reviewed" @selected=onReviewedSelected></toggle>
-              </div>
+                <label>資料審核</label>
+                <div>
+                    <input type="hidden" v-model="form.teacher.reviewed"  >
+                    <toggle :items="reviewedOptions"   :default_val="form.teacher.reviewed" @selected="onReviewedSelected"></toggle>
+                </div>
           </div>
       </div>
    </div>   <!--  row   -->
@@ -102,13 +102,20 @@
         </div>
         <div class="col-sm-4">
             <div class="form-group">                           
+                <label>現職</label>
+                <input type="text" name="teacher.job" class="form-control" v-model="form.teacher.job"  >
+                <small class="text-danger" v-if="form.errors.has('teacher.job')" v-text="form.errors.get('teacher.job')"></small>
+            </div>
+        </div>
+        <div v-show="false" class="col-sm-4">
+            <div class="form-group">                           
                 <label>教師證書號</label>
                 <input type="text" name="teacher.certificate" class="form-control" v-model="form.teacher.certificate"  >
                 <small class="text-danger" v-if="form.errors.has('teacher.certificate')" v-text="form.errors.get('teacher.certificate')"></small>
             </div>
-         </div>
+        </div>
    </div> <!--  row   -->
-   <div class="row">
+   <div v-if="false" class="row">
        <div class="col-sm-4">
           <div class="form-group">                           
               <label>現職</label>
@@ -116,7 +123,7 @@
               <small class="text-danger" v-if="form.errors.has('teacher.job')" v-text="form.errors.get('teacher.job')"></small>
           </div>
        </div>
-       <div class="col-sm-4">
+       <div v-show="false"  class="col-sm-4">
             <div class="form-group">                           
                 <label>職稱</label>
                 <input type="text" name="teacher.jobtitle" class="form-control" v-model="form.teacher.jobtitle"  >
@@ -130,7 +137,7 @@
    <div class="row">
         <div class="col-sm-4">
             <div class="form-group">
-                <label>學經歷</label>
+                <label>經歷</label>
                 <textarea rows="6" cols="50" class="form-control" name="teacher.experiences"  v-model="form.teacher.experiences">
                 </textarea>
                 

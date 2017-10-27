@@ -4,6 +4,7 @@
         <td>
             <a herf="#" @click.prevent="selected(category.id)">{{ category.name}}</a> 
         </td>
+        <td>{{ category.code }}</td>
         <td v-html="getType(category)"></td> 
         <td v-html="$options.filters.showIcon(category.icon)"></td> 
         <td v-html="$options.filters.activeLabel(category.active)"></td> 

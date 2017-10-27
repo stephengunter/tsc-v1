@@ -71,7 +71,13 @@ class CoursesController extends BaseController
     
     public function latest()
     {
-        $category=$this->categories->findByName('最新課程');          
+        $courses=[];
+        
+        $category=$this->categories->findByCode('latest'); 
+        if(!$category){
+            return response() ->json(['courses' => $courses  ]); 
+        }
+        
         $center=0;
         return $this->getCourses($category->id,$center);
        
@@ -145,6 +151,8 @@ class CoursesController extends BaseController
 
     private function getCourses($category,$center)
     {
+        $courses=[];
+        return response() ->json(['courses' => $courses  ]); 
         $categoryId=(int)$category;       
         $centerId=(int)$center;
 

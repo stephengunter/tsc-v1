@@ -137,6 +137,10 @@ class Categories
     {
         return $this->activeCategories()->where('name',$name)->first();
     }
+    public function findByCode($code)
+    {
+        return $this->activeCategories()->where('code',$code)->first();
+    }
     public function groupCategory()
     {
         return Category::where('code','group')->first();

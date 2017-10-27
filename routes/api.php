@@ -4,8 +4,6 @@ use Illuminate\Http\Request;
 
 Route::get('/user', function (Request $request) {
      $user=$request->user();
-    // $user->isTeacher=$user->isTeacher();
-     //$user->isStudent=$user->isStudent();
      return $user;
 })->middleware('auth:api');
 
