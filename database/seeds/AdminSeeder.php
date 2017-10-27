@@ -16,19 +16,34 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-         $roleName='Dev';
-         $user=User::where('email','traders.com.tw@gmail.com')->firstOrFail();
+        $user=\App\User::create([
+			'name' => '花組長',
+			'email' =>'hua@gmail.com',
+			'phone' => '0932000000',
+			'password' => '000000',
+			'email_confirmed' => true,
+			'remember_token' => str_random(10),
+		]);
+		$profile=new \App\Profile([
+			'user_id' => $user->id,					
+			'fullname'=> '花組長',
+			'dob' =>'1970-1-1',
+			'gender' => 1,
+		]);
+        $user->profile()->save($profile); 
+        
+        $roleName=Role::ownerRoleName();
+		$user->addRole($roleName);
 
-         $role=Role::where('name',$roleName)->firstOrFail();
-         $user->attachRole($role);
-
-         
-
-         $adminValues = [
+        $adminValues = [
 		     'role' => $roleName,	
              'user_id' => $user->id,
 		 ];
-         Admin::create($adminValues);
+        Admin::create($adminValues);
+
+        $center=Center::where('head',true)->first();
+        $admin=Admin::find($user->id);
+        $admin->attachCenter($center->id);
         
 
          

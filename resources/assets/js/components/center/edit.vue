@@ -30,11 +30,16 @@
                             <input type="text" name="center.name" class="form-control" v-model="form.center.name">
                             <small class="text-danger" v-if="form.errors.has('center.name')" v-text="form.errors.get('center.name')"></small>
                         </div>
+                        <div class="form-group">                           
+                            <label>代碼</label>
+                            <input type="text" name="center.code" class="form-control" v-model="form.center.code">
+                            <small class="text-danger" v-if="form.errors.has('center.code')" v-text="form.errors.get('center.code')"></small>
+                        </div>
                         <div v-show="false" class="form-group">
                             <label>狀態</label>
                             <div>
                             <input type="hidden" v-model="form.center.active">
-                                 <toggle :items="activeOptions"   :default_val="form.center.active" @selected=setActive></toggle>
+                                 <toggle :items="activeOptions"   :default_val="form.center.active" @selected="setActive"></toggle>
                             </div>
                         </div>
                         

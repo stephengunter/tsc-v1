@@ -85,8 +85,8 @@
             }
         },
         watch: {
-            version: function () {
-               this.current_version += 1
+            version () {
+               this.init()
             }
         },
         data() {
@@ -145,8 +145,6 @@
             init() {
                 this.edittingOrder=false
                 this.centers=[]
-
-              
 
                 this.fetchData()
             },

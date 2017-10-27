@@ -33,16 +33,23 @@ Route::group(['middleware' => 'admin'], function()
     Route::get('/', 'HomeController@index');
     Route::get('/downloads', 'DownloadsController@index');
 
-    
+    Route::resource('photoes', 'PhotoesController',['only'=>['show','store']]);
+
     Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
     Route::post('centers/display-order','\App\Http\Controllers\Settings\CentersController@updateDisplayOrder');
     Route::put('centers/{id}/update-photo','\App\Http\Controllers\Settings\CentersController@updatePhoto');
     Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
 
-    Route::resource('centers-import', '\App\Http\Controllers\Settings\CentersImportController');
+    Route::resource('centers-import', '\App\Http\Controllers\Settings\CentersImportController',['only' => ['index','store']]);
 
 
+    Route::post('categories/display-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
+    Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController'); 
+    Route::resource('categories-import', '\App\Http\Controllers\Course\CategoriesImportController',['only' => ['index','store']]);
     
+
+
+
     
 
     Route::resource('teachers/review', '\App\Http\Controllers\Teacher\TeachersReviewController');
@@ -67,9 +74,7 @@ Route::group(['middleware' => 'admin'], function()
 
    
 
-    Route::post('categories/display-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
-    
-
+   
     Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
     Route::get('courses/sub-courses', '\App\Http\Controllers\Course\CoursesController@subCourses');
     Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
@@ -104,7 +109,7 @@ Route::group(['middleware' => 'admin'], function()
 
 
     Route::resource('titles', '\App\Http\Controllers\User\TitlesController');
-    Route::resource('photoes', 'PhotoesController');
+    
 
     Route::resource('volunteers', '\App\Http\Controllers\User\VolunteersController');
 
@@ -144,7 +149,7 @@ Route::group(['middleware' => 'admin'], function()
                                         ['only' => ['index','update']]);   
     Route::resource('leaves', '\App\Http\Controllers\Course\LeavesController');
 
-    Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController');                                                                  
+                                                                     
     
     
     
@@ -179,7 +184,7 @@ Route::group(['middleware' => 'owner'], function()
     Route::get('admins/index-options', '\App\Http\Controllers\Admin\AdminsController@indexOptions');
     Route::resource('admins', '\App\Http\Controllers\Admin\AdminsController'); 
 
-    Route::resource('admins-import', '\App\Http\Controllers\Admin\AdminsImportController');
+    Route::resource('admins-import', '\App\Http\Controllers\Admin\AdminsImportController',['only' => ['index','store']]);
                                            
 });
 

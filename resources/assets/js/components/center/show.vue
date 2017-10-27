@@ -25,7 +25,7 @@
                 <div class="col-sm-3">
                     <photo :id="$options.filters.tryParseInt(center.photo_id)"></photo>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                   
                    
                     <label class="label-title">名稱</label>
@@ -35,10 +35,9 @@
                       <p>{{  center.created_at | tpeTime }}</p>
                     
                 </div>
-                <div class="col-sm-5">
-                    <label class="label-title">狀態</label>
-                     <p v-html="$options.filters.activeLabel(center.active)">                       
-                     </p>
+                <div class="col-sm-3">
+                    <label class="label-title">代碼</label>
+                    <p> {{ center.code }} </p>
 
                     <label class="label-title">最後更新</label>
                      <p v-if="!center.updated_by"> 
@@ -49,6 +48,16 @@
                             {{   center.updated_at|tpeTime  }}
                          </a>
                      </p>  
+                </div>
+                <div class="col-sm-3">
+                  
+                   
+                     <label class="label-title">狀態</label>
+                     <p v-html="$options.filters.activeLabel(center.active)">                       
+                     </p>
+                   
+                  
+                    
                 </div>
            </div>  <!-- End row-->
 

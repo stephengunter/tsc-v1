@@ -12,12 +12,17 @@ class Center extends Model
 {
 	use FilterPaginateOrder;
 	
-	protected $fillable = ['name', 'code' , 'active'	, 'display_order',
+	protected $fillable = ['name', 'code' , 'active', 'display_order',
 							'removed','updated_by'];
 	
     protected $filter = [
-        'name', 'updated_at','display_order'
-    ];
+        'name', 'code' ,'updated_at','display_order'
+	];
+	
+	public function setcodeAttribute($value) {
+		
+		$this->attributes['code'] = strtoupper($value);
+	}
 
 	public static function initialize()
     {

@@ -2,7 +2,7 @@
   <ul class="nav navbar-nav" style="font-weight:bold;">
       
 
-      <li v-for="item in menus" v-bind:class="{ active: item.active }">
+      <li v-show="hideItem(item)"  v-for="(item,index) in menus" :key="index" :class="{ active: item.active }">
          <a :href="item.path" >
               {{ item.text }}
          </a>  
@@ -32,7 +32,10 @@
         },
         
         methods: {
-            
+            hideItem(item){
+                if(item.hide) return false
+                return true
+            },
            
         }
         

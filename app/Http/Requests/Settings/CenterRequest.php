@@ -17,21 +17,33 @@ class CenterRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
+    public function getId()
+    {
+        $values = $this->get('center');
+       
+        $id=0;        
+        if(array_key_exists ( 'id' ,$values)){
+            $id=(int)$values['id'];
+        }  
+        return $id;
+    }
     public function rules()
     {
+       
+        $id=$this->getId();
+       
+
         return [
             'center.name' => 'required|max:255',
+            'center.code' => 'required|unique:centers,code,'. $id, 
         ];
     }
     public function messages()
     {
         return [
             'center.name.required' => '必須填寫名稱',
+            'center.code.required' => '必須填寫代碼',
+            'center.code.unique' => '代碼與現有中心重複',
         ];
     }
 

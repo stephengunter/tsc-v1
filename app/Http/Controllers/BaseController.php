@@ -44,6 +44,7 @@ class BaseController extends Controller
     protected function menus($key)
     {
         $current=Route::current()->uri();
+        $current_user=$this->currentUser();
        
         if($key=='signups'){
            return array(
@@ -194,18 +195,21 @@ class BaseController extends Controller
             );
         }
         if($key=='main_settings'){
+            
             return array(
                 [
                     'id' => 1,
                     'text' => '開課中心',
                     'path' => '/centers',
-                    'active' => $current=='centers'
+                    'active' => $current=='centers',
+                    
                 ],
                 [
                     'id' => 2,
                     'text' => '匯入開課中心',
                     'path' => '/centers-import',
-                    'active' => $current=='centers-import'
+                    'active' => $current=='centers-import',
+                    'hide' => !\App\Center::canImport($current_user) 
                 ],
                 [
                     'id' => 3,
@@ -216,8 +220,9 @@ class BaseController extends Controller
                 [
                     'id' => 4,
                     'text' => '匯入課程分類',
-                    'path' => '/categories/import',
-                    'active' => $current=='categories/import'
+                    'path' => '/categories-import',
+                    'active' => $current=='categories-import',
+                    'hide' => !\App\Category::canImport($current_user) 
                 ],
                  
              );

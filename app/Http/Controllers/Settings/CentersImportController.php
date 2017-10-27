@@ -39,8 +39,8 @@ class CentersImportController extends BaseController
 
     public function store(Request $form)
     { 
-        $current_user=$this->currentUser();
-       
+        
+        $current_user=$this->currentUser();       
         
         if(!Center::canImport($current_user)){
             return  $this->unauthorized();  
@@ -51,12 +51,15 @@ class CentersImportController extends BaseController
                         ->json(['centers_file' => ['無法取得上傳檔案'] 
                             ]  ,  422);      
         }
-
        
-       
-        $file=Input::file('centers_file');      
+        $file=Input::file('centers_file'); 
+        
 
-        $this->centers->importCenters($file,$current_user);
+        $err_msg=$this->centers->importCenters($file,$current_user);
+        if($err_msg) {
+            return response()->json(['error' => $err_msg,'code' => 422 ], 422);
+        
+        }
 
         return response()->json(['success' => true]);
 

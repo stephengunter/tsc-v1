@@ -8,7 +8,7 @@
 
    <category-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
      @btn-back-clicked="backToIndex" @category-deleted="onCategoryDeleted">
-  </category-details>
+   </category-details>
 
    <category-create v-if="creating"   :course_id="course_id"
     @canceled="createCanceled" @saved="categoryCreated">

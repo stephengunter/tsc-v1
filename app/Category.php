@@ -9,13 +9,14 @@ class Category extends Model
 {
    use FilterPaginateOrder;
 
-    protected $guarded = [];
+    
 
-	// protected $fillable = ['name', 'parent', 'order', 'active'	, 'icon'];
+    protected $fillable = ['name', 'code', 'order', 'public',
+                           'parent','active', 'icon'];
 
     
     protected $filter = [
-        'name', 'order','active'
+        'name', 'code','order','active'
     ];
 
     public static function canEdit($user)
@@ -26,7 +27,12 @@ class Category extends Model
 
         return 	$user->admin->fromHeadCenter();
     }
-
+    public static function canImport($user)
+	{
+		
+		return 	static::canEdit($user);
+          
+	} 
     public function courses()
     {
         return $this->belongsToMany('App\Course','course_category');

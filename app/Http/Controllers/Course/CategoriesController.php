@@ -11,7 +11,7 @@ use App\Support\Helper;
 
 class CategoriesController extends BaseController
 {
-    protected $key='categories';
+    protected $key='main_settings';
     public function __construct(Categories $categories) 
     {
         $this->categories=$categories;

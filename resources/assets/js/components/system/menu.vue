@@ -8,7 +8,7 @@
         </div>  <!-- End panel-heading-->
         <div class="panel-body" >
             <div class="row">
-                <div v-for="(item,index) in items" :key="index" class="col-md-6">
+                <div v-show="hideItem(item)" v-for="(item,index) in items" :key="index" class="col-md-6">
                     <ul style="list-style-type: square;">
                         <li> 
                             <a :href="item.path"> {{ item.text  }} </a>
@@ -104,7 +104,10 @@
                 return html
                 
             },
-            
+            hideItem(item){
+                if(item.hide) return false
+                return true
+            },
             hasUnReviewTeachers(path){
                 if(path!='/teachers/review') return false
                 if(!this.badges)  return false

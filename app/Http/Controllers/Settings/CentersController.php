@@ -29,7 +29,7 @@ class CentersController extends BaseController
 
     public function index()
     { 
-        
+       
         if(!request()->ajax()){
             
             $menus=$this->menus($this->key);            
@@ -58,7 +58,10 @@ class CentersController extends BaseController
     public function create()
     {
         if(!request()->ajax()){
-            return view('centers.create');                   
+           
+            $menus=$this->menus($this->key);            
+            return view('centers.create')
+                    ->with(['menus' => $menus]);                  
         }  
 
         $center= Center::initialize();
@@ -85,7 +88,10 @@ class CentersController extends BaseController
     {
         
         if(!request()->ajax()){
-            return view('centers.details')->with([ 'id' => $id ]);          
+            $menus=$this->menus($this->key);            
+            return view('centers.details')
+                    ->with(['menus' => $menus , 'id' => $id ]); 
+                  
         }  
 
         $center=$this->centers->findOrFail($id);        
@@ -115,6 +121,7 @@ class CentersController extends BaseController
     }
     public function update(CenterRequest $request, $id)
     {
+       
          $center=$this->centers->findOrFail($id);    
          $current_user=$this->currentUser();
          if(!$center->canEditBy($current_user)){
@@ -123,6 +130,8 @@ class CentersController extends BaseController
          $updated_by=$current_user->id;
          $removed=false;
          $values= $request->getValues($updated_by,$removed);
+
+         dd($request->getId());
 
          $center->update($values);
 

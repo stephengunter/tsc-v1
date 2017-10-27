@@ -10,21 +10,14 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Input;
 
 use Image;
-use App\Http\Middleware\CheckAdmin;
 use App\Photo;
 
 class PhotoesController extends BaseController
 {
     private  $default_folder = '/images/uploads/';
    
-    public function __construct(CheckAdmin $checkAdmin)                                
+    public function __construct()                                
     {
-          $exceptAdmin=['store','show'];
-          $allowVisitors=['defaultProfile','defaultCenter','defaultCourse'];
-
-          $this->setMiddleware( $exceptAdmin, $allowVisitors);        
-
-          $this->checkAdmin=$checkAdmin;
           
 	}
     public function show($id)

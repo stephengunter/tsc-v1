@@ -89,6 +89,7 @@ Vue.component('teacher-review', require('./views/teachers/review'))
 Vue.component('category-index', require('./views/categories/index'))
 Vue.component('category-create', require('./views/categories/create'))
 Vue.component('category-details', require('./views/categories/details'))
+Vue.component('category-import', require('./views/categories/import'))
 
 Vue.component('course-index', require('./views/courses/index'))
 Vue.component('course-create', require('./views/courses/create'))

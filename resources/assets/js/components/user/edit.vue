@@ -56,7 +56,7 @@
                         <div class="form-group">
                             <label>性別</label>
                             <div>
-                             <toggle :items="genderOptions"   :default_val="form.user.profile.gender" @selected=setGender></toggle>
+                             <toggle :items="genderOptions"   :default_val="form.user.profile.gender" @selected="setGender"></toggle>
                             </div>
                         </div>
                         <div class="form-group">
@@ -85,7 +85,7 @@
                         <div class="form-group">
                             <label>稱謂</label>
                             <select  v-model="form.user.profile.title_id"  name="user.profile.title_id" class="form-control" >
-                                <option v-for="item in titleOptions" :value="item.value" v-text="item.text"></option>
+                                <option v-for="(item,index) in titleOptions" :key="index" :value="item.value" v-text="item.text"></option>
                             </select>
                         </div>
                         

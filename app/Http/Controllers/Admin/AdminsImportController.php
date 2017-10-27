@@ -37,6 +37,7 @@ class AdminsImportController extends BaseController
 
     public function store(Request $form)
     {
+        
         $current_user=$this->currentUser();
         
         if(!$current_user->isDev()){
@@ -50,11 +51,16 @@ class AdminsImportController extends BaseController
                             ]  ,  422);      
         }
 
+
+        $file=Input::file('admins_file'); 
         
 
-        $file=Input::file('admins_file');      
-
-        $this->admins->importAdmins($file,$current_user);
+        $err_msg=$this->admins->importAdmins($file,$current_user);
+       
+        if($err_msg) {
+             return response()->json(['error' => $err_msg,'code' => 422 ], 422);
+         
+        }
 
         return response()->json(['success' => true]);
 

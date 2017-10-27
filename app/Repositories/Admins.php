@@ -8,6 +8,7 @@ use App\Admin;
 use App\Role;
 
 use App\Repositories\Users;
+use App\Repositories\Centers;
 
 use App\Http\Requests\AdminRequest;
 use App\Support\Support;
@@ -22,9 +23,10 @@ use App\Events\UserRegistered;
 
 class Admins 
 {
-    public function __construct(Users $users)                          
+    public function __construct(Users $users, Centers $centers)                          
     {
         $this->users=$users;  
+        $this->centers=$centers;  
         
     }
 
@@ -209,118 +211,140 @@ class Admins
     public function importAdmins($file,$current_user)
     {
         
+        $err_msg='';
 
-        Excel::load($file, function($reader) use ($current_user){
-           $adminList=$reader->get()->toArray()[0];
-           for($i = 1; $i < count($adminList); ++$i) {
-               $row=$adminList[$i];
-               
-               $fullname=trim($row['fullname']);
-               if(!$fullname){
-                  continue;
-               }
+        $excel=Excel::load($file, function($reader) {             
+            $reader->limitColumns(16);
+            $reader->limitRows(100);
+        })->get();
 
-               $exist_user=null;
-               $sid=trim($row['id']);
-               if($sid){
-                   $exist_user=$this->users->findBySID(strtoupper($sid));
-               }
-
-               $gender=(int)trim($row['gender']);
-               if($gender) $gender=true;
-               else $gender=false;
-
-               $dob=trim($row['dob']);
-               if($dob){
-                   $pieces=explode('/', $dob);
-                   $year = (int)$pieces[0] + 1911;
-                   $dob= $year . '/'.$pieces[1]. '/'.$pieces[2];
-                   
-               }
-
-               $phone=trim($row['phone']);
-               $email=trim($row['email']);
-
-               if(!$exist_user){
-                   $userList=$this->users->findUsers($email, $phone);
-                   if(count($userList)) $exist_user=$userList[0];
-               }
-
-               $role=trim($row['role']);
-               if(strtolower($role) == strtolower(Role::ownerRoleName()) ){
-                   $role=Role::ownerRoleName();
-               }else{
-                   $role=Role::adminRoleName();
-               }
-
-               $active=(int)trim($row['active']);
-               if($active){
-                   $active=1;
-               }else{
-                   $active=0;
-               }
-
-               $updated_by=$current_user->id;
+        $adminList=$excel->toArray()[0];
        
-               $adminValues=[
-                   'role' => $role,
-                   'active' => $active,                 
-                   'updated_by' => $updated_by,
-                   'removed' => false
-               ];
-               $userValues=[
-                   'name' => $fullname,
-                   'email' => $email,
-                   'phone' => $phone,
-                   'updated_by' => $updated_by,
-                   'removed' => false
-               ];
-               $profileValues=[
-                   'fullname' => $fullname,
-                   'SID' => $sid,
-                   'gender' => $gender,
-                   'dob' => $dob,
-                  
-                   'updated_by' => $updated_by,
-                 
-               ];
+        for($i = 1; $i < count($adminList); ++$i) {
+            $row=$adminList[$i];
+            
+            $fullname=trim($row['fullname']);
+            if(!$fullname){
+               continue;
+            }
+
+            $center_code=trim($row['center']);
+            if(!$center_code){
+                $err_msg .= '中心代碼不可空白' . ',';
+                continue;
+            }
+            $center=$this->centers->getByCode($center_code);
+            if(!$center) {
+                $err_msg .= '中心代碼' .$center_code . '錯誤'. ',';
+                continue;
+            }
+
+            $canAdminCenter=false;
+            if($current_user->isDev())  $canAdminCenter=true;
+            if($current_user->admin){
+                $canAdminCenter=$current_user->admin->canAdminCenter($center);
+            }
+            if(!$canAdminCenter) {
+                $err_msg .= '您沒有管理中心代碼' .$center_code . '的權限';
+                continue;
+            }
+            
+
+            $exist_user=null;
+            $sid=trim($row['id']);
+            if($sid){
+                $exist_user=$this->users->findBySID(strtoupper($sid));
+            }
+
+            $gender=(int)trim($row['gender']);
+            if($gender) $gender=true;
+            else $gender=false;
+
+            $dob=trim($row['dob']);
+            if($dob){
+                $pieces=explode('/', $dob);
+                $year = (int)$pieces[0] + 1911;
+                $dob= $year . '/'.$pieces[1]. '/'.$pieces[2];
+                
+            }
+
+            $phone=trim($row['phone']);
+            $email=trim($row['email']);
+
+            if(!$exist_user){
+                $userList=$this->users->findUsers($email, $phone);
+                if(count($userList)) $exist_user=$userList[0];
+            }
+
+            $role=trim($row['role']);
+            if(strtolower($role) == strtolower(Role::ownerRoleName()) ){
+                $role=Role::ownerRoleName();
+            }else{
+                $role=Role::adminRoleName();
+            }
+
+            $active=(int)trim($row['active']);
+            if($active){
+                $active=1;
+            }else{
+                $active=0;
+            }
+
+            $updated_by=$current_user->id;
+    
+            $adminValues=[
+                'role' => $role,
+                'active' => $active,                 
+                'updated_by' => $updated_by,
+                'removed' => false
+            ];
+            $userValues=[
+                'name' => $fullname,
+                'email' => $email,
+                'phone' => $phone,
+                'updated_by' => $updated_by,
+                'removed' => false
+            ];
+            $profileValues=[
+                'fullname' => $fullname,
+                'SID' => $sid,
+                'gender' => $gender,
+                'dob' => $dob,
                
-               $user_id=0;
-               if($exist_user) $user_id=$exist_user->getUserId();
-
-               $admin_id=0;
-               if($exist_user){
-                   if($exist_user->admin) $admin_id=$exist_user->getUserId();
-               }
-
-               $center_id=0;
-               if($current_user->admin){
-                    $center=$current_user->admin->defaultCenter();
-                    if($center){
-                        $center_id=$center->id;
-                    }
-               }
-
-               
-               
-
-               $admin=$this->storeAdmin($userValues,$profileValues,$adminValues,$user_id,$admin_id,$current_user,$center_id);
-
-               
-               if(!$admin) continue;
-
-               $zipcode=trim($row['zipcode']);
-               $street=trim($row['street']);
-
-               if($zipcode){
-                   $admin->user->updateAddress($zipcode, $street,$updated_by);
-               }
-               
+                'updated_by' => $updated_by,
               
-           }  //end for  
+            ];
+            
+            $user_id=0;
+            if($exist_user) $user_id=$exist_user->getUserId();
 
-          
-       });
+            $admin_id=0;
+            if($exist_user){
+                if($exist_user->admin) $admin_id=$exist_user->getUserId();
+            }
+
+            $center_id=$center->id;
+            $admin=$this->storeAdmin($userValues,$profileValues,$adminValues,$user_id,$admin_id,$current_user,$center_id);
+
+            
+            if(!$admin) continue;
+
+            $zipcode=trim($row['zipcode']);
+            $street=trim($row['street']);
+
+            if($zipcode){
+                $admin->user->updateAddress($zipcode, $street,$updated_by);
+            }
+            
+           
+        }  //end for  
+
+        
+        
+
+        
+
+        return $err_msg;
 
        
 

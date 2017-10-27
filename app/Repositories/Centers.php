@@ -23,6 +23,11 @@ class Centers
     public function getById($id){
         return Center::find($id);
     }
+    public function getByCode($code)
+    {
+        $code=strtoupper($code);
+        return $this->getAll()->where('code',$code)->first();
+    }
     
     public function store($values)
     {
@@ -105,58 +110,67 @@ class Centers
 
     public function importCenters($file,$current_user)
     {
+        $err_msg='';
 
-        Excel::load($file, function($reader) use ($current_user){
-            $centerList=$reader->get()->toArray()[0];
-            for($i = 1; $i < count($centerList); ++$i) {
-                $row=$centerList[$i];
-                
-                $name=trim($row['name']);
-                if(!$name){
-                   continue;
-                }
- 
-                $exist_center=$this->getAll()->where('name',$name)->first(); 
+        $excel=Excel::load($file, function($reader) {             
+            $reader->limitColumns(16);
+            $reader->limitRows(100);
+        })->get();
 
-                $code=trim($row['code']);    
-                            
-                $order=(int)trim($row['order']);
+        $centerList=$excel->toArray()[0];
+        for($i = 1; $i < count($centerList); ++$i) {
+            $row=$centerList[$i];
+            
+            $name=trim($row['name']);
+            if(!$name){
+               continue;
+            }
+
+            $code=trim($row['code']);  
+            if(!$code){
+                $err_msg .= '必須填寫中心代碼';
+                continue;
+            }
+            
+            $exist_center=$this->getByCode($code);
+             
+                        
+            $order=(int)trim($row['order']);
+            $active=true;
+            if($order>=0){
                 $active=true;
-                if($order>=0){
-                    $active=true;
-                }else{
-                    $active=false;
-                }
+            }else{
+                $active=false;
+            }
 
-                $zipcode=trim($row['zipcode']);
-                $street=trim($row['street']);
-                $tel=trim($row['tel']);
-                $fax=trim($row['fax']);
-               
-
-                $updated_by=$current_user->id;
-
-                $values=[
-                    'name' => $name,
-                    'code' => $code,
-                    'display_order' => $order,
-                    'active' => $active,
-                    'updated_by' => $updated_by
-                ];
-
-                if($exist_center){
-                    $exist_center->updateContactInfo($tel ,$fax, $zipcode, $street,$updated_by);                    
-                    $exist_center->update($values);
-                }else{
-                    $contactInfo=ContactInfo::createByAddress($tel,$fax,$zipcode, $street, $updated_by);
-                    if($contactInfo) $values['contact_info'] = $contactInfo->id;
-                    $center=Center::create($values);
-                
-                }
-            }  //end for  
- 
+            $zipcode=trim($row['zipcode']);
+            $street=trim($row['street']);
+            $tel=trim($row['tel']);
+            $fax=trim($row['fax']);
            
-        });
+
+            $updated_by=$current_user->id;
+
+            $values=[
+                'name' => $name,
+                'code' => $code,
+                'display_order' => $order,
+                'active' => $active,
+                'updated_by' => $updated_by
+            ];
+
+            if($exist_center){
+                $exist_center->updateContactInfo($tel ,$fax, $zipcode, $street,$updated_by);                    
+                $exist_center->update($values);
+            }else{
+                $contactInfo=ContactInfo::createByAddress($tel,$fax,$zipcode, $street, $updated_by);
+                if($contactInfo) $values['contact_info'] = $contactInfo->id;
+                $center=Center::create($values);
+            
+            }
+        }  //end for  
+
+        return $err_msg;
     }
   
    

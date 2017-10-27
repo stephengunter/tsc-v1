@@ -17,7 +17,6 @@ use App\Repositories\Roles;
 
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\AdminUserRequest;
-use App\Http\Middleware\CheckOwner;
 
 use App\Support\Helper;
 
