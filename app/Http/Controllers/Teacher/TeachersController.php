@@ -17,15 +17,9 @@ use App\Repositories\Courses;
 use App\Repositories\Users;
 use App\Repositories\Centers;
 use App\Repositories\Roles;
-use App\Http\Middleware\CheckAdmin;
 use App\Support\Helper;
 
 use Illuminate\Support\Facades\Input;
-
-use DB;
-
-use Storage;
-
 class TeachersController extends BaseController
  {
     protected $key='teachers';
@@ -47,15 +41,21 @@ class TeachersController extends BaseController
 	public function index()
     {
        
+        $request = request();
+
         if(!request()->ajax()){
+            $group=(bool)$request->group;
             $menus=$this->menus($this->key);            
             return view('teachers.index')
-                    ->with(['menus' => $menus]);
+                    ->with([ 'menus' => $menus,
+                             'group' => $group  
+                          ]);
         }  
-        $request = request();
+        
         
         $centerId=(int)$request->center;
-        $group_teacher_id=(int)$request->group;
+        $group=(bool)$request->group;
+       
         $teacherList=[];
         if($centerId){
           
@@ -67,30 +67,40 @@ class TeachersController extends BaseController
                                         ->with('user.profile');
         }
 
-        if($group_teacher_id){
-            $group_teacher=$this->teachers->findOrFail($group_teacher_id);
-            $groupTeacherIds=$group_teacher->groupTeacherIds();           
-            array_push($groupTeacherIds,$group_teacher_id);
-           
-          
-            $teacherList=$teacherList
-                        ->where('group',false)
-                        ->whereNotIn('user_id',$groupTeacherIds);
+        if($group){
+            $teacherList=$teacherList->where('group',true);
+            
+        }else{
+            
+            $teacherList=$teacherList->where('group',false);
+
+            $teacherGroupId=(int)$request->group_id;            
+            if($teacherGroupId){
+                $teacherGroup=$this->teachers->findOrFail($teacherGroupId);
+                $teacherIds=$teacherGroup->groupTeacherIds();           
+                array_push($teacherIds,$teacherGroupId);
+            
+            
+                $teacherList=$teacherList
+                            ->where('group',false)
+                            ->whereNotIn('user_id',$teacherIds);
+            }
         }
+
+        
 
         $teacherList=$teacherList->filterPaginateOrder();   
         if(count($teacherList)){
             foreach($teacherList as $teacher){
                 $teacher->centerNames=$teacher->centerNames();
             }
-        }
-        
+        }        
                                     
-        return response()
-            ->json([
-               'model' => $teacherList                
-            ]);
+        return response()->json([ 'model' => $teacherList ]);
+
     }
+
+    
 
     public function create()
     {
@@ -149,6 +159,8 @@ class TeachersController extends BaseController
            return  $this->unauthorized();  
         }
         $teacher->name=$teacher->getName();
+        $teacher->centerNames=$teacher->centerNames();
+
         $teacher->canEdit=$teacher->canEditBy($current_user);
         $teacher->canReview=$teacher->canReviewBy($current_user);
         $teacher->canDelete=$teacher->canDeleteBy($current_user);
@@ -182,14 +194,18 @@ class TeachersController extends BaseController
         $updated_by=$current_user->id;
         $removed=false;
 
+        $center_id=0;
+        $defaultCenter=$this->defaultCenter();
+        if($defaultCenter) $center_id=$defaultCenter->id;
+        
         
         $teacher=null;
         if($request->isGroup()){
             $teacherValues=$request->get('teacher');
             $name=$teacherValues['name'];
             $description=$teacherValues['description'];
-
-            $teacher=$this->teachers->storeTeacherGroup($name,$description,$current_user);
+            
+            $teacher=$this->teachers->storeTeacherGroup($name,$description,$center_id,$current_user);
         }else{
 
             $teacherValues=$request->getTeacherValues($updated_by,$removed);
@@ -200,7 +216,8 @@ class TeachersController extends BaseController
             $user_id=$request->getUserId();
             $teacherId=$request->getTeacherId();
     
-            $teacher=$this->teachers->storeTeacher($userValues,$profileValues,$teacherValues,$user_id,$teacherId,$current_user);
+            $teacher=$this->teachers->storeTeacher($userValues,$profileValues,$teacherValues,
+                                                    $user_id,$teacherId,$current_user,$center_id);
     
            
         }
@@ -210,45 +227,6 @@ class TeachersController extends BaseController
         return response()->json($teacher); 
             
     }
-
-    
-    public function import()
-    {
-        
-
-        $menus=$this->menus($this->key);     
-       
-        return view('teachers.import')
-                ->with(['menus' => $menus]);
-    }
-    public function importTeachers(Request $form)
-    {
-
-        if(!$form->hasFile('teachers_file')){
-            return   response()
-                        ->json(['teachers_file' => ['無法取得上傳檔案'] 
-                            ]  ,  422);      
-        }
-
-        $current_user=$this->currentUser();
-
-        $file=Input::file('teachers_file');
-        $type=(int)$form['type'];
-
-       
-
-        if($type){
-            $this->teachers->importTeachers($file,$current_user);
-           
-        }else{
-            $this->teachers->importGroupTeachers($file,$current_user);
-        }   
-
-        return response()->json(['success' => true]);
-
-       
-    }
-
     
     
     public function update(TeacherRequest $request,$id)
@@ -274,19 +252,6 @@ class TeachersController extends BaseController
         return response()->json($teacher); 
          
            
-    }
-    public function updateReview(Request $form)
-    {
-        $id=$form['id'];
-        $reviewed=$form['reviewed'];
-
-        $current_user=$this->currentUser();
-       
-        $teacher=$this->teachers->updateReview($id,$reviewed,$current_user);    
-
-        return response()->json($teacher); 
-
-        
     }
 
     public function destroy($id)

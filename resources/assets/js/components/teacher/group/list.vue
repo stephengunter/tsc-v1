@@ -2,12 +2,10 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-             <div class="panel-title">
+            <div class="panel-title">
                  <h4 v-html="title">
                  </h4>
-             </div>
-              
-
+            </div>
             <button v-show="can_edit" class="btn btn-primary btn-sm" @click="onAddClicked">
                  <span  class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                  加入教師
@@ -20,7 +18,7 @@
                 <thead>
                     <tr>
                       
-                        <th v-for="item in thead" >
+                        <th v-for="(item,index) in thead" :key="index">
                            {{item.title}}
                         </th>
                         <th></th>
@@ -28,14 +26,13 @@
                     
                 </thead>
                 <tbody>
-                   <tr v-for="teacher in teachers">
+                   <tr v-for="(teacher,index) in teachers" :key="index">
                       
                         <td><a herf="#" @click="selected(teacher.user_id)">{{teacher.user.profile.fullname}}</a> </td>
                         <td>{{teacher.user.phone}}</td>
                         <td>{{teacher.specialty}}</td>
                         
                         <td v-html="$options.filters.namesText(teacher.centerNames)"></td>
-                        <td v-html="$options.filters.activeLabel(teacher.active)" ></td>
                         <td v-html="$options.filters.reviewedLabel(teacher.reviewed)" ></td> 
                         <td>{{ teacher.updated_at | tpeTime}}</td> 
                         <td>

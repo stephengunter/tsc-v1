@@ -17,7 +17,7 @@
             <div class="row">
                     
                 <div class="col-sm-4">
-                    <button v-if="loading" class="btn btn-default btn-lg">
+                    <button v-if="loading" class="btn btn-default">
                          <i class="fa fa-spinner fa-spin"></i> 
                          處理中
                     </button> 
@@ -86,7 +86,7 @@
                 store.then(result => {
                    
                         Helper.BusEmitOK()
-                        this.init
+                        this.loading=false
                         this.$emit('imported')  
                     })
                     .catch(error => {

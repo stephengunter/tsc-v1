@@ -97,7 +97,13 @@ class Teacher extends Model
     public function centersCanAdd()
 	{
         return Helper::centersCanAdd($this);
-	}
+    }
+    
+    public function centersCanAddByUser($user)
+	{
+         return Helper::centersCanAddByUser($this,$user);
+    }
+
     public function centersCanAddByAdmin($admin)
 	{
          return Helper::centersCanAddByAdmin($this,$admin);
@@ -110,18 +116,18 @@ class Teacher extends Model
     }
     public function attachCenter($center_id)
     {
-            if(!$this->centers->contains($center_id)) 
-            {
-                $this->centers()->attach($center_id);
-            }
+        if(!$this->centers->contains($center_id)) 
+        {
+            $this->centers()->attach($center_id);
+        }
            
     }
     public function detachCenter($center_id)
     {
-            if($this->centers->contains($center_id)) 
-            {
-                $this->centers()->detach($center_id);
-            }
+        if($this->centers->contains($center_id)) 
+        {
+            $this->centers()->detach($center_id);
+        }
     }
     
 
@@ -146,7 +152,12 @@ class Teacher extends Model
 	public function canEditBy($user)
 	{
         if($user->isDev()) return true;
-		if($user->id==$this->user_id) return true;
+        if($user->id==$this->user_id) return true;
+        
+        if($this->group){
+            $groupTeacherIds=$this->groupTeacherIds();
+            return in_array($user->id,$groupTeacherIds);
+        }
 
         if(!$user->isAdmin()) return false;
         return Helper::centersIntersect($this,$user->admin);
@@ -165,7 +176,6 @@ class Teacher extends Model
 
     public function experiencesArray()
     {
-       
         return   explode('<br>', $this->experiences);
     }
 

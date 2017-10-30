@@ -45,17 +45,20 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::post('categories/display-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
     Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController'); 
+    
     Route::resource('categories-import', '\App\Http\Controllers\Course\CategoriesImportController',['only' => ['index','store']]);
     
 
-
-
     
+    Route::get('teachers/options', '\App\Http\Controllers\Teacher\TeachersController@options');
+    Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');
 
-    Route::resource('teachers/review', '\App\Http\Controllers\Teacher\TeachersReviewController');
-    Route::get('teachers/import', '\App\Http\Controllers\Teacher\TeachersController@import');
-    Route::post('teachers/import', '\App\Http\Controllers\Teacher\TeachersController@importTeachers');
-    Route::post('teachers/update-review', '\App\Http\Controllers\Teacher\TeachersController@updateReview');
+    Route::put('group-teachers/{id}/remove',['uses'=>'\App\Http\Controllers\Teacher\GroupTeachersController@remove']);   
+    Route::resource('group-teachers', '\App\Http\Controllers\Teacher\GroupTeachersController',['only' => ['create','store','show']]);
+
+    Route::resource('teachers-import', '\App\Http\Controllers\Teacher\TeachersImportController',['only' => ['index','store']]);
+
+    Route::resource('teachers-review', '\App\Http\Controllers\Teacher\TeachersReviewController',['only' => ['index','store','update']]);
     
 
     Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
@@ -87,9 +90,9 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::get('lessons/{id}/print', '\App\Http\Controllers\Course\LessonsController@print');
 
-    Route::get('teachers/options', '\App\Http\Controllers\Teacher\TeachersController@options');
+    
 
-    Route::put('group-teachers/{id}/remove', '\App\Http\Controllers\Teacher\GroupTeachersController@remove');
+    
 
     
 
@@ -156,9 +159,7 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('category-courses', '\App\Http\Controllers\Course\CategoryCourseController');                                                                  
 
 
-    Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');
-    Route::resource('group-teachers', '\App\Http\Controllers\Teacher\GroupTeachersController',
-                                                                    ['only' => ['show','store']]);   
+    
 
     Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');
     Route::resource('identities', '\App\Http\Controllers\Discounts\IdentitiesController');

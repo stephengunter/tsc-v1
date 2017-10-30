@@ -1,7 +1,7 @@
 <template>
 <div>
     
-    <list   :group_id="teacherId" :can_edit="can_edit"  
+    <list :group_id="teacherId" :can_edit="can_edit"  
        :version="version"
          @begin-edit="beginEdit"  @begin-delete="beginDelete" >                 
      
@@ -11,21 +11,24 @@
       @close="onDeleteCanceled" @confirmed="removeTeacher">        
     </delete-confirm>
 
-     <modal :showbtn="false" :width="editSettings.width" :show.sync="editSettings.show"  @closed="endEdit" 
-        effect="fade">
-          <div slot="modal-header" class="modal-header">
+    <modal effect="fade" :showbtn="false"  :show.sync="editSettings.show"  
+          :width="editSettings.width"@closed="endEdit" >
+        
+        <div slot="modal-header" class="modal-header">
            
             <button id="close-button" type="button" class="close" data-dismiss="modal" @click="endEdit">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
             </button>
            
-          </div>
+        </div>
         <div slot="modal-body" class="modal-body">
            
-            <teacher-list v-if="editSettings.show" :group="teacherId"
+            <teacher-list v-if="editSettings.show" 
+               :group_id="teacherId" :source_url="editSettings.source"
                :hide_create="editSettings.hide_create" 
                 @selected="onTeacherSelected">
             </teacher-list>
+            
  
       
         </div>
@@ -64,6 +67,7 @@
 
                 },
                 editSettings:{
+                    source:GroupTeacher.createUrl(),
                     width:1200,
                     show:false,
                     hide_create:true
@@ -90,8 +94,7 @@
                 this.$emit('data-loaded',admin)
             },        
             beginEdit() {
-                this.editSettings.show=true
-               // this.readOnly=false
+                this.editSettings.show=true               
             },
             endEdit(){
                 this.editSettings.show=false

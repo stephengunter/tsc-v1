@@ -26,7 +26,10 @@ class DownloadsController extends BaseController
         $file_name='';
         if($key=='teachers'){
             $file_name = 'teachers.xlsx';
-        }else if($key=='admins'){
+        }else if($key=='teacher-groups'){
+            $file_name = 'teacher-groups.xlsx';
+        }
+        else if($key=='admins'){
             $file_name = 'admins.xlsx';
         }else if($key=='centers'){
             $file_name = 'centers.xlsx';
@@ -39,19 +42,6 @@ class DownloadsController extends BaseController
         if(!$file_name) abort(404);
 
         $path .= $file_name;
-        
-        //$path = storage_path('uploads/xy.zip');
-      
-       
-        
-    
-       
-            // dd($contents);
-    
-    
-        // $file = public_path()."/downloads/info.pdf";
-        // $headers = array('Content-Type: application/pdf',);
-        // return Response::download($file, 'info.pdf',$headers);
       
         
         return response()->download(storage_path($path));

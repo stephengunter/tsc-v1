@@ -129,7 +129,7 @@
             updateReview(val){
                 let id = this.teacher_id 
                 let review= val
-                let save= Teacher.updateReview(id,review)
+                let save= TeacherReview.update(id,review)
 
                 save.then(teacher => {
                     Helper.BusEmitOK('存檔成功')

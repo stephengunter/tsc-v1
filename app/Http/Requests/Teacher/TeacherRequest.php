@@ -59,13 +59,17 @@ class TeacherRequest extends FormRequest
 
     public function messages()
     {
+        $name_err_msg='必須填寫教師姓名';
+        if($this->isGroup()) $name_err_msg='必須填寫名稱';
         $messages=[
 
-            'teacher.name.required' => '必須填寫教師姓名',
+            'teacher.name.required' => $name_err_msg,
             'teacher.specialty.required' => '必須填寫專長',
             'teacher.education.required' => '必須填寫最高學歷',
             'teacher.experiences.required' => '必須填寫學經歷',
         ];
+
+        
         
         $userMessages=User::getRuleMessages();
         return array_merge($messages,$userMessages);

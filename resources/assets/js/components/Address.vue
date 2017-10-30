@@ -4,11 +4,11 @@
         <div class="form-inline">
 
             <select :disabled="isReadOnly"  v-model="address.city_id" @change="loadDistricts" style="width:auto;" class="form-control selectWidth">
-                <option v-for="city in cities" :value="city.id" v-text="city.name" >
+                <option v-for="(city,index) in cities" :key="index" :value="city.id" v-text="city.name" >
                 </option>
             </select>
             <select :disabled="isReadOnly"  v-model="address.district_id" style="width:auto;" class="form-control selectWidth">
-                <option v-for="d in districts" :value="d.id" v-text="d.name">
+                <option v-for="(d,index) in districts" :key="index" :value="d.id" v-text="d.name">
                 </option>
             </select>
             <input :readonly="isReadOnly" type="text"  name="address.streetAddress" v-model="address.streetAddress" style="width:50%" class="form-control" >
@@ -35,19 +35,19 @@
         </div>
     </form>
 
-     <modal :showBtn="true"  :show.sync="showConfirm" @ok="deleteAddress"  @closed="closeConfirm" ok-text="確定"
+    <modal :showBtn="true"  :show.sync="showConfirm" @ok="deleteAddress"  @closed="closeConfirm" ok-text="確定"
         effect="fade" width="800">
-          <div slot="modal-header" class="modal-header modal-header-danger">
+        <div slot="modal-header" class="modal-header modal-header-danger">
            
             <button id="close-button" type="button" class="close" data-dismiss="modal" @click="closeConfirm">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
             </button>
-             <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
+            <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
           </div>
         <div slot="modal-body" class="modal-body">
             <h3 v-text="confirmMsg"> </h3>
         </div>
-     </modal>
+    </modal>
 
   </div>  
 </template>

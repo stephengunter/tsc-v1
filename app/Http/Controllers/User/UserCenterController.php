@@ -46,15 +46,27 @@ class UserCenterController extends BaseController
         $role=strtolower($role);
         $centers=[];
         if( $role == strtolower(Role::teacherRoleName()) ){
-            $centers=$user->teacher->validCenters();   
-            $canEdit=true;   
+            
+            $teacher=$user->teacher;
+            $centers=$teacher->validCenters();   
+            $canEdit=$teacher->canEditBy($current_user);   
+
+            if($canEdit){
+                $centersCanAdd=$teacher->centersCanAddByUser($current_user);
+                if(Helper::isNullOrEmpty($centersCanAdd)) $canEdit=false;
+            }
+
             return response()->json([
                 'centers' => $centers ,
                 'canEdit' => $canEdit
             ]);
+
         }else if( $role == strtolower(Role::volunteerRoleName()) ){
+
             $centers=$user->volunteer->validCenters();
+
         }else if(in_array($role, Role::adminRoleNames(true))){
+
             $centers=$user->admin->validCenters();
             $canEdit=$this->headCenterAdmin();
             return response()->json([
@@ -69,6 +81,7 @@ class UserCenterController extends BaseController
     }
     public function create()
     {
+        $current_user=$this->currentUser();
         $current_admin=$this->currentUser()->admin;
         $request = request();
         
@@ -83,11 +96,17 @@ class UserCenterController extends BaseController
         $centersCanAdd=[];
        
         if( $role == strtolower(Role::teacherRoleName()) ){
-            $centersCanAdd=$user->teacher->centersCanAddByAdmin($current_admin);
+
+            $centersCanAdd=$user->teacher->centersCanAddByUser($current_user);
+
         }else if( $role == strtolower(Role::volunteerRoleName()) ){
+
             $centersCanAdd=$user->volunteer->centersCanAddByAdmin($current_admin);
+
         }else if(in_array($role, Role::adminRoleNames(true))){
+
             $centersCanAdd=$user->admin->centersCanAddByAdmin($current_admin);
+
         }else{
             abort(404);
         }

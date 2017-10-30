@@ -22,6 +22,7 @@ Vue.component('time-picker', require('vue2-timepicker'))
 Vue.component('pager', require('vue-simple-pager'))
 
 Vue.component('main-nav', require('./components/MainNav'))
+Vue.component('nav-item', require('./components/NavItem'))
 Vue.component('html-editor', require('./components/HtmlEditor'))
 Vue.component('delete-confirm', require('./components/DeleteConfirm'))
 Vue.component('review-editor', require('./components/ReviewEditor'))
@@ -171,6 +172,8 @@ import Tuition from './models/tuition.js'
 import Refund from './models/refund.js'
 import Center from './models/center.js'
 import Teacher from './models/teacher.js'
+import TeacherImport from './models/teacher-import.js'
+import TeacherReview from './models/teacher-review.js'
 import GroupTeacher from './models/group-teacher.js'
 import Volunteer from './models/volunteer.js'
 import Admin from './models/admin.js'
@@ -222,6 +225,8 @@ window.Signup = Signup
 window.Tuition = Tuition
 window.Refund = Refund
 window.Teacher = Teacher
+window.TeacherImport = TeacherImport
+window.TeacherReview = TeacherReview
 window.GroupTeacher = GroupTeacher
 window.Volunteer = Volunteer
 window.Admin = Admin

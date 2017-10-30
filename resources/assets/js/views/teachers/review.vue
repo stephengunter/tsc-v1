@@ -3,12 +3,11 @@
     <div class="panel panel-default">
         <div  class="panel-heading">
             <div class="panel-title">
-                <h4 v-html="title">
-                </h4>
+                <h4 v-html="title"></h4>                
             </div>
             <div  class="form-inline" slot="header">
                 <select  v-model="searchParams.center"  style="width:auto;" class="form-control selectWidth">
-                      <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
+                      <option v-for="(item,index) in centerOptions" :key="index" :value="item.value" v-text="item.text"></option>
                 </select>
     
             </div>
@@ -28,11 +27,11 @@
                                 @selected="checkAll"   @unselected="unCheckAll">                             
                             </checkbox>
                         </th>
-                        <th v-for="item in thead"> {{ item.title }} </th>
+                        <th v-for="(item,index) in thead" :key="index"> {{ item.title }} </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="teacher in teacherList">
+                    <tr v-for="(teacher,index) in teacherList" :key="index">
                         <td>
                             
                             <checkbox :value="teacher.user_id" :default="beenChecked(teacher.user_id)"
@@ -104,7 +103,43 @@
             return {
                 loaded:false,
                 title:Helper.getIcon('Teachers')  + '  教師審核',
-                thead:Teacher.getThead(),
+                thead:[{
+                    title: '姓名/名稱',
+                    key: 'name',
+                    sort: false,
+                    default: true
+                },{
+                    title: '群組',
+                    key: 'group',
+                    sort: false,
+                    default: true
+                }, {
+                    title: '手機',
+                    key: 'user.phone',
+                    sort: false,
+                    default: true
+                }, {
+                    title: '專長',
+                    key: 'specialty',
+                    sort: true,
+                    default: true
+                }, {
+                    title: '所屬中心',
+                    key: 'centers',
+                    sort: false,
+                    default: true
+
+                }, {
+                    title: '審核',
+                    key: 'reviewed',
+                    sort: true,
+                    default: true
+                }, {
+                    title: '更新時間',
+                    key: 'updated_at',
+                    sort: true,
+                    default: true
+                }],
                 searchParams:{
                     center : 0,
                    
@@ -166,19 +201,19 @@
             },
             fetchData(){
                 let center=this.searchParams.center
-                let getData = Teacher.unreviewedList(center)
+                let getData = TeacherReview.index(center)
                 getData.then(data => {
                           
-                          this.teacherList=data.teacherList
-                          if(data.centerOptions.length){
-                              this.centerOptions=data.centerOptions
-                              this.searchParams.center=this.centerOptions[0].value
-                          }
-                          
-                          this.loaded=true
-                       }).catch( error => {
-                          Helper.BusEmitError(error)           
-                       })
+                        this.teacherList=data.teacherList
+                        if(data.centerOptions.length){
+                            this.centerOptions=data.centerOptions
+                            this.searchParams.center=this.centerOptions[0].value
+                        }
+                        
+                        this.loaded=true
+                    }).catch( error => {
+                        Helper.BusEmitError(error)           
+                    })
             },
             isGroup(teacher){
                 return Helper.isTrue(teacher.group)
@@ -211,7 +246,7 @@
                
             },
             submit(){
-                let save = Teacher.updateReviewList(this.checked_ids)
+                let save = TeacherReview.store(this.checked_ids)
                 save.then(data => {
                         this.$emit('saved')
                     }).catch( error => {
@@ -227,7 +262,7 @@
             updateReview(val){
                 let id = this.selected 
                 let review= val
-                let save= Teacher.updateReview(id,review)
+                let save= TeacherReview.update(id,review)
 
                 save.then(teacher => {
                     Helper.BusEmitOK('存檔成功')

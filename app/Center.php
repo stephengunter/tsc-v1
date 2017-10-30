@@ -33,6 +33,8 @@ class Center extends Model
 			 
         ];
 	}
+
+	
 	
 	public static function canEdit($user)
 	{
@@ -54,7 +56,7 @@ class Center extends Model
 	
 	public static function getHeadCenter()
 	{
-		return static::where('head',true)->where('removed',false)->get();
+		return static::where('head',true)->where('removed',false)->first();
 	}
 
     public function courses() 

@@ -267,12 +267,12 @@
             onSubmit() {
               
                 if(this.isGroup){
-                   this.form.group=1
-                   let teacher=this.form.teacher
-                   this.form.user.name=teacher.name
-                   this.form.user.profile.fullname=teacher.name
+                    this.form.group=1
+                    let teacher=this.form.teacher
+                    this.form.user.name=teacher.name
+                    this.form.user.profile.fullname=teacher.name
                  
-                   this.submitForm()
+                    this.submitForm()
                 }else{
                     this.form.group=0
                     if(!this.form.user.id){
@@ -294,8 +294,8 @@
                 
                 let store=Teacher.store(this.form)
                     .then(data => {
-                    //    Helper.BusEmitOK()
-                    //    this.$emit('saved',data)                            
+                        Helper.BusEmitOK()
+                        this.$emit('saved',data)                            
                     })
                     .catch(error => {
                         if(error.status==422){

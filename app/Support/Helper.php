@@ -2,19 +2,19 @@
 
 namespace App\Support;
 
+use Illuminate\Database\Eloquent\Collection;
 use App\Center;
-
 use Carbon\Carbon;
 
 class Helper 
 {
     public static function getAppSettings($frontend=false)
     {
-       if($frontend){
-          return config('app.frontend');
-       }else{
-          return config('app.backend');
-       }
+        if($frontend){
+            return config('app.frontend');
+        }else{
+            return config('app.backend');
+        }
     }
     public static function buildUrl($spa,$url,$action,$query)
     {
@@ -29,6 +29,12 @@ class Helper
          }
 
          return $url;
+    }
+
+    public static function isNullOrEmpty(Collection $value = null)
+    {
+        if(!$value) return true;
+        return $value->isEmpty();
     }
     
    
@@ -86,6 +92,22 @@ class Helper
 		}
 
     }
+    public static function centersCanAddByUser($entity,$user)
+	{
+        if($user->isAdmin()) return static::centersCanAddByAdmin($entity,$user->admin);
+
+        if(!$user->isDev()) return [];
+        
+        $centersCanAdd=static::centersCanAdd($entity)->pluck('id')->toArray();        
+        
+        $admin_center_ids=Center::where('removed',false)->pluck('id')->toArray();
+		
+        $canAddIds= array_intersect($centersCanAdd, $admin_center_ids);
+        
+        
+        if(!count($canAddIds)) return null;
+        return Center::where('removed',false)->whereIn('id' , $canAddIds)->get();
+	}
     public static function centersCanAddByAdmin($entity,$admin)
 	{
         $centersCanAdd=static::centersCanAdd($entity)->pluck('id')->toArray();        

@@ -26,14 +26,15 @@
                     <photo :id="$options.filters.tryParseInt(user.profile.photo_id)"></photo>
                 </div>
                 <div class="col-sm-3">
-                  
-                   
                     <label class="label-title">Email</label>
                     <p>{{user.email}}</p>
-                       <label class="label-title">真實姓名</label>
+
+                    <label class="label-title">真實姓名</label>
                     <p>{{user.profile.fullname}}</p>
+
                     <label class="label-title">身分證號</label>
-                      <p>{{user.profile.SID}}</p>
+                    <p>{{user.profile.SID}}</p>
+
                     <label class="label-title">建檔日期</label>
                     <p>{{ user.created_at | tpeTime  }}</p>
                     
@@ -59,7 +60,7 @@
                             <button type="button" class="btn btn-default btn-xs" @click="onAddRoleCilcked">
                               <span class="glyphicon glyphicon-plus"></span>
                             </button>
-                            <role-label v-for="role in user.roles" :labelstyle="role.style" 
+                            <role-label v-for="(role,index) in user.roles" :key="index" :labelstyle="role.style" 
                             :labeltext="role.display_name">
                             </role-label>
                             

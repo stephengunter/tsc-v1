@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Route;
 
+use App\Center;
+
 use Illuminate\Auth\AuthenticationException;
 
 class BaseController extends Controller
@@ -22,15 +24,26 @@ class BaseController extends Controller
         return $admin->fromHeadCenter();
     }
     protected function canAdminCenters()
-    {        
-        $admin=auth()->user()->admin;
-        if($admin) return $admin->centers;
-        return null;
+    {   
+        $currentUser=$this->currentUser();
+        if(!$currentUser) return [];    
+
+        if($currentUser->isDev()) return Center::where('removed',false)->get();
+
+
+        $admin=$currentUser->admin;
+        if(!$admin) return [];  
+        return $admin->centersCanAdmin();
+        
         
     }
     protected function defaultCenter()
-    {        
-        $admin=auth()->user()->admin;
+    {   
+        $currentUser=$this->currentUser();     
+        if($currentUser->isDev()){
+            return Center::getHeadCenter();
+        }
+        $admin=$currentUser->admin;
         if($admin) return $admin->defaultCenter();
         return null;
         
@@ -113,7 +126,18 @@ class BaseController extends Controller
                     'id' => 1,
                     'text' => '教師管理',
                     'path' => '/teachers',
-                    'active' => $current=='teachers'
+                    'active' => $current=='teachers',
+                    'items' => array(
+                        [
+                            'text' => '一般教師',
+                            'path' => '/teachers',
+                        ],
+                        [
+                            'text' => '教師群組',
+                            'path' => '/teachers?group=true',
+                        ]
+
+                    )
                 ],
                 [
                     'id' => 2,
@@ -125,15 +149,15 @@ class BaseController extends Controller
                 [
                     'id' => 3,
                     'text' => '匯入教師',
-                    'path' => '/teachers/import',
-                    'active' => $current=='teachers/import',
+                    'path' => '/teachers-import',
+                    'active' => $current=='teachers-import',
                     
                 ],
                 [
                     'id' => 4,
                     'text' => '教師審核',
-                    'path' => '/teachers/review',
-                    'active' => $current=='teachers/review',
+                    'path' => '/teachers-review',
+                    'active' => $current=='teachers-review',
                     
                 ],
                

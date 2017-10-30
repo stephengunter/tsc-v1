@@ -2,13 +2,14 @@
 
 
 @section('content')
-
-       <teacher-index v-show="!selected" :hide_create="indexSettings.hide_create" :version="version"
-           @selected="onSelected"  @begin-create="onBeginCreate">
-       </teacher-index> 
-       <teacher-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
-        @btn-back-clicked="backToIndex" @teacher-deleted="onTeacherDeleted">
-       </teacher-details>
+   
+    <teacher-index v-show="!selected" :hide_create="indexSettings.hide_create" 
+          :group="group"          :version="version"
+        @selected="onSelected"  @begin-create="onBeginCreate">
+    </teacher-index> 
+    <teacher-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
+    @btn-back-clicked="backToIndex" @teacher-deleted="onTeacherDeleted">
+    </teacher-details>
        
 @endsection
 
@@ -22,17 +23,18 @@
         el: '#content',
         data() {
             return {
-               version:0,
-              
-               selected:0,
-               creating:false,
+                group:false,
+
+                version:0,              
+                selected:0,
+                creating:false,
                
-               indexSettings:{
+                indexSettings:{
                   hide_create:true, 
-               },
-               detailsSettings:{
+                },
+                detailsSettings:{
                   can_back:true
-               },
+                },
             }
         },
         computed: {
@@ -43,11 +45,17 @@
             }
         },
         beforeMount() {
-             
+            this.init() 
         },
         methods: {
             init(){
-             
+                @if(isset($group) && $group)
+
+                this.group=true
+
+                @endif
+
+                
             },
             
             onSelected(id){

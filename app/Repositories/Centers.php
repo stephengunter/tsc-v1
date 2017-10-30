@@ -69,6 +69,8 @@ class Centers
 
     public function optionsConverting($centerList,$empty_item=false)
     {
+        if(!$centerList) return [];
+        
         $centerOptions=[];
 
         if($empty_item){

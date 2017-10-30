@@ -25,7 +25,7 @@
                         </tr> 
                     </thead>
                     <tbody> 
-                        <edit v-for="center in centers"  :center="center" 
+                        <edit v-for="(center,index) in centers" :key="index"  :center="center" 
                            :UserCenters="UserCenters" :can_edit="can_edit"  
                             @btn-delete-clicked="onBtnDeleteClicked" >
                         </edit>

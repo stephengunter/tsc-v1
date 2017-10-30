@@ -6,13 +6,13 @@
        @dataLoaded="onDataLoaded">
      
          
-         <div  class="form-inline" slot="header">
+        <div  class="form-inline" slot="header">
             <select  v-model="searchParams.center"  style="width:auto;" class="form-control selectWidth">
-                  <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
+                  <option v-for="(item,index) in centerOptions" :key="index" :value="item.value" v-text="item.text"></option>
             </select>
 
         </div>
-         <template scope="props">
+        <template scope="props">
             <tr>
                 <td v-if="can_select">
                     <button @click.prevent="selected(props.item.user_id)"  type="button" class="btn-xs btn btn-primary">
@@ -20,7 +20,7 @@
                     </button>
                 </td> 
                 <td><a herf="#" @click="selected(props.item.user_id,true)">{{props.item.user.profile.fullname}}</a> </td>
-                <td>
+                <td v-if="false">
                   
                   <span v-if="isGroup(props.item)" v-html="$options.filters.okSign(true)"></span>
 
@@ -44,9 +44,13 @@
     export default {
         name: 'TeacherList',
         props: {
+            source_url:{
+               type: String,
+               default: ''
+            },
             hide_create: {
-              type: Boolean,
-              default: false
+               type: Boolean,
+               default: false
             },
             version:{
                type: Number,
@@ -56,7 +60,7 @@
                type: Boolean,
                default: true
             },
-            group:{
+            group_id:{
                type: Number,
                default: 0
             }
@@ -68,7 +72,7 @@
             return {
                 title:Helper.getIcon('Teachers')  + '  教師管理',
                 loaded:false,
-                source: Teacher.source(),
+                source: '',
                 
                 defaultSearch:'specialty',
                 defaultOrder:'updated_at',                
@@ -88,7 +92,7 @@
                 centerOptions:[],
                 searchParams:{
                     center : 0,
-                    group:0
+                    group_id:0
                 },
               
                 viewMore:false
@@ -104,12 +108,15 @@
         methods: {
             init() {
                 this.loaded=false
+
+                if(this.source_url) this.source=this.source_url
+                else this.source=Teacher.source()
                
                 this.thead=Teacher.getThead(this.can_select)
 
                 this.searchParams={
                     center : 0,
-                    group:this.group
+                    group_id:this.group_id
                 }
                 let options = this.loadCenterOptions()
                 options.then((value) => {
@@ -120,7 +127,7 @@
                        })
             },
             loadCenterOptions(){
-                 return new Promise((resolve, reject) => {
+                return new Promise((resolve, reject) => {
                     
                     let options=Center.options()
                     options.then(data => {
@@ -141,15 +148,14 @@
                 return Helper.isTrue(teacher.group)
             },
             selected(id,isLink){
-              if(isLink){
-                this.$emit('selected',id,true)
-              }else{
-                 this.$emit('selected',id)
+                if(isLink){
+                    this.$emit('selected',id,true)
+                }else{
+                    this.$emit('selected',id)
 
-              }
+                }
                 
             },
-            
             beginCreate(){
                  this.$emit('begin-create')
             },

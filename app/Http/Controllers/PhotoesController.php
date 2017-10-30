@@ -23,10 +23,10 @@ class PhotoesController extends BaseController
     public function show($id)
     {
         $photo = Photo::findOrFail($id);
-        return response()
-            ->json([
-                'photo' => $photo
-            ]);
+        return response() ->json(['photo' => $photo]);
+           
+                
+            
     }
     public function store(Request $form)
     {
@@ -59,8 +59,9 @@ class PhotoesController extends BaseController
 
     private function create_file_name($file)
     {
-        $timestamp = str_replace([' ', ':'], '-', Carbon::now()->toDateTimeString());            
-        return $timestamp. '-' .$file->getClientOriginalName();         
+        $timestamp = str_replace([' ', ':' , '-'], '', \Carbon\Carbon::now()->toDateTimeString());
+              
+        return $timestamp. '.' . $file->getClientOriginalExtension();         
     }
 
     private function save_upload_photo($file ,$width , $height ,$folder_name=null ) 

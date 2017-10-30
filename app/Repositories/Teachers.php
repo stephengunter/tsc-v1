@@ -10,6 +10,7 @@ use App\Center;
 use App\Role;
 
 use App\Repositories\Users;
+use App\Repositories\Centers;
 
 use App\Support\Helper;
 use Excel;
@@ -20,9 +21,10 @@ use App\Events\TeacherDeleted;
 
 class Teachers 
 {
-    public function __construct(Users $users)                          
+    public function __construct(Users $users, Centers $centers)                          
     {
         $this->users=$users;  
+        $this->centers=$centers; 
         
     }
 
@@ -39,12 +41,27 @@ class Teachers
          return Teacher::where('removed',false);
     }
 
+    public function getByName($name,$group=false)
+    {
+        if($group){
+            $group_teacher=$this->teacherGroups()->whereHas('user', function($query)use ($name){
+                $query->where('name', $name);
+            })->first();
+            return $group_teacher;
+        }
+
+        $ids=$this->getAll()->pluck('user_id')->toArray();
+        $user_ids=Profile::whereIn('user_id',$ids)->where('fullname',$name)->pluck('user_id')->toArray();
+        
+        if(!count($user_ids)) return null;
+        return Teacher::whereIn('user_id', $user_ids);
+        
+    }
+
     public function unReviewedTeachers()
     {
         return $this->getAll()->where('reviewed',false);
     }
-
-
     public function teacherGroups()
     {
          return $this->getAll()->where('group',true);
@@ -76,20 +93,17 @@ class Teachers
         return $this->getAll()->where('user_id',$id)->first();
        
     }
-    public function groupTeachers($id)
+    public function teachersInGroup($group_id)
     {
-        $teacher = $this->findOrFail($id);
-        $teacher_ids=$teacher->teacher_ids;
-        $ids= explode( ',', $teacher_ids );
-        return $this->getAll()->whereIn('user_id',$ids)
-                              ->with('user.profile');
-        if($teacher_ids){
-           $ids= explode( ',', $teacher_ids );
-           return $this->getAll()->whereIn('user_id',$ids)
-                                 ->with('user.profile');
-        }
+        $teacherGroup = $this->findOrFail($group_id);
+        $teacher_ids=$teacherGroup->teacher_ids;
 
-        return null;
+        if(!$teacher_ids) return null;
+
+        $ids= explode( ',', $teacher_ids );
+        return $this->getAll()->whereIn('user_id',$ids)->with('user.profile');
+                              
+        
        
     }
     
@@ -195,10 +209,10 @@ class Teachers
             return $teacher;
     }
 
-    public function storeTeacherGroup($name,$description,$current_user)
+    public function storeTeacherGroup($name,$description,$center_id,$current_user)
     {
        
-        $user= DB::transaction(function() 
+        $user= DB::transaction(function () 
             use($name,$description,$current_user)
             {
                 $updated_by=$current_user->id;
@@ -216,8 +230,6 @@ class Teachers
                     'updated_by'=>$updated_by
                 ];
 
-                
-
                 $user=new User($userValues);            
                 $user->save();
                 $profile=new Profile($profileValues);
@@ -233,13 +245,53 @@ class Teachers
             });
 
         $teacher= Teacher::findOrFail($user->id);
+        $teacher->attachCenter($center_id);
+
         event(new TeacherCreated($teacher, $current_user));
         
         return    $user->teacher; 
     }
 
+    public function updateTeacherGroup($teacher_id,$name,$description,$center_id,$current_user)
+    {
+        $user= DB::transaction(function() 
+        use($teacher_id,$name,$description,$current_user)
+        {
+            $updated_by=$current_user->id;
+            $userValues=[
+                'name' => $name,
+                'updated_by' =>$updated_by
+            ];
+            $profileValues=[
+                'fullname' => $name,
+                'updated_by'=>$updated_by
+            ];
+            $teacherValues=[
+                'description' => $description,
+                'group' => 1,
+                'updated_by'=>$updated_by
+            ];
+
+            $teacher=Teacher::findOrFail($teacher_id);
+            $teacher->update($teacherValues);
+
+            $user=User::findOrFail($teacher_id);
+            $user->update($userValues);
+
+            $profile=Profile::findOrFail($teacher_id);
+            $profile->update($profileValues);
+        
+            return $user;
+        });
+
+        $teacher= Teacher::findOrFail($user->id);
+        $teacher->attachCenter($center_id);
+
+        return    $user->teacher; 
+        
+    }
    
-    public function storeTeacher($userValues,$profileValues,$teacherValues,$user_id,$teacherId,$current_user)
+    public function storeTeacher($userValues,$profileValues,$teacherValues,$user_id,$teacherId,$current_user,$center_id)
     {
         $user= DB::transaction(function() 
             use($userValues,$profileValues,$teacherValues,$user_id,$teacherId)
@@ -274,8 +326,11 @@ class Teachers
                 return $user;
         });
 
-        
         $teacher= Teacher::findOrFail($user->id);
+
+        $teacher->attachCenter($center_id);
+        
+        
         event(new TeacherCreated($teacher, $current_user));
 
         return $teacher;
@@ -283,142 +338,177 @@ class Teachers
 
     public function importTeachers($file,$current_user)
     {
-        Excel::load($file, function($reader) use ($current_user){
-            $teacherList=$reader->get()->toArray()[0];
-            for($i = 1; $i < count($teacherList); ++$i) {
-                $row=$teacherList[$i];
-                
-                $fullname=trim($row['fullname']);
-                if(!$fullname){
-                   continue;
-                }
-
-                $exist_user=null;
-                $sid=trim($row['id']);
-                if($sid){
-                    $exist_user=$this->users->findBySID(strtoupper($sid));
-                   
-                }
-
-                
-
-                $gender=(int)trim($row['gender']);
-                if($gender) $gender=true;
-                else $gender=false;
-
-                $dob=trim($row['dob']);
-                if($dob){
-                    $pieces=explode('/', $dob);
-                    $year = (int)$pieces[0] + 1911;
-                    $dob= $year . '/'.$pieces[1]. '/'.$pieces[2];
-                    
-                }
-
-                $phone=trim($row['phone']);
-                $email=trim($row['email']);
-
-                if(!$exist_user){
-                    $userList=$this->users->findUsers($email, $phone);
-                    if(count($userList)) $exist_user=$userList[0];
-                }
-
-                $education=trim($row['education']);
-                $specialty=trim($row['specialty']);
-                $job=trim($row['job']);
-                $jobtitle=trim($row['jobtitle']);
-                $description=trim($row['description']);
-                $certificate=trim($row['certificate']);
-                
-                $experiences='';               
-                $array_experiences = explode(',', trim($row['experiences']));
-                for($j = 0; $j < count($array_experiences); ++$j){
-                    $experiences .= $array_experiences[$j] . '<br>';
-                }
-
-
-                $updated_by=$current_user->id;
+        $err_msg='';
         
-                $teacherValues=[
-                    'education' => $education,
-                    'specialty' => $specialty,
-                    'job' => $job,
-                    'jobtitle' => $jobtitle,
-                    'description' => $description,
-                    'experiences' => $experiences,
-                    'certificate' => $certificate,
-                    'updated_by' => $updated_by,
-                    'removed' => false
-                ];
-                $userValues=[
-                    'name' => $fullname,
-                    'email' => $email,
-                    'phone' => $phone,
-                    'updated_by' => $updated_by,
-                    'removed' => false
-                ];
-                $profileValues=[
-                    'fullname' => $fullname,
-                    'SID' => $sid,
-                    'gender' => $gender,
-                    'dob' => $dob,
-                   
-                    'updated_by' => $updated_by,
-                  
-                ];
-                
-                $user_id=0;
-                if($exist_user) $user_id=$exist_user->getUserId();
+        
+        $excel=Excel::load($file, function($reader) {             
+            $reader->limitColumns(16);
+            $reader->limitRows(100);
+        })->get();
 
-                $teacher_id=0;
-                if($exist_user){
-                    if($exist_user->teacher) $teacher_id=$exist_user->getUserId();
-                }
+        $teacherList=$excel->toArray()[0];
+        for($i = 1; $i < count($teacherList); ++$i) {
+            $row=$teacherList[$i];
 
-                $teacher=$this->storeTeacher($userValues,$profileValues,$teacherValues,$user_id,$teacher_id,$current_user);
+            $fullname=trim($row['fullname']);
+            if(!$fullname){
+               continue;
+            }
 
-                
-                if(!$teacher) continue;
+            $center_code=trim($row['center']);
+            
+            if(!$center_code){
+                $err_msg .= '中心代碼不可空白' . ',';
+                continue;
+            }
+            $center=$this->centers->getByCode($center_code);
+            if(!$center) {
+                $err_msg .= '中心代碼' .$center_code . '錯誤'. ',';
+                continue;
+            }
 
-
-
-                $zipcode=trim($row['zipcode']);
-                $street=trim($row['street']);
-
-                if($zipcode){
-                    $teacher->user->updateAddress($zipcode, $street,$updated_by);
-                }
-                
+            $exist_user=null;
+            $sid=trim($row['id']);
+            if($sid){
+                $exist_user=$this->users->findBySID(strtoupper($sid));
                
-            }  //end for  
+            }
 
-           
-        });
-    }
-    public function importGroupTeachers($file,$current_user)
-    {
-        Excel::load($file, function($reader) use ($current_user){
-            $teacherList=$reader->get()->toArray()[0];
-            for($i = 1; $i < count($teacherList); ++$i) {
-                $row=$teacherList[$i];
+            $gender=(int)trim($row['gender']);
+            if($gender) $gender=true;
+            else $gender=false;
+
+            $dob=trim($row['dob']);
+            if($dob){
+                $pieces=explode('/', $dob);
+                $year = (int)$pieces[0] + 1911;
+                $dob= $year . '/'.$pieces[1]. '/'.$pieces[2];
                 
-                $name=trim($row['name']);
-                if(!$name)  continue;
+            }
 
-                            
-                $exist_group_teacher=$this->teacherGroups()->whereHas('user', function($q)use ($name){
-                    $q->where('name', $name);
-                })->first();
+            $phone=trim($row['phone']);
+            $email=trim($row['email']);
 
-                if($exist_group_teacher)  continue;
+            if(!$exist_user){
+                $userList=$this->users->findUsers($email, $phone);
+                if(count($userList)) $exist_user=$userList[0];
+            }
 
-                $description=trim($row['description']);
+            $education=trim($row['education']);
+            $specialty=trim($row['specialty']);
+            $job=trim($row['job']);
+            $description=trim($row['description']);
+            
+            $experiences='';               
+            $array_experiences = explode(',', trim($row['experiences']));
+            for($j = 0; $j < count($array_experiences); ++$j){
+                $experiences .= $array_experiences[$j] . '<br>';
+            }
+
+
+            $updated_by=$current_user->id;
     
-                $teacher=$this->storeTeacherGroup($name,$description,$current_user);
-               
-            }  //end for  
+            $teacherValues=[
+                'education' => $education,
+                'specialty' => $specialty,
+                'job' => $job,
+                
+                'description' => $description,
+                'experiences' => $experiences,
+                
+                'updated_by' => $updated_by,
+                'removed' => false
+            ];
+            $userValues=[
+                'name' => $fullname,
+                'email' => $email,
+                'phone' => $phone,
+                'updated_by' => $updated_by,
+                'removed' => false
+            ];
+            $profileValues=[
+                'fullname' => $fullname,
+                'SID' => $sid,
+                'gender' => $gender,
+                'dob' => $dob,               
+                'updated_by' => $updated_by,
+              
+            ];
+            
+            $user_id=0;
+            if($exist_user) $user_id=$exist_user->getUserId();
 
-           
-        });
+            $teacher_id=0;
+            if($exist_user){
+                if($exist_user->teacher) $teacher_id=$exist_user->getUserId();
+            }
+
+            $teacher=$this->storeTeacher($userValues,$profileValues,$teacherValues,
+            $user_id,$teacher_id,$current_user,$center->id);
+
+            
+            if(!$teacher) continue;
+
+
+            $zipcode=trim($row['zipcode']);
+            $street=trim($row['street']);
+
+            if($zipcode){
+                $teacher->user->updateAddress($zipcode, $street,$updated_by);
+            }
+        }
+
+        return $err_msg;
+    }
+    public function importTeacherGroups($file,$current_user)
+    {
+        $err_msg='';        
+        
+        $excel=Excel::load($file, function($reader) {             
+            $reader->limitColumns(16);
+            $reader->limitRows(100);
+        })->get();
+
+        $teacherList=$excel->toArray()[0];
+        for($i = 1; $i < count($teacherList); ++$i) {
+            $row=$teacherList[$i];
+            
+            $name=trim($row['name']);
+            if(!$name)  continue;
+
+
+            $group=true;  
+            $center_code=trim($row['center']);           
+            
+            if(!$center_code){
+                $err_msg .= '中心代碼不可空白' . ',';
+                continue;
+            }
+            $center=$this->centers->getByCode($center_code);
+            if(!$center) {
+                $err_msg .= '中心代碼' .$center_code . '錯誤'. ',';
+                continue;
+            }
+
+            $description=trim($row['description']);
+
+            $exist_teacher_group=null;
+            $id=(int)trim($row['id']);
+            if($id){
+                $exist_teacher_group=Teacher::find($id);
+            }
+
+            if($exist_teacher_group){
+                $teacher=$this->updateTeacherGroup($id,$name,$description,$center->id,$current_user);
+            }else{
+                $teacher=$this->storeTeacherGroup($name,$description,$center->id,$current_user);                
+            }
+
+            
+        }  //end for  
+
+        return $err_msg;
+        
     }
     
 }

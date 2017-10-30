@@ -10,29 +10,22 @@ class TeacherEventListener
     public function onTeacherCreated($event) 
     {
         
-         $teacher=$event->teacher;
-         if(!$teacher->group){
-             $teacher->addToRole();
-         }
+        $teacher=$event->teacher;
+        if($teacher->group) return;
+
+        $teacher->addToRole();
          
 
-         $current_user=$event->current_user;
-
-         if($current_user->isAdmin()){
-             $center=$current_user->admin->defaultCenter();
-             if($center){
-                 $teacher->attachCenter($center->id);
-             }
-         }
+        
     }
 
     
     public function onTeacherDeleted($event) 
     {
         $teacher=$event->teacher;
-        if(!$teacher->group){
-            $teacher->removeRole();   
-        }
+        if($teacher->group) return;
+        
+        $teacher->removeRole();
            
         
     }

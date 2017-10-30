@@ -21,7 +21,7 @@
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                             
-                         </div>
+                        </div>
                     </div>
                     <div class="col-sm-3">
                         <div class="form-group">                           
@@ -108,14 +108,14 @@
         </div>
     </div>
 
-     <modal :showbtn="false" title="上傳圖片" :show.sync="showModal"  @closed="closeModel"
+    <modal :showbtn="false" title="上傳圖片" :show.sync="showModal"  @closed="closeModel"
         effect="fade" width="800">
       
         <div slot="modal-body" class="modal-body">
             <image-upload :width="200" :height="200" :user="form.user.id" @uploaded="photoUploaded"></image-upload>
         </div>
-     </modal>
-     <modal showbtn="true"  :show.sync="showConfirm" @ok="deletePhoto"  @closed="closeConfirm" ok-text="確定"
+    </modal>
+    <modal showbtn="true"  :show.sync="showConfirm" @ok="deletePhoto"  @closed="closeConfirm" ok-text="確定"
         effect="fade" width="800">
           <div slot="modal-header" class="modal-header modal-header-danger">
             <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
@@ -123,7 +123,7 @@
         <div slot="modal-body" class="modal-body">
             <h3> 確定要刪除個人相片？</h3>
         </div>
-     </modal>
+    </modal>
      
 </div>
 </template>

@@ -1,9 +1,10 @@
+
 @extends('layouts.master')
 
 @section('content')
     
     <teacher-import 
-    @canceled="onCanceled" @saved="onSaved">
+    @canceled="onCanceled" @imported="onImported">
     </teacher-import>
 
 @endsection
@@ -25,14 +26,16 @@
         },
         methods: {
             onCanceled(){
-               this.backToIndex()
+                this.backToIndex()
             },
-            onSaved(){
-               let url='/teachers' 
-               Helper.redirect(url)
+            onImported(isGroup){
+               
+                this.backToIndex(isGroup)
             },            
-            backToIndex(){
-                Helper.redirect('/teachers')
+            backToIndex(isGroup){
+                let url='/teachers'
+                if(Helper.isTrue(isGroup))  url += '?group=true'
+                Helper.redirect(url)
             }
 
         },

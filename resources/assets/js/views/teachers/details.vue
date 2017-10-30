@@ -7,7 +7,7 @@
 
   </teacher>
 
-  <div  id="tabTeacher" class="panel with-nav-tabs panel-default">
+  <div v-if="loaded" id="tabTeacher" class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
             <ul class="nav nav-tabs">
                 <li v-if="isGroup" class="active">
@@ -29,7 +29,7 @@
         <div class="panel-body">
             <div class="tab-content">
                 <div v-if="isGroup"  class="tab-pane fade active in" id="group-teachers">
-                    <group-teacher-view :teacher="teacher"></group-teacher-view>
+                    <group-teacher-view v-if="activeIndex==0"  :teacher="teacher"></group-teacher-view>
                 </div>
                 <div v-else class="tab-pane fade active in" id="user">
                     <user v-if="activeIndex==0" :id="id" :can_edit="userSettings.can_edit" :can_back="userSettings.can_back"  

@@ -23,7 +23,7 @@ class Helper {
         return false
     }
     static replaceAll(strVal, oldVal, newVal) {
-
+        if (!strVal) return ''
         return strVal.replace(new RegExp(oldVal, 'g'), newVal)
     }
     static boolText(val) {

@@ -45,10 +45,10 @@ class UsersController extends BaseController
         }  
 
         $users=$this->users->getAll()->with('roles');
-        return response()
-            ->json([
-                'model' => $users -> filterPaginateOrder()
-            ]);
+        return response()->json([ 'model' => $users -> filterPaginateOrder() ]);
+                
+                    
+               
     }
 
     public function create()
@@ -126,10 +126,10 @@ class UsersController extends BaseController
         $user->canEdit=$user->canEditBy($current_user);
         $user->canDelete=$user->canDeleteBy($current_user);
         
-        return response()
-            ->json([
-                'user' => $user
-            ]);
+        return response()->json(['user' => $user]);
+            
+                
+            
     }
 
     public function edit($id)
@@ -178,10 +178,8 @@ class UsersController extends BaseController
             return  $this->unauthorized();  
         }
 
-        return response()
-            ->json([
-                'deleted' => true
-            ]);
+        return response()->json(['deleted' => true]);
+            
     }
    
     public function rolesCanAdd($id)
@@ -189,19 +187,18 @@ class UsersController extends BaseController
         $user =$this->users->findOrFail($id);
         
         $with_admin=$this->checkAdmin->isOwner();
-         return response()
-            ->json([
-                'roles' => $user->rolesCanAdd($with_admin)
-            ]);
+        $roles=$user->rolesCanAdd($with_admin);
+
+        return response()->json([ 'roles' => $roles ]);
     }
     public function roles($id)
     {
         $user =$this->users->findOrFail($id);
         
-         return response()
-            ->json([
-                'roles' => $user->roles
-            ]);
+        return response()->json([ 'roles' => $user->roles ]);
+            
+               
+           
     }
 
     public function updateContactInfo(Request $request, $userId)
@@ -216,10 +213,7 @@ class UsersController extends BaseController
         $user->updated_by=$current_user->id;
         $user->save();
 
-            return response()
-                    ->json([
-                        'saved' => true
-                    ]);
+        return response()->json(['saved' => true ]);
 
     }
     public function updatePhoto(Request $request, $userId)
@@ -227,6 +221,8 @@ class UsersController extends BaseController
         $user =$this->users->findOrFail($userId);
 
         $current_user=$this->currentUser();
+
+        
         if(!$user->canEditBy($current_user)){
               return  $this->unauthorized();
         }
@@ -235,11 +231,7 @@ class UsersController extends BaseController
         $user->profile->updated_by=$current_user->id;
         $user->profile->save();
            
-            return response()
-                    ->json([
-                        'saved' => true
-                    ]);
-
+        return response()->json(['saved' => true ]);
 
     }
 
@@ -252,10 +244,8 @@ class UsersController extends BaseController
         $userList=$this->users->findUsers($email, $phone);
         
         
-        return response()
-                    ->json([
-                        'userList' => $userList
-                    ]);
+        return response()->json(['userList' => $userList  ]);  
+                  
     }
 
     

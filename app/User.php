@@ -199,12 +199,6 @@ class User extends Authenticatable {
         }
     }
 
-
-
-	
-
-	
-
 	public function rolesCanAdd($with_admin=false)
 	{
 		$roles = Role::orderBy('importance','desc');
@@ -261,6 +255,12 @@ class User extends Authenticatable {
 
 		return false;
 	}
+	public function isTeacherGroup()
+	{
+		if(!$this->teacher) return false;
+
+		return $this->teacher->group;
+	}
 	public function isStudent()
 	{
 		if(count($this->students)) return true;
@@ -293,6 +293,9 @@ class User extends Authenticatable {
 			return	$this->admin->canEditBy($user);
 		}
 		if($this->isTeacher()){			
+			return	$this->teacher->canEditBy($user);		
+		}
+		if($this->isTeacherGroup()){			
 			return	$this->teacher->canEditBy($user);		
 		}
 		if($this->isVolunteer()){
