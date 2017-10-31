@@ -22,6 +22,11 @@ return [
 		 'default_folder' => '/files/uploads/',
  
 	 ],
+
+	'group_category' => [
+		 'code' => '3',
+		 'name' => '學分班' 
+	 ],
  
 
 

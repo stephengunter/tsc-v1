@@ -129,9 +129,6 @@ class Teacher extends Model
             $this->centers()->detach($center_id);
         }
     }
-    
-
-    
 
     public function centerNames()
     {

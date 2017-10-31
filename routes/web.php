@@ -35,6 +35,7 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::resource('photoes', 'PhotoesController',['only'=>['show','store']]);
 
+    //Center
     Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
     Route::post('centers/display-order','\App\Http\Controllers\Settings\CentersController@updateDisplayOrder');
     Route::put('centers/{id}/update-photo','\App\Http\Controllers\Settings\CentersController@updatePhoto');
@@ -42,14 +43,14 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::resource('centers-import', '\App\Http\Controllers\Settings\CentersImportController',['only' => ['index','store']]);
 
-
+    //Category
     Route::post('categories/display-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
     Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController'); 
     
     Route::resource('categories-import', '\App\Http\Controllers\Course\CategoriesImportController',['only' => ['index','store']]);
     
 
-    
+    //Teacher
     Route::get('teachers/options', '\App\Http\Controllers\Teacher\TeachersController@options');
     Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');
 
@@ -60,7 +61,19 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::resource('teachers-review', '\App\Http\Controllers\Teacher\TeachersReviewController',['only' => ['index','store','update']]);
     
+    //Course
+    Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
+    Route::get('courses/sub-courses', '\App\Http\Controllers\Course\CoursesController@subCourses');
+    Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
+    Route::get('courses/group-options', '\App\Http\Controllers\Course\CoursesController@groupOptions');
+    Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
+    Route::post('courses/update-numbers','\App\Http\Controllers\Course\CoursesController@updateNumbers');
 
+    Route::post('courses/import', '\App\Http\Controllers\Course\CoursesController@import');
+    Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);
+    Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
+    
+    
     Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
     Route::put('users/{user}/update-photo',['uses'=>'\App\Http\Controllers\User\UsersController@updatePhoto']);
     Route::post('users/find-users', ['uses' => '\App\Http\Controllers\User\UsersController@findUsers']);
@@ -78,15 +91,7 @@ Route::group(['middleware' => 'admin'], function()
    
 
    
-    Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
-    Route::get('courses/sub-courses', '\App\Http\Controllers\Course\CoursesController@subCourses');
-    Route::get('courses/options', '\App\Http\Controllers\Course\CoursesController@options');
-    Route::get('courses/group-options', '\App\Http\Controllers\Course\CoursesController@groupOptions');
-    Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
-
-
-    Route::post('courses/import', '\App\Http\Controllers\Course\CoursesController@import');
-    Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);
+    
 
     Route::get('lessons/{id}/print', '\App\Http\Controllers\Course\LessonsController@print');
 
@@ -130,7 +135,7 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::resource('notices', '\App\Http\Controllers\Notice\NoticesController');
 
-    Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
+    
     Route::resource('statuses', '\App\Http\Controllers\Course\StatusesController',
                                     ['only' => ['index','show','edit','update']]);
     Route::resource('admissions', '\App\Http\Controllers\Course\AdmissionsController');  

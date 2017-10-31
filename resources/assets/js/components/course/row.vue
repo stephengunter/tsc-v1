@@ -11,8 +11,17 @@
               @unselected="unselected(course.id)" ></checkbox>
         </td>
         <td v-text="course.center.name"></td>   
+
+        <td v-if="editting_number" >
+            <input @keydown="clearErrorMsg(index)" type="text" name="course.number" class="form-control" v-model="course.default_number">
+    
+            <small class="text-danger" v-text="course.error"></small>             
+        </td> 
+        <td v-else v-text="course.number">
+           
+        </td>
         
-        <td v-text="course.number"></td>   
+        
         <td>
             <a herf="#" @click.prevent="selected(course.id)">
                    {{ course.name }}
@@ -28,8 +37,8 @@
         </td> 
         <td v-if="!more" v-html="getClassTimesText(course.class_times)"></td> 
         <td v-if="!more" v-html="period(course.begin_date , course.end_date)"></td> 
-        <td v-if="!more" v-html="period(course.open_date , course.close_date)"></td> 
-        <td v-if="!more" v-html="$options.filters.activeLabel(course.active)" ></td> 
+        <td v-if="!more" v-html="period(course.open_date , course.close_date)"></td>
+        <td v-html="$options.filters.reviewedLabel(course.reviewed)" ></td> 
 
         <td v-if="more"  v-html="teachersText(course.teachers)"></td> 
         <td v-if="more" v-text="course.credit_count"></td>
@@ -48,6 +57,10 @@
     export default {
         name: 'CourseRow',
         props: {
+            index:{
+               type: Number,
+               default: 0
+            },
             course: {
                type: Object,
                default: null
@@ -66,8 +79,12 @@
             },
             been_selected:{
                 type: Boolean,
-               default: false
-            }
+                default: false
+            },
+            editting_number:{
+                type: Boolean,
+                default: false
+            },
             
         },
         data() {
@@ -115,7 +132,10 @@
             },
             unselected(id){
                  this.$emit('unselected',id)
-            }
+            },
+            clearErrorMsg(index){
+                this.$emit('clear-error',index)
+            },
             
             
         },

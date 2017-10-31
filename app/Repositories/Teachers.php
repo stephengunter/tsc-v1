@@ -165,11 +165,16 @@ class Teachers
     }
    
 
-    public function optionsByCenter($center_id)
+    public function optionsByCenter($center_id,$reviewed=false)
     {
-        $teachers=$this->getByCenter($center_id)->where('active',true)->get();
+        $teachers=$this->getByCenter($center_id);
         
-        return $this->optionsConverting($teachers);
+        if($reviewed){
+            $teachers=$teachers->where('reviewed',true);
+        }
+        
+        
+        return $this->optionsConverting($teachers->orderBy('group')->get());
        
     }
 
@@ -183,6 +188,7 @@ class Teachers
 
     public function optionsConverting($teacherList)
     {
+        if(Helper::isNullOrEmpty($teacherList)) return [];
         $options=[];
         foreach($teacherList as $teacher)
         {

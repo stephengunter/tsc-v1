@@ -13,7 +13,7 @@ class Center extends Model
 	use FilterPaginateOrder;
 	
 	protected $fillable = ['name', 'code' , 'active', 'display_order',
-							'removed','updated_by'];
+						   'contact_info','removed','updated_by'];
 	
     protected $filter = [
         'name', 'code' ,'updated_at','display_order'
@@ -148,6 +148,7 @@ class Center extends Model
 	public function updateContactInfo($tel ,$fax, $zipcode, $street,$updated_by)
 	{
 		$contact_info=$this->contactInfo();
+		
 		if($contact_info){
 			$contact_info->updateAddress($zipcode, $street,$updated_by);
 			$contact_info->update([

@@ -18,6 +18,10 @@ class Courses
     {
          return Course::where('removed',false);
     }
+    public function getAllGroupCourses()
+    {
+        return $this->getAll()->where('credit_count', '>' , 0);
+    }
     public function findOrFail($id)
     {
          return Course::findOrFail($id);
@@ -34,7 +38,7 @@ class Courses
 
     public function groupCategory()
     {
-        return Category::where('code','group')->first();
+        return Category::groupCategory();
         
     }
     public function parentCourses()
@@ -50,20 +54,10 @@ class Courses
 
     public function getGroupCourses(int $term_id,int $center_id,$top_only=true)
     {
-        $category=$this->groupCategory();
-        if(!$category) return null;
-
-        $categoryId=$category->id;
-
-        $courseList=$this->getAll();
+        $courseList=$this->getAllGroupCourses();
         if($term_id) $courseList=$courseList->where('term_id',$term_id);       
         
         if($center_id) $courseList=$courseList->where('center_id',$center_id);
-
-        $courseList= $courseList->whereHas('categories', function($q)  use ($categoryId)
-        {
-             $q->where('id', $categoryId );
-        });
 
         if($top_only) $courseList=$courseList->where('parent',0);
 
@@ -154,11 +148,14 @@ class Courses
      {
         
         $term_id=$courseValues['term_id'];
-        $number=$this->generateNumber($term_id); 
+        $term=Term::findOrFail($term_id);
+        $courseValues['open_date']='2017-3-3';
+        $courseValues['close_date']='2017-6-9';
+         
         $course= DB::transaction(function() 
-        use($courseValues,$number){
+        use($courseValues){
               $course=new Course($courseValues);
-              $course->number=$number;
+              
               $course->save();
 
               $statusValues=Status::initialize($course);
@@ -177,12 +174,16 @@ class Courses
         if(count($teacherIds)){
             $this->syncTeachers($teacherIds , $course);
         }
+
+        if($course->isGroup()){
+            $course->attachGroupCategory();
+        }
        
 
         return $course;
      }
-     public function update($courseValues , $categoryIds, $teacherIds, $id)
-     {
+    public function update($courseValues , $categoryIds, $teacherIds, $id)
+    {
          $course=Course::findOrFail($id); 
          
          $course->update($courseValues);
@@ -191,8 +192,19 @@ class Courses
          $this->syncTeachers($teacherIds , $course);
 
          return $course;
-     }
-
+    }
+    public function updateNumber($id,$number,$updated_by)
+    {
+         $course=$this->findOrFail($id);          
+    
+         $course->number= $number;           
+         $course->updated_by= $updated_by;
+        
+         $course->save();
+    
+         return $course;
+ 
+    }
    
 
     private function syncCategories($categoryIds , $course)
@@ -205,22 +217,23 @@ class Courses
     }
     
 
-     public static function generateNumber($termid)
+     public static function generateNumber($termid, Term $term=null)
      {
-        $term=Term::find($termid);
+        if(!$term)  $term=Term::findOrFail($termid);
+       
         $count=$term->courses->count();
         $count+=1;
 
         $countString='';
-         if($count < 10){
+        if($count < 10){
             $countString= "00" . $count;
-         } else if($count<100){
+        } else if($count<100){
              $countString= "0" . $count;
-         }else{
+        }else{
              $countString=$count;
-         }
+        }
          
-         return $term->number .  $countString;
+        return $term->number .  $countString;
      }
     public function optionsConverting($courseList,$with_empty=false)
     {

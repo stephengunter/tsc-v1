@@ -32,7 +32,19 @@ class Category extends Model
 		
 		return 	static::canEdit($user);
           
-	} 
+    } 
+    public static function groupCategory()
+    {
+        $code=config('app.group_category.code');
+        $category=Category::where('code',$code)->first();
+
+        if($category) return $category;
+
+        $name=config('app.group_category.name');
+        return $category=Category::where('name',$name)->first();
+        
+    }
+
     public function courses()
     {
         return $this->belongsToMany('App\Course','course_category');

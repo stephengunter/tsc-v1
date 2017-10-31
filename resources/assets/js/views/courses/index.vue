@@ -6,28 +6,28 @@
                 
                 <div class="form-group">
                     <select @change="onParamChanged"  v-model="params.term"    style="width:auto;" class="form-control selectWidth">
-                        <option v-for="item in termOptions" :value="item.value" v-text="item.text"></option>
+                        <option v-for="(item,index) in termOptions" :key="index" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 <div class="form-group">
                     <select @change="onParamChanged"  v-model="params.center" style="width:auto;" class="form-control selectWidth">
-                         <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
+                         <option v-for="(item,index) in centerOptions" :key="index" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 <div class="form-group">
                     <select @change="onParamChanged"  v-model="params.category" style="width:auto;" class="form-control selectWidth">
-                         <option v-for="item in categoryOptions" :value="item.value" v-text="item.text"></option>
+                         <option v-for="(item,index)  in categoryOptions" :key="index"  :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 <div class="form-group">
                     <select @change="onParamChanged" v-model="params.weekday" style="width:auto;" class="form-control selectWidth">
-                         <option v-for="item in weekdayOptions" :value="item.value" v-text="item.text"></option>
+                         <option v-for="(item,index) in weekdayOptions" :key="index" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
 
                 <div v-if="groupReady"  class="form-group">&nbsp;&nbsp;群組課程
                     <select @change="onParentChanged" style="width:auto;"  v-model="params.parent"  class="form-control selectWidth" >
-                         <option v-for="item in parentOptions" :value="item.value" v-text="item.text"></option>
+                         <option v-for="(item,index) in parentOptions" :key="index" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 <div v-if="hasParent"  class="form-group">
@@ -41,7 +41,8 @@
         </div>
     </div>
      
-    <course-list v-if="ready" :search_params="listSettings.params"  
+    <course-list v-if="ready" :no_page="listSettings.no_page" 
+        :can_edit_number="listSettings.canEditNumber"  :search_params="listSettings.params"  
         :hide_create="listSettings.hide_create" :version="version"  
         :can_select="listSettings.can_select"
         @selected="onSelected" @begin-create="onBeginCreate"
@@ -93,6 +94,8 @@
                 },
 
                 listSettings:{
+                    no_page:true,
+                    canEditNumber:true,
                     can_select:false,
                     hide_create:false,
                     params:{

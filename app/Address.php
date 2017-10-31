@@ -35,7 +35,9 @@ class Address extends Model
 
     public static function initializeByZipcode($zipcode,$street,$updated_by)
     {
+       
         $district=District::where('zipcode', $zipcode)->first();
+       
         if(!$district) return null;
 
       
@@ -53,6 +55,7 @@ class Address extends Model
     public static function createByZipcode($zipcode,$street,$updated_by)
     {
         $values=static::initializeByZipcode($zipcode,$street,$updated_by);
+      
         if(!$values) return null;
 
         return static::create($values);

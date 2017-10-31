@@ -7,6 +7,8 @@ use App\ContactInfo;
 use Excel;
 use DB;
 
+use App\Support\Helper;
+
 class Centers 
 {
     
@@ -69,7 +71,7 @@ class Centers
 
     public function optionsConverting($centerList,$empty_item=false)
     {
-        if(!$centerList) return [];
+        if(Helper::isNullOrEmpty($centerList)) return [];
         
         $centerOptions=[];
 
@@ -161,15 +163,19 @@ class Centers
                 'updated_by' => $updated_by
             ];
 
+
             if($exist_center){
                 $exist_center->updateContactInfo($tel ,$fax, $zipcode, $street,$updated_by);                    
                 $exist_center->update($values);
             }else{
-                $contactInfo=ContactInfo::createByAddress($tel,$fax,$zipcode, $street, $updated_by);
+                
+                $contactInfo=ContactInfo::createByAddress($zipcode, $street, $updated_by,$tel,$fax);
                 if($contactInfo) $values['contact_info'] = $contactInfo->id;
+               
                 $center=Center::create($values);
             
             }
+
         }  //end for  
 
         return $err_msg;

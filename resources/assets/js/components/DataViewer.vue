@@ -33,12 +33,12 @@
             <div class="filter" v-if="showFilter">
                 <div class="filter-column">
                     <select class="form-control" v-model="params.search_column">
-                        <option v-for="column in filter" :value="column.key" v-text="column.title"></option>
+                        <option v-for="(column,index) in filter" :key="index" :value="column.key" v-text="column.title"></option>
                     </select>
                 </div>
                 <div class="filter-operator">
                     <select class="form-control" v-model="params.search_operator">
-                        <option v-for="(value, key) in operators" :value="key">{{value}}</option>
+                        <option v-for="(value, key) in operators" :key="key" :value="key">{{value}}</option>
                     </select>
                 </div>
                 <div class="filter-input">
@@ -56,7 +56,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th v-for="item in thead" v-if="item.default" v-bind:style="{ width: item.width }" >
+                        <th v-for="(item,index) in thead" :key="index" v-if="item.default" :style="{ width: item.width }" >
                             <div v-if="item.sort" style="color: #337ab7"  class="dataviewer-th" @click="sort(item.key)" >
                                 <span>{{item.title}}</span>
                                 <span v-if="params.column === item.key">
@@ -66,13 +66,23 @@
                             </div>
                             <div v-else>
                                 <span>{{item.title}}</span>
+                                <button v-if="item.edit" v-show="!itemEditting(item.key)" @click.prevent="onEdit(item.key)" class="btn btn-primary btn-xs">
+                                    <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
+                                </button>
+                                <button v-if="item.edit" v-show="itemEditting(item.key)" @click="onSubmitEdit(item.key)" class="btn btn-success btn-xs">
+                                    <span aria-hidden="true" class="glyphicon glyphicon-floppy-disk" ></span>
+                                </button>
+                                <button v-if="item.edit" v-show="itemEditting(item.key)" @click="onCancelEdit(item.key)" class="btn btn-default btn-xs">
+                                    <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
+                                </button>
                             </div>
+                           
                         </th>
                     </tr>
                     
                 </thead>
                 <tbody>
-                    <slot v-for="item in model.data"  :item="item"></slot>                    
+                    <slot v-for="(item,index) in model.data"   :item="item"></slot>                    
                 </tbody>
             </table>
         </div>
@@ -159,12 +169,17 @@
             show_title:{
                type: Boolean,
                default: true
+            },
+            editting:{
+               type: String,
+               default: ''
             }
            
         },
         
         data() {
             return {
+                
                 originUrl: '',
                 showFilter: false,
                 model: {
@@ -203,6 +218,7 @@
         },
         methods: {
             init(){
+                
                 this.originUrl= '',
                 this.showFilter= false
                 this.model= {
@@ -210,7 +226,7 @@
                 }
 
                 let perPage=10
-                if(this.no_page) perPage=99
+                if(this.no_page) perPage=150
                 this.params={
                     column: this.default_order,  
                     direction: this.default_direction,
@@ -237,7 +253,21 @@
                 this.originUrl = this.buildURL();
                 this.fetchData(this.originUrl)
             },
-            
+            onEdit(key){
+                this.$emit('edit',key)
+               
+            },            
+            itemEditting(key){
+                return this.editting==key
+            },    
+            onCancelEdit(key){
+                this.$emit('cancel-edit',key)
+                
+            },    
+            onSubmitEdit(key){
+                this.$emit('submit-edit',key)
+               
+            },     
             showCreateBtn() {
                 if (this.create_text) return true
                 return false

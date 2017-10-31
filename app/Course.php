@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Category;
 use App\Photo;
 use App\Support\FilterPaginateOrder;
 use Carbon\Carbon;
@@ -161,6 +162,23 @@ class Course extends Model
         return true;
     }
 
+    public function attachCategory($category_id)
+    {
+        if(!$this->categories->contains($category_id)) 
+        {
+            $this->categories()->attach($category_id);
+        }
+           
+    }
+
+    public function detachCategory($category_id)
+    {
+        if($this->categories->contains($category_id)) 
+        {
+            $this->categories()->detach($category_id);
+        }
+    }
+
     public function validCategories()
     {
         if(!$this->categories()->count()) return null;
@@ -220,6 +238,8 @@ class Course extends Model
 
     public function canEditBy($user)
 	{
+        if($user->isDev())return true;
+        
         if($user->isAdmin()){
            return $this->center->canEditBy($user);
         } 
@@ -304,10 +324,28 @@ class Course extends Model
     {
         return (int)$this->credit_count > 0;
     }
+    public function attachGroupCategory()
+    {
+        $groupCategory=Category::groupCategory();
+        if($groupCategory) $this->attachCategory($groupCategory->id);
+        
+    }
     public function groupAndParent()
     {
          if(!$this->isGroup()) return false;
          return (int)$this->parent < 1;
+    }
+
+    public function generateNumber()
+    {
+        $term = $this->term;
+        $center = $this->center;
+        $category = $this->defaultCategory();
+        
+        if(!$category) return '';
+        
+        return $term->number . $center->code . $category->code . '-';
+        
     }
 
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Course;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use App\Course;
+use App\Center;
 use App\Schedule;
 
 use App\Repositories\Courses;
@@ -31,8 +32,6 @@ class CoursesController extends BaseController
                                
     {
        
-        
-       
         $this->courses=$courses;
         $this->categories=$categories;
         $this->teachers=$teachers;
@@ -40,16 +39,15 @@ class CoursesController extends BaseController
         $this->centers=$centers;
         $this->weekdays=$weekdays;
 
-       
-       
-      
-
 	}
     public function indexOptions()
     {
+        
         $termOptions=$this->terms->options();
-        $allCategories=$this->categories->getAll()->get();       
+
+        $allCategories=$this->categories->privateCategories()->get();       
         $categoryOptions=$this->categories->optionsConverting($allCategories);
+
         $centerOptions=$this->centers->options();
         $weekdayOptions=$this->weekdays->options();
 
@@ -68,6 +66,7 @@ class CoursesController extends BaseController
     }
     public function index()
     {
+        
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('courses.index')
@@ -81,19 +80,38 @@ class CoursesController extends BaseController
         $parentId=(int)$request->parent;
         $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId,$parentId)->filterPaginateOrder();
         
+        $canEditNumber=false;
+        if($centerId){
+            $center=Center::findOrFail($centerId);
+            $canEditNumber=$this->canAdminCenter($center);
+        }
+        
+        
         if(count($courseList)){
             foreach ($courseList as $course) {
+               
                 $course->getParentCourse();
                 foreach ($course->classTimes as $classTime) {
-                  $classTime->weekday;
+                   $classTime->weekday;
                 }
                 foreach ($course->teachers as $teacher) {
-                  $teacher->name=$teacher->getName();
+                   $teacher->name=$teacher->getName();
                 }
+
+                if($course->number){
+                    $course->default_number=$course->number;
+                }else{
+                    $course->default_number=$course->generateNumber();
+                }
+
+                
             }
         }
 
-        return response() ->json(['model' => $courseList  ]);  
+        return response() ->json([
+                                    'model' => $courseList, 
+                                    'canEditNumber' => $canEditNumber 
+                                 ]);  
        
     }
     public function create()
@@ -105,23 +123,21 @@ class CoursesController extends BaseController
         }
 
         $current_user=$this->currentUser();
-        $validCenters=$current_user->admin->validCenters();
+        $validCenters=$this->canAdminCenters();
         $centerOptions=$this->centers->optionsConverting($validCenters);
         
         $request = request();
         $parent=(int)$request->parent; 
-        
-       
 
         $parent_course=null;
         if($parent){
             $parent_course=Course::find($parent);            
         }
-
        
 
         $publicCategories=false;
         $categoryOptions=$this->categories->options($publicCategories);
+
         
 
         $termOptions=$this->terms->options();
@@ -149,6 +165,8 @@ class CoursesController extends BaseController
             $course= Course::initialize($center_id);
             $course['term_id']=$termOptions[0]['value'];
         }
+
+        
 
         $teacherOptions=$this->teachers->optionsByCenter($center_id);
 
@@ -250,7 +268,7 @@ class CoursesController extends BaseController
         $credit_count=(int)$courseValues['credit_count'];
         $categoryIds =[];
         $teacherIds=[];
-        $groupCategory=$this->courses->groupCategory();
+        
         if($credit_count){
             if($parent){
                 $teacherIds = $request->getTeacherIds(); 
@@ -280,10 +298,7 @@ class CoursesController extends BaseController
 
                 $categoryIds = $request->getCategoryIds();
             }
-
-            if(!in_array($groupCategory->id, $categoryIds)){
-                array_push($categoryIds, $groupCategory->id);
-            }
+           
 
         }else{
             $courseValues['credit_price'] = null;
@@ -344,8 +359,8 @@ class CoursesController extends BaseController
         $course->begin_date=Helper::checkDateString($course->begin_date);
         $course->end_date=Helper::checkDateString($course->end_date);
 
-        $validCenters=$current_user->admin->validCenters();
-        $centerOptions=$this->centers->optionsConverting($validCenters);
+        $canAdminCenters=$this->canAdminCenters();
+        $centerOptions=$this->centers->optionsConverting($canAdminCenters);
 
         
         $publicCategories=false;
@@ -393,25 +408,26 @@ class CoursesController extends BaseController
         return response()->json($course);     
                
     }
-    // public function updateDisplayOrder(Request $request, $id)
-    // {
-    //         $course=Course::findOrFail($id); 
-    //         $up=$request['up'];
-    //         $num= rand(1, 10);
-    //         if($up){
-    //             $course->display_order += $num;
-    //         }else{
-    //             $course->display_order -= $num;
-    //         }
-            
-    //         $course->save();
-           
-    //         return response()
-    //             ->json([
-    //                 'course' => $course
-    //             ]);    
+    public function updateNumbers(Request $form)
+    {
+        $current_user=$this->currentUser();
+        $courses=$form['courses'];
+        
+        for($i = 0; $i < count($courses); ++$i) {
+            $course=$courses[$i];
 
-    // }
+            $id=$course['id'];
+            $number=$course['default_number'];
+            $updated_by=$current_user->id;
+
+            $this->courses->updateNumber($id,$number,$updated_by);
+            
+        }
+
+
+        return response()->json(['success' => true]);
+
+    }
 
     public function updatePhoto(Request $request, $id)
     {
@@ -449,11 +465,12 @@ class CoursesController extends BaseController
         $term_id=(int)$request->term; 
         $center_id=(int)$request->center;
        
-
-        $groupCourses= $this->courses->getGroupCourses($term_id,$center_id)
-                                    ->get();
-        $with_empty=true;
-        $options=$this->courses->optionsConverting($groupCourses,$with_empty);
+        $options=[];
+        $groupCourses= $this->courses->getGroupCourses($term_id,$center_id)->get();
+        if(!Helper::isNullOrEmpty($groupCourses)){
+            $with_empty=true;
+            $options=$this->courses->optionsConverting($groupCourses,$with_empty);
+        }
 
         return response()->json([
                                     'options' => $options ,

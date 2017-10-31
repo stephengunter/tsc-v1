@@ -37,6 +37,12 @@ class BaseController extends Controller
         
         
     }
+    protected function canAdminCenter($center)
+    {   
+        return $this->canAdminCenters()->contains($center);
+        
+        
+    }
     protected function defaultCenter()
     {   
         $currentUser=$this->currentUser();     

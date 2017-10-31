@@ -2,21 +2,23 @@
     <data-viewer  :default_search="defaultSearch" :default_order="defaultOrder"
       :source="source" :search_params="search_params"  :thead="thead" :no_search="can_select"  
       :filter="filter"  :title="title" create_text="新增課程" 
-      :show_title="show_title"  :no_page="no_page"
-      @refresh="init" :version="version"   @beginCreate="beginCreate"
-       @dataLoaded="onDataLoaded">
-         <div  class="form-inline" slot="header">
+      :show_title="show_title"  :no_page="no_page" :editting="editting"
+      @refresh="init" :version="current_version"   @beginCreate="beginCreate"
+      @dataLoaded="onDataLoaded" @edit="onEdit" @cancel-edit="onCancelEdit"
+      @submit-edit="onSubmitEdit">
+        <div  class="form-inline" slot="header">
                
-                <button v-show="hasData" class="btn btn-default btn-xs" @click.prevent="onBtnViewMoreClicked">
-                    <span v-if="viewMore" class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-                    <span v-if="!viewMore" class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
-                </button>
-         </div>
+            <button v-show="hasData" class="btn btn-default btn-xs" @click.prevent="onBtnViewMoreClicked">
+                <span v-if="viewMore" class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+                <span v-if="!viewMore" class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+            </button>
+        </div>
          
          
-         <template scope="props">
+        <template scope="props">
             <row :course="props.item" :more="viewMore" :select="can_select"
-               :been_selected="beenSelected(props.item.id)"       
+               :been_selected="beenSelected(props.item.id)"    
+               :editting_number="edittingNumber"   
                @selected="onRowSelected" @group-selected="onGroupSelected"
                @unselected ="onRowUnselected">
                 
@@ -65,18 +67,31 @@
                type: Boolean,
                default: false
             },
+            can_edit_number:{
+               type: Boolean,
+               default: false
+            },
         },
         beforeMount() {
            this.init()
         },
         watch: {
-            course_id: function (value) {
+            course_id(value) {
                this.searchParams.course=value
+            },
+            canEditNumber(value){
+                
+                let numberThead =this.thead.find(item=>{
+                      return item.key=='number'
+                })
+
+                numberThead.edit=value
             }
         },
         data() {
             return {
                 title:Helper.getIcon('Courses')  + '  課程管理',
+                current_version:0,
                 loaded:false,
                 source: Course.source(),
                 
@@ -84,7 +99,7 @@
                 defaultOrder:'begin_date',                      
                 create: Course.createUrl(),
                 
-                thead:[],
+                thead:Course.getThead(this.can_select)  ,
                 filter: [{
                     title: '名稱',
                     key: 'name',
@@ -96,21 +111,47 @@
                     key: 'begin_date',
                 }],
   
-                
+                courseList:[],
+                canEditNumber:false,
                 hasData:false,
                 viewMore:false,
+
+                editting:''
 
               
              
             }
         },
-        
+        computed: {
+            edittingNumber(){
+                return this.editting=='number'
+            },
+        },
         methods: {
             init() {
-                this.thead=Course.getThead(this.can_select)  
+                this.current_version=this.version
+            },
+            refresh(){
+                this.current_version += 1
             },
             onDataLoaded(data){
+                
+                if(data.canEditNumber){
+                    this.setCanEditNumber(data.canEditNumber)
+                }else{
+                    this.setCanEditNumber(false)
+                } 
+                
+              
+                this.courseList=data.model.data
                 this.hasData=data.model.total
+            },
+            setCanEditNumber(val){
+                if(this.can_edit_number){
+                    this.canEditNumber=val
+                }else{
+                    this.canEditNumber=false
+                }
             },
             onBtnViewMoreClicked(){
                 this.viewMore=!this.viewMore
@@ -138,7 +179,31 @@
             },
             onGroupSelected(id){
                  this.$emit('group-selected',id)
-            }
+            },
+            onEdit(key){
+                this.editting=key
+            },
+            onCancelEdit(key){
+                this.editting=''
+            },
+            onSubmitEdit(key){
+                if(key=='number') this.submitUpdateNumbers()
+            },
+            submitUpdateNumbers(){
+                let form=new Form({
+                    courses:this.courseList
+                })
+                let save=Course.updateNumbers(form)
+                save.then(result => {
+                        Helper.BusEmitOK()
+                        
+                        this.refresh()
+                        this.editting=''
+                    })
+                    .catch(error => {
+                         Helper.BusEmitError(error,'存檔失敗')
+                    })
+            }  
             
            
         },

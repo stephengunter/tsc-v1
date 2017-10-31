@@ -226,37 +226,7 @@
                          Helper.BusEmitError(error,'存檔失敗')
                     })
             },
-            resetImport(){
-               this.$refs.fileinput.value = null
-            },
-            onFileChange(e) {
-              
-                var files = e.target.files || e.dataTransfer.files
-                if (!files.length)  return
-                   
-                this.files = e.target.files
-
-                this.submitImport()
-            },
-            submitImport() {
-                let type=1
-                if(!Helper.isTrue(this.type)) type=0
-
-                let form = new FormData()
-                for (let i = 0; i < this.files.length; i++) {
-                    form.append('teachers_file', this.files[i])
-                    form.append('type', type)
-                }
-
-                let store=Teacher.import(form)
-                store.then(result => {
-                        // Helper.BusEmitOK()
-                        // this.$emit('saved')  
-                    })
-                    .catch(error => {
-                         Helper.BusEmitError(error,'存檔失敗')
-                    })
-            },
+           
             
             
         },

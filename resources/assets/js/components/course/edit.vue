@@ -38,14 +38,14 @@
                             <label>學分班</label>
                             <div>
                                <input type="hidden" v-model="form.course.group"  >
-                               <toggle :items="groupOptions"   :default_val="form.course.group" @selected=setGroup></toggle>
+                               <toggle :items="groupOptions"   :default_val="form.course.group" @selected="setGroup"></toggle>
                             </div>
                         </div>
                          <div v-show="isGroup" class="form-group">                           
                            
-                             <label>學分數</label>
-                             <select @change="onCreditCountChanged"  v-model="form.course.credit_count"  name="course.credit_count" class="form-control" >
-                                <option v-for="item in creditCountOptions" :value="item.value" v-text="item.text"></option>
+                            <label>學分數</label>
+                            <select @change="onCreditCountChanged"  v-model="form.course.credit_count"  name="course.credit_count" class="form-control" >
+                                <option v-for="(item,index) in creditCountOptions" :key="index" :value="item.value" v-text="item.text"></option>
                             </select>
                             <small class="text-danger" v-if="form.errors.has('course.credit_count')" v-text="form.errors.get('course.credit_count')"></small>
                         </div>
@@ -57,20 +57,20 @@
                         <div class="form-group">                           
                           <label>開課中心</label>
                             <select @change="onCenterChanged"  v-model="form.course.center_id"  name="course.center_id" class="form-control" >
-                                <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
+                                <option v-for="(item,index) in centerOptions" :key="index"  :value="item.value" v-text="item.text"></option>
                             </select>
                         </div>
                         <div   class="form-group">                           
                           <label>群組課程</label>
                             <select :disabled="!isGroup" @change="onParentChanged"   v-model="form.course.parent"  name="course.parent" class="form-control" >
-                                <option v-for="item in parentOptions" :value="item.value" v-text="item.text"></option>
+                                <option v-for="(item,index) in parentOptions" :key="index" :value="item.value" v-text="item.text"></option>
                             </select>
                         </div>
                         <div v-show="hasParent"  class="form-group">                           
                             <label>必修</label>
                             <div>
                                <input type="hidden" v-model="form.course.must"  >
-                               <toggle :items="mustOptions"   :default_val="form.course.must" @selected=setMust></toggle>
+                               <toggle :items="mustOptions"   :default_val="form.course.must" @selected="setMust"></toggle>
                             </div>
                         </div>
                         <div v-show="groupAndParent"  class="form-group">                           
@@ -87,7 +87,7 @@
                         <div class="form-group">
                             <label>學期別</label>
                             <select @change="onTermChanged"  v-model="form.course.term_id"  name="course.term_id" class="form-control" >
-                                <option v-for="item in termOptions" :value="item.value" v-text="item.text"></option>
+                                <option v-for="(item,index) in termOptions" :key="index"  :value="item.value" v-text="item.text"></option>
                             </select>
                          </div>
                         <div class="form-group">
@@ -104,14 +104,16 @@
                     <div  class="col-sm-3">
                         <div class="form-group">  
                             <label>課程分類</label>
-                             <drop-down :value.sync="categories" multiple  :options="categoryOptions" label="text"></drop-down>
+                            <drop-down :value.sync="categories" multiple  :options="categoryOptions" label="text"></drop-down>
                             <small class="text-danger" v-if="form.errors.has('course.categories')" v-text="form.errors.get('course.categories')"></small>
                         </div>
                     </div>
                     <div  class="col-sm-3">
                         <div v-show="!hideTeacher" class="form-group">  
                             <label>教師</label>
-                             <drop-down :value.sync="teachers" multiple  :options="teacherOptions" label="text"></drop-down>
+                            <drop-down :value.sync="teachers" multiple  :options="teacherOptions" label="text">
+                                <slot name="no-options">daaa</slot>
+                            </drop-down>
                             <small class="text-danger" v-if="form.errors.has('course.teachers')" v-text="form.errors.get('course.teachers')"></small>
                         </div>
                     </div>
@@ -154,15 +156,7 @@
                              <small class="text-danger" v-if="form.errors.has('course.end_date')" v-text="form.errors.get('course.end_date')"></small>
                         </div>
                     </div>
-                    <!-- <div class="col-sm-3">
-                        <div class="form-group">  
-                            <label>學分數</label>
-                             <select  v-model="form.course.credit_count"  name="course.credit_count" class="form-control" >
-                                <option v-for="item in creditCountOptions" :value="item.value" v-text="item.text"></option>
-                            </select>
-                        </div>
-                           
-                    </div> -->
+                    
                 </div>
                  <div class="row">
                     <div v-if="id" class="col-sm-3">
@@ -173,7 +167,7 @@
                      <div v-show="!hideTeacher" class="form-group">  
                             <label>週數</label>
                              <select  v-model="form.course.weeks"  name="course.weeks" class="form-control" >
-                                <option v-for="item in weeksOptions" :value="item.value" v-text="item.text"></option>
+                                <option v-for="(item,index) in weeksOptions" :key="index" :value="item.value" v-text="item.text"></option>
                             </select>
                         </div>
                        
