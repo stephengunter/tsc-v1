@@ -21,8 +21,9 @@ trait FilterPaginateOrder {
 
     public function scopeFilterPaginateOrder($query)
     {
+        
         $request = request();
-
+        
         $v = Validator::make($request->all(), [
             // 'column' => 'required|in:'.implode(',', $this->filter),
             'direction' => 'required|in:asc,desc',

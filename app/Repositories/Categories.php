@@ -50,18 +50,16 @@ class Categories
 
            return $category;
     }
-    public function options($public)
+    public function options($public=false)
     {
-        $options=[];
-        $categoryList=[];
+        
         if($public){
             $categoryList=$this->publicCategories();
         }else{
             $categoryList=$this->privateCategories();
         }
-        $categoryList=$categoryList->where('active',true)->get();
        
-          return $this->optionsConverting($categoryList);
+        return $this->optionsConverting($categoryList->get());
     }
     public function optionsConverting($categoryList)
     {

@@ -3,7 +3,9 @@
     <div v-if="signupinfo" class="panel panel-default show-data">
         <div class="panel-heading">
             <span class="panel-title">
-               <i class="fa fa-info-circle" aria-hidden="true"></i>  課程報名資訊
+                <h4>
+                     <i class="fa fa-info-circle" aria-hidden="true"></i>  課程報名資訊
+                </h4>
             </span> 
               
             <div>
@@ -26,7 +28,7 @@
                     <div class="col-sm-3">
                         <label class="label-title">報名截止日</label>
                         <p>
-                        {{ signupinfo.close_date }}
+                          {{ signupinfo.close_date }}
 
                         </p>  
                       
@@ -64,6 +66,7 @@
                          <label class="label-title">網路報名</label>
                         <p>
                             {{ signupinfo.net_signup | boolText  }}
+                            <span v-html="$options.filters.yesOrNoSign(signupinfo.net_signup)"></span>
                           
                         </p>
                      </div>

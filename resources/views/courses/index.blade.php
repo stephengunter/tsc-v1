@@ -5,7 +5,7 @@
         
        <course-index v-show="indexMode" :hide_create="indexSettings.hide_create" 
            :version="version"
-         @begin-create="onBeginCreate"  @selected="onSelected"  >
+         @begin-create="onBeginCreate"  @details="onSelected"  >
        </course-index> 
 
        
@@ -39,7 +39,7 @@
                selected:0,
                
                indexSettings:{
-                  hide_create:true, 
+                  hide_create:false, 
                },
                detailsSettings:{
                   can_back:true

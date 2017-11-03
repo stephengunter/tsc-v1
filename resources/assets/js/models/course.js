@@ -9,11 +9,15 @@ class Course {
         this.categoriesText = Course.categoriesText(data.categories)
         this.classTimesText = Course.getClassTimesText(data.class_times)
 
-        this.canNetSignup = '可'
-        if (Helper.tryParseInt(data.net_signup) < 1) {
-            this.canNetSignup = '否'
-        }
 
+
+        this.canNetSignup = Course.canNetSignup(this)
+
+        this.isCredit = Course.isCredit(this)
+        this.hasParent = Course.hasParent(this)
+        this.isGroup = Course.isGroup(this)
+        this.groupAndParent = Course.groupAndParent(this)
+        this.hasReviewedBy = Course.hasReviewedBy(this)
 
     }
     static title() {
@@ -236,19 +240,36 @@ class Course {
                 })
         })
     }
-
-    static isParentGroup(course) {
-        let credit_count = parseInt(course.credit_count)
-        let parent = parseInt(course.parent)
-        return credit_count > 0 && parent == 0
+    static canNetSignup(course) {
+        return Helper.isTrue(course.net_signup)
     }
+    static isCredit(course) {
+        return parseInt(course.credit_count) > 0
+    }
+    static isGroup(course) {
+        return Helper.isTrue(course.group)
+    }
+    static groupAndParent(course) {
+        let group = this.isGroup(course)
+        let parent = parseInt(course.parent)
+        return group && parent == 0
 
+    }
+    static isParentGroup(course) {
+        return this.groupAndParent(course)
+    }
+    static hasParent(course) {
+        return parseInt(course.parent) > 0
+    }
     static isGroupSubCourse(course) {
         let credit_count = parseInt(course.credit_count)
         let parent = parseInt(course.parent)
         return credit_count > 0 && parent > 0
     }
-
+    static hasReviewedBy(course) {
+        if (!course.reviewed_by) return false
+        return parseInt(course.reviewed_by) > 0
+    }
     static mustText(mustVal) {
         if (Helper.isTrue(mustVal)) return '必修'
         return '選修'
@@ -256,99 +277,136 @@ class Course {
 
     static getThead(canSelect) {
         let thead = [{
-            title: '開課中心',
-            key: 'center',
-            sort: false,
-            static: true,
-            default: true
 
-        }, {
-            title: '編號',
-            key: 'number',
-            sort: false,
-            static: true,
-            default: true
+                title: '開課中心',
+                key: 'center',
+                sort: false,
+                static: true,
+                default: true
 
-        }, {
-            title: '名稱',
-            key: 'name',
-            sort: true,
-            static: true,
-            default: true
+            }, {
 
-        }, {
-            title: '群組課程',
-            key: 'group',
-            sort: false,
-            default: true
-        }, {
-            title: '上課時間',
-            key: 'time',
-            sort: false,
-            default: true
-        }, {
-            title: '課程日期',
-            key: 'begin_date',
-            sort: true,
-            default: true
+                title: '編號',
+                key: 'number',
+                sort: false,
+                static: true,
+                default: true
 
-        }, {
-            title: '報名日期',
-            key: 'open_date',
-            sort: true,
-            default: true
-        }, {
-            title: '審核',
-            key: 'reviewed',
-            sort: false,
+            }, {
 
-            default: true
-        }, {
-            title: '教師',
-            key: 'teacherNames',
-            sort: false,
-            default: false
-        }, {
-            title: '學分數',
-            key: 'credit_count',
-            sort: true,
-            default: false
-        }, {
-            title: '週數',
-            key: 'weeks',
-            sort: true,
-            default: false
-        }, {
-            title: '時數',
-            key: 'hours',
-            sort: true,
-            default: false
-        }, {
-            title: '學費',
-            key: 'cost',
-            sort: true,
-            default: false
-        }, {
-            title: '材料',
-            key: 'materials',
-            sort: false,
-            default: false
-        }, {
-            title: '材料費',
-            key: 'cost',
-            sort: true,
-            default: false
-        }, {
-            title: '人數上限',
-            key: 'limit',
-            sort: true,
-            default: false
-        }, {
-            title: '最低人數',
-            key: 'min',
-            sort: false,
-            default: false
-        }]
+                title: '名稱',
+                key: 'name',
+                sort: true,
+                static: true,
+                default: true
+
+            },
+            //  End Static Columns
+            {
+                view: 0,
+                title: '課程分類',
+                key: 'categories',
+                sort: false,
+                default: true
+
+            }, {
+                view: 0,
+                title: '群組課程',
+                key: 'group',
+                sort: true,
+                default: true
+            }, {
+                view: 0,
+                title: '上課時間',
+                key: 'time',
+                sort: false,
+                default: true
+            }, {
+                view: 0,
+                title: '課程日期',
+                key: 'begin_date',
+                sort: true,
+                default: true
+
+            }, {
+                view: 0,
+                title: '審核',
+                key: 'reviewed',
+                sort: true,
+                default: true
+            },
+            // End Default Columns
+            {
+                view: 1,
+                title: '教師',
+                key: 'teacherNames',
+                sort: false,
+                default: false
+            }, {
+                view: 1,
+                title: '學分數',
+                key: 'credit_count',
+                sort: true,
+                default: false
+            }, {
+                view: 1,
+                title: '學分單價',
+                key: 'credit_price',
+                sort: true,
+                default: false
+            }, {
+                view: 1,
+                title: '週數',
+                key: 'weeks',
+                sort: true,
+                default: false
+            }, {
+                view: 1,
+                title: '時數',
+                key: 'hours',
+                sort: true,
+                default: false
+            }, {
+                view: 1,
+                title: '學費',
+                key: 'cost',
+                sort: true,
+                default: false
+            },
+
+            // Key==2
+            {
+                view: 2,
+                title: '材料',
+                key: 'materials',
+                sort: false,
+                default: false
+            }, {
+                view: 2,
+                title: '材料費',
+                key: 'cost',
+                sort: true,
+                default: false
+            }, {
+                view: 2,
+                title: '報名日期',
+                key: 'open_date',
+                sort: true,
+                default: false
+            }, {
+                view: 2,
+                title: '人數上限',
+                key: 'limit',
+                sort: true,
+                default: false
+            }, {
+                view: 2,
+                title: '最低人數',
+                key: 'min',
+                sort: false,
+                default: false
+            }
+        ]
 
         if (canSelect) {
             let selectColumn = {
@@ -362,8 +420,16 @@ class Course {
         }
         return thead
     }
+    static creditCountText(course) {
+        if (!this.isCredit(course)) return 0
+        if (!this.hasParent(course)) return course.credit_count
+
+        let text = this.mustText(course.must)
+        return course.credit_count + ' (' + text + ')'
+    }
     static teachersText(teachers) {
-        if (!teachers.length) return ''
+        if (!teachers || !teachers.length) return ''
+
         let html = ''
         for (var i = 0; i < teachers.length; i++) {
             html += teachers[i].name + '&nbsp;'
@@ -371,7 +437,8 @@ class Course {
         return html
     }
     static categoriesText(categories) {
-        if (!categories.length) return ''
+        if (!categories || !categories.length) return ''
+
         let html = ''
         for (var i = 0; i < categories.length; i++) {
             html += categories[i].name + '&nbsp;'
@@ -379,11 +446,11 @@ class Course {
         return html
     }
     static getClassTimesText(class_times) {
+        if (!class_times || !class_times.length) return ''
+
         let html = ''
-        if (class_times.length) {
-            for (var i = 0; i < class_times.length; i++) {
-                html += Classtime.classTimeFullText(class_times[i]) + '&nbsp;'
-            }
+        for (var i = 0; i < class_times.length; i++) {
+            html += Classtime.classTimeFullText(class_times[i]) + '&nbsp;'
         }
         return html
     }

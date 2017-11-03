@@ -16,24 +16,15 @@ use App\Repositories\Weekdays;
 use App\Http\Requests\Course\SignupInfoRequest;
 
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 use App\Events\CourseUpdated;
 
 class SignupInfoesController extends BaseController
 {
     
-    public function __construct(Courses $courses, CheckAdmin $checkAdmin)                           
+    public function __construct(Courses $courses)                           
     {
-       
-      
-        $exceptAdmin=[];
-        $allowVisitors=[];
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
-        
         $this->courses=$courses;
-
-        $this->setCheckAdmin($checkAdmin);
 	}
     
     
@@ -42,7 +33,6 @@ class SignupInfoesController extends BaseController
         $current_user=$this->currentUser();
         $course = Course::findOrFail($id);
         $course->canEdit=$course->canEditBy($current_user);
-        $course->canDelete=$course->canDeleteBy($current_user);
 
         return response()->json(['signupinfo' => $course]);          
                

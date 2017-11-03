@@ -3,7 +3,8 @@
     
     <show v-if="readOnly"  :id="id" can_edit="can_edit"  :can_back="can_back"  
        :version="version"  @begin-edit="beginEdit" @loaded="onDataLoaded"
-       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" >                 
+       @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" 
+       @edit-review="onEditReview">                 
     </show>
 
     <edit v-else :id="id" 
@@ -14,6 +15,9 @@
       @close="closeConfirm" @confirmed="deleteCourse">        
     </delete-confirm>
     
+    <review-editor :showing="showReviewEditor" :reviewed="courseReviewed"
+      @close="showReviewEditor=false" @save="updateReview">
+    </review-editor>
 
 </div>
 </template>
@@ -54,7 +58,10 @@
                     show:false,
                     msg:'',
 
-                }    
+                },
+               
+                showReviewEditor:false,
+                courseReviewed:false,    
             }
         },
         beforeMount(){
@@ -72,8 +79,11 @@
                     show:false,
                     msg:''
                }
+               this.showReviewEditor=false
+               this.courseReviewed=false
             },      
             onDataLoaded(course){
+                this.courseReviewed=Helper.isTrue(course.reviewed)
                 this.$emit('loaded',course)
             },        
             beginEdit() {
@@ -110,6 +120,25 @@
                     this.closeConfirm()   
                 })
             },
+            onEditReview(){
+                this.showReviewEditor=true     
+            },
+            updateReview(val){
+                let id = this.id 
+                let review= val
+                let save= CourseReview.update(id,review)
+
+                save.then(course => {
+                    Helper.BusEmitOK('存檔成功')
+                    this.init()
+                   
+                    this.$emit('review-updated',course)
+                })
+                .catch(error => {
+                    Helper.BusEmitError(error,'存檔失敗')
+                    this.showReviewEditor=false   
+                })
+            }
             
         }
     }

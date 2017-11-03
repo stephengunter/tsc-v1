@@ -41,13 +41,15 @@ Route::group(['middleware' => 'admin'], function()
     Route::put('centers/{id}/update-photo','\App\Http\Controllers\Settings\CentersController@updatePhoto');
     Route::resource('centers', '\App\Http\Controllers\Settings\CentersController');
 
-    Route::resource('centers-import', '\App\Http\Controllers\Settings\CentersImportController',['only' => ['index','store']]);
+    Route::resource('centers-import', '\App\Http\Controllers\Settings\CentersImportController',
+    ['only' => ['index','store']]);
 
     //Category
     Route::post('categories/display-order',['uses'=>'\App\Http\Controllers\Course\CategoriesController@updateDisplayOrder']);
     Route::resource('categories', '\App\Http\Controllers\Course\CategoriesController'); 
     
-    Route::resource('categories-import', '\App\Http\Controllers\Course\CategoriesImportController',['only' => ['index','store']]);
+    Route::resource('categories-import', '\App\Http\Controllers\Course\CategoriesImportController',
+    ['only' => ['index','store']]);
     
 
     //Teacher
@@ -55,11 +57,14 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('teachers', '\App\Http\Controllers\Teacher\TeachersController');
 
     Route::put('group-teachers/{id}/remove',['uses'=>'\App\Http\Controllers\Teacher\GroupTeachersController@remove']);   
-    Route::resource('group-teachers', '\App\Http\Controllers\Teacher\GroupTeachersController',['only' => ['create','store','show']]);
+    Route::resource('group-teachers', '\App\Http\Controllers\Teacher\GroupTeachersController',
+    ['only' => ['create','store','show']]);
 
-    Route::resource('teachers-import', '\App\Http\Controllers\Teacher\TeachersImportController',['only' => ['index','store']]);
+    Route::resource('teachers-import', '\App\Http\Controllers\Teacher\TeachersImportController',
+    ['only' => ['index','store']]);
 
-    Route::resource('teachers-review', '\App\Http\Controllers\Teacher\TeachersReviewController',['only' => ['index','store','update']]);
+    Route::resource('teachers-review', '\App\Http\Controllers\Teacher\TeachersReviewController',
+    ['only' => ['index','store','update']]);
     
     //Course
     Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
@@ -69,9 +74,20 @@ Route::group(['middleware' => 'admin'], function()
     Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
     Route::post('courses/update-numbers','\App\Http\Controllers\Course\CoursesController@updateNumbers');
 
-    Route::post('courses/import', '\App\Http\Controllers\Course\CoursesController@import');
+    //Route::post('courses/import', '\App\Http\Controllers\Course\CoursesController@import');
     Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);
     Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
+
+    Route::resource('courses-import', '\App\Http\Controllers\Course\CoursesImportController',
+    ['only' => ['index','store']]);
+
+    Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
+    ['only' => ['show','edit','update']]);
+
+    Route::resource('classtimes', '\App\Http\Controllers\Course\ClassTimesController');
+
+    Route::resource('courses-review', '\App\Http\Controllers\Course\CoursesReviewController',
+    ['only' => ['index','store','update']]);
     
     
     Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
@@ -144,9 +160,8 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('scores', '\App\Http\Controllers\Students\ScoresController',
                                             ['only' => ['index','store']]);   
 
-    Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
-                                            ['only' => ['show','edit','update']]);
-    Route::resource('classtimes', '\App\Http\Controllers\Course\ClassTimesController');
+    
+    
     Route::resource('schedules', '\App\Http\Controllers\Course\SchedulesController');
     Route::resource('import-schedules', '\App\Http\Controllers\Course\ImportSchedulesController', 
                                         ['only' => ['create','store']]);

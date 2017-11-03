@@ -44,7 +44,7 @@
                             <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
                         </button>  
                     </p>
-                    <p v-else > 
+                    <p v-else> 
                         <span v-html="$options.filters.reviewedLabel(teacher.reviewed)"></span>     
                         &nbsp;        
                         <button class="btn btn-primary btn-xs" @click.prevent="editReview" >

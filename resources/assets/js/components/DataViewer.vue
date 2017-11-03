@@ -1,22 +1,21 @@
 <template>
 
     <div class="panel panel-default">
-        <div v-show="show_title" class="panel-heading">
-             <div class="panel-title">
-                 <h4 v-html="title">
+        <div v-show="show_header" class="panel-heading">
+             
+            <div class="panel-title">
+                 <h4 v-show="show_title"  v-html="title">
                  </h4>
-             </div>
-           
-             <slot name="header"></slot>
+            </div>
+            <slot name="header"></slot>
               
 
-             <div>   
+            <div>   
                 <a  v-if="showCreateBtn()" class="btn btn-primary btn-sm" @click.prevent="createClicked"
                    v-text="create_text" >
                 </a>
                 
                 <slot name="btn"></slot>
-               
                 
                
                 <button v-if="!showFilter"  class="btn btn-default btn-sm" @click="fetchData()">
@@ -26,7 +25,7 @@
                     <span v-if="!showFilter" class="glyphicon glyphicon-search" aria-hidden="true"></span>
                     <span v-if="showFilter" class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                 </button>
-             </div>
+            </div>
              
         </div>
         <div class="panel-body">
@@ -56,7 +55,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th v-for="(item,index) in thead" :key="index" v-if="item.default" :style="{ width: item.width }" >
+                        <th v-for="(item,index) in thead" :key="index"  :style="{ width: item.width }" >
                             <div v-if="item.sort" style="color: #337ab7"  class="dataviewer-th" @click="sort(item.key)" >
                                 <span>{{item.title}}</span>
                                 <span v-if="params.column === item.key">
@@ -65,7 +64,7 @@
                                 </span>
                             </div>
                             <div v-else>
-                                <span>{{item.title}}</span>
+                                <span v-if="item.title">{{item.title}}</span>
                                 <button v-if="item.edit" v-show="!itemEditting(item.key)" @click.prevent="onEdit(item.key)" class="btn btn-primary btn-xs">
                                     <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
                                 </button>
@@ -75,6 +74,9 @@
                                 <button v-if="item.edit" v-show="itemEditting(item.key)" @click="onCancelEdit(item.key)" class="btn btn-default btn-xs">
                                     <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
                                 </button>
+                                <checkbox v-if="item.checkall" v-show="hasData" :default="false"
+                                    @selected="checkAll"   @unselected="unCheckAll">                             
+                                </checkbox>
                             </div>
                            
                         </th>
@@ -166,6 +168,10 @@
                type: Boolean,
                default: false
             },
+            show_header:{
+               type: Boolean,
+               default: true
+            },
             show_title:{
                type: Boolean,
                default: true
@@ -173,7 +179,7 @@
             editting:{
                type: String,
                default: ''
-            }
+            },
            
         },
         
@@ -193,7 +199,6 @@
         },
         computed: {
             hasData(){
-               
                 return this.model.total
             },
         },
@@ -252,6 +257,12 @@
                 
                 this.originUrl = this.buildURL();
                 this.fetchData(this.originUrl)
+            },  
+            checkAll(){
+                this.$emit('checkall')
+            },   
+            unCheckAll(){
+                this.$emit('uncheckall')
             },
             onEdit(key){
                 this.$emit('edit',key)
@@ -319,18 +330,17 @@
             fetchData(url) {
                 var vm = this;
                 if (!url) {
-                    url = this.buildURL();
+                    url = this.buildURL()
                 }
                 if(!url) return false
                
                 axios.get(url)
-                    .then(function(response) {
+                    .then(response=> {
                         let model=response.data.model
-                        Vue.set(vm.$data, 'model', model)
-                       
-                        vm.$emit('dataLoaded', response.data)
+                        this.model=model
+                        this.$emit('dataLoaded' , response.data)
                     })
-                    .catch(function(error) {
+                    .catch(error=> {
                         console.log(error)
                     })
             },
@@ -356,7 +366,7 @@
             },
             canSearch(){
                 if(this.no_search) return false;
-                if(this.filter && this.filter.length > 0) return true;
+                if(this.filter && this.filter.length > 0) return true
                 return false 
             }
         },

@@ -32,9 +32,13 @@ class TeacherReview {
             }) //End Promise
     }
 
-    static store(form) {
+    static store(teacher_ids) {
+
         let url = this.storeUrl()
         let method = 'post'
+        let form = new Form({
+            teacher_ids: teacher_ids
+        })
         return new Promise((resolve, reject) => {
             form.submit(method, url)
                 .then(data => {
@@ -64,23 +68,7 @@ class TeacherReview {
     }
 
 
-    static store(teacher_ids) {
-        let url = this.storeUrl()
-        let method = 'post'
-        let form = new Form({
-            teachers: teacher_ids
-        })
 
-        return new Promise((resolve, reject) => {
-            form.submit(method, url)
-                .then(data => {
-                    resolve(data);
-                })
-                .catch(error => {
-                    reject(error);
-                })
-        })
-    }
 
 
 

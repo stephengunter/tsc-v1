@@ -32,7 +32,7 @@
                        @canceled="onCreateCanceled" > 
                     </edit>  
 
-                    <edit  v-for="classtime in classtimeList"  :classtime="classtime" 
+                    <edit  v-for="(classtime,index) in classtimeList" :key="index"  :classtime="classtime" 
                         :can_edit="can_edit"
                         @editting="onEditting" @canceled="onEditCanceled"
                         @saved="onUpdated"  @btn-delete-clicked="beginDelete" >
@@ -72,6 +72,10 @@
             course_id: {
               type: Number,
               default: 0
+            },
+            classtime_list: {
+              type: Array,
+              default: null
             },
             can_edit:{
                type: Boolean,
@@ -122,13 +126,19 @@
                 }
 
                 this.classtimeList=[]
-                this.fetchData()
+
+                if(this.classtime_list){
+                     this.classtimeList=data.classtimeList
+                }else{
+                    this.fetchData()
+                }
+                
             },
             fetchData() {
                 let getData=Classtime.index(this.course_id)
                     getData.then(data => {
                       
-                       this.classtimeList=data.classtimeList
+                      
                        this.loaded = true
                         
                     })

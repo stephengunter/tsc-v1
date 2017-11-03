@@ -7,24 +7,46 @@ use App\Status;
 use App\Category;
 use App\Center;
 use App\Teacher;
+use App\Profile;
+
+
+use App\Repositories\Users;
+use App\Repositories\Centers;
+use App\Repositories\Terms;
+
 use App\Term;
 use Carbon\Carbon;
 
+use App\Support\Helper;
 use DB;
+use Excel;
 
 class Courses 
 {
+    public function __construct(Users $users, Centers $centers , Terms $terms)                          
+    {
+        $this->users=$users;  
+        $this->centers=$centers; 
+        $this->terms=$terms; 
+        
+    }
+
     public function getAll()
     {
          return Course::where('removed',false);
     }
     public function getAllGroupCourses()
     {
-        return $this->getAll()->where('credit_count', '>' , 0);
+        return $this->getAll()->where('group', true);
     }
     public function findOrFail($id)
     {
          return Course::findOrFail($id);
+    }
+    public function findByNumber($number)
+    {
+          return  $this->getAll()->where('number',$number)->first();
+
     }
     public function getByTeacher($teacher_id)
     {
@@ -33,6 +55,11 @@ class Courses
                                         $q->where('user_id', $teacher_id );
                                     });
 
+
+    }
+    public function getByCenter($centerId)
+    {
+          return  $this->getAll()->where('center_id',$centerId);
 
     }
 
@@ -86,17 +113,18 @@ class Courses
     {
         $courseList=$this->getAll()->with(['center','categories','teachers','classTimes']);
         
-        if($termId) $courseList=$courseList->where('term_id',$termId);       
+        if($termId) $courseList->where('term_id',$termId);       
 
-        if($centerId) $courseList=$courseList->where('center_id',$centerId);
+        if($centerId) $courseList->where('center_id',$centerId);
 
-        $courseList=$courseList->where('parent',$parentId);
+        if($parentId) $courseList->where('parent',$parentId);
+        
 
         if($categoryId){
-             $courseList= $courseList->whereHas('categories', function($q)  use ($categoryId)
-             {
+            $courseList= $courseList->whereHas('categories', function($q)  use ($categoryId)
+            {
                 $q->where('id', $categoryId );
-             });
+            });
         }
 
         if($weekdayId){
@@ -138,23 +166,29 @@ class Courses
             $q->where('id', $categoryId );
         });
 
-       
-
         return $courseList;
     }
     
    
-     public function store($courseValues , $categoryIds, $teacherIds)
-     {
+    public function store($courseValues , $categoryIds, $teacherIds)
+    {
+        $parent=(int)$courseValues['parent'];
+        $course=new Course($courseValues);
+        if($parent){           
+            $course->copyParentCourseValues($parent);
+        }else{           
+            $term=Term::findOrFail($course->term_id);
+
+            $course->open_date=$term->open_date;
+            $course->close_date=$term->close_date;
+        }
+
+        $course->countTuition();
         
-        $term_id=$courseValues['term_id'];
-        $term=Term::findOrFail($term_id);
-        $courseValues['open_date']='2017-3-3';
-        $courseValues['close_date']='2017-6-9';
+        
          
         $course= DB::transaction(function() 
-        use($courseValues){
-              $course=new Course($courseValues);
+        use($course){
               
               $course->save();
 
@@ -175,17 +209,15 @@ class Courses
             $this->syncTeachers($teacherIds , $course);
         }
 
-        if($course->isGroup()){
-            $course->attachGroupCategory();
-        }
+        // if($course->isGroup()){
+        //     $course->attachGroupCategory();
+        // }
        
 
         return $course;
-     }
-    public function update($courseValues , $categoryIds, $teacherIds, $id)
+    }
+    public function update($courseValues , $categoryIds, $teacherIds, Course $course)
     {
-         $course=Course::findOrFail($id); 
-         
          $course->update($courseValues);
 
          $this->syncCategories($categoryIds , $course);    
@@ -193,11 +225,13 @@ class Courses
 
          return $course;
     }
-    public function updateNumber($id,$number,$updated_by)
+    public function updateNumber($id,$custom_number,$updated_by)
     {
          $course=$this->findOrFail($id);          
-    
-         $course->number= $number;           
+         
+         $default_number=$course->generateNumber();
+         
+         $course->number= $default_number . $custom_number;           
          $course->updated_by= $updated_by;
         
          $course->save();
@@ -205,7 +239,137 @@ class Courses
          return $course;
  
     }
-   
+    public function updateReview($id,$reviewed,$current_user)
+    {
+        $course = Course::findOrFail($id);
+        if(!$course->canReviewBy($current_user)){
+            throw new AuthenticationException();    
+        }
+
+        $course->reviewed=$reviewed;
+        if($reviewed){
+            $course->reviewed_by=$current_user->id;
+        }else{
+            $course->reviewed_by='';
+        }
+        
+        $course->save();
+        
+       
+         
+        return $course;
+    }
+    
+    public function importCourses($file,$isUpdate,$current_user)
+    {
+        $err_msg='';
+        
+        $excel=Excel::load($file, function($reader) {             
+            $reader->limitColumns(16);
+            $reader->limitRows(100);
+        })->get();
+        
+
+        $courseList=$excel->toArray()[0];
+        for($i = 1; $i < count($courseList); ++$i) {
+            $row=$courseList[$i];
+
+            if($isUpdate){
+                $number=trim($row['number']);
+                if(!$number)continue;
+
+                $course=$this->findByNumber($number);
+                if(!$course) {
+                    $err_msg .= '課程代碼' .$number . '錯誤'. ',';
+                    continue;
+                }
+
+                $credit_count=(int)trim($row['credit']);
+                $credit_price=trim($row['credit_price']);
+                $must=(int)trim($row['must']);                
+
+                $tuition=trim($row['tuition']);
+                $materials=trim($row['materials']);
+                $cost=trim($row['cost']);
+                $limit=trim($row['limit']);
+                $min=trim($row['min']);
+
+                $description=trim($row['description']);
+
+                $courseValues=[
+                    'credit_count' => $credit_count,
+                    'credit_price' => $credit_price,
+                    'must' => $must,
+                    'tuition' => $tuition,
+                    'materials' => $materials,
+                    'cost' => $cost,
+                    'limit' => $limit,
+                    'min' => $min,
+
+                    'description' => $description
+                ];
+
+
+                $course->update($courseValues);
+
+
+
+            }else{
+                $name=trim($row['name']);
+                if(!$name)continue;
+
+                $center_code=trim($row['center']);
+                $center=$this->centers->getByCode($center_code);
+                if(!$center) {
+                    $err_msg .=$name . ': '. '中心代碼' .$center_code . '錯誤'. ',';
+                    continue;
+                }
+
+                $term_nember=trim($row['term']);  
+                $term=$this->terms->getByNumber($term_nember);
+                if(!$term) {
+                    $err_msg .=$name . ': '. '學期別' .$term_nember . '錯誤'. ',';
+                    continue;
+                }
+
+
+                $begin_date=trim($row['begin_date']);
+                $end_date=trim($row['end_date']);
+                $weeks=trim($row['weeks']);
+                $hours=trim($row['hours']);
+
+                $courseValues=[
+                    'group' => false,
+                    'parent' => 0,
+                    'term_id' => $term->id,
+                    'center_id' => $center->id,
+                    'name' => $name,
+                    'begin_date' => $begin_date,
+                    'end_date' => $end_date,
+                    'weeks' => $weeks,
+                    'hours' => $hours
+                ];
+
+               
+                $category_codes= explode(',', trim($row['categories']));
+                $categoryIds=Category::whereIn('code',$category_codes)->pluck('id')->toArray();
+
+                $teacher_SIDs=explode(',', trim($row['teachers']));
+                $teacherIds=Profile::whereIn('SID',$teacher_SIDs)->pluck('user_id')->toArray();
+
+                $course=$this->store($courseValues , $categoryIds, $teacherIds);
+            }
+            
+
+            
+
+            
+
+            
+        }
+
+        return $err_msg;
+    }
 
     private function syncCategories($categoryIds , $course)
     {

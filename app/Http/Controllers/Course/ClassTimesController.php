@@ -14,21 +14,13 @@ use App\Repositories\Weekdays;
 
 
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 class ClassTimesController extends BaseController
 {
-    public function __construct(Classtimes $classtimes,Weekdays $weekdays,CheckAdmin $checkAdmin) 
+    public function __construct(Classtimes $classtimes,Weekdays $weekdays) 
     {
-        $exceptAdmin=[];
-        $allowVisitors=[];
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
-        
-
 		$this->classtimes=$classtimes;
         $this->weekdays=$weekdays;
-
-        $this->setCheckAdmin($checkAdmin);
 	}
 
     public function index()

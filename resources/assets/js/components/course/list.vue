@@ -1,26 +1,33 @@
 <template>
-    <data-viewer  :default_search="defaultSearch" :default_order="defaultOrder"
-      :source="source" :search_params="search_params"  :thead="thead" :no_search="can_select"  
-      :filter="filter"  :title="title" create_text="新增課程" 
-      :show_title="show_title"  :no_page="no_page" :editting="editting"
-      @refresh="init" :version="current_version"   @beginCreate="beginCreate"
+    <data-viewer v-if="ready"  :default_search="defaultSearch" :default_order="defaultOrder"
+      :source="source" :search_params="search_params"  :thead="getThead()" :no_search="no_search"  
+      :filter="filter"  :title="title" :create_text="createText" 
+      :show_header="show_header" :show_title="show_title"  :no_page="no_page" :editting="editting"
+      :data_list="courseList" :version="current_version"  
+      @refresh="init"  @beginCreate="beginCreate"
       @dataLoaded="onDataLoaded" @edit="onEdit" @cancel-edit="onCancelEdit"
-      @submit-edit="onSubmitEdit">
+      @submit-edit="onSubmitEdit" @checkall="checkAll"   @uncheckall="unCheckAll">
         <div  class="form-inline" slot="header">
                
-            <button v-show="hasData" class="btn btn-default btn-xs" @click.prevent="onBtnViewMoreClicked">
-                <span v-if="viewMore" class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-                <span v-if="!viewMore" class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+            <button v-show="viewing > 0" class="btn btn-default btn-xs" @click.prevent="viewing--">
+                <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>                
             </button>
+            <button v-show="viewing <=2" class="btn btn-default btn-xs" @click.prevent="viewing++">
+                <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+            </button>
+
         </div>
          
          
         <template scope="props">
-            <row :course="props.item" :more="viewMore" :select="can_select"
-               :been_selected="beenSelected(props.item.id)"    
-               :editting_number="edittingNumber"   
-               @selected="onRowSelected" @group-selected="onGroupSelected"
-               @unselected ="onRowUnselected">
+            <row :course="props.item" :viewing="viewing" 
+                :details_link="details_link" :can_remove="can_remove"
+                :single_select="single_select" :multi_select="multi_select"
+                :been_selected="beenSelected(props.item.id)"  
+                :editting_number="edittingNumber"   
+                @details="onDetails" 
+                @selected="onRowSelected" @group-selected="onGroupSelected"
+                @checked ="onRowChecked" @unchecked="onRowUnChecked">
                 
             </row>
             
@@ -39,57 +46,82 @@
         },
         name: 'CourseList',
         props: {
+            source_url:{
+                type: String,
+                default: ''
+            },
             search_params: {
-              type: Object,
-              default: null
+                type: Object,
+                default: null
             },
             hide_create: {
-              type: Boolean,
-              default: false
+                type: Boolean,
+                default: false
             },
             version:{
-               type: Number,
-               default: 0
+                type: Number,
+                default: 0
             },
-            can_select:{
+            can_remove:{
+               type: Boolean,
+               default: false
+            },
+            details_link:{
                type: Boolean,
                default: true
+            },
+            single_select:{
+               type: Boolean,
+               default: false
+            },
+            multi_select:{
+               type: Boolean,
+               default: false
             },
             selected_ids: {
-              type: Array,
-              default: null
+                type: Array,
+                default: null
+            },
+            show_header:{
+                type: Boolean,
+                default: true
             },
             show_title:{
-               type: Boolean,
-               default: true
+                type: Boolean,
+                default: true
             },
             no_page:{
-               type: Boolean,
-               default: false
+                type: Boolean,
+                default: false
+            },
+            no_search:{
+                type: Boolean,
+                default: false
             },
             can_edit_number:{
-               type: Boolean,
-               default: false
+                type: Boolean,
+                default: false
             },
         },
         beforeMount() {
            this.init()
         },
         watch: {
+            version(val){
+                this.current_version=val
+            },
             course_id(value) {
                this.searchParams.course=value
-            },
-            canEditNumber(value){
-                
-                let numberThead =this.thead.find(item=>{
-                      return item.key=='number'
-                })
-
-                numberThead.edit=value
             }
         },
         data() {
             return {
+                ready:false,
+                createText:'',
+
+                allThead:Course.getThead(),
+                viewing:0,
+
                 title:Helper.getIcon('Courses')  + '  課程管理',
                 current_version:0,
                 loaded:false,
@@ -98,8 +130,8 @@
                 defaultSearch:'name',
                 defaultOrder:'begin_date',                      
                 create: Course.createUrl(),
-                
-                thead:Course.getThead(this.can_select)  ,
+               
+
                 filter: [{
                     title: '名稱',
                     key: 'name',
@@ -129,22 +161,79 @@
         },
         methods: {
             init() {
+                if(this.hide_create) this.createText=''
+                else this.createText='新增課程'
+
+                if(this.source_url) this.source=this.source_url
                 this.current_version=this.version
+
+                this.ready=true
+                
+            },
+            getThead(){
+                
+                let staticThead=this.allThead.filter(item=>{
+                    return item.static
+                })
+
+                if(this.single_select || this.multi_select){
+                   
+                    let selectColumn = {
+                        title: '',
+                        key: '',
+                        sort: false,
+                        static: true,
+                        default: true,
+                        checkall:this.multi_select
+                    }
+                    staticThead.splice(0, 0, selectColumn);
+                }
+               
+
+
+                let thead= this.allThead.filter(item=>{
+                    return item.view == this.viewing
+                })
+
+               let numberThead =staticThead.find(item=>{
+                      return item.key=='number'
+                })
+
+                numberThead.edit=this.canEditNumber
+
+                return staticThead.concat(thead)
             },
             refresh(){
                 this.current_version += 1
             },
             onDataLoaded(data){
-                
+               
                 if(data.canEditNumber){
                     this.setCanEditNumber(data.canEditNumber)
                 }else{
                     this.setCanEditNumber(false)
                 } 
+
+                if(data.parentCourse){
+                    
+                   
+                    let courseList=data.model.data
+                    
+                    courseList.splice(0,0,data.parentCourse)
+                    this.courseList=courseList
+                }
                 
-              
                 this.courseList=data.model.data
+                
                 this.hasData=data.model.total
+
+                this.$emit('data-loaded' , data)
+            },
+            checkAll(){
+                this.$emit('checkall')
+            },   
+            unCheckAll(){
+                this.$emit('uncheckall')
             },
             setCanEditNumber(val){
                 if(this.can_edit_number){
@@ -153,29 +242,26 @@
                     this.canEditNumber=false
                 }
             },
-            onBtnViewMoreClicked(){
-                this.viewMore=!this.viewMore
-                for (var i = this.thead.length - 1; i >= 0; i--) {
-                    if(!this.thead[i].static){
-                        this.thead[i].default = !this.thead[i].default
-                    }
-                    
-                }
+            onDetails(id){
+                this.$emit('details',id)
             },
-            onRowSelected(id,number,name){
-                this.$emit('selected',id,number,name)
+            onRowSelected(course){
+                this.$emit('selected',course)
             },
-            onRowUnselected(id){
-                this.$emit('unselected',id)
+            onRowChecked(id){
+                this.$emit('checked',id)
+            },
+            onRowUnChecked(id){
+                this.$emit('unchecked',id)
             },
             beginCreate(){
                  this.$emit('begin-create')
             },
             beenSelected(id){
+               
                 if(!this.selected_ids) return false
-                if(this.selected_ids.length < 1)  return false
-                 let index = this.selected_ids.indexOf(id)
-                return index >= 0
+
+                return this.selected_ids.includes(id)
             },
             onGroupSelected(id){
                  this.$emit('group-selected',id)
@@ -197,8 +283,8 @@
                 save.then(result => {
                         Helper.BusEmitOK()
                         
-                        this.refresh()
-                        this.editting=''
+                        // this.refresh()
+                        // this.editting=''
                     })
                     .catch(error => {
                          Helper.BusEmitError(error,'存檔失敗')

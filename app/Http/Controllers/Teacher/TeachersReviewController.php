@@ -87,7 +87,8 @@ class TeachersReviewController extends BaseController
     public function store(Request $form)
     {
         $current_user=$this->currentUser();
-        $teacher_ids=$form['teachers'];
+        $teacher_ids=$form['teacher_ids'];
+        
         $reviewed=true;
         if(count($teacher_ids)){
             for($i = 0;  $i< count($teacher_ids);  ++$i) {

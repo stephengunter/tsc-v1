@@ -23,126 +23,123 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-sm-3">
-                    <photo :id="$options.filters.tryParseInt(course.photo_id)"></photo>
-                </div>
-                <div class="col-sm-3">
-                  
-                   
-                    <label class="label-title">名稱</label>
-                    <p>{{course.name}}</p>
-
-                    <label class="label-title">課程編號</label>
-                    <p>{{course.number}}</p>
-
-                     <label class="label-title">課程日期</label>
-                    <p>{{course.begin_date}}
-                        ~
-                       {{course.end_date}} 
-                    </p>
-
-                   
-                    
-                </div>
-                <div class="col-sm-3">
-                    <label class="label-title">開課中心</label>
-                    <p> {{ course.center.name }}</p>
-
-                    <label v-if="hasParent" class="label-title">群組課程</label>
-                    <p v-if="hasParent" v-html="course.parentCourse.name"></p>
-
-                    <label v-if="!hasParent" class="label-title">課程分類</label>
-                    <p v-if="!hasParent" v-html="course.categoriesText"></p>
-
-                     <label class="label-title">學分數</label>
-                    <p v-html="creditCountText(course)">  </p>
-
-                   
-
-                     
-
-                </div>
-
-                 <div class="col-sm-3">
-                    <label class="label-title">學期</label>
-                    <p v-text="course.term.name">                       
-                    </p>
-                    
-                     <label v-if="!groupAndParent" class="label-title">教師</label>
-                     <p  v-if="!groupAndParent" v-html="course.teachersText"></p>
-
-                    <label v-if="groupAndParent" class="label-title">群組課程</label>
-                    <p v-if="groupAndParent" >
-                      <span class="glyphicon glyphicon-ok-sign text-success"></span>
-                    </p>
-
-
-                   
-                    <label v-if="groupAndParent" class="label-title">學分單價</label>
-                    <p v-if="groupAndParent"> {{ course.credit_price | formatMoney }} </p>
-                         
-                    
-                    
-                </div>
-            </div>  <!-- End row-->
-            <div class="row">
-                <div class="col-sm-3">
-                </div>
+                     <photo :id="$options.filters.tryParseInt(course.photo_id)"></photo>
+                </div>  
                 <div class="col-sm-9">
-                     <label class="label-title">課程簡介</label>
-                     <p>{{  course.description }}</p>
-                    
-                </div>
-                
-            </div> 
-            <div v-if="!groupAndParent" class="row">
-                <div class="col-sm-3">
-                </div>
-                <div class="col-sm-3">
-                     <label  class="label-title">週數</label>
-                     <p>{{  course.weeks }}</p>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">名稱</label>
+                            <p>{{course.name}}</p>
+                        </div>  
+                        <div class="col-sm-4">
+                            <label class="label-title">開課中心</label>  
+                            <p> {{ course.center.name }}</p>                          
+                        </div> 
+                        <div class="col-sm-4">
+                            <label class="label-title">學期</label>
+                            <p v-text="course.term.name">                       
+                            </p>
+                        </div>    
+                    </div> 
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">課程編號</label>
+                            <p>{{course.number}}</p>
+                        </div>  
+                        <div class="col-sm-4">
+                            <label class="label-title">課程分類</label>
+                            <p  v-html="course.categoriesText"></p>
+                        </div> 
+                        <div class="col-sm-4">
+                            <label class="label-title">教師</label>
+                            <p v-html="course.teachersText"></p>
+                        </div>    
+                    </div>   
+                    <div v-if="course.isGroup" class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">群組課程</label>
+                            <p>
+                                <span class="glyphicon glyphicon-ok-sign text-success"></span>
+                            </p>
+                        </div>  
+                        <div v-if="course.hasParent" class="col-sm-4">
+                            <label class="label-title">父課程</label>
+                            <p v-html="course.parentCourse.name"></p>
+                        </div> 
+                        <div class="col-sm-4">
+                            
+                        </div>    
+                    </div>  
+                    <div v-if="course.isCredit" class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">學分數</label>
+                            <p v-html="creditCountText()">  </p>
+                        </div>  
+                        <div  class="col-sm-4">
+                            <label  class="label-title">學分單價</label>
+                            <p> {{ course.credit_price | formatMoney }} </p>
+                        </div> 
+                        <div class="col-sm-4">
+                           
+                        </div>    
+                    </div>  
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label class="label-title">課程簡介</label>
+                            <p>{{  course.description }}</p>
+                        </div>  
+                          
+                    </div> 
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">課程日期</label>
+                            <p> {{course.begin_date}}
+                                 ~
+                                {{course.end_date}} 
+                            </p>
+                        </div>  
+                        <div  class="col-sm-4">
+                            <label  class="label-title">週數</label>
+                            <p>{{  course.weeks }}</p>
 
-                
-                  
-                    
-                </div>
-                <div class="col-sm-3">
-                     <label class="label-title">時數</label>
-                     <p>{{  course.hours }}</p>
-                   
-                    
-                </div>
-               
-                <div class="col-sm-3">
-                    
-                    
-                </div>
-            </div> 
-            <div class="row">
-                <div class="col-sm-3">
-                </div>
-                <div class="col-sm-3">
-                   <label class="label-title">上架狀態</label>
-                    <p v-html="$options.filters.activeLabel(course.active)">                       
-                    </p>
-                   <!-- <label class="label-title">上課時間</label>
-                   <p v-html="course.classTimesText">
-                       
-                   </p> -->
-                </div>
-                <div class="col-sm-3">
-                   <label class="label-title">審核</label>
-                    <p v-html="$options.filters.reviewedLabel(course.reviewed)">                       
-                    </p>
-                </div>
-                <div class="col-sm-3">
-                   <label class="label-title">最後更新</label>
-                   <updated :entity="course"></updated>
-               
-                </div>
-               
-            </div> 
+                        </div> 
+                        <div class="col-sm-4">
+                            <label class="label-title">時數</label>
+                            <p>{{  course.hours }}</p>
+                        </div>    
+                    </div> 
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">上架狀態</label>
+                            <p v-html="$options.filters.activeLabel(course.active)">                       
+                            </p>
+                        </div>  
+                        <div  class="col-sm-4">
+                            <label class="label-title">資料審核</label>
+                            <p v-if="course.hasReviewedBy" >
+                                <a @click.prevent="showReviewedBy" href="#" v-html="$options.filters.reviewedLabel(course.reviewed)">                         
+                                </a>
+                                &nbsp;     
+                                <button v-if="course.canReview" class="btn btn-primary btn-xs" @click.prevent="editReview" >
+                                    <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
+                                </button>  
+                            </p>
+                            <p v-else> 
+                                <span v-html="$options.filters.reviewedLabel(course.reviewed)"></span>     
+                                &nbsp;        
+                                <button class="btn btn-primary btn-xs" @click.prevent="editReview" >
+                                    <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
+                                </button>             
+                            </p>
 
-       
+                        </div> 
+                        <div class="col-sm-4">
+                            <label class="label-title">最後更新</label>
+                            <updated :entity="course"></updated>
+                        </div>    
+                    </div> 
+                </div>   
+            </div>
         </div>  <!-- End panel-body-->
 
     </div>
@@ -189,18 +186,7 @@
             'version':'init'
         },
         computed:{
-            isGroup(){
-              let credit_count=parseInt(this.course.credit_count)
-              return credit_count > 0
-               
-            },
-            hasParent(){
-                let parent=parseInt(this.course.parent)
-              return parent > 0
-            },
-            groupAndParent(){
-                return this.isGroup && !this.hasParent
-            }
+            
         }, 
         beforeMount() {
             this.init()
@@ -226,17 +212,8 @@
                     Helper.BusEmitError(error)
                 })
             },   
-            creditCountText(course){
-               let credit_count= Helper.tryParseInt(course.credit_count)
-               if(credit_count > 0){
-                   let parent=Helper.tryParseInt(course.parent)
-                   if(!parent) return  course.credit_count
-
-                   let text=Course.mustText(course.must)
-                  return   course.credit_count + ' (' + text + ')'
-               }else{
-                    return '0'
-               }
+            creditCountText(){
+               return Course.creditCountText(this.course)
             },
             btnEditCilcked(){
                this.$emit('begin-edit');
@@ -252,6 +229,12 @@
             onBtnBackClick(){
                 this.$emit('btn-back-clicked')
             },
+            showReviewedBy(){
+                Bus.$emit('onShowEditor', parseInt(this.course.reviewed_by) , '審核者')
+            },
+            editReview(){
+                this.$emit('edit-review')
+            }
 
             
 

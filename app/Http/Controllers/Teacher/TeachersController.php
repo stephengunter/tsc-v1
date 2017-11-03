@@ -40,7 +40,6 @@ class TeachersController extends BaseController
 	}
 	public function index()
     {
-       
         $request = request();
 
         if(!request()->ajax()){

@@ -1,7 +1,7 @@
 <template>
 <div>
     
-    <show v-if="readOnly"  :signupinfo="signupinfo" can_edit="can_edit"  
+    <show v-if="readOnly"  :signupinfo="signupinfo" :can_edit="can_edit"  
          @begin-edit="beginEdit"  >       
                
     </show>

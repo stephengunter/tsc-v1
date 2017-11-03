@@ -1,8 +1,10 @@
 <template>
 <div>
+    
   <course v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
      @saved="onCourseUpdated" @loaded="onDataLoaded" :version="version"
-     @btn-back-clicked="onBtnBackClicked" @deleted="onCourseDeleted" > 
+     @btn-back-clicked="onBtnBackClicked" @deleted="onCourseDeleted" 
+     @review-updated="onReviewUpdated"> 
 
   </course>
 
@@ -45,7 +47,7 @@
                 </div>
                 <div class="tab-pane fade" id="classtime">
                     <classtime v-if="activeIndex==1"  
-                      :course_id="id"   :canEdit="course.canEdit" 
+                      :course_id="id"   :can_edit="course.canEdit" 
                      @created="onClasstimeChanged" @deleted="onClasstimeChanged"
                      @updated="onClasstimeChanged"   >             
                     </classtime>
@@ -273,6 +275,9 @@
             },
             onCourseUpdated(){
                this.init()
+            },
+            onReviewUpdated(){
+                this.version += 1
             },
             onBtnBackClicked(){
                 this.$emit('btn-back-clicked')

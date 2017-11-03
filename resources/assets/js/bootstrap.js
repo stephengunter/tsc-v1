@@ -95,6 +95,8 @@ Vue.component('category-import', require('./views/categories/import'))
 Vue.component('course-index', require('./views/courses/index'))
 Vue.component('course-create', require('./views/courses/create'))
 Vue.component('course-details', require('./views/courses/details'))
+Vue.component('course-import', require('./views/courses/import'))
+Vue.component('course-review', require('./views/courses/review'))
 Vue.component('course-statuses', require('./views/courses/statuses'))
 
 Vue.component('admission-index', require('./views/admissions/index'))
@@ -153,6 +155,8 @@ import Address from './models/address.js'
 import Category from './models/category.js'
 import CategoryCourses from './models/category-courses.js'
 import Course from './models/course.js'
+import CourseImport from './models/course-import.js'
+import CourseReview from './models/course-review.js'
 import CourseStatus from './models/course-status.js'
 import Admit from './models/admit.js'
 import Admission from './models/admission.js'
@@ -208,6 +212,8 @@ window.UserCenters = UserCenters
 window.Category = Category
 window.CategoryCourses = CategoryCourses
 window.Course = Course
+window.CourseImport = CourseImport
+window.CourseReview = CourseReview
 window.CourseStatus = CourseStatus
 window.Admit = Admit
 window.Admission = Admission
@@ -288,6 +294,9 @@ Vue.filter('tryParseInt', function(val) {
 })
 Vue.filter('okSign', function(val) {
     return Helper.okSign(val)
+})
+Vue.filter('yesOrNoSign', function(val) {
+    return Helper.yesOrNoSign(val)
 })
 
 window.Bus = new Vue({});

@@ -9,7 +9,8 @@
 
                        {{ title}}
                    </h4>
-             </span>           
+             </span>   
+            
         </div>
         <div  v-if="loaded"  class="panel-body">  
             <form class="form" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">

@@ -5,7 +5,7 @@
             <div class="panel-title">
                 <h4 v-html="title"></h4>                
             </div>
-            <div  class="form-inline" slot="header">
+            <div  class="form-inline" >
                 <select  v-model="searchParams.center"  style="width:auto;" class="form-control selectWidth">
                       <option v-for="(item,index) in centerOptions" :key="index" :value="item.value" v-text="item.text"></option>
                 </select>
@@ -23,7 +23,7 @@
                 <thead>
                     <tr>
                         <th>
-                            <checkbox  :default="false"
+                            <checkbox  v-show="hasData" :default="false"
                                 @selected="checkAll"   @unselected="unCheckAll">                             
                             </checkbox>
                         </th>
@@ -176,7 +176,10 @@
             canSubmit() {
                return  this.checked_ids.length > 0
             },
-            
+            hasData(){
+               
+                return this.teacherList.length > 0
+            },
         },
         watch: {
           version() {
@@ -246,9 +249,11 @@
                
             },
             submit(){
+                
                 let save = TeacherReview.store(this.checked_ids)
                 save.then(data => {
-                        this.$emit('saved')
+                       Helper.BusEmitOK('存檔成功')
+                       this.$emit('saved')
                     }).catch( error => {
                         Helper.BusEmitError(error,'存檔失敗')           
                     })

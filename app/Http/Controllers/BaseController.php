@@ -180,12 +180,29 @@ class BaseController extends Controller
                 ],
                 [
                     'id' => 2,
-                    'text' => '新增課程',
-                    'path' => '/courses/create',
-                    'active' => $current=='courses/create'
+                    'text' => '課程審核',
+                    'path' => '/courses-review',
+                    'active' => $current=='courses-review'
                 ],
                 [
                     'id' => 3,
+                    'text' => '匯入課程',
+                    'path' => '/courses-import',
+                    'active' => $current=='courses-import',
+                    'items' => array(
+                        [
+                            'text' => '從舊課程複製',
+                            'path' => '/courses-import',
+                        ],
+                        [
+                            'text' => 'Excel 匯入',
+                            'path' => '/courses-import?from=excel',
+                        ]
+
+                    )
+                ],
+                [
+                    'id' => 4,
                     'text' => '狀態查詢',
                     'path' => '/statuses',
                     'active' => $current=='statuses'

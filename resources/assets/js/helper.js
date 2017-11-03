@@ -364,9 +364,17 @@ class Helper {
     static okSign(val) {
 
         if (this.isTrue(val)) {
-            return '<span class="glyphicon glyphicon-ok-sign text-success"></span>'
+            return ' <i class="fa fa-check-circle" style="color:green" aria-hidden="true"></i>'
         } else {
             return ''
+        }
+    }
+    static yesOrNoSign(val) {
+
+        if (this.isTrue(val)) {
+            return ' <i class="fa fa-check-circle" style="color:green" aria-hidden="true"></i>'
+        } else {
+            return '<i class="fa fa-minus-circle" style="color:red" aria-hidden="true"></i>'
         }
     }
     static removeHTML(strText) {

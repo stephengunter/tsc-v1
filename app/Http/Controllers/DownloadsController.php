@@ -37,7 +37,13 @@ class DownloadsController extends BaseController
         else if($key=='categories'){
             $file_name = 'categories.xlsx';
         }
+        else if($key=='courses'){
+            $file_name = 'courses.xlsx';
+        }else if($key=='course-infoes'){
+            $file_name = 'course-infoes.xlsx';
+        }
 
+       
 
         if(!$file_name) abort(404);
 

@@ -14,7 +14,7 @@ class Course extends Model
    
     
     protected $fillable = [ 'term_id', 'center_id', 'name', 
-                            'parent','must',
+                            'group','parent','must','number',
                             'credit_count' , 'credit_price' ,'net_signup' , 
                             'begin_date' ,  'end_date' , 'weeks', 'hours',
                             'tuition', 'cost' , 'materials',
@@ -25,7 +25,7 @@ class Course extends Model
                             
                             ];
 	
-    protected $filter =  [ 'name',  'weeks', 'hours', 'number',
+    protected $filter =  [ 'name',  'weeks', 'hours', 'number', 'group' ,
                            'net_signup' , 'credit_count' ,'credit_price' ,
                            'begin_date' ,   'tuition' , 'cost' , 
                            'open_date' ,  'limit' , 'active',	
@@ -71,7 +71,7 @@ class Course extends Model
             'categories'=> [],
             'teachers'=> [],
 
-            
+            'isCredit'=> 0
            
         ];
     }
@@ -140,8 +140,16 @@ class Course extends Model
 		return Photo::find($this->photo_id);
 
 	}
-
-   
+    public function isGroup()
+    {
+        return $this->group;
+    }
+    public function isCredit()
+    {
+        $this->isCredit=false;
+        if($this->credit_count)  $this->isCredit=(int)$this->isCredit > 0;
+        return $this->isCredit;
+    }
 
     public function isValid()
     {
@@ -149,6 +157,50 @@ class Course extends Model
         if(!$this->active) return false;
         return true;
 
+    }
+
+    public function copyParentCourseValues($parent_id)
+    {
+        $parent_course=static::findOrFail($parent_id);
+        $this->parent=$parent_id;
+        $this->term_id=$parent_course->term_id;
+        $this->center_id = $parent_course->center_id;
+        $this->open_date = $parent_course->open_date;
+        $this->close_date = $parent_course->close_date;
+        $this->limit = $parent_course->limit;
+        $this->min= $parent_course->min;
+        $this->net_signup= $parent_course->net_signup;
+        
+    }
+
+    public function populateViewData(){
+        $this->getParentCourse();
+        foreach ($this->classTimes as $classTime) {
+            $classTime->weekday;
+        }
+        foreach ($this->teachers as $teacher) {
+            $teacher->name=$teacher->getName();
+        }
+
+        if($this->number){
+            $parts=explode('-', $this->number);
+            $this->default_number=$parts[0] . '-';
+            $this->custom_number=$parts[1];
+        }else{
+            $this->default_number=$this->generateNumber();
+            $this->custom_number='';
+        }
+    }
+    public function countTuition()
+    {
+        $credit_count=(int)$this->credit_count;  //學分數
+        if(!$credit_count) return;
+
+        $credit_price=$this->credit_price;
+        if(!$credit_price) return;
+
+        $this->tuition=$credit_count * $credit_price;
+        
     }
 
     public function validLessons()
@@ -250,15 +302,17 @@ class Course extends Model
 		
 		return false;
           
-	} 
+    } 
+    public function canReviewBy($user)
+	{
+        if($user->isDev()) return true;
+        if(!$user->isOwner()) return false;
+		return Helper::centersIntersect($this,$user->admin);
+	}
 	public function canDeleteBy($user)
 	{
         if(count($this->validLessons())) return false;
-		if($user->isAdmin()){
-           return $this->center->canEditBy($user);
-        } 
-        
-        return  false;
+		return $this->canEditBy($user);
         
 	}
 
@@ -320,10 +374,7 @@ class Course extends Model
         return $this->parentCourse;
     }
 
-    public function isGroup()
-    {
-        return (int)$this->credit_count > 0;
-    }
+    
     public function attachGroupCategory()
     {
         $groupCategory=Category::groupCategory();

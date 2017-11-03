@@ -17,6 +17,8 @@ class CreateCourseTable extends Migration
             $table->increments('id');
             $table->integer('term_id')->unsigned();
 
+            $table->boolean('group')->default(false); 
+
             $table->integer('parent')->unsigned()->default(0);
             $table->boolean('must')->default(false);
 
@@ -54,7 +56,9 @@ class CreateCourseTable extends Migration
             $table->boolean('reviewed')->default(false);
             $table->boolean('active')->default(false);            
             $table->boolean('removed')->default(false);
+            
             $table->integer('updated_by')->unsigned()->nullable();
+            $table->integer('reviewed_by')->unsigned()->nullable();
 			$table->timestamps();
 		});
        

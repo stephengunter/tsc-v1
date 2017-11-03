@@ -228,6 +228,7 @@ class Teachers
                 ];
                 $profileValues=[
                     'fullname' => $name,
+                    'SID' => '',
                     'updated_by'=>$updated_by
                 ];
                 $teacherValues=[
@@ -238,6 +239,7 @@ class Teachers
 
                 $user=new User($userValues);            
                 $user->save();
+                $profileValues['SID']=$user->id;
                 $profile=new Profile($profileValues);
                 $user->profile()->save($profile);
 

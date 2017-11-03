@@ -25,16 +25,17 @@
                     </select>
                 </div>
 
-                <div v-if="groupReady"  class="form-group">&nbsp;&nbsp;群組課程
-                    <select @change="onParentChanged" style="width:auto;"  v-model="params.parent"  class="form-control selectWidth" >
-                         <option v-for="(item,index) in parentOptions" :key="index" :value="item.value" v-text="item.text"></option>
-                    </select>
+                <div v-if="hasParent" class="form-group">&nbsp;&nbsp;群組課程：
+                    <span>
+                    &nbsp; {{ parentCourse.name  }}
+                        <button type="button" @click.prevent="clearParent" class="close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </span>
+                    
+       
                 </div>
-                <div v-if="hasParent"  class="form-group">
-                   學分數：{{ parentCourse.credit_count }} &nbsp;
-                   學分單價：{{ parentCourse.credit_price |  formatMoney }} &nbsp;
-                   學費：{{ parentCourse.tuition |  formatMoney }}
-                </div>
+                
                 
 
             </div>
@@ -43,8 +44,10 @@
      
     <course-list v-if="ready" :no_page="listSettings.no_page" 
         :can_edit_number="listSettings.canEditNumber"  :search_params="listSettings.params"  
-        :hide_create="listSettings.hide_create" :version="version"  
+        :hide_create="hide_create" :version="version"  
         :can_select="listSettings.can_select"
+        @details="OnDetails"
+        @data-loaded="onCoursesLoaded"
         @selected="onSelected" @begin-create="onBeginCreate"
         @group-selected="onGroupSelected">
     </course-list>
@@ -75,10 +78,10 @@
         data() {
             return {
                 ready:false,
-                groupCategory:{},
-                groupCourses:[],
-                parentOptions:[],
-                parentCourse:{},
+                
+                
+                parentCourse:null,
+
                 groupReady:false,
 
                 termOptions:[],
@@ -91,6 +94,7 @@
                     center:0,
                     category:0,
                     weekday:0,
+                    parent:0,
                 },
 
                 listSettings:{
@@ -114,18 +118,12 @@
              this.init()
         },
         computed:{
-            isGroup(){
-                if(!this.groupCategory) return false
-                let category = parseInt(this.params.category)
-                return category==parseInt(this.groupCategory.id)
-            },
             hasParent(){
-                if(!this.isGroup) return false
+               
                 if(!this.parentCourse) return false
                   
                 return  Helper.tryParseInt(this.parentCourse.id) > 0
             }
-            
         }, 
         methods: {
             init(){
@@ -150,7 +148,7 @@
                     this.weekdayOptions.splice(0, 0, allWeekdays);
                     this.params.weekday=this.weekdayOptions[0].value
 
-                    this.groupCategory=data.groupCategory
+                   
 
                     this.onParamChanged()
 
@@ -161,41 +159,14 @@
                 })
              
             },
-            onParamChanged(parent){
-                if(parent){
-                    if(isNaN(parent))  this.params.parent=0
-                    else  this.params.parent=Helper.tryParseInt(parent)
-                }else{
-                    this.params.parent=0
-                }
-
-                if(this.isGroup){
-                    let center=this.params.center
-                    let term=this.params.term
-                    let params={ 
-                        center:center,
-                        term:term
-                    }
-                    let options=Course.groupOptions(params)
-                    options.then(data => {
-                        this.parentOptions=data.options
-                        this.groupCourses=data.groupCourses
-                        this.groupReady=true
-                        this.setListParams()
-                    })
-                    .catch(error=>{
-                           Helper.BusEmitError(error)                         
-                    })   
-                }else{
-                    this.groupReady=false
-                    this.setListParams()
-                }
-              
+            onCoursesLoaded(data){
+               
+               this.parentCourse = data.parentCourse
                
             },
-            onParentChanged(){
-                
+            onParamChanged(){
                 this.setListParams()
+               
             },
             setListParams(){
                 this.listSettings.params.term=this.params.term
@@ -204,56 +175,34 @@
                 this.listSettings.params.weekday=this.params.weekday
                 this.listSettings.params.parent=this.params.parent
 
-                this.setParentCourse(this.listSettings.params.parent)
-            },
-            setParentCourse(id){
-                if(Helper.tryParseInt(id) < 1) {
-                   this.parentCourse={}
-                }else{
-                    for (let i = 0; i < this.groupCourses.length; i++) {
-                        let course=this.groupCourses[i]
-                        if(course.id==id){
-                            this.parentCourse=course
-                            break
-                        }
-                  
-                    }
-                }
                 
-                                   
+            },
+            clearParent(){
+                this.params.parent=0
+                this.parentCourse=null
+                this.onParamChanged()
+            },
+            OnDetails(id){
+                this.$emit('details',id)
             },
             onSelected(id){
                 this.$emit('selected',id)
             },
             onGroupSelected(id){
-
-                this.params.category=this.groupCategory.id
-                this.onParamChanged(id)
+                this.params.parent=id
+                this.onParamChanged()
                 
             },
             onBeginCreate(){
-                
-                this.$emit('begin-create',this.parentCourse.id)
+                let parent=0
+                if(this.parentCourse) parent= this.parentCourse.id
+                this.$emit('begin-create',parent)
             },
-            loadParentOptions(){
-                let center=this.params.center
-                let term=this.params.term
-                let params={ 
-                    center:center,
-                    term:term
-                }
-                let options=Course.groupOptions(params)
-                options.then(data => {
-                    this.parentOptions=data.options
-                })
-                .catch(error=>{
-                       Helper.BusEmitError(error) 
-                    
-                })   
-            },
+            
             
             
         },
 
     }
 </script>
+
