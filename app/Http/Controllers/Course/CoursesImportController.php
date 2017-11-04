@@ -24,12 +24,16 @@ class CoursesImportController extends BaseController
 	}
 	public function index()
     {
-        $from=request()->get('from');
+        $menus=$this->menus($this->key);  
+
+        $from=request()->get('from');       
         if(!$from) $from='';
-       
-        $menus=$this->menus($this->key);            
-        return view('courses.import')->with([ 'menus' => $menus , 'from' => $from ]);        
-       
+
+        if(strtolower($from)=='excel'){
+            return view('courses.import')->with([ 'menus' => $menus  ]); 
+        }else{
+            return view('courses.copy')->with([ 'menus' => $menus  ]); 
+        }
     
     }
 
@@ -54,11 +58,15 @@ class CoursesImportController extends BaseController
         $file=Input::file('courses_file'); 
 
         $err_msg='';
-        if($group){
-            $err_msg=$this->courses->importGroupCourses($file,$isUpdate,$current_user);
+        if($isUpdate){
+            $err_msg=$this->courses->importCourseInfoes($file,$current_user);
         }else{
-            $err_msg=$this->courses->importCourses($file,$isUpdate,$current_user);
-        }  
+            if($group){
+                $err_msg=$this->courses->importGroupCourses($file,$current_user);
+            }else{
+                $err_msg=$this->courses->importCourses($file,$current_user);
+            }  
+        }
         
 
         if($err_msg) {

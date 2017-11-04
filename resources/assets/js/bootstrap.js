@@ -33,6 +33,7 @@ Vue.component('photo', require('./components/Photo'))
 Vue.component('file-upload', require('./components/FileUpload'))
 Vue.component('image-upload', require('./components/ImageUpload'))
 Vue.component('role-label', require('./components/RoleLabel'))
+Vue.component('options-filter', require('./components/filter'))
 Vue.component('combination-select', require('./components/CombinationSelect'))
 Vue.component('updated', require('./components/Updated'))
 Vue.component('admin-card', require('./components/AdminCard'))
@@ -53,7 +54,6 @@ Vue.component('signup-create', require('./views/signups/create'))
 Vue.component('new-user-signup', require('./views/signups/new-user-signup'))
 
 Vue.component('tuition-view', require('./views/tuitions/view'))
-
 
 Vue.component('refund-index', require('./views/refunds/index'))
 Vue.component('refund-create', require('./views/refunds/create'))
@@ -96,6 +96,7 @@ Vue.component('course-index', require('./views/courses/index'))
 Vue.component('course-create', require('./views/courses/create'))
 Vue.component('course-details', require('./views/courses/details'))
 Vue.component('course-import', require('./views/courses/import'))
+Vue.component('course-copy', require('./views/courses/copy'))
 Vue.component('course-review', require('./views/courses/review'))
 Vue.component('course-statuses', require('./views/courses/statuses'))
 

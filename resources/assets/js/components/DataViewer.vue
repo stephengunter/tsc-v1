@@ -74,7 +74,7 @@
                                 <button v-if="item.edit" v-show="itemEditting(item.key)" @click="onCancelEdit(item.key)" class="btn btn-default btn-xs">
                                     <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
                                 </button>
-                                <checkbox v-if="item.checkall" v-show="hasData" :default="false"
+                                <checkbox v-if="item.checkall" v-show="hasData" :default="item.checked"
                                     @selected="checkAll"   @unselected="unCheckAll">                             
                                 </checkbox>
                             </div>
@@ -84,7 +84,7 @@
                     
                 </thead>
                 <tbody>
-                    <slot v-for="(item,index) in model.data"   :item="item"></slot>                    
+                    <slot v-for="(item,index) in model.data"   :item="item" :index="index"></slot>                    
                 </tbody>
             </table>
         </div>

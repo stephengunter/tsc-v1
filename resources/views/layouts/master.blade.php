@@ -53,3 +53,7 @@
             @include('layouts.footer')
      </body>
 </html>
+
+<script>
+   
+</script>

@@ -99,6 +99,8 @@
                 this.deleteConfirm.show=false
             },
             deleteCategory(){
+                this.closeConfirm()
+
                 let id = this.deleteConfirm.id 
                 let remove= Category.delete(id)
                 remove.then(result => {

@@ -134,7 +134,6 @@ class Center extends Model
 
 	public function canEditBy($user)
 	{
-		
 		return 	static::canEdit($user);
           
 	} 

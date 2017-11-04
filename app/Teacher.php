@@ -149,6 +149,7 @@ class Teacher extends Model
 	public function canEditBy($user)
 	{
         if($user->isDev()) return true;
+
         if($user->id==$this->user_id) return true;
         
         if($this->group){
@@ -156,8 +157,12 @@ class Teacher extends Model
             return in_array($user->id,$groupTeacherIds);
         }
 
-        if(!$user->isAdmin()) return false;
-        return Helper::centersIntersect($this,$user->admin);
+        if($user->isAdmin()){
+            return Helper::centersIntersect($this, $user->admin);
+        } 
+
+        return false;
+       
           
     }
     public function canReviewBy($user)

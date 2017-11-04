@@ -157,6 +157,8 @@ class TeachersController extends BaseController
         if(!$teacher->canViewBy($current_user)){
            return  $this->unauthorized();  
         }
+
+        
         $teacher->name=$teacher->getName();
         $teacher->centerNames=$teacher->centerNames();
 

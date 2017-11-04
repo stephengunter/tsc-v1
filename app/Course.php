@@ -173,7 +173,7 @@ class Course extends Model
         
     }
 
-    public function populateViewData(){
+    public function populateViewData($editNumber=false){
         $this->getParentCourse();
         foreach ($this->classTimes as $classTime) {
             $classTime->weekday;
@@ -182,14 +182,20 @@ class Course extends Model
             $teacher->name=$teacher->getName();
         }
 
-        if($this->number){
-            $parts=explode('-', $this->number);
-            $this->default_number=$parts[0] . '-';
-            $this->custom_number=$parts[1];
-        }else{
-            $this->default_number=$this->generateNumber();
-            $this->custom_number='';
+        if($editNumber){
+            $this->numberError='';
+            if($this->number){
+                $parts=explode('-', $this->number);
+                $this->default_number=$parts[0] . '-';
+                $this->custom_number=$parts[1];
+            }else{
+                $this->default_number=$this->generateNumber();
+                $this->custom_number='';
+            }
+
         }
+
+        
     }
     public function countTuition()
     {
@@ -290,10 +296,10 @@ class Course extends Model
 
     public function canEditBy($user)
 	{
-        if($user->isDev())return true;
+        if($user->isDev()) return true;
         
         if($user->isAdmin()){
-           return $this->center->canEditBy($user);
+            return $user->admin->canAdminCenter($this->center);           
         } 
 
         if($user->isTeacher()){

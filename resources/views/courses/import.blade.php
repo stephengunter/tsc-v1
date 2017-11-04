@@ -6,7 +6,6 @@
     
 
     <course-import 
-        :from="{{ json_encode($from) }}"
         @canceled="onCanceled" @imported="onImported">
     </course-import>
 

@@ -1,26 +1,18 @@
 <template>
 <div>
+    
     <div class="panel panel-default">
         <div  class="panel-heading">
             <div class="panel-title">
-                <h4 v-html="title"></h4>                
+                <h4 v-html="title"></h4>  
+                            
             </div>
-            <div  class="form-inline">
-                
-                <div class="form-group">
-                    <select @change="onParamChanged"  v-model="searchParams.center" style="width:auto;" class="form-control selectWidth">
-                         <option v-for="(item,index) in center_options" :key="index" :value="item.value" v-text="item.text"></option>
-                    </select>
-                </div>
-                <div v-if="hasParent" class="form-group">&nbsp;&nbsp;群組課程：
-                    <span>
-                    &nbsp; {{ parentCourse.name  }}
-                        <button type="button" @click.prevent="clearParent" class="close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </span>
-                </div>
-            </div>
+            <options-filter :params="params" :parent_course="parentCourse"
+                :options="filter_options"
+                @ready="ready=true"  @param-changed="onParamChanged"
+                @clear-parent="clearParent" >
+            </options-filter>  
+            
             <div>
                 <button :disabled="!canSubmit" @click.prevent="submit" class="btn btn-success" >
                     <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 審核通過
@@ -30,9 +22,9 @@
         </div>
     </div>
 
-    <course-list v-if="loaded" :source_url="listSettings.source_url" :no_page="listSettings.no_page" 
+    <course-list v-if="ready" :source_url="listSettings.source_url" :no_page="listSettings.no_page" 
         :show_title="listSettings.show_title" :no_search="listSettings.no_search"
-        :can_edit_number="listSettings.canEditNumber"  :search_params="searchParams"  
+        :can_edit_number="listSettings.canEditNumber"  :search_params="params"  
         :hide_create="listSettings.hide_create" :version="listSettings.version"  
         :multi_select="listSettings.multi_select" :selected_ids="checked_ids"
         @data-loaded="onCoursesLoaded"
@@ -100,13 +92,18 @@
         data() {
             return {
                 
-                loaded:false,
+                ready:false,
                 title:Helper.getIcon('Courses')  + '  課程審核',
                 thead:Course.getThead(),
-                searchParams:{
+
+                params:{
                     reviewed: 0,
                     center : 0,
                     parent:0
+                },
+
+                filter_options:{
+                    centerOptions:  this.center_options
                 },
 
                 listSettings:{
@@ -152,46 +149,37 @@
             }
         },
         computed: {
-            hasParent(){
-               
-                if(!this.parentCourse) return false
-                  
-                return  Helper.tryParseInt(this.parentCourse.id) > 0
-            },
+            
             canSubmit() {
                 return  this.checked_ids.length > 0
             }
             
         },
         watch: {
-          version() {
-             this.init()
-             this.listSettings.version +=1
-          },
+            version() {
+               this.init()
+               this.listSettings.version +=1
+            },
         
         },
         beforeMount() {
+            this.ready=false
+            this.params.center=this.center_options[0].value
             this.init()
         },
         methods: {
             init(){
-                
-                this.loaded=false
+
                 this.selected=0
                 this.checked_ids=[]
                 this.courseList=[]
 
                 this.modalSettings.show=false
                 this.reviewEditor.show=false
-
-                if(this.center_options.length){
-                    this.searchParams.center=this.center_options[0].value
-                    this.loaded=TextTrackCue 
-                }
-                
                               
             },
             refresh(){
+              
                 this.listSettings.version+=1
             },
             onCoursesLoaded(data){
@@ -200,16 +188,16 @@
                
             },
             onGroupSelected(id){
-                this.searchParams.parent=id
-                this.onParamChanged()
-                
+                this.params.parent=id  
             },
-            clearParent(){
-                this.searchParams.parent=0
+            clearParent(params){
                 this.parentCourse=null
-                this.onParamChanged()
+                this.onParamChanged(params)
             },
-            onParamChanged(){
+            onParamChanged(params){
+                for(let property in params){
+                    this.params[property]=params[property]
+                } 
                 this.unCheckAll()
             },
             isGroup(course){
@@ -247,11 +235,12 @@
                 this.selectedCourse=course
             },
             submit(){
-                
+               
                 let save = CourseReview.store(this.checked_ids)
                 save.then(data => {
                         Helper.BusEmitOK('存檔成功')
-                        this.$emit('saved')
+                        this.init()
+                        this.refresh()
                     }).catch( error => {
                         Helper.BusEmitError(error,'存檔失敗')           
                     })
@@ -268,6 +257,7 @@
                 let save= CourseReview.update(id,review)
 
                 save.then(course => {
+                    
                     Helper.BusEmitOK('存檔成功')
                     this.init()
                     this.refresh()

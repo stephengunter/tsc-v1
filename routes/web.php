@@ -30,6 +30,11 @@ Route::get('reset-password/user/{user}/token/{token}','\App\Http\Controllers\Aut
 
 Route::group(['middleware' => 'admin'], function()
 {
+    Route::get('/test', function(){
+        
+        return view('test');
+        
+    });
     Route::get('/', 'HomeController@index');
     Route::get('/downloads', 'DownloadsController@index');
 
@@ -80,7 +85,7 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::resource('courses-import', '\App\Http\Controllers\Course\CoursesImportController',
     ['only' => ['index','store']]);
-
+   
     Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
     ['only' => ['show','edit','update']]);
 

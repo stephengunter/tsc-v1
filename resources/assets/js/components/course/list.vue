@@ -20,12 +20,12 @@
          
          
         <template scope="props">
-            <row :course="props.item" :viewing="viewing" 
+            <row :course="props.item" :viewing="viewing" :index="props.index"
                 :details_link="details_link" :can_remove="can_remove"
                 :single_select="single_select" :multi_select="multi_select"
                 :been_selected="beenSelected(props.item.id)"  
                 :editting_number="edittingNumber"   
-                @details="onDetails" 
+                @details="onDetails" @clear-error="onClearRowError"
                 @selected="onRowSelected" @group-selected="onGroupSelected"
                 @checked ="onRowChecked" @unchecked="onRowUnChecked">
                 
@@ -34,7 +34,6 @@
         </template>
 
     </data-viewer>
-
 </template>
 
 <script>
@@ -104,7 +103,8 @@
             },
         },
         beforeMount() {
-           this.init()
+            
+            this.init()
         },
         watch: {
             version(val){
@@ -120,6 +120,15 @@
                 createText:'',
 
                 allThead:Course.getThead(),
+                selectColumn : {
+                    title: '',
+                    key: '',
+                    sort: false,
+                    static: true,
+                    default: true,
+                    checkall:this.multi_select,
+                    checked:false
+                },
                 viewing:0,
 
                 title:Helper.getIcon('Courses')  + '  課程管理',
@@ -160,6 +169,7 @@
             },
         },
         methods: {
+           
             init() {
                 if(this.hide_create) this.createText=''
                 else this.createText='新增課程'
@@ -178,15 +188,7 @@
 
                 if(this.single_select || this.multi_select){
                    
-                    let selectColumn = {
-                        title: '',
-                        key: '',
-                        sort: false,
-                        static: true,
-                        default: true,
-                        checkall:this.multi_select
-                    }
-                    staticThead.splice(0, 0, selectColumn);
+                    staticThead.splice(0, 0, this.selectColumn);
                 }
                
 
@@ -203,36 +205,44 @@
 
                 return staticThead.concat(thead)
             },
+            cancelUnCheckAll(){
+                this.selectColumn.checked=false
+            },
             refresh(){
                 this.current_version += 1
             },
             onDataLoaded(data){
-               
+                this.cancelUnCheckAll()
+                
+                let courseList=data.model.data
+
                 if(data.canEditNumber){
                     this.setCanEditNumber(data.canEditNumber)
+                   
                 }else{
                     this.setCanEditNumber(false)
                 } 
 
                 if(data.parentCourse){
-                    
-                   
-                    let courseList=data.model.data
-                    
-                    courseList.splice(0,0,data.parentCourse)
-                    this.courseList=courseList
+                    courseList.splice(0,0,data.parentCourse)                   
                 }
                 
-                this.courseList=data.model.data
+                this.courseList=courseList
                 
                 this.hasData=data.model.total
 
+               
                 this.$emit('data-loaded' , data)
+                
+                
+                
             },
             checkAll(){
+                this.selectColumn.checked=true
                 this.$emit('checkall')
             },   
             unCheckAll(){
+                this.selectColumn.checked=false
                 this.$emit('uncheckall')
             },
             setCanEditNumber(val){
@@ -270,10 +280,16 @@
                 this.editting=key
             },
             onCancelEdit(key){
+                this.refresh()
                 this.editting=''
+               
             },
             onSubmitEdit(key){
                 if(key=='number') this.submitUpdateNumbers()
+            },
+            onClearRowError(index,name){
+                //name=='number'
+                this.courseList[index].numberError=''
             },
             submitUpdateNumbers(){
                 let form=new Form({
@@ -283,11 +299,22 @@
                 save.then(result => {
                         Helper.BusEmitOK()
                         
-                        // this.refresh()
-                        // this.editting=''
+                        this.refresh()
+                        this.editting=''
                     })
                     .catch(error => {
-                         Helper.BusEmitError(error,'存檔失敗')
+                        if(error.data.code==422){
+                            let error_ids=error.data.error
+                            error_ids.forEach(id=>{
+                                let course=this.courseList.find(item=>{
+                                    return item.id==id
+                                })
+                                course.numberError='編號重複'
+                           })
+                        }
+                       
+                        Helper.BusEmitError(error,'存檔失敗')
+                        
                     })
             }  
             

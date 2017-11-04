@@ -112,6 +112,8 @@
                 this.deleteConfirm.show=false
             },
             deleteCenter(){
+                this.closeConfirm()
+                
                 let id = this.deleteConfirm.id 
                 let remove= Center.delete(id)
                 remove.then(result => {

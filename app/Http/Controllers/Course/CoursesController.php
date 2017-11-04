@@ -66,6 +66,7 @@ class CoursesController extends BaseController
     }
     public function index()
     {
+        
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('courses.index')
@@ -78,7 +79,8 @@ class CoursesController extends BaseController
         $weekdayId=(int)$request->weekday;
         $parentId=(int)$request->parent;
 
-        $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId,$parentId);
+        $with=['center','categories','teachers','classTimes'];
+        $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId,$parentId,$with);
                            
         $hasReviewed = $request->has('reviewed');
         if($hasReviewed){
@@ -91,7 +93,7 @@ class CoursesController extends BaseController
         
        
         $parentCourse=null;
-        if($parentId) $parentCourse=Course::find($parentId);
+        if($parentId) $parentCourse=Course::with($with)->find($parentId);
         if($parentCourse) $parentCourse->populateViewData();
        
         $canEditNumber=false;
@@ -102,7 +104,7 @@ class CoursesController extends BaseController
         
         
         foreach ($courseList as $course) {
-            $course->populateViewData();
+            $course->populateViewData($canEditNumber);
             
         }
 
@@ -402,7 +404,7 @@ class CoursesController extends BaseController
         }
         $number=$request->getCourseNumber();
         if($number){
-            $number_exist=$this->courses->getAll()->where('number',$number)->where('id','!=',$id)->first();
+            $number_exist=$this->courses->numberExist($number,$id);
             if($number_exist) return response()->json([ 'course.number' => ['課程編號重複了']], 422);
         }
         
@@ -419,6 +421,8 @@ class CoursesController extends BaseController
     {
         $current_user=$this->currentUser();
         $courses=$form['courses'];
+        
+        $errors=[];
 
         for($i = 0; $i < count($courses); ++$i) {
             $course=$courses[$i];
@@ -427,11 +431,15 @@ class CoursesController extends BaseController
             $custom_number=trim($course['custom_number']);
             $updated_by=$current_user->id;
  
-            if($custom_number) $this->courses->updateNumber($id,$custom_number,$updated_by);
+            if(!$custom_number) continue;
 
+            $course=$this->courses->updateNumber($id,$custom_number,$updated_by);
+            if(!$course) array_push($errors, $id);
             
             
         }
+
+        if(count($errors))  return response()->json(['error' => $errors,'code' => 422 ], 422);
 
 
         return response()->json(['success' => true]);

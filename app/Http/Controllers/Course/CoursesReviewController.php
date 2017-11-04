@@ -46,14 +46,18 @@ class CoursesReviewController extends BaseController
         $centerId=(int)$request->center;
         $parentId=(int)$request->parent;
 
-        $courseList=$this->courses->getByCenter($centerId)->where('reviewed',false);
+        $with=['center','categories','teachers','classTimes'];
+
+        $courseList=$this->courses->getByCenter($centerId)
+                                    ->where('reviewed',false)
+                                    ->with($with);
 
         if($parentId) $courseList=$courseList->where('parent',$parentId);
       
         $courseList=$courseList->filterPaginateOrder();
        
         $parentCourse=null;
-        if($parentId) $parentCourse=Course::find($parentId);
+        if($parentId)  $parentCourse=Course::with($with)->find($parentId);
         if($parentCourse) $parentCourse->populateViewData();
        
         

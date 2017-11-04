@@ -101,14 +101,18 @@
                 this.$emit('btn-back-clicked')
             },
             beginDelete(values){
+               
                 this.deleteConfirm.msg='確定要刪除 ' + values.name + ' 的課程資料嗎？'
                 this.deleteConfirm.id=values.id
+                
                 this.deleteConfirm.show=true                
             },
             closeConfirm(){
                 this.deleteConfirm.show=false
             },
             deleteCourse(){
+                this.closeConfirm()
+                 
                 let id = this.deleteConfirm.id 
                 let remove= Course.delete(id)
                 remove.then(result => {

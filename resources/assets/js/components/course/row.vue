@@ -25,9 +25,11 @@
         <!-- 編號 -->
         <td v-if="editting_number" >  
             {{  course.default_number }}     
-            <input @keydown="clearErrorMsg(index)" type="text" name="course.custom_number" class="form-control" v-model="course.custom_number">
+            <input @keydown="clearNumberError(index)" type="text" name="course.custom_number" class="form-control" v-model="course.custom_number">
     
-            <small class="text-danger" v-text="course.error"></small>             
+            <small  class="text-danger" >
+               {{ course.numberError }}
+            </small>             
         </td> 
         <td v-else>
            {{ course.number }}
@@ -56,7 +58,8 @@
         <td v-show="viewing==0">
             <a v-if="isGroup(course)" @click="onGroupSelected" 
                 v-html="$options.filters.okSign(true)" class="btn btn-sm">
-            </a>   
+            </a>    
+           
             <span v-if="hasParent(course)" v-text="parentCourseName(course)" ></span>
         </td> 
 
@@ -229,8 +232,12 @@
             unchecked(id){
                  this.$emit('unchecked',id)
             },
-            clearErrorMsg(index){
-                this.$emit('clear-error',index)
+            hasError(key){
+                if(this.course.numberError) return true
+                return false
+            },
+            clearNumberError(index){
+                this.$emit('clear-error',index , 'number')
             },
             
             

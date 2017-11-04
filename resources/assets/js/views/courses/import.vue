@@ -1,33 +1,22 @@
 <template>
-    <!-- <course-selector 
-      :show_title="selectorSettings.show_title"
-      :title="selectorSettings.title"
-      :default_text="selectorSettings.default_text"
-      @submit="onSubmit"
-      @canceled="onCanceled"  >
-        
-    </course-selector> -->
+    
     <div class="panel panel-default">
-        <div class="panel-heading ">           
-       
-
+        <div v-if="fromExcel"  class="panel-heading ">
             <h4 v-html="title"></h4>
             
             <a v-show="fromExcel" :href="downloadUrl" target="_blank" class="btn btn-default btn-primary">
                 <i class="fa fa-download" aria-hidden="true"></i>下載範例檔
             </a> 
-           
-            
         </div> <!--  panel  heading -->
-          
+        
         <div v-if="fromExcel"  class="panel-body">
          
             <div class="row">
                 <div class="col-sm-4">
-                    <toggle :items="groupOptions"   :default_val="0" @selected="onTypeSelected"></toggle>
+                    <toggle :items="isUpdateOptions"   :default_val="0" @selected="setIsUpdate"></toggle>
                 </div>
                 <div class="col-sm-4">
-                    <toggle :items="isUpdateOptions"   :default_val="0" @selected="setIsUpdate"></toggle>
+                    <toggle v-show="isCreate" :items="groupOptions"   :default_val="0" @selected="onTypeSelected"></toggle>
                 </div>
                 <div class="col-sm-4" >
                     <button v-if="loading" class="btn btn-default">
@@ -47,7 +36,7 @@
 
         </div> <!--  panel  body -->
         <div v-else class="panel-body">
-            fromDB
+            
         </div> <!--  panel  body -->  
     </div>  <!--  panel  -->
 
@@ -55,9 +44,13 @@
 </template>
 
 <script>
-    
+    import CourseList from '../../components/course/list.vue'
+    import CourseSelector from '../../components/course/selector.vue' 
     export default {
         name: 'CourseImport',
+        components: {
+            'course-selector':CourseSelector
+        },
         props: {
             from:{
                type: String,
@@ -143,11 +136,13 @@
                 this.title=title
                 
             },
+            
             onTypeSelected(val){
                 this.group=val              
             },
             setIsUpdate(val){
                 this.isUpdate=val
+               
             },
             onFileChange(e) {
               
@@ -171,8 +166,8 @@
                 let store=CourseImport.store(form)
                 store.then(result => {
                         Helper.BusEmitOK()
-                        // this.loading=false
-                        // this.$emit('imported',this.isGroup)                         
+                        this.loading=false
+                        this.$emit('imported',this.isGroup)                         
                     })
                     .catch(error => {
                         

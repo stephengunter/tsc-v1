@@ -1,23 +1,26 @@
 <template>
      <div>
-         <leave-list :lesson_id="lesson_id"></leave-list>
+         <options-filter :params="params"></options-filter>
      </div>
 </template>
 
 <script>
-    import LeaveList from '../components/lesson/leave/list.vue'
     
 
     export default {
         components: {
-            'leave-list':LeaveList,
+           
         },
         data() {
             return {
-                loaded:false,
-                lesson_id:1,
-                keys:[],
-                test:'',
+                ready:false,
+                params:{
+                    term:0,
+                    center:0,
+                    category:0,
+                    weekday:0,
+                    parent:0,
+                },
             }
         },
         beforeMount(){
@@ -25,7 +28,8 @@
         },
         methods: {
             init() {
-              
+               
+               
             },
             fetchData() {
                 

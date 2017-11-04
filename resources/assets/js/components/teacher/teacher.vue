@@ -112,6 +112,8 @@
                 this.showConfirm=false
             },
             deleteTeacher(){
+                this.closeConfirm()
+                
                 let id = this.deleteId 
                 let remove= Teacher.delete(id)
                 remove.then(result => {

@@ -100,6 +100,8 @@
                 this.deleteConfirm.show=true                 
             },
             deleteAdmin(){
+                this.deleteConfirm.show=false
+                
                 let id = this.deleteConfirm.id 
                 let remove= Admin.delete(id)
                 remove.then(result => {
