@@ -1,109 +1,165 @@
 <template>
-     <div class="panel panel-default">
+<div>
+    <div class="panel panel-default">
         <div class="panel-heading">
-            <span  class="panel-title">
-                 <span  class="panel-title">
-                    <h4 v-html="title">
-                    </h4>
-                  
-                  </span>
-            </span>
-            
+            <div  class="panel-title">
+                <options-filter :params="params" :parent_course="parentCourse"
+                    :options="options"
+                    @ready="ready=true"  @param-changed="onParamChanged"
+                    @clear-parent="clearParent">
+                </options-filter>
+            </div>
             <div>
-                <button v-show="hasData" class="btn btn-default btn-xs" @click.prevent="btnViewMoreClicked">
-                <span v-if="viewMore" class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-                  <span v-if="!viewMore" class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+                
+                <button :disabled="!canSubmit" @click.prevent="submit" class="btn btn-success" >
+                    <slot  name="btn">
+                        確認送出
+                    </slot>   
                 </button>
-            </div>
-            <div class="form-inline">  
-                <button type="submit" @click="submitCourses" class="btn btn-success" :disabled="!hasSelected">確認送出</button>
+               
+                
             </div>
         </div>
-        <div class="panel-body" v-if="hasData">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th v-for="item in thead" v-if="item.default" v-bind:style="{ width: item.width }" >
-                            {{item.title}}
-                        </th>
-                       
-                    </tr>
-                </thead>
-                <tbody>
-                    <row v-for="course in courses" :course="course" 
-                      :more="viewMore" :select="canSelect"
-                       @selected="onRowSelected" @unselected="courseUnselected">
-                        
-                    </row>            
-                </tbody>
-            </table>
-           
-        </div>
-       
     </div>
+    <course-list v-if="ready" :source_url="listSettings.source_url" :no_page="listSettings.no_page" 
+        :show_title="listSettings.show_title" :title_text="listSettings.title_text"
+        :no_search="listSettings.no_search"
+        :can_edit_number="listSettings.canEditNumber"  :search_params="params"  
+        :hide_create="listSettings.hide_create" :version="listSettings.version"  
+        :multi_select="listSettings.multi_select" :selected_ids="checked_ids"
+        @data-loaded="onCoursesLoaded"
+        @details="onDetails"
+        @checked="onChecked" @unchecked="onUnChecked"
+        @group-selected="onGroupSelected" 
+        @checkall="checkAll"   @uncheckall="unCheckAll" > 
+    </course-list> 
+</div>    
 </template>
 
 
 
 <script>
-    import Row from '../../components/course/row.vue'
+    import CourseList from './list.vue'
     export default {
         name: 'CourseSelector',
+        components: {
+            'course-list':CourseList                
+        },
         props: {
-            courses: {
-              type: Array,
-              default: null
+            source_url:{
+                type: String,
+                default: ''
             },
+            params: {
+                type: Object,
+                default: null
+            },
+            options: {
+                type: Object,
+                default: null
+            },
+            title_text:{
+                type: String,
+                default: ''
+            }
             
         },
-        components: {
-             Row
-        },
         beforeMount() {
-           this.init()
+            this.ready=false
+            
+            this.init()
         },
         computed:{
-            hasData(){
-                if(this.courses.length) return true
-                return false    
-            },
-            hasSelected(){
-                if(this.selectedIds.length) return true
-                return false    
+            canSubmit() {
+                return  this.checked_ids.length > 0
             }
         }, 
         data() {
             return {
-                title:Helper.getIcon(Course.title()) + '  請選擇課程' ,
-                loaded:false,
                 
-                canSelect:true,
-                thead:Course.getThead(true),
-                viewMore:false,               
-                selectedIds:[],
-             
+                ready:false,
+                parentCourse:null,             
+                
+                courseList:[],
+
+                listSettings:{
+                    version:0,
+                    source_url:'',
+                    show_title:true,
+                    title_text:this.title_text,
+                    no_search:true,
+                    no_page:true,
+                    canEditNumber:true,
+                    multi_select:true,
+                    hide_create:true,
+                    
+                },
+
+                checked_ids:[],
             }
         },
         methods: {
             init(){
+                if(this.source_url){
+                    this.listSettings.source_url=this.source_url
+                }else{
+                    this.listSettings.source_url=Course.source()
+                } 
+
+                this.checked_ids=[]
+                this.courseList=[]
+            },
+            refresh(){
+                this.checked_ids=[]
+                this.courseList=[]
+                this.listSettings.version+=1
+            },
+            onCoursesLoaded(data){
+                this.courseList=data.model.data
+                this.parentCourse = data.parentCourse
+               
+            },
+            onDetails(id){
+                this.$emit('details',id);                
+            },
+            onGroupSelected(id){
+                this.params.parent=id  
+            },
+            clearParent(params){
+                this.parentCourse=null
+                this.onParamChanged(params)
+            },
+            onParamChanged(params){
+                for(let property in params){
+                    this.params[property]=params[property]
+                } 
+                this.unCheckAll()
+            },
+            beenChecked(id){
+                return this.checked_ids.includes(id)
+            },
+            onChecked(id){
                 
-                this.loaded=false  
-                this.viewMore=false
-                this.selectedIds=[]
+                if(!this.beenChecked(id))  this.checked_ids.push(id) 
             },
-            
-            btnViewMoreClicked(){
-                this.viewMore=!this.viewMore
+            onUnChecked(id){
+                 
+                let index= this.checked_ids.indexOf(id)
+                if(index >= 0)  this.checked_ids.splice(index, 1) 
+                
             },
-           
-            onRowSelected(id){
-                this.selectedIds.push(id)
+            checkAll(){
+                if(!this.courseList)  return false
+                this.courseList.forEach( course => {
+                     this.onChecked(course.id)
+                })
             },
-            courseUnselected(id){
-                Helper.removeItem(this.selectedIds , id)
+            unCheckAll(){
+                
+                this.checked_ids=[]
             },
-            submitCourses(){
-                this.$emit('submit-courses',this.selectedIds);               
+            submit(){
+                this.$emit('submit',this.checked_ids);               
             }
         }
      }

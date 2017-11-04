@@ -1,38 +1,15 @@
 <template>
 <div>
-    
-    <div class="panel panel-default">
-        <div  class="panel-heading">
-            <div class="panel-title">
-                <h4 v-html="title"></h4>  
-                            
-            </div>
-            <options-filter :params="params" :parent_course="parentCourse"
-                :options="filter_options"
-                @ready="ready=true"  @param-changed="onParamChanged"
-                @clear-parent="clearParent" >
-            </options-filter>  
-            
-            <div>
-                <button :disabled="!canSubmit" @click.prevent="submit" class="btn btn-success" >
-                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 審核通過
-                </button>
-                
-            </div>
-        </div>
-    </div>
+    <course-selector ref="selector"
+        :params="params" :options="filter_options" :title_text="title"
+        @details="onDetails" @submit="submit">
+        <span slot="btn">
+            <span  class="glyphicon glyphicon-ok" aria-hidden="true"></span> 
+            審核通過
+        </span>
+    </course-selector>
 
-    <course-list v-if="ready" :source_url="listSettings.source_url" :no_page="listSettings.no_page" 
-        :show_title="listSettings.show_title" :no_search="listSettings.no_search"
-        :can_edit_number="listSettings.canEditNumber"  :search_params="params"  
-        :hide_create="listSettings.hide_create" :version="listSettings.version"  
-        :multi_select="listSettings.multi_select" :selected_ids="checked_ids"
-        @data-loaded="onCoursesLoaded"
-        @details="onDetails"
-        @checked="onChecked" @unchecked="onUnChecked"
-        @group-selected="onGroupSelected" 
-        @checkall="checkAll"   @uncheckall="unCheckAll" > 
-    </course-list> 
+    
 
     <modal :width="modalSettings.width" :showbtn="modalSettings.showBtn"  :show.sync="modalSettings.show" 
      :large="modalSettings.large"  @closed="onCloseModal" effect="fade" >   
@@ -66,14 +43,14 @@
 </template>
     
 <script>
-    import CourseList from '../../components/course/list.vue'
+    import CourseSelector from '../../components/course/selector.vue'
     import Show from '../../components/course/show.vue'
     import SignupInfoComponent from '../../components/course/signupinfo/view.vue'
     import ClasstimeComponent from '../../components/classtime/classtime.vue'
     export default {
         name: 'CourseReview',  
         components: {
-            'course-list':CourseList,
+            'course-selector':CourseSelector,
             'show':Show,
             'signup-info' : SignupInfoComponent,    
             'classtime' : ClasstimeComponent,      
@@ -91,10 +68,7 @@
         },
         data() {
             return {
-                
-                ready:false,
-                title:Helper.getIcon('Courses')  + '  課程審核',
-                thead:Course.getThead(),
+                title:'課程審核',
 
                 params:{
                     reviewed: 0,
@@ -105,24 +79,6 @@
                 filter_options:{
                     centerOptions:  this.center_options
                 },
-
-                listSettings:{
-                    version:0,
-                    source_url:CourseReview.source(),
-                    show_title:false,
-                    no_search:true,
-                    no_page:true,
-                    canEditNumber:true,
-                    multi_select:true,
-                    hide_create:true,
-                    
-                },
-
-                parentCourse:null,
-
-                checked_ids:[],
-
-                courseList:[],
 
                 modalSettings:{
                     width:1200,
@@ -163,7 +119,7 @@
         
         },
         beforeMount() {
-            this.ready=false
+            
             this.params.center=this.center_options[0].value
             this.init()
         },
@@ -171,60 +127,13 @@
             init(){
 
                 this.selected=0
-                this.checked_ids=[]
-                this.courseList=[]
 
                 this.modalSettings.show=false
                 this.reviewEditor.show=false
                               
             },
             refresh(){
-              
-                this.listSettings.version+=1
-            },
-            onCoursesLoaded(data){
-                this.courseList=data.model.data
-                this.parentCourse = data.parentCourse
-               
-            },
-            onGroupSelected(id){
-                this.params.parent=id  
-            },
-            clearParent(params){
-                this.parentCourse=null
-                this.onParamChanged(params)
-            },
-            onParamChanged(params){
-                for(let property in params){
-                    this.params[property]=params[property]
-                } 
-                this.unCheckAll()
-            },
-            isGroup(course){
-                return Helper.isTrue(course.group)
-            },
-            beenChecked(id){
-                return this.checked_ids.includes(id)
-            },
-            onChecked(id){
-                
-                if(!this.beenChecked(id))  this.checked_ids.push(id) 
-            },
-            onUnChecked(id){
-                 
-                let index= this.checked_ids.indexOf(id)
-                if(index >= 0)  this.checked_ids.splice(index, 1) 
-                
-            },
-            checkAll(){
-                if(!this.courseList)  return false
-                this.courseList.forEach( course => {
-                        this.onChecked(course.id)
-                })
-            },
-            unCheckAll(){
-                
-                this.checked_ids=[]
+                this.$refs.selector.refresh()
             },
             onDetails(id){
                 this.selected=id
@@ -234,9 +143,9 @@
             setSelectedCourse(course){
                 this.selectedCourse=course
             },
-            submit(){
+            submit(course_ids){
                
-                let save = CourseReview.store(this.checked_ids)
+                let save = CourseReview.store(course_ids)
                 save.then(data => {
                         Helper.BusEmitOK('存檔成功')
                         this.init()

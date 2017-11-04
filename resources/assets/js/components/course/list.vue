@@ -89,6 +89,10 @@
                 type: Boolean,
                 default: true
             },
+            title_text:{
+                type: String,
+                default: ''
+            },
             no_page:{
                 type: Boolean,
                 default: false
@@ -131,7 +135,7 @@
                 },
                 viewing:0,
 
-                title:Helper.getIcon('Courses')  + '  課程管理',
+                title:Helper.getIcon('Courses') ,
                 current_version:0,
                 loaded:false,
                 source: Course.source(),
@@ -173,6 +177,9 @@
             init() {
                 if(this.hide_create) this.createText=''
                 else this.createText='新增課程'
+
+                if(this.title_text) this.title += '  ' + this.title_text
+                else this.title += '  課程管理'
 
                 if(this.source_url) this.source=this.source_url
                 this.current_version=this.version
