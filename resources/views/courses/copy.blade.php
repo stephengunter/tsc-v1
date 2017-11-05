@@ -4,11 +4,13 @@
 @section('content')
      
     
+    
+        <course-copy   :term_options="{{ json_encode($termOptions) }}"
+            :center_options="{{ json_encode($centerOptions) }}"
+            @canceled="onCanceled" @imported="onImported" >   
+        </course-copy >
 
-    <course-copy 
-        
-        @canceled="onCanceled" @imported="onImported">
-    </course-copy>
+   
 
   
     

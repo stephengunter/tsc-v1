@@ -5,7 +5,7 @@
             <div  class="panel-title">
                 <options-filter :params="params" :parent_course="parentCourse"
                     :options="options"
-                    @ready="ready=true"  @param-changed="onParamChanged"
+                    @ready="onFilterReady"  @param-changed="onParamChanged"
                     @clear-parent="clearParent">
                 </options-filter>
             </div>
@@ -89,7 +89,7 @@
                     title_text:this.title_text,
                     no_search:true,
                     no_page:true,
-                    canEditNumber:true,
+                    canEditNumber:false,
                     multi_select:true,
                     hide_create:true,
                     
@@ -108,6 +108,14 @@
 
                 this.checked_ids=[]
                 this.courseList=[]
+            },
+            onFilterReady(params){
+                for(let property in params){
+                    this.params[property]=params[property]
+                }
+
+                this.ready=true
+                
             },
             refresh(){
                 this.checked_ids=[]

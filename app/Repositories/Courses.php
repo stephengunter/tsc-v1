@@ -8,6 +8,7 @@ use App\Category;
 use App\Center;
 use App\Teacher;
 use App\Profile;
+use App\Schedule;
 
 
 use App\Repositories\Users;
@@ -117,7 +118,7 @@ class Courses
         return $courseList;
         
     }
-    public function index($termId,$categoryId,$centerId,$weekdayId,$parentId,array $with=[])
+    public function index(int $termId,int $categoryId,int $centerId,int $weekdayId,int $parentId,array $with=[])
     {
         if(!count($with)) $with=['center','categories','teachers','classTimes'];
         $courseList=$this->getAll()->with($with);
@@ -126,7 +127,11 @@ class Courses
 
         if($centerId) $courseList->where('center_id',$centerId);
 
-        if($parentId) $courseList->where('parent',$parentId);
+        if($parentId > 0){
+            $courseList->where('parent',$parentId);
+        }else if($parentId <0 ){
+            $courseList->where('parent', 0);
+        } 
         
 
         if($categoryId){
@@ -487,6 +492,46 @@ class Courses
         }  //End For
 
         return $err_msg;
+    }
+
+    public function copyCourse(Course $old_course,$term_id, $center_id , $updated_by , $parent_id=0)
+    {
+        $courseValues=$old_course->toArray();
+        
+        $courseValues['term_id']=$term_id;
+        $courseValues['center_id']=$center_id;
+        
+        $courseValues['number']='';
+        $courseValues['begin_date']='';
+        $courseValues['end_date']='';
+        $courseValues['open_date']='';
+        $courseValues['close_date']='';
+
+        $courseValues['reviewed']=false;
+        $courseValues['active']=false;
+        $courseValues['removed']=false;
+        $courseValues['updated_by']=$updated_by;
+        $courseValues['parent']=$parent_id;
+
+        $categoryIds = $old_course->privateCategories()
+                                    ->pluck('id')->toArray();
+        
+        $teacherIds = $old_course->teachers()->get()
+                                    ->pluck('user_id')->toArray(); 
+
+        $course = $this->store($courseValues , $categoryIds, $teacherIds);
+
+        if(count($old_course->schedules)){
+            foreach ($old_course->schedules as $schedule) {
+                $scheduleValues=$schedule->toArray();
+                $scheduleValues['course_id']=$course->id;
+                Schedule::create($scheduleValues);
+            }
+
+        }
+
+
+        return $course;
     }
     private function syncCategories($categoryIds , $course)
     {

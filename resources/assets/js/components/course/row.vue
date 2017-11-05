@@ -56,10 +56,12 @@
 
         <!-- 群組課程 -->
         <td v-show="viewing==0">
-            <a v-if="isGroup(course)" @click="onGroupSelected" 
+            <a v-if="canSelectGroup(course)" @click="onGroupSelected" 
                 v-html="$options.filters.okSign(true)" class="btn btn-sm">
             </a>    
-           
+            <span v-else v-show="isGroup(course)" v-html="$options.filters.okSign(true)"  ></span>
+
+
             <span v-if="hasParent(course)" v-text="parentCourseName(course)" ></span>
         </td> 
 
@@ -167,6 +169,10 @@
                 type: Boolean,
                 default: false
             },
+            can_select_group:{
+                type: Boolean,
+                default: true
+            }
             
         },
         data() {
@@ -188,6 +194,10 @@
             },
             getClassTimesText(class_times){
                 return Course.getClassTimesText(class_times)             
+            },
+            canSelectGroup(course){
+                if(!this.can_select_group) return false
+                return this.isGroup(course)
             },
             isGroup(course){
                 return Course.isGroup(course)

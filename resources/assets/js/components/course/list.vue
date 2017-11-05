@@ -24,7 +24,7 @@
                 :details_link="details_link" :can_remove="can_remove"
                 :single_select="single_select" :multi_select="multi_select"
                 :been_selected="beenSelected(props.item.id)"  
-                :editting_number="edittingNumber"   
+                :editting_number="edittingNumber"  :can_select_group="canSelectGroup" 
                 @details="onDetails" @clear-error="onClearRowError"
                 @selected="onRowSelected" @group-selected="onGroupSelected"
                 @checked ="onRowChecked" @unchecked="onRowUnChecked">
@@ -114,9 +114,9 @@
             version(val){
                 this.current_version=val
             },
-            course_id(value) {
-               this.searchParams.course=value
-            }
+            // course_id(value) {
+            //    this.searchParams.course=value
+            // }
         },
         data() {
             return {
@@ -171,6 +171,11 @@
             edittingNumber(){
                 return this.editting=='number'
             },
+            canSelectGroup(){
+                if(!this.search_params) return true
+                if(!this.search_params.hasOwnProperty('parent')) return true
+                return parseInt(this.search_params.parent) > -1
+            }
         },
         methods: {
            
@@ -204,13 +209,20 @@
                     return item.view == this.viewing
                 })
 
-               let numberThead =staticThead.find(item=>{
+                let numberThead =staticThead.find(item=>{
                       return item.key=='number'
                 })
-
+                
                 numberThead.edit=this.canEditNumber
 
                 return staticThead.concat(thead)
+            },
+            setCanEditNumber(val){
+                if(this.can_edit_number){
+                    this.canEditNumber=val
+                }else{
+                    this.canEditNumber=false
+                }
             },
             cancelUnCheckAll(){
                 this.selectColumn.checked=false
@@ -221,10 +233,12 @@
             onDataLoaded(data){
                 this.cancelUnCheckAll()
                 
+                
+                this.hasData = parseInt(data.model.total) > 0
                 let courseList=data.model.data
 
-                if(data.canEditNumber){
-                    this.setCanEditNumber(data.canEditNumber)
+                if(data.canEditNumber && this.hasData){
+                    this.setCanEditNumber(true)
                    
                 }else{
                     this.setCanEditNumber(false)
@@ -235,8 +249,6 @@
                 }
                 
                 this.courseList=courseList
-                
-                this.hasData=data.model.total
 
                
                 this.$emit('data-loaded' , data)
@@ -244,6 +256,7 @@
                 
                 
             },
+
             checkAll(){
                 this.selectColumn.checked=true
                 this.$emit('checkall')
@@ -252,13 +265,7 @@
                 this.selectColumn.checked=false
                 this.$emit('uncheckall')
             },
-            setCanEditNumber(val){
-                if(this.can_edit_number){
-                    this.canEditNumber=val
-                }else{
-                    this.canEditNumber=false
-                }
-            },
+            
             onDetails(id){
                 this.$emit('details',id)
             },

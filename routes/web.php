@@ -79,10 +79,11 @@ Route::group(['middleware' => 'admin'], function()
     Route::get('courses/index-options', '\App\Http\Controllers\Course\CoursesController@indexOptions');
     Route::post('courses/update-numbers','\App\Http\Controllers\Course\CoursesController@updateNumbers');
 
-    //Route::post('courses/import', '\App\Http\Controllers\Course\CoursesController@import');
+    
     Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);
     Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
 
+    Route::post('courses-import/copy', '\App\Http\Controllers\Course\CoursesImportController@copy');
     Route::resource('courses-import', '\App\Http\Controllers\Course\CoursesImportController',
     ['only' => ['index','store']]);
    

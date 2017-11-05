@@ -104,13 +104,6 @@
                 
             }
         },
-        computed: {
-            
-            canSubmit() {
-                return  this.checked_ids.length > 0
-            }
-            
-        },
         watch: {
             version() {
                this.init()

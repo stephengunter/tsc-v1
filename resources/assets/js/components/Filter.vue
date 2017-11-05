@@ -59,7 +59,7 @@
         },
         data() {
             return {
-                ready:false,
+                
                 search_params:{},
 
                 termOptions:[],
@@ -95,7 +95,7 @@
                     this.setOptions(data)
                 }).catch(error=>{
                     Helper.BusEmitError(error)
-                    this.ready=false
+                    
                 })
             },
             setOptions(data){
@@ -133,8 +133,8 @@
                     } 
                 }
 
-                this.ready=true
-                this.$emit('ready')
+                
+                this.$emit('ready',this.search_params)
             },
             hasSearchKey(key){
                 return  this.search_params.hasOwnProperty(key)

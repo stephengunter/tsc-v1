@@ -3,7 +3,7 @@
     <div class="panel panel-default" >
         <div class="panel-heading">
             <options-filter :params="params" :parent_course="parentCourse"
-              @ready="ready=true"  @param-changed="onParamChanged"
+              @ready="onFilterReady"  @param-changed="onParamChanged"
               @clear-parent="clearParent">
             </options-filter>
         </div> <!--  End Head  -->
@@ -78,6 +78,14 @@
         methods: {
             init(){
                 this.listSettings.hide_create=this.hide_create
+            },
+            onFilterReady(params){
+                for(let property in params){
+                    this.params[property]=params[property]
+                }
+
+                this.ready=true
+                
             },
             onCoursesLoaded(data){
                this.parentCourse = data.parentCourse
