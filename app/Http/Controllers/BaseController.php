@@ -11,6 +11,7 @@ use Illuminate\Auth\AuthenticationException;
 
 class BaseController extends Controller
 {
+    
     protected function currentUser()
     {        
         return auth()->user();

@@ -69,32 +69,32 @@ class CoursesController extends BaseController
             $menus=$this->menus($this->key);            
             return view('courses.index')
                     ->with(['menus' => $menus]);
-        }          
-        $request = request();
-        $termId=(int)$request->term; 
-        $categoryId=(int)$request->category;       
-        $centerId=(int)$request->center;
-        $weekdayId=(int)$request->weekday;
-        $parentId=(int)$request->parent;
+        }      
+        
+        
+        $params = request()->toArray();
+
+        
 
         $with=['center','categories','teachers','classTimes'];
-        $courseList=$this->courses->index($termId,$categoryId,$centerId,$weekdayId,$parentId,$with);
+        $courseList=$this->courses->index($params,$with);
                            
-        $hasReviewed = $request->has('reviewed');
+        $hasReviewed =array_key_exists('reviewed', $params);
         if($hasReviewed){
-            $reviewed=(bool)$request->reviewed;
+            $reviewed=(bool)$params['reviewed'];
             $courseList=$courseList->where('reviewed',$reviewed);
         };
       
         $courseList=$courseList->filterPaginateOrder();
 
         
-       
+        $parentId=Helper::getIntegerByKey($params, 'parent');
         $parentCourse=null;
         if($parentId) $parentCourse=Course::with($with)->find($parentId);
         if($parentCourse) $parentCourse->populateViewData();
        
         $canEditNumber=false;
+        $centerId=Helper::getIntegerByKey($params, 'center');
         if($centerId){
             $center=Center::findOrFail($centerId);
             $canEditNumber=$this->canAdminCenter($center);

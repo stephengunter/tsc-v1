@@ -31,6 +31,7 @@ class CoursesReviewController extends BaseController
 	}
 	public function index()
     {
+        
         if(!request()->ajax()) {
             $centerOptions=$this->centers->optionsConverting($this->canAdminCenters());
             $menus=$this->menus($this->key);            
@@ -39,25 +40,21 @@ class CoursesReviewController extends BaseController
                                                     'centerOptions' => $centerOptions
                                                 ]); 
 
-        }                         
+        }      
 
-        $request = request();
-           
-        $centerId=(int)$request->center;
-        $parentId=(int)$request->parent;
+        $params = request()->toArray();
+       
 
         $with=['center','categories','teachers','classTimes'];
+        $courseList=$this->courses->index($params,$with);
+        
 
-        $courseList=$this->courses->getByCenter($centerId)
-                                    ->where('reviewed',false)
-                                    ->with($with);
-
-        if($parentId) $courseList=$courseList->where('parent',$parentId);
-      
-        $courseList=$courseList->filterPaginateOrder();
+        $courseList=$courseList->where('reviewed',false)
+                                ->filterPaginateOrder();
        
+        $parentId=Helper::getIntegerByKey($params, 'parent');
         $parentCourse=null;
-        if($parentId)  $parentCourse=Course::with($with)->find($parentId);
+        if($parentId) $parentCourse=Course::with($with)->find($parentId);
         if($parentCourse) $parentCourse->populateViewData();
        
         

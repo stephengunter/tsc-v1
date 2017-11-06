@@ -23,7 +23,9 @@
                 <li>
                      <a @click="activeIndex=2" href="#centers" data-toggle="tab">所屬中心</a>
                 </li>
-                
+                <li>
+                     <a @click="activeIndex=3" href="#courses" data-toggle="tab">開課紀錄</a>
+                </li>
             </ul>
         </div>
         <div class="panel-body">
@@ -49,7 +51,19 @@
                 <div class="tab-pane fade" id="centers">
                     <user-center v-if="activeIndex==2" :user_id="id" :role='role'>
                     </user-center>
-                </div>                 
+                </div>        
+                <div class="tab-pane fade" id="courses">
+                   <course-list v-if="activeIndex==3"  :source_url="listSettings.source_url" :no_page="listSettings.no_page" 
+                        :show_title="listSettings.show_title" :title_text="listSettings.title_text"
+                        :no_search="listSettings.no_search"
+                        :can_edit_number="listSettings.canEditNumber"  :search_params="listSettings.params"  
+                        :hide_create="listSettings.hide_create" :version="listSettings.version"  
+                        
+                        @details="onCourseDetails"  > 
+                        
+                       
+                    </course-list> 
+                </div>           
             </div>
         </div>
    </div>
@@ -68,6 +82,7 @@
     import ContactInfoComponent from '../../components/contactInfo/contactInfo.vue'
     import UserCenterView from '../../components/user-center/view.vue'
     import GroupTeacherView from '../../components/teacher/group/view.vue'
+    import CourseList from '../../components/course/list.vue'
     
     export default {
         name: 'TeacherDetails',
@@ -76,7 +91,8 @@
            'user' : UserComponent,
            'contact-info' : ContactInfoComponent,
            'user-center':UserCenterView,
-           'group-teacher-view':GroupTeacherView
+           'group-teacher-view':GroupTeacherView,
+           'course-list':CourseList 
          
         },
         props: {
@@ -118,6 +134,23 @@
                     can_edit:true,
                     can_back:false,
                     show_residence:true,
+               },
+
+               listSettings:{
+                    version:0,
+                    source_url:'',
+                    show_title:true,
+                    title_text:'開課紀錄',
+                    no_search:true,
+                    no_page:true,
+                    canEditNumber:false,
+                    multi_select:true,
+                    hide_create:true,
+                    params:{
+                        teacher:this.id,
+                        parent:-1
+                    }
+                    
                },
 
                backTuitionSettings:{
@@ -211,6 +244,9 @@
             onContactInfoDeleted(){ 
                 this.setContactInfo(null)
             },
+            onCourseDetails(id){
+                alert('details ' + id)
+            }
             
         }, 
 

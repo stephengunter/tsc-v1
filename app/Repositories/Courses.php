@@ -118,8 +118,15 @@ class Courses
         return $courseList;
         
     }
-    public function index(int $termId,int $categoryId,int $centerId,int $weekdayId,int $parentId,array $with=[])
+    public function index(array $params ,array $with=[])
     {
+        $termId=Helper::getIntegerByKey($params, 'term');
+        $centerId=Helper::getIntegerByKey($params, 'center');
+        $categoryId=Helper::getIntegerByKey($params, 'category');
+        $teacherId=Helper::getIntegerByKey($params, 'teacher');
+        $weekdayId=Helper::getIntegerByKey($params, 'weekday');
+        $parentId=Helper::getIntegerByKey($params, 'parent');
+
         if(!count($with)) $with=['center','categories','teachers','classTimes'];
         $courseList=$this->getAll()->with($with);
         
@@ -139,6 +146,14 @@ class Courses
             {
                 $q->where('id', $categoryId );
             });
+        }
+
+        if($teacherId){
+            $courseList= $courseList->whereHas('teachers', function($q) use ($teacherId)
+            {
+                $q->where('user_id', $teacherId);
+            });
+
         }
 
         if($weekdayId){

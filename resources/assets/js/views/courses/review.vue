@@ -1,6 +1,6 @@
 <template>
 <div>
-    <course-selector ref="selector"
+    <course-selector ref="selector" :source_url="source_url"
         :params="params" :options="filter_options" :title_text="title"
         @details="onDetails" @submit="submit">
         <span slot="btn">
@@ -69,7 +69,7 @@
         data() {
             return {
                 title:'課程審核',
-
+                source_url:CourseReview.source(),
                 params:{
                     reviewed: 0,
                     center : 0,

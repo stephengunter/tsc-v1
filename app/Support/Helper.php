@@ -30,7 +30,12 @@ class Helper
 
          return $url;
     }
-
+    public static function getIntegerByKey(array $arr , $key)
+    {
+        $val=0;
+        if(array_key_exists($key, $arr)) $val=(int)$arr[$key];
+        return $val;
+    }
     public static function isNullOrEmpty(Collection $value = null)
     {
         if(!$value) return true;
