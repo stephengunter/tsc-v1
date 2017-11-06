@@ -59,7 +59,7 @@
                 
                 loading:false,
 
-                type:0,
+                group:0,
                 isUpdate:0,
 
                 files: [],
@@ -88,7 +88,7 @@
         },
         computed:{
             isGroup(){
-               return Helper.isTrue(this.type)
+               return Helper.isTrue(this.group)
             },
             isCreate(){
                return !Helper.isTrue(this.isUpdate)
@@ -100,7 +100,7 @@
             downloadUrl(){
                 let url='/downloads?type=import&key='
                 if(this.isGroup) {
-
+                    return  url+'group-courses'
                 }else{
                     if(this.isCreate)  return  url+'courses'
                     else return  url+'course-infoes'
