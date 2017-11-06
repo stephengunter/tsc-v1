@@ -1,71 +1,71 @@
 <template>
-<tr v-if="isReadOnly" >
-     <th  scope="row" v-text="term.year"></th> 
-     <td  v-text="term.order"></td> 
-     <td  v-text="term.name"></td>
-     <td v-html="period(term.open_date , term.close_date)"></td> 
-     <td  v-html="$options.filters.activeLabel(term.active)" ></td>
-     <td> 
-        <a v-if="term.updated_by"  href="#" @click.prevent="showUpdatedBy" >
-          {{   term.updated_at|tpeTime  }}
-        </a>
-        <span v-else>{{   term.updated_at|tpeTime  }}</span>
-        
+    <tr v-if="isReadOnly" >
+        <th  scope="row" v-text="term.year"></th> 
+        <td  v-text="term.order"></td> 
+        <td  v-text="term.name"></td>
+        <td  v-html="period(term.open_date , term.close_date)"></td> 
+        <td  v-html="$options.filters.activeLabel(term.active)" ></td>
+        <td> 
+            <a v-if="term.updated_by"  href="#" @click.prevent="showUpdatedBy" >
+                {{   term.updated_at|tpeTime  }}
+            </a>
+            <span v-else>{{   term.updated_at|tpeTime  }}</span>
+            
 
-     </td>           
-     <td>
-         <button class="btn btn-primary btn-xs" @click="beginEdit">
-            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-        </button>  
-         <button v-if="term.canDelete"  class="btn btn-danger btn-xs" @click.prevent="btnDeleteClicked">
-             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-        </button>
-     </td> 
-</tr>
-<tr v-else>
-    <td v-if="loaded">
-          <select @change="clearErrorMsg('term.number')"   v-model="form.term.year"  class="form-control" >
-               <option v-for="item in yearOptions" :value="item.value" v-text="item.text"></option>
-          </select>
-    </td> 
-    <td v-if="loaded">
-          <select @change="clearErrorMsg('term.number')"  v-model="form.term.order"  class="form-control" >
-               <option v-for="item in orderOptions" :value="item.value" v-text="item.text"></option>
-           </select>
-    </td> 
+        </td>           
+        <td>
+            <button class="btn btn-primary btn-xs" @click="beginEdit">
+                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+            </button>  
+            <button v-if="term.canDelete"  class="btn btn-danger btn-xs" @click.prevent="btnDeleteClicked">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+        </td> 
+    </tr>
+    <tr v-else>
+        <td v-if="loaded">
+            <select @change="clearErrorMsg('term.number')"   v-model="form.term.year"  class="form-control" >
+                <option v-for="(item,index) in yearOptions" :key="index" :value="item.value" v-text="item.text"></option>
+            </select>
+        </td> 
+        <td v-if="loaded">
+            <select @change="clearErrorMsg('term.number')"  v-model="form.term.order"  class="form-control" >
+                <option v-for="(item,index) in orderOptions" :key="index" :value="item.value" v-text="item.text"></option>
+            </select>
+        </td> 
+        
+        <td v-if="loaded">
+        <small class="text-danger" v-if="form.errors.has('term.number')" v-text="form.errors.get('term.number')"></small>
     
-    <td v-if="loaded">
-      <small class="text-danger" v-if="form.errors.has('term.number')" v-text="form.errors.get('term.number')"></small>
-   
-    </td>
-    <td v-if="loaded">
-         <date-picker :option="datePickerOption" :date="open_date" ></date-picker>
-         <input  type="hidden" v-model="form.term.open_date"  >
-          <small class="text-danger" v-if="form.errors.has('term.open_date')" v-text="form.errors.get('term.open_date')"></small>
-         起至
-         <date-picker :option="datePickerOption" :date="close_date" ></date-picker>
-          <input  type="hidden" v-model="form.term.close_date"  >
-          <small class="text-danger" v-if="form.errors.has('term.close_date')" v-text="form.errors.get('term.close_date')"></small>
-    </td>
-    <td v-if="loaded">
-          <input type="hidden" v-model="form.term.active"  >
-           <toggle :items="activeOptions"   :default_val="form.term.active" @selected=setActive></toggle>
-                            
-    </td>
-    <td v-if="loaded">
-         
-    </td>
-    
-    <td v-if="loaded">
-         
-        <button @click.prevent="onSubmit"  class="btn btn-success btn-xs">
-            <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-        </button>  
-         <button  class="btn btn-default btn-xs" @click.prevent="cancelEdit">
-             <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
-        </button>
-    </td> 
-</tr>  
+        </td>
+        <td v-if="loaded">
+            <date-picker :option="datePickerOption" :date="open_date" ></date-picker>
+            <input  type="hidden" v-model="form.term.open_date"  >
+            <small class="text-danger" v-if="form.errors.has('term.open_date')" v-text="form.errors.get('term.open_date')"></small>
+            起至
+            <date-picker :option="datePickerOption" :date="close_date" ></date-picker>
+            <input  type="hidden" v-model="form.term.close_date"  >
+            <small class="text-danger" v-if="form.errors.has('term.close_date')" v-text="form.errors.get('term.close_date')"></small>
+        </td>
+        <td v-if="loaded">
+            <input type="hidden" v-model="form.term.active"  >
+            <toggle :items="activeOptions"   :default_val="form.term.active" @selected="setActive"></toggle>
+                                
+        </td>
+        <td v-if="loaded">
+            
+        </td>
+        
+        <td v-if="loaded">
+            
+            <button @click.prevent="onSubmit"  class="btn btn-success btn-xs">
+                <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+            </button>  
+            <button  class="btn btn-default btn-xs" @click.prevent="cancelEdit">
+                <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
+            </button>
+        </td> 
+    </tr>  
 </template>
 
 

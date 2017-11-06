@@ -8,11 +8,11 @@ class Terms
 {
     public function getAll()
     {
-       return Term::where('removed',false); 
+        return Term::where('removed',false); 
     }
     public function activeTerms()
     {
-       return $this->getAll()->where('active',true);
+        return $this->getAll()->where('active',true);
          
     }
     public function latest()
@@ -35,7 +35,7 @@ class Terms
 
     public function findOrFail($id)
     {
-       return Term::findOrFail($id); 
+        return Term::findOrFail($id); 
          
     }
 
@@ -46,16 +46,37 @@ class Terms
     
     public function store($values)
     {
-          $term=Term::create($values);
+        $term=Term::create($values);
 
-          return $term;
+        return $term;
     }
-    public function update($values, $id)
+    public function update($values,$id)
     {
-         $term=Term::findOrFail($id); 
-         $term->update($values);
+        $term=Term::findOrFail($id); 
+        if($term->open_date == $values['open_date'] &&  $term->close_date == $values['close_date'] ){
+            $term->update($values);
+            
+        }else{
+            //報名日期有變動
+            $term->update($values);
+            $this->updateCourses($term);
+        }
+        
+        $term->update($values);
 
-          return $term;
+        return $term;
+    }
+
+    private function updateCourses(Term $term)
+    {
+       
+        foreach ($term->courses as $course) {
+            $course->open_date=$term->open_date;
+            $course->close_date=$term->close_date;
+            
+            $course->save();
+           
+        }
     }
     
     
@@ -63,13 +84,13 @@ class Terms
     {
         $term = Term::findOrFail($id);
 
-         $values=[
+        $values=[
             'active' =>0,
             'removed' => 1,
             'updated_by' => $admin_id
-         ];
+        ];
         
-         $term->update($values);
+        $term->update($values);
         
     }
 

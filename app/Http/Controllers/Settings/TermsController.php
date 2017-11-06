@@ -116,6 +116,8 @@ class TermsController extends BaseController
                              ]  ,  422);
         }
 
+        
+
        
         $term= $this->terms->update($values,$id);
 
