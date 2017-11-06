@@ -204,8 +204,10 @@ class TeachersController extends BaseController
         if($request->isGroup()){
             $teacherValues=$request->get('teacher');
             $name=$teacherValues['name'];
-            $description=$teacherValues['description'];
-            
+            $description='';
+            if(array_key_exists('description',$teacherValues)){
+                $description=$teacherValues['description'];
+            }
             $teacher=$this->teachers->storeTeacherGroup($name,$description,$center_id,$current_user);
         }else{
 

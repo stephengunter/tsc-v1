@@ -154,7 +154,7 @@ class Teacher extends Model
         
         if($this->group){
             $groupTeacherIds=$this->groupTeacherIds();
-            return in_array($user->id,$groupTeacherIds);
+            if( in_array($user->id,$groupTeacherIds) ) return true;
         }
 
         if($user->isAdmin()){
