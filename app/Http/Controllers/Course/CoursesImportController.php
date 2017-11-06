@@ -27,8 +27,6 @@ class CoursesImportController extends BaseController
 	}
 	public function index()
     {
-        
-
         $menus=$this->menus($this->key);  
 
         $from=request()->get('from');       

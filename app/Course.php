@@ -21,7 +21,7 @@ class Course extends Model
                             'description','target',
                             'open_date' , 'close_date', 'limit','min',
                             'display_order' , 'reviewed', 'active'	,       
-                            'removed' , 'updated_by'   
+                            'removed' , 'updated_by'  
                             
                             ];
 	
@@ -66,7 +66,9 @@ class Course extends Model
             'credit_price' => null,
            
             'net_signup'=> $net_signup ,
-            'active'=> 0 ,
+            'active'=> 1 ,
+
+            'ps' => '',
             
             'categories'=> [],
             'teachers'=> [],
@@ -159,6 +161,14 @@ class Course extends Model
 
     }
 
+    public function getPS()
+    {
+        if(!$this->status) return '';
+        $this->ps=$this->status->ps;
+        return $this->ps;
+
+    }
+
     public function copyParentCourseValues($parent_id)
     {
         $parent_course=static::findOrFail($parent_id);
@@ -218,6 +228,11 @@ class Course extends Model
         if( $this->groupAndParent() ) return false;
         if(  count($this->validLessons()) ) return false;
         return true;
+    }
+
+    public function updateStatus()
+    {
+        $this->status->updateStatus();
     }
 
     public function attachCategory($category_id)

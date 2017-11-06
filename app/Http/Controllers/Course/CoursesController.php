@@ -18,7 +18,6 @@ use App\Repositories\Weekdays;
 use App\Http\Requests\Course\CourseRequest;
 
 use App\Support\Helper;
-use App\Events\CourseUpdated;
 use Carbon\Carbon;
 
 
@@ -234,7 +233,8 @@ class CoursesController extends BaseController
         }
 
         $current_user=$this->currentUser();
-        $course = Course::with('center','term','categories','teachers','classTimes')->findOrFail($id);
+        $with=['status','center','term','categories','teachers','classTimes'];
+        $course = Course::with($with)->findOrFail($id);
         
         $course->canEdit=$course->canEditBy($current_user);
         $course->canDelete=$course->canDeleteBy($current_user);
@@ -256,16 +256,19 @@ class CoursesController extends BaseController
     }
     public function edit($id)
     {
-        $course = Course::with('categories','teachers')->findOrFail($id);     
+        $course = Course::with(['status','categories','teachers'])->findOrFail($id);     
         $current_user=$this->currentUser();
         if(!$course->canEditBy($current_user)){
             return  $this->unauthorized(); 
         }
 
+        $course->canReview=$course->canReviewBy($current_user);
+
         $course->begin_date=Helper::checkDateString($course->begin_date);
         $course->end_date=Helper::checkDateString($course->end_date);
 
         $course->isCredit();
+        $course->getPS();
 
         if($course->isGroup()) return $this->editGroupCourse($course);
 
@@ -348,7 +351,7 @@ class CoursesController extends BaseController
        
         $course=$this->createOrUpdate($request,$course);
         
-        event(new CourseUpdated($course, $current_user));
+        
         
         return response()->json($course);     
                

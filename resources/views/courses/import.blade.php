@@ -4,7 +4,6 @@
 @section('content')
      
     
-
     <course-import 
         @canceled="onCanceled" @imported="onImported">
     </course-import>

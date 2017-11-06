@@ -74,6 +74,9 @@
         <!-- 審核 -->
         <td  v-show="viewing==0" v-html="$options.filters.reviewedLabel(course.reviewed)" >
         </td>
+        <!-- 狀態 -->
+        <td  v-show="viewing==0" v-html="activeLabel(course.active)" >
+        </td>
 
         <!-- End Default Columns --> 
 
@@ -209,7 +212,9 @@
                  if(course.parentCourse) return course.parentCourse.name
                     return ''
             },
-            
+            activeLabel(active){
+                return Course.activeLabel(active)
+            },
             period(begin,end){
                return Helper.period(begin,end)
             },

@@ -19,6 +19,8 @@ class Course {
         this.groupAndParent = Course.groupAndParent(this)
         this.hasReviewedBy = Course.hasReviewedBy(this)
 
+        this.activeLabel = Course.activeLabel(this.active)
+
     }
     static title() {
         return 'Courses'
@@ -334,6 +336,12 @@ class Course {
                 key: 'reviewed',
                 sort: true,
                 default: true
+            }, {
+                view: 0,
+                title: '狀態',
+                key: 'active',
+                sort: true,
+                default: true
             },
             // End Default Columns
             {
@@ -475,6 +483,17 @@ class Course {
         }
         return options
 
+    }
+    static activeLabel(active) {
+        let style = 'label label-default'
+        let text = '停止開課'
+        if (parseInt(active)) {
+            style = 'label label-info'
+            text = '正常開課'
+        }
+
+
+        return `<span class="${style}" > ${text} </span>`
     }
 
 

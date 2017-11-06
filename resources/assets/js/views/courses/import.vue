@@ -1,15 +1,15 @@
 <template>
     
     <div class="panel panel-default">
-        <div v-if="fromExcel"  class="panel-heading ">
+        <div class="panel-heading ">
             <h4 v-html="title"></h4>
             
-            <a v-show="fromExcel" :href="downloadUrl" target="_blank" class="btn btn-default btn-primary">
+            <a :href="downloadUrl" target="_blank" class="btn btn-default btn-primary">
                 <i class="fa fa-download" aria-hidden="true"></i>下載範例檔
             </a> 
         </div> <!--  panel  heading -->
         
-        <div v-if="fromExcel"  class="panel-body">
+        <div class="panel-body">
          
             <div class="row">
                 <div class="col-sm-4">
@@ -35,16 +35,14 @@
             
 
         </div> <!--  panel  body -->
-        <div v-else class="panel-body">
-            
-        </div> <!--  panel  body -->  
+        
     </div>  <!--  panel  -->
 
    
 </template>
 
 <script>
-    import CourseList from '../../components/course/list.vue'
+    
     import CourseSelector from '../../components/course/selector.vue' 
     export default {
         name: 'CourseImport',
@@ -52,10 +50,7 @@
             'course-selector':CourseSelector
         },
         props: {
-            from:{
-               type: String,
-               default: 'db'
-            },
+            
            
         }, 
         data() {
@@ -92,9 +87,6 @@
             }
         },
         computed:{
-            fromExcel(){
-                return this.from == 'excel'
-            },
             isGroup(){
                return Helper.isTrue(this.type)
             },
@@ -124,17 +116,6 @@
             init(){
                 this.err_msg=''
                 this.loading=false
-
-                let title= Helper.getIcon('Courses')
-                if(this.fromExcel){
-                    this.$refs.fileinput.value = null
-                    title   +=  '  Excel 匯入課程'
-                }else{
-                     title   +=  '  從舊課程複製'
-                }  
-
-                this.title=title
-                
             },
             
             onTypeSelected(val){

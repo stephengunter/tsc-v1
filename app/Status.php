@@ -34,11 +34,13 @@ class Status extends Model
 
     public static function initialize($course)
     {
-        
+        $ps='';
+        if($course->ps) $ps=$course->ps;
         $signup=static::getSignupStatus($course);
         $class=static::getClassStatus($course);
         
-        return [            
+        return [   
+            'ps' => $ps,         
             'signup' => $signup,
             'register' => 0,
             'class' => $class
@@ -49,26 +51,16 @@ class Status extends Model
     public function updateStatus()
     {
         $course=$this->course;
+        
         if((int)$this->signup!=0 ){
             $this->signup=static::getSignupStatus($course);
         }
-        if((int)$this->class!=0 ){
+
+        if($course->active){
             $this->class=static::getClassStatus($course);
         }else{
-            //停止開課
-           
-            if($course->active){
-                $course->active=false;
-                $course->save();
-            }
+            $this->class=0;
         }
-
-        if(!$course->reviewed){
-            if($course->active){
-                $course->active=false;
-                $course->save();
-            }
-        } 
 
         
         $this->save();

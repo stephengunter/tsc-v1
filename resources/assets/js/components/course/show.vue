@@ -110,12 +110,12 @@
                     </div> 
                     <div class="row">
                         <div class="col-sm-4">
-                            <label class="label-title">上架狀態</label>
-                            <p v-html="$options.filters.activeLabel(course.active)">                       
+                            <label class="label-title">狀態</label>
+                            <p v-html="course.activeLabel">                       
                             </p>
                         </div>  
                         <div  class="col-sm-4">
-                            <label class="label-title">資料審核</label>
+                            <label class="label-title">審核</label>
                             <p v-if="course.hasReviewedBy" >
                                 <a @click.prevent="showReviewedBy" href="#" v-html="$options.filters.reviewedLabel(course.reviewed)">                         
                                 </a>
@@ -137,7 +137,14 @@
                             <label class="label-title">最後更新</label>
                             <updated :entity="course"></updated>
                         </div>    
-                    </div> 
+                    </div>  <!-- End Row -->
+                    <div v-if="course.status.ps" class="row">
+                        <div class="col-sm-12">
+                            <label class="label-title">備註</label>
+                            <p v-text="course.status.ps">                       
+                            </p>
+                        </div> 
+                    </div>  <!-- End Row -->    
                 </div>   
             </div>
         </div>  <!-- End panel-body-->

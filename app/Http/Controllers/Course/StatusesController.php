@@ -14,27 +14,15 @@ use App\Status;
 use App\Course;
 
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 class StatusesController extends BaseController
 {
     
-    public function __construct(Courses $courses,   Terms $terms , 
-                               Centers $centers,CheckAdmin $checkAdmin)
-                               
+    public function __construct(Courses $courses,Terms $terms , Centers $centers) 
     {
-       
-        $exceptAdmin=[];
-        $allowVisitors=[];
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
-        
         $this->courses=$courses;
         $this->terms=$terms;
         $this->centers=$centers;
-
-        $this->setCheckAdmin($checkAdmin);
-       
-      
 
 	}
     public function index()

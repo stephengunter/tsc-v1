@@ -191,7 +191,37 @@
                                     <small class="text-danger" v-if="form.errors.has('course.hours')" v-text="form.errors.get('course.hours')"></small>
                                 </div>
                             </div> 
+                            
                         </div>      <!-- End Row   --> 
+                        <div v-if="!isCreate" v-show="form.course.canReview" class="row">
+                            <div class="col-sm-4">
+                                <div  class="form-group">  
+                                    <label>狀態</label>
+                                    <div>
+                                        <input type="hidden" v-model="form.course.active"  >
+                                        <toggle :items="activeOptions"   :default_val="form.course.active" @selected="setActive"></toggle>
+                                    </div>
+                                </div>
+                            </div> 
+                            <div class="col-sm-4">
+                                <div class="form-group">  
+                                    <label>審核</label>
+                                    <div>
+                                        <input type="hidden" v-model="form.course.reviewed"  >
+                                        <toggle :items="reviewedOptions"   :default_val="form.course.reviewed" @selected="setReviewed"></toggle>
+                                    </div>
+                                </div>
+                            </div> 
+                            
+                        </div>      <!-- End Row   --> 
+                        <div  class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">  
+                                    <label>備註</label>
+                                    <input type="text" name="course.ps" class="form-control" v-model="form.course.ps">
+                                </div>
+                            </div>
+                        </div> 
                         <div  class="row">
                             <div class="col-sm-4">
                                 <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確認送出</button>
@@ -274,7 +304,13 @@
                 termOptions:[],
                 creditCountOptions:Helper.numberOptions(0,60),
                 weeksOptions:Course.weeksOptions(),
-                activeOptions:Helper.activeOptions(),
+                activeOptions:[{
+                    text: '正常開課',
+                    value: '1'
+                }, {
+                    text: '停止開課',
+                    value: '0'
+                }],
                 reviewedOptions:Helper.reviewedOptions(),
 
                 photo_id: 0,
@@ -497,6 +533,7 @@
                 this.form.course.active = val
             },
             setReviewed(val) {
+               
                 this.form.course.reviewed = val
             },
             clearErrorMsg(name) {

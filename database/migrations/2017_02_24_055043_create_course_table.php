@@ -54,7 +54,7 @@ class CreateCourseTable extends Migration
             $table->integer('photo_id')->unsigned()->nullable();
 
             $table->boolean('reviewed')->default(false);
-            $table->boolean('active')->default(false);            
+            $table->boolean('active')->default(true);            
             $table->boolean('removed')->default(false);
             
             $table->integer('updated_by')->unsigned()->nullable();

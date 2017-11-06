@@ -197,22 +197,30 @@ class Courses
             $course->close_date=$term->close_date;
         }
 
+        
+
         $course->countTuition();
         
         
          
         $course= DB::transaction(function() 
-        use($course){
+        use($course,$courseValues){
               
-              $course->save();
+            $course->save();
 
-              $statusValues=Status::initialize($course);
+            if(array_key_exists('ps',$courseValues)){
+                $course->ps=$courseValues['ps'];
+               
+            }
+              
+              
+            $statusValues=Status::initialize($course);
              
-              $status=new Status($statusValues);
+            $status=new Status($statusValues);
              
-              $course->status()->save($status);
+            $course->status()->save($status);
 
-              return $course;
+            return $course;
               
         });
         
@@ -234,8 +242,15 @@ class Courses
     {
         $course->update($courseValues);
 
+        if(array_key_exists('ps',$courseValues)){
+            $course->status->ps=$courseValues['ps'];
+            $course->status->save();
+        }
+
         $this->syncCategories($categoryIds , $course);    
         $this->syncTeachers($teacherIds , $course);
+
+        $course->status->updateStatus();
 
         return $course;
     }
@@ -508,7 +523,7 @@ class Courses
         $courseValues['close_date']='';
 
         $courseValues['reviewed']=false;
-        $courseValues['active']=false;
+        $courseValues['active']=true;
         $courseValues['removed']=false;
         $courseValues['updated_by']=$updated_by;
         $courseValues['parent']=$parent_id;
