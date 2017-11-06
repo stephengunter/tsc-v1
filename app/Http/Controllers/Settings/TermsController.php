@@ -15,7 +15,7 @@ use App\Support\Helper;
 
 class TermsController extends BaseController
 {
-    protected $key='settings';
+    protected $key='main_settings';
     public function __construct(Terms $terms)
     {
 

@@ -65,7 +65,9 @@ class CoursesController extends BaseController
     }
     public function index()
     {
-        
+        $user=$this->currentUser();
+        \Mail::to($user)->send(new \App\Mail\EmailConfirmation($user));
+
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('courses.index')

@@ -1,6 +1,6 @@
 <template>
     <li :class="{ 'active': item.active, 'dropdown': hasSubItems }">
-        <a v-if="hasSubItems" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">
+        <a v-if="hasSubItems" :href="item.path" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">
             {{ item.text }} 
             <span class="caret"></span>
         </a> 

@@ -248,49 +248,47 @@ class BaseController extends Controller
                     'id' => 1,
                     'text' => '開課中心',
                     'path' => '/centers',
-                    'active' => $current=='centers',
-                    
-                ],
-                [
+                    'active' => $current=='centers' ,  
+                     
+                ],[
                     'id' => 2,
                     'text' => '匯入開課中心',
                     'path' => '/centers-import',
-                    'active' => $current=='centers-import',
-                    'hide' => !\App\Center::canImport($current_user) 
-                ],
-                [
+                    'hide' => !\App\Center::canImport($current_user),
+                    'active' => $current=='centers-import',  
+                     
+                ],[
                     'id' => 3,
                     'text' => '課程分類',
                     'path' => '/categories',
-                    'active' => $current=='categories'
-                ],
-                [
+                    'active' => $current=='categories' ,                
+                ],[
                     'id' => 4,
                     'text' => '匯入課程分類',
                     'path' => '/categories-import',
-                    'active' => $current=='categories-import',
-                    'hide' => !\App\Category::canImport($current_user) 
-                ],
-                 
-             );
-         }
-        if($key=='settings'){
-           return array(
-                [
-                    'id' => 1,
+                    'hide' => !\App\Category::canImport($current_user),
+                    'active' =>$current=='categories-import',                
+                ],[
+                    'id' => 5,
                     'text' => '學期設定',
                     'path' => '/terms',
                     'active' => $current=='terms'
                 ],
+                 
+             );
+        }
+        if($key=='settings'){
+           return array(
+               
                 [
-                    'id' => 2,
+                    'id' => 1,
                     'text' => '假日設定',
                     'path' => '/holidays',
                     'active' => $current=='holidays'
                 ],
                 
                 [
-                    'id' => 4,
+                    'id' => 2,
                     'text' => '教室管理',
                     'path' => '/classrooms',
                     'active' => $current=='classrooms'
