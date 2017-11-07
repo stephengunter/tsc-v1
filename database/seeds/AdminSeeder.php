@@ -18,7 +18,7 @@ class AdminSeeder extends Seeder
     {
         $user=\App\User::create([
 			'name' => '花組長',
-			'email' =>'hua@gmail.com',
+			'email' =>'test@tcust.com.tw',
 			'phone' => '0932000000',
 			'password' => '000000',
 			'email_confirmed' => true,
@@ -44,6 +44,10 @@ class AdminSeeder extends Seeder
         $center=Center::where('head',true)->first();
         $admin=Admin::find($user->id);
         $admin->attachCenter($center->id);
+
+        
+        
+		
         
 
          

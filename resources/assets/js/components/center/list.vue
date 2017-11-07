@@ -46,6 +46,9 @@
                         </td>
                         <td>{{ center.code }}</td>
                         <td v-text="addressText(center.contactInfo)"></td>
+
+                        <td v-text="center.course_tel"></td>
+
                         <td v-text="telText(center.contactInfo)"></td>
                         <td v-text="faxText(center.contactInfo)"></td>   
                         <td v-html="$options.filters.activeLabel(center.active)" ></td>
@@ -106,6 +109,11 @@
                     },{
                         title: '地址',
                         key: 'name',
+                        sort: false,
+                        default:true
+                    }, {
+                        title: '課程洽詢電話',
+                        key: 'course_tel',
                         sort: false,
                         default:true
                     }, {
