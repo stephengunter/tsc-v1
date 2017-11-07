@@ -8,13 +8,16 @@ use App\Photo;
 use App\Support\FilterPaginateOrder;
 use Carbon\Carbon;
 
+
+use App\Support\Helper;
+
 class Course extends Model
 {
     use FilterPaginateOrder;
    
     
     protected $fillable = [ 'term_id', 'center_id', 'name', 
-                            'group','parent','must','number',
+                            'group','parent','must','number', 'caution',
                             'credit_count' , 'credit_price' ,'net_signup' , 
                             'begin_date' ,  'end_date' , 'weeks', 'hours',
                             'tuition', 'cost' , 'materials',
@@ -328,7 +331,8 @@ class Course extends Model
 	{
         if($user->isDev()) return true;
         if(!$user->isOwner()) return false;
-		return Helper::centersIntersect($this,$user->admin);
+
+        return $user->admin->canAdminCenter($this->center);
 	}
 	public function canDeleteBy($user)
 	{

@@ -239,6 +239,8 @@ class CoursesController extends BaseController
         $course->canDelete=$course->canDeleteBy($current_user);
         $course->canReview=$course->canReviewBy($current_user);
 
+        
+
         $course->getParentCourse();
        
         foreach ($course->classTimes as $classTime) {
@@ -261,7 +263,7 @@ class CoursesController extends BaseController
             return  $this->unauthorized(); 
         }
 
-        $course->canReview=$course->canReviewBy($current_user);
+        //$course->canReview=$course->canReviewBy($current_user);
 
         $course->begin_date=Helper::checkDateString($course->begin_date);
         $course->end_date=Helper::checkDateString($course->end_date);

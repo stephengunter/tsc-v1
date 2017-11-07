@@ -137,8 +137,7 @@
             fetchData() {
                 let getData=Classtime.index(this.course_id)
                     getData.then(data => {
-                      
-                      
+                       this.classtimeList= data.classtimeList
                        this.loaded = true
                         
                     })

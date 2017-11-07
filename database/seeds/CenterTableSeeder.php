@@ -48,6 +48,7 @@ class CenterTableSeeder extends Seeder
 			'head' => 1,
 			'contact_info' => $contactinfo->id,
 			'code' => 'A',
+			'course_tel' => '03-845236 轉1703或1704',
 			'active' => 1,
 		]);
 		// //台北中心

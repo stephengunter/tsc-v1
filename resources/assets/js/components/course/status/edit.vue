@@ -10,6 +10,17 @@
             <form class="form" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
                 <div class="row">
                     <div class="col-sm-3">
+                         <div class="form-group">                           
+                            <label>開課狀態</label>
+                            <div>
+                                <input type="hidden" v-model="form.status.course.active"  >
+                                <toggle :items="activeOptions"   :default_val="form.status.course.active" @selected="setActive"></toggle>
+                            </div>
+                         </div>
+                       
+                    </div>
+
+                    <!-- <div class="col-sm-3">
                         <div class="form-group">                           
                             <label>報名狀態</label>
                             <div>
@@ -17,18 +28,9 @@
                                 <toggle :items="signupOptions"   :default_val="form.status.signup" @selected="setSignupStatus"></toggle>
                             </div>
                          </div>
-                    </div>
-                    <div class="col-sm-3">
-                         <div class="form-group">                           
-                            <label>開課狀態</label>
-                            <div>
-                                <input type="hidden" v-model="form.status.class"  >
-                                <toggle :items="classOptions"   :default_val="form.status.class" @selected="setClassStatus"></toggle>
-                            </div>
-                         </div>
-                       
-                    </div>
-                    <div class="col-sm-6">
+                    </div> -->
+                    
+                    <div class="col-sm-9">
                          <div class="form-group">                           
                             <label>備註</label>
                             <div>
@@ -47,9 +49,7 @@
                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                          <button class="btn btn-default" @click.prevent="cancel">取消</button>
                     </div>
-                    <div class="col-sm-4">
-                        
-                    </div>
+                    
 
                 </div>
                     
@@ -87,7 +87,7 @@
                     value: '1'
                 }],
 
-                classOptions:[{
+                activeOptions:[{
                     text: '停止開課',
                     value: '0'
                 }, {
@@ -130,8 +130,9 @@
             setSignupStatus(val){
                 this.form.status.signup = val
             },
-            setClassStatus(val){
-                 this.form.status.class = val
+            setActive(val){
+                
+                this.form.status.course.active = val
             },
             clearErrorMsg(name) {
                 this.form.errors.clear(name)
@@ -144,8 +145,8 @@
                 let update=CourseStatus.update(this.form, id)
                 
                 update.then(data => {
-                   Helper.BusEmitOK()
-                   this.$emit('saved',data)                            
+                    Helper.BusEmitOK()
+                    this.$emit('saved',data)                            
                 })
                 .catch(error => {
                     Helper.BusEmitError(error) 

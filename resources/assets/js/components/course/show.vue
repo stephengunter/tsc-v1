@@ -109,6 +109,13 @@
                         </div>    
                     </div> 
                     <div class="row">
+                        <div class="col-sm-12">
+                            <label class="label-title">注意事項</label>
+                            <p v-html="course.caution"></p>
+                        </div>  
+                          
+                    </div> 
+                    <div class="row">
                         <div class="col-sm-4">
                             <label class="label-title">狀態</label>
                             <p v-html="course.activeLabel">                       

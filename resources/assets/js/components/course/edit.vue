@@ -148,7 +148,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">  
                                     <label>課程簡介</label>
-                                    <textarea rows="6" cols="50" class="form-control" name="course.description"  v-model="form.course.description">
+                                    <textarea rows="4" cols="50" class="form-control" name="course.description"  v-model="form.course.description">
                                     </textarea>
                                     <small class="text-danger" v-if="form.errors.has('course.description')" v-text="form.errors.get('course.description')"></small>
                                 </div> 
@@ -193,7 +193,7 @@
                             </div> 
                             
                         </div>      <!-- End Row   --> 
-                        <div v-if="!isCreate" v-show="form.course.canReview" class="row">
+                        <!-- <div v-if="!isCreate" v-show="form.course.canReview" class="row">
                             <div class="col-sm-4">
                                 <div  class="form-group">  
                                     <label>狀態</label>
@@ -213,13 +213,16 @@
                                 </div>
                             </div> 
                             
-                        </div>      <!-- End Row   --> 
+                        </div>      -->
                         <div  class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">  
                                     <label>注意事項</label>
-                                    <input type="text" name="course.caution" class="form-control" v-model="form.course.caution">
-                                </div>
+                                    <textarea rows="4" cols="50" class="form-control" name="course.caution"  v-model="form.course.caution">
+                                    </textarea>
+                                    <small class="text-danger" v-if="form.errors.has('course.caution')" v-text="form.errors.get('course.descripcautiontion')"></small>
+                                </div> 
+                               
                             </div>
                         </div> 
                         <div  class="row">
@@ -408,7 +411,7 @@
                 
                 getData.then(data=>{
                     let course = data.course
-                    
+                    course.caution = Helper.replaceAll(course.caution, '<br>', '\n')
                     this.form = new Form({
                             course: course,
                         })
@@ -545,6 +548,11 @@
             onSubmit() {
                 this.form.course.teachers=this.teachers
                 this.form.course.categories=this.categories
+
+                if(this.form.course.caution){
+                   let caution=Helper.replaceAll( this.form.course.caution, '\n','<br>')
+                   this.form.course.caution=caution
+                }
                 this.submitForm()
             },
             submitForm() {

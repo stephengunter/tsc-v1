@@ -257,11 +257,6 @@ class Courses
     {
         $course->update($courseValues);
 
-        if(array_key_exists('ps',$courseValues)){
-            $course->status->ps=$courseValues['ps'];
-            $course->status->save();
-        }
-
         $this->syncCategories($categoryIds , $course);    
         $this->syncTeachers($teacherIds , $course);
 

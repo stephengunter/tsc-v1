@@ -18,8 +18,8 @@
                                 <date-picker :option="datePickerOption" :date="open_date" ></date-picker>
                             </div>
                             <input type="hidden" v-model="form.signupinfo.open_date"  >
-                             <small class="text-danger" v-if="form.errors.has('signupinfo.open_date')" v-text="form.errors.get('signupinfo.open_date')"></small>
-                         </div>
+                            <small class="text-danger" v-if="form.errors.has('signupinfo.open_date')" v-text="form.errors.get('signupinfo.open_date')"></small>
+                        </div>
                     </div>
                     <div class="col-sm-3">
                        <div class="form-group">                           
@@ -39,6 +39,12 @@
                         </div>
                     </div>
                     <div class="col-sm-3">
+                        <div class="form-group">                           
+                            <label>最低人數</label>
+                            <input type="text" name="signupinfo.min" class="form-control" v-model="form.signupinfo.min">
+                            <small class="text-danger" v-if="form.errors.has('signupinfo.min')" v-text="form.errors.get('signupinfo.min')"></small>
+                        </div>
+                       
                         
                     </div>
                 </div>
@@ -52,38 +58,32 @@
                     </div>
                     <div class="col-sm-3">
                         <div class="form-group">                           
-                            <label>材料費</label>
+                            <label>教材費</label>
                             <input type="text" name="signupinfo.cost" class="form-control" v-model="form.signupinfo.cost">
                             <small class="text-danger" v-if="form.errors.has('signupinfo.cost')" v-text="form.errors.get('signupinfo.cost')"></small>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">                           
-                            <label>材料</label>
-                             <textarea rows="2" cols="50" class="form-control" name="signupinfo.materials"  v-model="form.signupinfo.materials">
-                            </textarea>
-                            <small class="text-danger" v-if="form.errors.has('signupinfo.materials')" v-text="form.errors.get('signupinfo.materials')"></small>
+                            <label>網路報名</label>
+                            <div>
+                                <input type="hidden" v-model="form.signupinfo.net_signup"  >
+                                <toggle :items="boolOptions"   :default_val="form.signupinfo.net_signup" @selected="setNetSignup"></toggle>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                  <div class="col-sm-3">
+                  
+                    <div class="col-sm-12">
                         <div class="form-group">                           
-                            <label>網路報名</label>
-                            <div>
-                            <input type="hidden" v-model="form.signupinfo.net_signup"  >
-                             <toggle :items="boolOptions"   :default_val="form.signupinfo.net_signup" @selected="setNetSignup"></toggle>
-                            </div>
-                          </div>
+                            <label>教材</label>
+                                <textarea rows="4" cols="50" class="form-control" name="signupinfo.materials"  v-model="form.signupinfo.materials">
+                                </textarea>
+                            <small class="text-danger" v-if="form.errors.has('signupinfo.materials')" v-text="form.errors.get('signupinfo.materials')"></small>
+                        </div>
                     </div>
-                    <div class="col-sm-3">
-                        <div class="form-group">                           
-                         </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="form-group">                           
-                         </div>
-                    </div>
+                   
                 </div>
                 <div class="row">
                     <div class="col-sm-3">
@@ -91,9 +91,7 @@
                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                          <button class="btn btn-default" @click.prevent="cancel">取消</button>
                     </div>
-                    <div class="col-sm-4">
-                        
-                    </div>
+                    
 
                 </div>
                     
@@ -170,10 +168,10 @@
                 let id=this.id
                 let getData=SignupInfo.edit(id)
                 
-               getData.then(data=>{
+                getData.then(data=>{
                     let signupinfo = new SignupInfo(data.signupinfo)
                     if(!signupinfo.cost){
-                      signupinfo.cost=0
+                       signupinfo.cost=0
                     }
                     this.form = new Form({
                             signupinfo: signupinfo,
@@ -200,7 +198,11 @@
                 this.form.errors.clear(name)
             },
             onSubmit() {
-               this.submitForm()
+                if(this.form.signupinfo.materials){
+                   let materials=Helper.replaceAll( this.form.signupinfo.materials, '\n','<br>')
+                   this.form.signupinfo.materials=materials
+                }
+                this.submitForm()
             },
             submitForm() {
                 let id=this.id

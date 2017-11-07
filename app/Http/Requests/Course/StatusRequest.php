@@ -35,4 +35,8 @@ class StatusRequest extends FormRequest
     {
         return $this->get('status');
     }
+    public function getActive()
+    {
+        return $this->getValues()['course']['active'];
+    }
 }

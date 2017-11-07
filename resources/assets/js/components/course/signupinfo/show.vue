@@ -20,58 +20,61 @@
         <div class="panel-body" >
            
             <div class="row">
-                    <div class="col-sm-3">
-                        <label class="label-title">報名起始日</label>
-                        <p v-text="signupinfo.open_date"></p>  
-                      
-                    </div>
-                    <div class="col-sm-3">
-                        <label class="label-title">報名截止日</label>
-                        <p>
-                          {{ signupinfo.close_date }}
+                <div class="col-sm-3">
+                    <label class="label-title">報名起始日</label>
+                    <p v-text="signupinfo.open_date"></p>  
+                    
+                </div>
+                <div class="col-sm-3">
+                    <label class="label-title">報名截止日</label>
+                    <p>
+                        {{ signupinfo.close_date }}
 
-                        </p>  
-                      
-                    </div>
-                    <div class="col-sm-3">
-                                              
-                        <label class="label-title">人數上限</label>
-                        <p v-text="signupinfo.limit"></p>  
-                       
-                    </div>
-                    <div class="col-sm-3">
-                        
-                    </div>
+                    </p>  
+                    
+                </div>
+                <div class="col-sm-3">
+                                            
+                    <label class="label-title">人數上限</label>
+                    <p v-text="signupinfo.limit"></p>  
+                    
+                </div>
+                <div class="col-sm-3">
+                    <label class="label-title">最低人數</label>
+                    <p v-text="signupinfo.min"></p>  
+                </div>
             </div>
             <div class="row">
-                    <div class="col-sm-3">
-                                                
-                        <label class="label-title">學費</label>
-                        <p v-text="signupinfo.tuition"></p>  
-                      
-                    </div>
-                    <div class="col-sm-3">
+                <div class="col-sm-3">
                                             
-                        <label class="label-title">材料費</label>
-                        <p v-text="signupinfo.cost"></p>  
-                     
-                    </div>
-                    <div class="col-sm-3">
-                                               
-                        <label class="label-title">材料</label>
-                        <p v-text="signupinfo.materials"></p>  
-                       
-                    </div>
-                    <div class="col-sm-3">
-                         <label class="label-title">網路報名</label>
-                        <p>
-                            {{ signupinfo.net_signup | boolText  }}
-                            <span v-html="$options.filters.yesOrNoSign(signupinfo.net_signup)"></span>
-                          
-                        </p>
-                     </div>
+                    <label class="label-title">學費</label>
+                    <p v-text="signupinfo.tuition"></p>  
+                    
+                </div>
+                <div class="col-sm-3">
+                                        
+                    <label class="label-title">教材費</label>
+                    <p v-text="signupinfo.cost"></p>  
+                    
+                </div>
+                
+                <div class="col-sm-3">
+                        <label class="label-title">網路報名</label>
+                    <p>
+                        {{ signupinfo.net_signup | boolText  }}
+                        <span v-html="$options.filters.yesOrNoSign(signupinfo.net_signup)"></span>
+                        
+                    </p>
+                </div>
             </div>
-          
+            <div class="row">
+                <div class="col-sm-12">
+                                            
+                    <label class="label-title">教材</label>
+                    <p v-html="signupinfo.materials"></p>  
+                    
+                </div>
+            </div>    
         </div> <!-- End panel-heading-->
 
     </div>
@@ -109,7 +112,9 @@
         },
          
         methods: {  
-            
+            getMaterials(signupinfo){
+                return 'ikik'
+            },
             btnEditCilcked(){
                this.$emit('begin-edit');
             },

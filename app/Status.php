@@ -26,7 +26,7 @@ class Status extends Model
         '1' => '已完成',
     ];
     public $classStatusList=[       
-       '-1' => '尚未開課',
+       '-1' => '尚未開始',
         '0' => '停止開課',
         '1' => '進行中',
         '2' => '已結束',
@@ -51,17 +51,14 @@ class Status extends Model
     public function updateStatus()
     {
         $course=$this->course;
-        
-        if((int)$this->signup!=0 ){
-            $this->signup=static::getSignupStatus($course);
-        }
 
         if($course->active){
             $this->class=static::getClassStatus($course);
+            $this->signup=static::getSignupStatus($course);
         }else{
-            $this->class=0;
+            $this->class=0;  //已停止
+            $this->signup=0;  //已停止
         }
-
         
         $this->save();
 
@@ -142,13 +139,8 @@ class Status extends Model
     public function canEditBy($user)
 	{
         
-		return $this->course->canEditBy($user);
+		return $this->course->canReviewBy($user);
           
 	} 
-	public function canDeleteBy($user)
-	{
-        return $this->course->canDeleteBy($user);
-        
-	}
 
 }

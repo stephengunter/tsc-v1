@@ -15,29 +15,34 @@
         <div class="panel-body" >
            
             <div class="row">
-                    <div class="col-sm-3">
-                        <label class="label-title">報名狀態</label>
-                        <p v-html="signupLabel()"></p>  
-                      
-                    </div>
-                    <div class="col-sm-3">
-                        <label class="label-title">註冊狀態</label>
-                          <p v-html="registerLabel()"></p>  
-                      
-                    </div>
-                    <div class="col-sm-3">
-                                              
-                        <label class="label-title">開課狀態</label>
-                          <p v-html="classLabel()"></p>  
-                       
-                    </div>
-                    <div class="col-sm-3">
-                        <label class="label-title">備註</label>
-                          <p v-text="status.ps"></p>  
-                    </div>
-            </div>
-           
-          
+                <div class="col-sm-3">
+                    <label class="label-title">狀態</label>
+                    <p v-html="activeLabel(status.course.active)"></p> 
+                </div>
+                <div class="col-sm-3">
+                    <label class="label-title">報名</label>
+                    <p v-html="signupLabel()"></p>  
+                    
+                </div>
+                <div class="col-sm-3">
+                    <label class="label-title">註冊</label>
+                    <p v-html="registerLabel()"></p>  
+                    
+                </div>
+                <div class="col-sm-3">
+                                            
+                    <label class="label-title">課程進行</label>
+                    <p v-html="classLabel()"></p>  
+                    
+                </div>
+                
+            </div> <!-- End row-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="label-title">備註</label>
+                    <p v-text="status.ps"></p>  
+                </div>
+            </div>    
         </div> <!-- End panel-heading-->
 
     </div>
@@ -91,6 +96,10 @@
                     Helper.BusEmitError(error)
                 })
               
+            },
+            activeLabel(active){
+               
+                return Course.activeLabel(active)
             },
             signupLabel(){
                 return CourseStatus.getSignupLabel(this.status)
