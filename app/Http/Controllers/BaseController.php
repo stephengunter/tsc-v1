@@ -204,10 +204,16 @@ class BaseController extends Controller
                 ],
                 [
                     'id' => 4,
-                    'text' => '狀態查詢',
-                    'path' => '/statuses',
-                    'active' => $current=='statuses'
+                    'text' => '新增課程',
+                    'path' => '/courses/create',
+                    'active' => $current=='courses/create'
                 ],
+                // [
+                //     'id' => 4,
+                //     'text' => '狀態查詢',
+                //     'path' => '/statuses',
+                //     'active' => $current=='statuses'
+                // ],
                 
             );
         }

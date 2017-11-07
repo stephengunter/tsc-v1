@@ -14,6 +14,8 @@ class CreateCenterTable extends Migration
 
             $table->string('name')->nullable();
             $table->string('code')->nullable();
+            $table->string('course_tel')->nullable();
+
             $table->integer('contact_info')->unsigned()->nullable();
             $table->integer('photo_id')->unsigned()->nullable();
             $table->boolean('active')->default(true);

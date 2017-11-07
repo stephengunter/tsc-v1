@@ -10,11 +10,8 @@ use App\Repositories\Users;
 use App\Http\Requests\Settings\CenterRequest;
 
 use App\Center;
-
-use App\Http\Middleware\CheckAdmin;
+use App\ContactInfo;
 use App\Support\Helper;
-
-use DB;
 
 class CentersController extends BaseController
 {
@@ -65,10 +62,11 @@ class CentersController extends BaseController
         }  
 
         $center= Center::initialize();
-       
+        $contact_info= ContactInfo::initialize();
         return response()
             ->json([
-                'center' => $center
+                'center' => $center,
+                'contact_info' => $contact_info
             ]);
     }
     public function store(CenterRequest $request)
@@ -77,9 +75,13 @@ class CentersController extends BaseController
         $updated_by=$current_user->id;
         $removed=false;
 
-        $values=$request->getValues($updated_by,$removed);
+        $centerValues=$request->getCenterValues($updated_by,$removed);
         
-        $center=Center::create($values);
+        
+        $contactInfo=ContactInfo::create($request->get('contact_info'));
+
+        $centerValues['contact_info']=$contactInfo->id;
+        $center=$this->centers->store($centerValues);
 
         return response()->json($center);
       
@@ -122,20 +124,20 @@ class CentersController extends BaseController
     public function update(CenterRequest $request, $id)
     {
        
-         $center=$this->centers->findOrFail($id);    
-         $current_user=$this->currentUser();
-         if(!$center->canEditBy($current_user)){
+        $center=$this->centers->findOrFail($id);    
+        $current_user=$this->currentUser();
+        if(!$center->canEditBy($current_user)){
              return  $this->unauthorized();      
-         }
-         $updated_by=$current_user->id;
-         $removed=false;
-         $values= $request->getValues($updated_by,$removed);
+        }
+        $updated_by=$current_user->id;
+        $removed=false;
+        $values= $request->getCenterValues($updated_by,$removed);
 
-         dd($request->getId());
+         
 
-         $center->update($values);
+        $center->update($values);
 
-          return response()->json($center);
+        return response()->json($center);
     }
     public function updateDisplayOrder(Request $form)
     {

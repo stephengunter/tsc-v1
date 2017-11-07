@@ -245,7 +245,8 @@
                 this.setContactInfo(null)
             },
             onCourseDetails(id){
-                alert('details ' + id)
+                let path='/courses/' + id
+                Helper.newWindow(path)
             }
             
         }, 

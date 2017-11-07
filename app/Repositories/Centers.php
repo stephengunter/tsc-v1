@@ -31,14 +31,21 @@ class Centers
         return $this->getAll()->where('code',$code)->first();
     }
     
-    public function store($values)
+    public function store($centerValues)
     {
-        $center=Center::create($values);
+        $center=new Center ($centerValues);
+        if($center->display_order>=0){
+            $center->active=true;
+        }else{
+            $center->active=false;
+        }
+
+        
+        $center->save();
+        
         return  $center;
       
     }
-
-    
    
     public function updateDisplayOrder($id,$order,$updated_by)
     {
@@ -147,6 +154,8 @@ class Centers
                 $active=false;
             }
 
+            $course_tel=trim($row['course_tel']);
+
             $zipcode=trim($row['zipcode']);
             $street=trim($row['street']);
             $tel=trim($row['tel']);
@@ -158,6 +167,7 @@ class Centers
             $values=[
                 'name' => $name,
                 'code' => $code,
+                'course_tel' => $course_tel,
                 'display_order' => $order,
                 'active' => $active,
                 'updated_by' => $updated_by
@@ -172,7 +182,7 @@ class Centers
                 $contactInfo=ContactInfo::createByAddress($zipcode, $street, $updated_by,$tel,$fax);
                 if($contactInfo) $values['contact_info'] = $contactInfo->id;
                
-                $center=Center::create($values);
+                $center=$this->store($values);
             
             }
 

@@ -40,9 +40,11 @@ class CreateCourseTable extends Migration
             
             $table->decimal('tuition', 8, 2)->nullable();   //學費
             $table->decimal('cost', 8, 2)->nullable();  //材料費
-            $table->string('materials')->nullable();   //材料    槌子,榔頭,電鑽
+            $table->text('materials')->nullable();   //材料    槌子,榔頭,電鑽
             $table->text('description')->nullable();
-            $table->text('target')->nullable();
+            $table->text('target')->nullable();  //招生對象
+
+            $table->text('caution')->nullable();  // 注意事項
 
             $table->date('open_date')->nullable();    //開始報名
             $table->date('close_date')->nullable();   //截止報名
@@ -50,6 +52,7 @@ class CreateCourseTable extends Migration
             $table->integer('min')->default(0);    //人數下限
 
             
+
             $table->integer('display_order')->default(0);
             $table->integer('photo_id')->unsigned()->nullable();
 

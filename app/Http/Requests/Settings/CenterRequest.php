@@ -47,7 +47,7 @@ class CenterRequest extends FormRequest
         ];
     }
 
-    public function getValues($updated_by,$removed)
+    public function getCenterValues($updated_by,$removed)
     {
         $except=['contact_info','photo_id'];
 

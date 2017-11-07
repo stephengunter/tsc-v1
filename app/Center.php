@@ -12,7 +12,8 @@ class Center extends Model
 {
 	use FilterPaginateOrder;
 	
-	protected $fillable = ['name', 'code' , 'active', 'display_order',
+	protected $fillable = ['name', 'code' , 'course_tel',
+							'active',  'display_order',
 						   'contact_info','removed','updated_by'];
 	
     protected $filter = [
@@ -29,6 +30,7 @@ class Center extends Model
          return [
 			 'name' => '',
 			 'active' => 0,
+			 'course_tel' => '',
 			 'display_order' => -1
 			 
         ];

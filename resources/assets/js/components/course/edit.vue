@@ -217,8 +217,8 @@
                         <div  class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">  
-                                    <label>備註</label>
-                                    <input type="text" name="course.ps" class="form-control" v-model="form.course.ps">
+                                    <label>注意事項</label>
+                                    <input type="text" name="course.caution" class="form-control" v-model="form.course.caution">
                                 </div>
                             </div>
                         </div> 

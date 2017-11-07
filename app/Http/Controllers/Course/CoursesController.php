@@ -255,7 +255,7 @@ class CoursesController extends BaseController
     }
     public function edit($id)
     {
-        $course = Course::with(['status','categories','teachers'])->findOrFail($id);     
+        $course = Course::with(['categories','teachers'])->findOrFail($id);     
         $current_user=$this->currentUser();
         if(!$course->canEditBy($current_user)){
             return  $this->unauthorized(); 
@@ -267,7 +267,7 @@ class CoursesController extends BaseController
         $course->end_date=Helper::checkDateString($course->end_date);
 
         $course->isCredit();
-        $course->getPS();
+        
 
         if($course->isGroup()) return $this->editGroupCourse($course);
 

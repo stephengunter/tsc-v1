@@ -1,10 +1,5 @@
 <template>
    
-    
-    <!-- <course-import v-if="importing"
-      @canceled="endImport"
-      @imported="onImported">
-    </course-import> -->
 
     <edit-course :course_id="course_id"  :parent="parent"
         @canceled="onCanceled" @saved="onSaved">
@@ -15,12 +10,11 @@
 
 <script>
     import EditCourse from '../../components/course/edit.vue'
-    // import CourseImport from '../../components/course/import.vue'
+    
     export default {
         name: 'CourseCreate',
         components: {
             'edit-course':EditCourse,
-            // 'course-import':CourseImport
         },
         props: {
             course_id:{
@@ -57,17 +51,6 @@
                
                 this.$emit('saved',course)
             },
-            // onImported(){
-            //     this.$emit('imported')
-            // },
-            // beginImport(){
-            //     this.importing=true
-            // },
-            // endImport(){
-            //     this.importing=false
-            // }
-            
-           
             
             
         },
