@@ -1,4 +1,7 @@
 class Helper {
+    static getScrollBarWidth() {
+        return CommonService.getScrollBarWidth()
+    }
     static newWindow(path) {
         window.open(window.location.origin + path)
     }

@@ -108,15 +108,6 @@ class StatusesController extends BaseController
         $status->ps=$values['ps'];
         $status->updated_by=$updated_by;
 
-        // $signup=(int)$values['signup'];
-        // $class=(int)$values['class'];
-        
-        // $status->class = $class;
-        // $status->signup=$signup;
-
-        
-        // if($class==0) $status->signup=0; //已停止
-
         $status->updateStatus();
 
         return response()->json(['status' => $status ]);   

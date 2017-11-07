@@ -20,12 +20,7 @@ use App\Http\Requests\AdminUserRequest;
 
 use App\Support\Helper;
 
-use App\Events\AdminCreated;
-use App\Events\AdminDeleted;
-use App\Events\UserRegistered;
-
 use Illuminate\Support\Facades\Input;
-use DB;
 
 class AdminsController extends BaseController
 {
@@ -201,7 +196,7 @@ class AdminsController extends BaseController
          $adminId=$request->getAdminId();
          $center_id=$adminValues['center_id'];
 
-         $admin=$this->admins->storeAdmin($userValues,$profileValues,$adminValues,$user_id,$adminId,$current_user,$center_id);
+         $admin=$this->admins->store($userValues,$profileValues,$adminValues,$user_id,$adminId,$current_user,$center_id);
 
          return response()->json($admin); 
 
@@ -255,35 +250,26 @@ class AdminsController extends BaseController
     public function update(Request $request ,$id)
     {
         $current_user=$this->currentUser();
-        $admin=$this->admins->findOrFail($id);
-        if(!$admin->canEditBy($current_user)){
-            return  $this->unauthorized();   
-        }
-
-        $updated_by=$current_user->id;
 
         $request = $request->get('admin');
        
-        $adminValues=array_except($request, ['user']);       
-        $adminValues=Helper::setUpdatedBy($adminValues,$updated_by);
-        $admin->update($adminValues);
+        $adminValues=array_except($request, ['user']);  
+       
 
-        if(!$admin->active){
-            event(new AdminDeleted($admin, $current_user));
-        }
+        $admin=$this->admins->update($id , $adminValues, $current_user);
+
+        
 
         return response()->json($admin);
     }
     public function destroy($id)
     {
-        $admin=$this->admins->findOrFail($id);
+        
         $current_user=$this->currentUser();
-        if(!$admin->canDeleteBy($current_user)){
-            return  $this->unauthorized();  
-        }
-        $this->admins->delete($id, $current_user->id);
+        
+        $this->admins->delete($id, $current_user);
 
-        event(new AdminDeleted($admin, $current_user));
+        
 
         return response()->json([ 'deleted' => true  ]);
     }

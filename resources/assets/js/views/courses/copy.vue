@@ -23,7 +23,7 @@
         <div slot="modal-body" class="modal-body">
             <show v-if="selected"  :id="selected" :hide_delete="showSettings.hide_delete"
                 :can_back="showSettings.can_back" :can_edit="showSettings.can_edit"
-                @loaded="setSelectedCourse" @edit-review="onEditReview"> 
+                @loaded="setSelectedCourse" > 
             </show>
             <signup-info v-if="selectedCourse" :course="selectedCourse" 
                :can_edit="showSettings.can_edit">

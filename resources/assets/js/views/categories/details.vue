@@ -1,42 +1,35 @@
 <template>
 <div>
-  <category v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
-     @saved="categoryUpdated" @loaded="onDataLoaded" 
-     @btn-back-clicked="onBtnBackClicked" @deleted="onCategoryDeleted" > 
+    <category v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
+        @saved="categoryUpdated" @loaded="onDataLoaded" 
+        @btn-back-clicked="onBtnBackClicked" @deleted="onCategoryDeleted" > 
 
-  </category>
+    </category>
 
-  <category-courses v-if="topCategory" :category="category"
-     :version="current_version"
-     @add-course="onAddCourse" @remove="beginRemove">
-    
-  </category-courses>
+    <category-courses v-if="topCategory" :category="category"
+        :version="current_version"
+        @add-course="onAddCourse" @remove="beginRemove">
+        
+    </category-courses>
 
-  <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
-      @close="deleteConfirm.show=false" @confirmed="submitRemove">        
-  </delete-confirm>
+    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+        @close="deleteConfirm.show=false" @confirmed="submitRemove">        
+    </delete-confirm>
   
   
-  <modal :showbtn="false" :width="courseSelector.width" :show.sync="courseSelector.show" 
-        @closed="onAddCourseCanceled"   effect="fade">
-       
-          <div slot="modal-header" class="modal-header">
-           
-            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="onAddCourseCanceled">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-            </button>
-           <h3>選擇要加入此分類的課程</h3>
-          </div>
+    <modal :showbtn="false" :width="modalSettings.width" :show.sync="modalSettings.show" 
+            @closed="onAddCourseCanceled"   effect="fade">
+        
+            
         <div slot="modal-body" class="modal-body">
-           
-           <course-selector v-if="courseSelector.show"
-             :courses="courseSelector.list"  
-             @submit-courses="submitAddCourses">
-                
+            <course-selector v-if="modalSettings.show" ref="selector"  
+               :source_url="courseSelector.source_url"
+               :params="courseSelector.params"  :title_text="courseSelector.title"
+                @submit="submitAddCourses">
             </course-selector>
-      
+           
         </div>
- </modal> 
+    </modal> 
   
 
 
@@ -80,112 +73,108 @@
         },
         data() {
             return {
-               loaded:false,
-               category:null,
-               current_version:0,
+                loaded:false,
+                category:null,
+                current_version:0,
 
-               removeCourses:[],
-               addCourses:[],
+                removeCourses:[],
+                addCourses:[],
 
-               courseSelector:{
-                  list:[],
-                  show:false,
-                  width:1200,
-               },
+                courseSelector:{
+                
+                   source_url:CategoryCourses.createUrl(),
+                   params:{
+                      term:0,
+                      center : 0,
+                      except:this.id,
+                      parent:-1
+                   },
+                   title:'選擇要加入此分類的課程'
+                },
+
+                modalSettings:{
+                    width:1200,
+                    show:false
+                },
                
-               deleteConfirm:{
+                deleteConfirm:{
                     id:0,
                     show:false,
                     msg:'',
 
                 }, 
 
-               courseListSettings:{
-                  title:Helper.getIcon(Course.title())  + '  此分類中的課程',
-                  hide_create:false,
-                  can_select:true,
-                  params:{
-                    category:this.id,
-                  },
-               }
+                
 
             }
         },
         computed:{
            topCategory(){
-               if(!this.category) return false
+                if(!this.category) return false
                 return Helper.isTrue(this.category.public)
            },
-           hasAddCourses(){
-               return this.addCourses.length > 0
-           },
-           hasRemoveCourses(){
-               return this.removeCourses.length > 0
-           },
+          
+        //    hasRemoveCourses(){
+        //        return this.removeCourses.length > 0
+        //    },
         },
         beforeMount(){
            this.init()
         },
         methods: {
             init(){
-              this.loaded=false
-              this.readonly=true
-              this.activeIndex=0
+                this.loaded=false
+                this.readonly=true
+                this.activeIndex=0
             },
             toBoolean(val){
-               return val=='true'
+                return val=='true'
             },
             onDataLoaded(category){              
                 this.loaded=true
                 this.category=category
             },
             btnEditClicked(){    
-              this.beginEdit()
+                this.beginEdit()
             },
             beginEdit(){
-               this.readonly=false
+                this.readonly=false
             },
             editCanceled(){
-               this.readonly=true
+                this.readonly=true
             },
             categoryUpdated(){
-               this.init()
+                this.init()
             },
             onBtnBackClicked(){
                 this.$emit('btn-back-clicked')
             },
             onCategoryDeleted(){
-               this.$emit('category-deleted')
+                this.$emit('category-deleted')
             },
-            getCoursesCanAdd(){
-               let getData=CategoryCourses.create(this.id)
-               getData.then(data=>{
-                    this.courseSelector.list=data.courseList
-                    this.courseSelector.show=true
-                }).catch(error=>{
-                    Helper.BusEmitError(error)
-                })
-
-            },
+            
             onAddCourse(){
-                this.getCoursesCanAdd()
+                this.modalSettings.show=true
             },
             onAddCourseCanceled(){
-                this.courseSelector.show=false
+                this.modalSettings.show=false
             },
             submitAddCourses(selectedIds){
-              let category=this.id
-              let courses=selectedIds
-              let store=CategoryCourses.store(category,courses)
-              store.then(data => {
-                 this.courseSelector.show=false
-                 this.current_version += 1
-                 Helper.BusEmitOK()
-                                          
-              })
-              .catch(error => {
-                    Helper.BusEmitError(error) 
-              })
+                this.modalSettings.show=false
+
+                
+                let category=this.id
+                let courses=selectedIds
+                let store=CategoryCourses.store(category,courses)
+                store.then(data => {
+                   
+                    this.current_version += 1
+                    Helper.BusEmitOK()
+                                            
+                })
+                .catch(error => {
+                        Helper.BusEmitError(error) 
+                })
             },
             beginRemove(values){
                 this.deleteConfirm.msg= '確定要將 『' + values.name + '』從分類中移除嗎' 

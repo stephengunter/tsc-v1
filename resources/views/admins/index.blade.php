@@ -2,14 +2,13 @@
 
 
 @section('content')
-
-       <admin-index :options="options" 
-           v-show="!selected" :hide_create="indexSettings.hide_create" :version="version"
-           @selected="onSelected"  @begin-create="onBeginCreate">
-       </admin-index> 
-       <admin-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
-           @btn-back-clicked="backToIndex" @admin-deleted="onAdminDeleted">
-       </admin-details>
+    <admin-index :options="options" 
+        v-show="!selected" :hide_create="indexSettings.hide_create" :version="version"
+        @selected="onSelected"  @begin-create="onBeginCreate">
+    </admin-index> 
+    <admin-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
+        @btn-back-clicked="backToIndex" @admin-deleted="onAdminDeleted">
+    </admin-details>
        
 @endsection
 
@@ -52,13 +51,13 @@
 
             @if(isset($roleOptions))
 
-                    this.options.roles={!! json_encode($roleOptions) !!}
+                this.options.roles={!! json_encode($roleOptions) !!}
 
             @endif
            
             @if(isset($centerOptions))
 
-                    this.options.centers={!! json_encode($centerOptions) !!}
+                this.options.centers={!! json_encode($centerOptions) !!}
 
             @endif
         },

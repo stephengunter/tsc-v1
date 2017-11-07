@@ -3,9 +3,9 @@
     <div class="panel panel-default">
         
         <div class="panel-heading">           
-             <span class="panel-title">
+            <span class="panel-title">
                    <h4 v-html="title"></h4>                  
-             </span>           
+            </span>           
         </div>
         <div v-if="loaded" class="panel-body">
             <form class="form" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
@@ -14,10 +14,10 @@
                         <div class="text-center">
                             <photo :id="photo_id"></photo>
                             <h5>個人相片</h5>
-                            <button @click.prevent="editPhoto" title="編輯相片" class="btn btn-info btn-xs">                                 
+                            <button @click.prevent="editPhoto(1)" title="編輯相片" class="btn btn-info btn-xs">                                 
                                 <span class="glyphicon glyphicon-pencil"></span>
                             </button> 
-                            <button v-show="photo_id" @click.prevent="showConfirm=true" type="button" class="btn btn-danger btn-xs"  data-toggle="tooltip" title="刪除相片">
+                            <button v-show="photo_id" @click.prevent="editPhoto(0)" type="button" class="btn btn-danger btn-xs"  data-toggle="tooltip" title="刪除相片">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                             
@@ -105,25 +105,18 @@
                     
                 
             </form>
-        </div>
-    </div>
+        </div>   <!-- end panel-body -->
+    </div>  <!-- end panel -->
+    
+    <photo-editor :user_id="photoEditorSettings.user_id" 
+        :entity_type="photoEditorSettings.entity_type" :entity_id="photoEditorSettings.entity_id"
+        :action="photoEditorSettings.action" :show="photoEditorSettings.show"
+        @canceled="onCancelEditPhoto" @photo-updated="onPhotoUpdated"
+        @photo-update-failed="onPhotoUpdateFailed">
 
-    <modal :showbtn="false" title="上傳圖片" :show.sync="showModal"  @closed="closeModel"
-        effect="fade" width="800">
-      
-        <div slot="modal-body" class="modal-body">
-            <image-upload :width="200" :height="200" :user="form.user.id" @uploaded="photoUploaded"></image-upload>
-        </div>
-    </modal>
-    <modal showbtn="true"  :show.sync="showConfirm" @ok="deletePhoto"  @closed="closeConfirm" ok-text="確定"
-        effect="fade" width="800">
-          <div slot="modal-header" class="modal-header modal-header-danger">
-            <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
-        </div>
-        <div slot="modal-body" class="modal-body">
-            <h3> 確定要刪除個人相片？</h3>
-        </div>
-    </modal>
+    </photo-editor>
+        
+    
      
 </div>
 </template>
@@ -142,18 +135,26 @@
         },
         data() {
             return {
-                title:Helper.getIcon('Users')  + '  編輯使用者資料',
-              
                 loaded:false,
-                showModal: false,
 
-                showConfirm: false,
+                title:Helper.getIcon('Users')  + '  編輯使用者資料',
+
                 form: new Form({
                     user: {
                         profile: {}
                     }
 
                 }),
+
+                photoEditorSettings:{
+                    user_id:0,
+                    entity_type:'user',
+                    entity_id:this.id,
+                    action:'upload',
+                    show:false
+                },
+               
+                
               
                 photo_id: 0,
                 gender: 1,
@@ -194,7 +195,6 @@
             this.init()
         },
         methods: {
-            
             init(){
                
                 this.genderOptions= Helper.genderOptions()
@@ -202,7 +202,6 @@
                 this.fetchData()
               
             },
-          
             fetchData() {
 
                 let getUser=User.edit(this.id)
@@ -214,7 +213,7 @@
                         })
                     this.dob.time = user.profile.dob
 
-                    this.photo_id =Helper.tryParseInt(user.profile.photo_id)
+                    this.photo_id = Helper.tryParseInt(user.profile.photo_id)
 
                     this.loaded=true
 
@@ -226,7 +225,10 @@
                 })
                 
             },
-            
+            endEdit(){
+              
+                this.$emit('canceled')
+            },
             onSubmit() {
                 
                 this.form.user.role = this.role
@@ -250,52 +252,39 @@
             setGender(val) {
                 this.form.user.profile.gender = val
             },
-           
-            closeModel() {
-                this.showModal = false
-            },
-            closeConfirm() {
-                this.showConfirm = false
-            },
-            editPhoto() {
-                this.showModal = true
-            },
-            deletePhoto() {
-                this.updatePhoto()
-                this.showConfirm = false
-            },
-            photoUploaded(photo) {
-                this.updatePhoto(photo)   
-                         
-                this.showModal = false
-            },
-            updatePhoto(photo){
-                let userId = this.form.user.id
-                let photoId = 0
-                if(photo){
-                    photoId = photo.id
+            //photoe functions
+            editPhoto(val){
+                if(val){
+                    this.photoEditorSettings.action='upload'
+                    this.photoEditorSettings.show=true
+                }else{
+                    this.photoEditorSettings.action='delete'
+                    this.photoEditorSettings.show=true
                 }
-
-                let updateUserPhoto=User.updateUserPhoto(userId, photoId)
-                updateUserPhoto.then(result => {
-                    if(photo){
-                        this.photo_id=photo.id
-                    }else{           
-                        this.photo_id=0
-                    }
-                })
-                .catch(error => {
-                    let title = '刪除相片失敗'
-                    if(photo){
-                        title = '更新相片失敗'
-                    }
-                    Helper.BusEmitError(error,title)                        
-                })
             },
-            endEdit(){
-              
-                this.$emit('canceled')
-            }
+            onCancelEditPhoto() {
+                this.photoEditorSettings.show=false
+            }, 
+            onPhotoUpdated(photoId){
+                this.onCancelEditPhoto()
+                this.photo_id=Helper.tryParseInt(photoId)
+                let msg = '刪除相片成功'
+                if(photoId){
+                    msg = '更新相片成功'
+                    
+                }
+                Helper.BusEmitOK(msg)
+            },
+            onPhotoUpdateFailed(photoId){
+                this.onCancelEditPhoto()
+
+                let title = '刪除相片失敗'
+                if(photoId){
+                    title = '更新相片失敗'
+                }
+                Helper.BusEmitError(error,title)    
+            },
+            
 
 
 

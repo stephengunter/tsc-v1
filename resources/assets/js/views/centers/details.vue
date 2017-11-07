@@ -36,13 +36,13 @@
 <script>
     
     import CenterComponent from '../../components/center/center.vue'
-    import contact_info from '../../components/contactInfo/contactInfo.vue'
+    import ContactInfo from '../../components/contactInfo/contactInfo.vue'
     
     export default {
         name: 'CenterDetails',
         components: {
              'center':CenterComponent,
-            'contact-info':contact_info,
+            'contact-info':ContactInfo,
            
         },
         props: {

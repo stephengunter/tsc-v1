@@ -1,12 +1,9 @@
 <template>
-<div>
      
-    <admin-list    :can_select="can_select" 
+    <admin-list  :options="options"  :can_select="can_select" 
         :hide_create="hide_create" :version="version" 
         @selected="onSelected" @begin-create="onBeginCreate">
     </admin-list>
-
-</div>
 
 </template>
 

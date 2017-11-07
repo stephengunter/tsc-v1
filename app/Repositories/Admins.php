@@ -21,6 +21,10 @@ use App\Events\AdminDeleted;
 use App\Events\UserRegistered;
 
 
+use App\Support\Helper;
+use Illuminate\Auth\AuthenticationException;
+
+
 class Admins 
 {
     public function __construct(Users $users, Centers $centers)                          
@@ -67,20 +71,8 @@ class Admins
        
        return $admins;
    }
-   public function store($user ,$values, $centerIds)
-   {
-        $admin=$user->admin;
-        if(!$admin){
-            $admin=new Admin($values);  
-            $user->admin()->save($admin);
-        }else{
-            $user->admin->update($values);
-        }
-
-        $this->syncCenters($user->id,$centerIds);
-        return $user;
-    }
-    public function storeAdmin($userValues,$profileValues,$adminValues,$user_id,$adminId,$current_user,$center_id)
+  
+    public function store($userValues,$profileValues,$adminValues,$user_id,$adminId,$current_user,$center_id)
     {
         $user= DB::transaction(function() 
             use($userValues,$profileValues,$adminValues,$user_id,$adminId)
@@ -138,13 +130,39 @@ class Admins
         return $admin;
     }
 
-    public function update($id, $values)
+    public function update($id, $values ,User $current_user)
     {
-         $admin=$this->findOrFail($id);
         
-         $admin->update($values);
+        $admin=$this->findOrFail($id);
+        if(!$admin->canEditBy($current_user)){
+            throw new AuthenticationException;
+        }
 
-         return $admin;
+        $updated_by=$current_user->id;
+        $values=Helper::setUpdatedBy($values,$updated_by);
+        
+        $admin->update($values);
+
+        if(!$admin->active){
+            event(new AdminDeleted($admin, $current_user));
+        }
+
+        return $admin;
+    }
+
+    public function delete($id, User $current_user)
+    {
+        $admin=$this->findOrFail($id);
+        if(!$admin->canDeleteBy($current_user)){
+            throw new AuthenticationException;
+        }
+
+        
+        $values=[
+            'removed' => 1,            
+        ];
+
+        return $this->update($id, $values , $current_user);
     }
 
     public function syncCenters($user_id,$centerIds)
@@ -196,18 +214,7 @@ class Admins
     }
 
   
-    public function delete($id,$updated_by)
-    {
-         $admin=$this->findOrFail($id); 
-          $values=[
-            'removed' => 1,
-            'updated_by' => $updated_by
-         ];
-        
-         $admin->update($values);
-
-         
-    }
+    
     public function importAdmins($file,$current_user)
     {
         

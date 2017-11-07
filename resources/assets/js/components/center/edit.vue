@@ -13,10 +13,10 @@
                         <div class="text-center">
                             <photo :id="photo_id"></photo>
                             <h5>相片</h5>
-                            <button  @click.prevent="editPhoto" title="編輯相片" class="btn btn-info btn-xs">                                 
+                            <button  @click.prevent="editPhoto(1)" title="編輯相片" class="btn btn-info btn-xs">                                 
                                 <span class="glyphicon glyphicon-pencil"></span>
                             </button> 
-                            <button v-show="photo_id" @click.prevent="onBtnDeletePhotoClicked" type="button" class="btn btn-danger btn-xs"  data-toggle="tooltip" title="刪除相片">
+                            <button v-show="photo_id" @click.prevent="editPhoto(0)" type="button" class="btn btn-danger btn-xs"  data-toggle="tooltip" title="刪除相片">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                             
@@ -75,22 +75,18 @@
                     
                 </div><!-- End Row   --> 
             </form>
-        </div>
-    </div>
+        </div> <!-- end panel-body -->
+    </div>  <!-- end panel -->
 
-    <modal :showbtn="false" title="上傳圖片" :show.sync="imageUpload.show"  @closed="onImageUploadCanceled"
-        effect="fade" width="800">
-      
-        <div slot="modal-body" class="modal-body">
-            <image-upload :width="imageUpload.width" :height="imageUpload.height" 
-               @uploaded="onPhotoUploaded">
-            </image-upload>
-        </div>
-    </modal>
-     
-    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
-      @close="onDeletePhotoCanceled" @confirmed="deletePhoto">        
-    </delete-confirm>
+
+    <photo-editor :user_id="photoEditorSettings.user_id" 
+        :entity_type="photoEditorSettings.entity_type" :entity_id="photoEditorSettings.entity_id"
+        :action="photoEditorSettings.action" :show="photoEditorSettings.show"
+        @canceled="onCancelEditPhoto" @photo-updated="onPhotoUpdated"
+        @photo-update-failed="onPhotoUpdateFailed">
+
+    </photo-editor>
+    
      
 </div>
 </template>
@@ -113,19 +109,13 @@
                 
                 photo_id: 0,
 
-                imageUpload:{
-                    show:false,
-                    width:200,
-                    height:200,
-                    user:0,
+                photoEditorSettings:{
+                    user_id:0,
+                    entity_type:'center',
+                    entity_id:this.id,
+                    action:'upload',
+                    show:false
                 },
-
-                deleteConfirm:{
-                    id:0,
-                    show:false,
-                    msg:'',
-
-                }
               
 
             }
@@ -195,7 +185,9 @@
                 })
                 
             },
-            
+            endEdit(){
+                this.$emit('canceled')
+            },
             onSubmit() {
                 
                 let save=null
@@ -217,56 +209,44 @@
             },
             
            
-            onImageUploadCanceled() {
-                this.imageUpload.show=false
-            },
+            // onImageUploadCanceled() {
+            //     this.imageUpload.show=false
+            // },
            
-            editPhoto() {
-                this.imageUpload.show=true
-            },
-            onBtnDeletePhotoClicked(){
-                this.deleteConfirm.msg='確定要刪除相片嗎？'
-                this.deleteConfirm.show=true
-            },
-            onDeletePhotoCanceled(){
-                this.deleteConfirm.show=false
-            },
-            deletePhoto() {
-                this.updatePhoto(null)
-                this.deleteConfirm.show=false
-            },
-            onPhotoUploaded(photo) {
-                this.updatePhoto(photo) 
-                this.imageUpload.show = false
-            },
-            updatePhoto(photo){
-                let centerId = this.form.center.id
-                let photoId = 0
-                if(photo){
-                    photoId = photo.id
+            
+            
+             //photoe functions
+            editPhoto(val){
+                if(val){
+                    this.photoEditorSettings.action='upload'
+                    this.photoEditorSettings.show=true
+                }else{
+                    this.photoEditorSettings.action='delete'
+                    this.photoEditorSettings.show=true
                 }
-
-                let updatePhoto=Center.updatePhoto(centerId, photoId)
-                updatePhoto.then(result => {
-                    if(photo){
-                        this.photo_id=photo.id
-                    }else{           
-                        this.photo_id=0
-                    }
-                })
-                .catch(error => {
-                    let title = '刪除相片失敗'
-                    if(photo){
-                        title = '更新相片失敗'
-                    }
-                    Helper.BusEmitError(error,title)                        
-                })
             },
-            endEdit(){
-              
-                this.$emit('canceled')
-            }
+            onCancelEditPhoto() {
+                this.photoEditorSettings.show=false
+            }, 
+            onPhotoUpdated(photoId){
+                this.onCancelEditPhoto()
+                this.photo_id=Helper.tryParseInt(photoId)
+                let msg = '刪除相片成功'
+                if(photoId){
+                    msg = '更新相片成功'
+                    
+                }
+                Helper.BusEmitOK(msg)
+            },
+            onPhotoUpdateFailed(photoId){
+                this.onCancelEditPhoto()
 
+                let title = '刪除相片失敗'
+                if(photoId){
+                    title = '更新相片失敗'
+                }
+                Helper.BusEmitError(error,title)    
+            },
 
 
 

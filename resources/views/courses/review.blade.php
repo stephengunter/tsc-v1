@@ -3,7 +3,8 @@
 @section('content')
 
     @if(isset($centerOptions))
-        <course-review :version="version" @saved="onSaved" :center_options="{{ json_encode($centerOptions) }}"  @saved="onSaved">   
+        <course-review :version="version" @saved="onSaved" 
+            :center_options="{{ json_encode($centerOptions) }}"  @saved="onSaved">   
         </course-review>
 
     @endif

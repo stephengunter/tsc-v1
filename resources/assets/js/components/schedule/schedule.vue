@@ -7,9 +7,7 @@
             </span>
             
             <div>
-                <button v-if="can_edit" class="btn btn-warning btn-sm" @click.prevent="beginImport">
-                    <span aria-hidden="true" class="glyphicon glyphicon-forward"></span> 匯入
-                </button>
+               
                 <button v-if="can_edit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
                 </button>
@@ -24,7 +22,7 @@
                         <th style="width:7%">#</th> 
                         <th style="width:25%">課目標題</th> 
                         <th style="width:25%">內容</th> 
-                        <th style="width:15%">材料</th>
+                        <th style="width:15%">教材</th>
                         <th style="width:15%">最後更新</th>
                         <th style="width:8%"></th> 
                     </tr> 
@@ -32,7 +30,7 @@
                         <th style="width:12%">順序</th> 
                         <th style="width:30%">課目標題</th> 
                         <th style="width:30%">內容</th> 
-                        <th style="width:20%">材料</th>
+                        <th style="width:20%">教材</th>
                         <th style="width:8%"></th>
                     </tr>
                    
@@ -42,7 +40,7 @@
                        @canceled="onCreateCanceled" > 
                     </edit>  
 
-                    <edit  v-for="schedule in scheduleList"  :schedule="schedule" 
+                    <edit  v-for="(schedule,index) in scheduleList" :key="index"  :schedule="schedule" 
                         :can_edit="can_edit" :editting="!indexMode"
                         @editting="onEditting" @canceled="onEditCanceled"
                         @saved="onUpdated"  @btn-delete-clicked="beginDelete" >

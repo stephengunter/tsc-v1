@@ -41,7 +41,7 @@
                 <tbody>
                     <tr v-for="(center, index) in centers" :key="center.id">    
                         <td>
-                            <a herf="#" @click.prevent="onSelected(center.id)"> {{center.name}}
+                            <a href="#" @click.prevent="onSelected(center.id)"> {{center.name}}
                             </a> 
                         </td>
                         <td>{{ center.code }}</td>
@@ -202,9 +202,9 @@
             },
             
             onSubmitDisplayOrders(){
-               this.hasError=true
-               let errors=0
-               for(let i=0; i<this.centers.length ; i++){
+                this.hasError=true
+                let errors=0
+                for(let i=0; i<this.centers.length ; i++){
                     let center=this.centers[i]
                     let val=center.display_order
                     if(isNaN(val) || val.length < 1){
@@ -213,18 +213,10 @@
                     }else{
                         center.error= ''
                     }
+                }
                    
-                }
-              
-                if(errors==0) {
-                    this.updateDisplayOrder()
-                }
-            },
-            updateDisplayOrder(){
-               
-                let form=new Form({
-                    centers:this.centers
-                })
+                
+                
                 let save=Center.updateDisplayOrder(form)
                 save.then(result => {
                         Helper.BusEmitOK()

@@ -10,26 +10,33 @@ require('../summernote/summernote.js');
 require('../summernote/lang/summernote-zh-TW.js');
 
 import Vue from 'vue';
-Vue.component('modal', require('vue-strap/src/modal'))
-Vue.component('alert', require('vue-strap/src/alert'))
-Vue.component('tooltip', require('vue-strap/src/tooltip'))
 
 
 import vSelect from 'vue-select'
 Vue.component('drop-down', vSelect)
 Vue.component('date-picker', require('vue-datepicker'))
 Vue.component('time-picker', require('vue2-timepicker'))
-Vue.component('pager', require('vue-simple-pager'))
+
+
+// import Auth from './packages/auth/Auth.js'
+// Vue.use(Auth)
+
+Vue.component('alert', require('./packages/components/Alert'))
+Vue.component('checkbox', require('./packages/components/CheckBox'))
+Vue.component('data-viewer', require('./packages/components/DataViewer'))
+Vue.component('delete-confirm', require('./packages/components/DeleteConfirm'))
+Vue.component('html-editor', require('./packages/components/HtmlEditor'))
+Vue.component('modal', require('./packages/components/Modal'))
+Vue.component('pager', require('./packages/components/Pager'))
+Vue.component('toggle', require('./packages/components/Toggle'))
+
+
 
 Vue.component('main-nav', require('./components/MainNav'))
 Vue.component('nav-item', require('./components/NavItem'))
-Vue.component('html-editor', require('./components/HtmlEditor'))
-Vue.component('delete-confirm', require('./components/DeleteConfirm'))
 Vue.component('review-editor', require('./components/ReviewEditor'))
-Vue.component('toggle', require('./components/Toggle'))
-Vue.component('checkbox', require('./components/CheckBox'))
-Vue.component('data-viewer', require('./components/DataViewer'))
 Vue.component('photo', require('./components/Photo'))
+Vue.component('photo-editor', require('./components/PhotoEditor'))
 Vue.component('file-upload', require('./components/FileUpload'))
 Vue.component('image-upload', require('./components/ImageUpload'))
 Vue.component('role-label', require('./components/RoleLabel'))
@@ -37,6 +44,8 @@ Vue.component('options-filter', require('./components/filter'))
 Vue.component('combination-select', require('./components/CombinationSelect'))
 Vue.component('updated', require('./components/Updated'))
 Vue.component('admin-card', require('./components/AdminCard'))
+
+
 
 Vue.component('test', require('./views/test'))
 Vue.component('menus', require('./views/menus'))
@@ -192,8 +201,8 @@ import Classroom from './models/classroom.js'
 import Title from './models/title.js'
 
 
-import Auth from './packages/auth/Auth.js'
-Vue.use(Auth)
+// import Auth from './packages/auth/Auth.js'
+// Vue.use(Auth)
 
 window.Form = Form
 window.Helper = Helper

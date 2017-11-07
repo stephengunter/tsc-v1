@@ -1,12 +1,12 @@
 <template>
     <data-viewer v-if="loaded"  :default_search="defaultSearch" :default_order="defaultOrder"
-      :source="source" :search_params="searchParams"  :thead="thead" :no_search="can_select"  
-      :filter="filter"  :title="title" :create_text="createText" 
-      @refresh="init" :version="version"   @beginCreate="beginCreate"
+       :source="source" :search_params="searchParams"  :thead="thead" :no_search="can_select"  
+       :filter="filter"  :title="title" :create_text="createText" 
+       @refresh="init" :version="version"   @beginCreate="beginCreate"
        @dataLoaded="onDataLoaded">
      
          
-         <div class="form-inline"   slot="header">
+        <div class="form-inline"   slot="header">
             開課中心
             <select  v-model="searchParams.center" style="width:auto;" class="form-control selectWidth">
                 <option v-for="(item,index) in centerOptions" :key="index" :value="item.value" v-text="item.text"></option>
@@ -24,9 +24,11 @@
             </select>
 
         </div>
-         <template scope="props">
+        <template scope="props">
             <tr>
-                <td><a herf="#" @click="selected(props.item.user_id)">{{props.item.user.profile.fullname}}</a> </td>
+                <td>
+                    <a href="#" @click.prevent="selected(props.item.user_id)">{{props.item.user.profile.fullname}}</a>
+                </td>
                 <td>
                     <role-label :labelstyle="props.item.roleModel.style" 
                         :labeltext="props.item.roleModel.display_name">                        

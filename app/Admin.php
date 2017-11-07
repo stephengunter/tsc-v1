@@ -73,7 +73,7 @@ class Admin extends Model
 	{
         
         $roleName=Role::adminRoleName();	
-			
+		$user=$this->user;	
 		if($user->hasRole($roleName)){
             $role=Role::where('name',$roleName)->first();
             $user->detachRole($role);       

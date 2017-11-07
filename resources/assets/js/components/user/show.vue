@@ -13,65 +13,86 @@
                 </button>
                 <button v-if="user.canEdit" v-show="can_edit" @click="btnEditCilcked" class="btn btn-primary btn-sm" >
                     <span class="glyphicon glyphicon-pencil"></span> 編輯
-                 </button>
-                 <button v-if="user.canDelete" v-show="!hide_delete" @click="btnDeleteCilcked" class="btn btn-danger btn-sm" >
+                </button>
+                <button v-if="user.canDelete" v-show="!hide_delete" @click="btnDeleteCilcked" class="btn btn-danger btn-sm" >
                     <span class="glyphicon glyphicon-trash"></span> 刪除
-                 </button>
+                </button>
                
             </div>
         </div>  <!-- End panel-heading-->
         <div class="panel-body">
             <div class="row">
                 <div class="col-sm-3">
-                    <photo :id="$options.filters.tryParseInt(user.profile.photo_id)"></photo>
-                </div>
-                <div class="col-sm-3">
-                    <label class="label-title">Email</label>
-                    <p>{{user.email}}</p>
+                     <photo :id="$options.filters.tryParseInt(user.profile.photo_id)"></photo>
+                </div> 
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">Email</label>
+                            <p> {{ user.email }} </p>
+                        </div>  
+                        <div class="col-sm-4">
+                            <label class="label-title">手機</label>
+                            <p> {{ user.phone }} </p>                         
+                        </div> 
+                        <div class="col-sm-4">
+                            <label class="label-title">角色</label>
+                            <p> 
+                        
+                                <button type="button" class="btn btn-default btn-xs" @click="onAddRoleCilcked">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                                <role-label v-for="(role,index) in user.roles" :key="index" :labelstyle="role.style" 
+                                    :labeltext="role.display_name">
+                                </role-label>
+                                
+                            </p>
+                        </div>    
+                    </div> <!-- End Row -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">真實姓名</label>
+                            <p> {{ user.profile.fullname }} </p>
+                        </div>  
+                        <div class="col-sm-4">
+                             <label class="label-title">性別</label>
+                             <p> {{ user.profile.gender | genderText }} </p>                    
+                        </div> 
+                        <div class="col-sm-4">
+                            <label class="label-title">稱謂</label>
+                            <p v-text="user.titleText"></p>
+                        </div>    
+                    </div>  <!-- End Row -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">身分證號</label>
+                            <p> {{ user.profile.SID }} </p>
 
-                    <label class="label-title">真實姓名</label>
-                    <p>{{user.profile.fullname}}</p>
-
-                    <label class="label-title">身分證號</label>
-                    <p>{{user.profile.SID}}</p>
-
-                    <label class="label-title">建檔日期</label>
-                    <p>{{ user.created_at | tpeTime  }}</p>
-                    
-                </div>
-                <div class="col-sm-3">
-                    
-                      <label class="label-title">手機</label>
-                    <p>{{user.phone}}</p>
-                     <label class="label-title">性別</label>
-                      <p>{{ user.profile.gender|genderText }}</p>
-                    <label class="label-title">生日</label>
-                      <p>{{user.profile.dob}}</p>
-                       
-                    
-                    <label class="label-title">最後更新</label>
-                     <updated :entity="user"></updated>
-                </div>
-                <div class="col-sm-3">
-                    
-                      <label class="label-title">角色</label>
-                        <p> 
-                      
-                            <button type="button" class="btn btn-default btn-xs" @click="onAddRoleCilcked">
-                              <span class="glyphicon glyphicon-plus"></span>
-                            </button>
-                            <role-label v-for="(role,index) in user.roles" :key="index" :labelstyle="role.style" 
-                            :labeltext="role.display_name">
-                            </role-label>
+                        </div>  
+                        <div class="col-sm-4">
+                            <label class="label-title">生日</label>
+                            <p> {{ user.profile.dob }} </p>                  
+                        </div> 
+                        <div class="col-sm-4">
                             
-                        </p>
-                     <label class="label-title">稱謂</label>
-                      <p v-text="user.titleText"></p>
-                    
-                </div>
-           </div>  <!-- End row-->
+                        </div>    
+                    </div>  <!-- End Row -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">建檔日期</label>
+                            <p> {{ user.created_at | tpeTime  }} </p>
 
-       
+                        </div>  
+                        <div class="col-sm-4">
+                            <label class="label-title">最後更新</label>
+                            <updated :entity="user"></updated>                 
+                        </div> 
+                        <div class="col-sm-4">
+                            
+                        </div>    
+                    </div>  <!-- End Row -->
+                </div>     
+            </div>
         </div>  <!-- End panel-body-->
 
     </div>

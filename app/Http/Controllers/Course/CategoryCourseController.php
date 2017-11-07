@@ -47,16 +47,13 @@ class CategoryCourseController extends BaseController
             $courseList=$courseList->where('center_id',$center_id);
         }
 
+        $canEditNumber=false;
         $courseList = $courseList->with(['center','categories','teachers'])->get();
-       
-        if(count($courseList)){
-            foreach ($courseList as $course) {
-                foreach ($course->teachers as $teacher) {
-                  $teacher->name=$teacher->getName();
-                }
-            }
+        foreach ($courseList as $course) {
+            $course->populateViewData($canEditNumber);
+            
         }
-
+       
 
 
         return response()
@@ -76,30 +73,41 @@ class CategoryCourseController extends BaseController
 
         if(!$canEdit)  return  $this->unauthorized(); 
 
-        $request = request();
-        $category_id=(int)$request->category;
-        $category=$this->categories->findOrFail($category_id);
-        $except_ids=$category->courses->pluck('id'); 
+        $params = request()->toArray();
+        $except_category = null;
+        if(array_key_exists('except', $params)){
+            $except_category_id=$params['except'];
+            $except_category=$this->categories->findOrFail($except_category_id);
 
-        $courseList=$this->courses->activeCourses();
-        $activeTerms=$this->terms->activeTerms()->get()->pluck('id');
-        $courseList=$courseList->whereIn('term_id' , $activeTerms);
-        $courseList=$courseList->whereNotIn('id' , $except_ids);
+        }
 
-        $courseList = $courseList->with(['center','categories','teachers'])->get();
+        if(!$except_category) abort(404);
+
+        $except_course_ids=$except_category->courses->pluck('id'); 
+
+        
+        $with=['center','categories','teachers','classTimes'];
+        $courseList=$this->courses->index($params,$with);
+
+        $courseList=$courseList->where('reviewed',true)->where('active',true)
+                               ->whereNotIn('id',$except_course_ids) 
+                               ->filterPaginateOrder();
+
+        $parentCourse=null;
+        $canEditNumber=false;
+
+        foreach ($courseList as $course) {
+            $course->populateViewData($canEditNumber);
+            
+        }
+
+        return response() ->json([
+                                    'model' => $courseList, 
+                                    'parentCourse' => $parentCourse,
+                                    'canEditNumber' => $canEditNumber 
+                                 ]);  
+                    
        
-        if(count($courseList)){
-            foreach ($courseList as $course) {
-                $course->getParentCourse();
-                foreach ($course->classTimes as $classTime) {
-                  $classTime->weekday;
-                }
-                foreach ($course->teachers as $teacher) {
-                  $teacher->name=$teacher->getName();
-                }
-            }
-        }                       
-        return response()->json(['courseList' => $courseList  ]);
     }
    
 
