@@ -25,43 +25,43 @@
                 <div class="col-sm-3">
                     <photo :id="$options.filters.tryParseInt(center.photo_id)"></photo>
                 </div>
-                <div class="col-sm-3">
-                  
-                   
-                    <label class="label-title">名稱</label>
-                    <p>{{center.name}}</p>
-                   
-                    <label class="label-title">建檔日期</label>
-                      <p>{{  center.created_at | tpeTime }}</p>
-                    
-                </div>
-                <div class="col-sm-3">
-                    <label class="label-title">代碼</label>
-                    <p> {{ center.code }} </p>
-
-                    <label class="label-title">最後更新</label>
-                     <p v-if="!center.updated_by"> 
-                          {{   center.updated_at|tpeTime  }}
-                     </p>
-                     <p v-else>
-                         <a  href="#" @click.prevent="showUpdatedBy" >
-                            {{   center.updated_at|tpeTime  }}
-                         </a>
-                     </p>  
-                </div>
-                <div class="col-sm-3">
-                  
-                   
-                     <label class="label-title">狀態</label>
-                     <p v-html="$options.filters.activeLabel(center.active)">                       
-                     </p>
-                   
-                  
-                    
-                </div>
-           </div>  <!-- End row-->
-
-       
+                <div class="col-sm-9"> 
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">名稱</label>
+                             <p> {{ center.name }} </p>
+                        </div> 
+                        <div class="col-sm-4">
+                            <label class="label-title">代碼</label>
+                            <p> {{ center.code }} </p>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="label-title">狀態</label>
+                            <p v-html="$options.filters.activeLabel(center.active)">                       
+                            </p>
+                            
+                        </div>
+                    </div>    <!-- End Row -->     
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="label-title">課程洽詢電話</label>
+                            <p> {{ center.course_tel }} </p>
+                        </div> 
+                        <div class="col-sm-4">
+                            <label class="label-title">最後更新</label>
+                            <p v-if="!center.updated_by"> 
+                                {{   center.updated_at|tpeTime  }}
+                            </p>
+                            <p v-else>
+                                <a  href="#" @click.prevent="showUpdatedBy" >
+                                    {{   center.updated_at|tpeTime  }}
+                                </a>
+                            </p>  
+                        </div>
+                        
+                    </div>  <!-- End Row -->  
+                </div>     
+            </div>   
         </div>  <!-- End panel-body-->
 
     </div>
