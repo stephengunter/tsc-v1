@@ -37,7 +37,7 @@
         
         <!-- 名稱 -->
         <td  v-if="details_link">
-            <a herf="#" @click.prevent="details(course.id)">
+            <a href="#" @click.prevent="details(course.id)">
                    {{ course.name }}
             </a>
         </td> 

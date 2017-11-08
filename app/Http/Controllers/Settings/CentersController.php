@@ -141,13 +141,15 @@ class CentersController extends BaseController
     }
     public function updateDisplayOrder(Request $form)
     {
+       
         $current_user=$this->currentUser();
+        
         $centers=$form['centers'];
         for($i = 0; $i < count($centers); ++$i) {
             $center=$centers[$i];
 
             $id=$center['id'];
-            $order=$center['display_order'];
+            $order=$center['order'];
             $updated_by=$current_user->id;
 
             $this->centers->updateDisplayOrder($id,$order,$updated_by);

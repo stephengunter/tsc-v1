@@ -63,13 +63,12 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::put('group-teachers/{id}/remove',['uses'=>'\App\Http\Controllers\Teacher\GroupTeachersController@remove']);   
     Route::resource('group-teachers', '\App\Http\Controllers\Teacher\GroupTeachersController',
-    ['only' => ['create','store','show']]);
+    ['only' => ['index','create','store']]);
 
     Route::resource('teachers-import', '\App\Http\Controllers\Teacher\TeachersImportController',
     ['only' => ['index','store']]);
 
-    Route::resource('teachers-review', '\App\Http\Controllers\Teacher\TeachersReviewController',
-    ['only' => ['index','store','update']]);
+    
     
     //Course
     Route::get('courses/search', '\App\Http\Controllers\Course\CoursesController@search');
@@ -213,6 +212,9 @@ Route::group(['middleware' => 'owner'], function()
 
     Route::resource('admins-import', '\App\Http\Controllers\Admin\AdminsImportController',['only' => ['index','store']]);
                                            
+
+    Route::resource('teachers-review', '\App\Http\Controllers\Teacher\TeachersReviewController',
+    ['only' => ['index','store','update']]);
 });
 
 

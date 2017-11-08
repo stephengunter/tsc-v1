@@ -18,8 +18,8 @@
                    :with_user="inputsSettings.with_user" :with_profile="inputsSettings.with_profile"
                    :with_teacher_name="inputsSettings.with_teacher_name"
                    @dob-selected="setDOB" 
-                  @active-selected="setActive"   @reviewed-selected="setReviewed"
-                  @gender-selected="setGender" @canceled="onCanceled" >
+                   @active-selected="setActive"   @reviewed-selected="setReviewed"
+                   @gender-selected="setGender" @canceled="onCanceled" >
                 </teacher-inputs>
 
             </form>

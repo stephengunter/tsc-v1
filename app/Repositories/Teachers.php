@@ -18,6 +18,8 @@ use DB;
 use App\Events\TeacherCreated;
 use App\Events\TeacherDeleted;
 
+use App\Events\UserRegistered;
+
 
 class Teachers 
 {
@@ -96,12 +98,11 @@ class Teachers
     public function teachersInGroup($group_id)
     {
         $teacherGroup = $this->findOrFail($group_id);
+
         $teacher_ids=$teacherGroup->teacher_ids;
-
-        if(!$teacher_ids) return null;
-
         $ids= explode( ',', $teacher_ids );
-        return $this->getAll()->whereIn('user_id',$ids)->with('user.profile');
+
+        return $this->getAll()->whereIn('user_id',$ids);
                               
         
        
@@ -334,12 +335,20 @@ class Teachers
                 return $user;
         });
 
+
+
         $teacher= Teacher::findOrFail($user->id);
 
         $teacher->attachCenter($center_id);
         
-        
         event(new TeacherCreated($teacher, $current_user));
+
+        $is_new_user=true;
+        if($user_id)  $is_new_user=false;
+
+        if($is_new_user){
+            event(new UserRegistered($user));            
+        }
 
         return $teacher;
     }

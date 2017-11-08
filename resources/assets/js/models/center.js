@@ -142,7 +142,10 @@ class Center {
                 })
         })
     }
-    static updateDisplayOrder(form) {
+    static updateDisplayOrder(centers) {
+        let form = new Form({
+            centers: centers
+        })
         return new Promise((resolve, reject) => {
 
             let url = this.storeUrl() + '/display-order'

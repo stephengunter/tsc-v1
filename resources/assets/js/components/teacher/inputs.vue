@@ -12,8 +12,8 @@
        <div  class="col-sm-4"> 
             <div class="form-group"> 
                 <label>Email</label>
-                <input type="text" name="user.email" class="form-control" v-model="form.user.email" >
-                <small v-if="form.errors.has('user.email')" v-text="form.errors.get('user.email')" class="text-danger"></small>
+                <input type="text" name="user.emall"  v-model="form.user.email" class="form-control" >
+                <small v-if="form.errors.has('user.emall')" v-text="form.errors.get('user.emall')" class="text-danger"></small>
             </div> 
        </div>
        <div  class="col-sm-4"> 

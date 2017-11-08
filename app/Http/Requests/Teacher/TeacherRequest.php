@@ -30,8 +30,6 @@ class TeacherRequest extends FormRequest
              'teacher.experiences'=> 'required',
              'teacher.education'=> 'required',
         ];
-        
-        return $rules;
 
         $id=$this->getTeacherId();
         if($id){

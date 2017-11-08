@@ -15,27 +15,27 @@
                 <div class="form-group">
                     <label  class="col-sm-3 control-label">Email</label>
                     <div class="col-sm-8">
-                       <input  name="username" class="form-control" v-model="form.username">
-                       <small class="text-danger" v-if="form.errors.has('username')" v-text="form.errors.get('username')"></small>
+                        <input  name="username" class="form-control" v-model="form.username">
+                        <small class="text-danger" v-if="form.errors.has('username')" v-text="form.errors.get('username')"></small>
                     </div>
                 </div>
                 <div class="form-group">
                     <label  class="col-sm-3 control-label">密碼</label>
                     <div class="col-sm-8">
-                       <input type="password" name="password" class="form-control" v-model="form.password">
-                       <small class="text-danger" v-if="form.errors.has('password')" v-text="form.errors.get('password')"></small>
+                        <input type="password" name="password" class="form-control" v-model="form.password">
+                        <small class="text-danger" v-if="form.errors.has('password')" v-text="form.errors.get('password')"></small>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-3 col-sm-5">
-                      <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確定</button>
-                      &nbsp;&nbsp;
-                      <small class="text-danger" v-if="form.errors.has('msg')" >登入失敗</small>
-                      
+                        <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確定</button>
+                        &nbsp;&nbsp;
+                        <small class="text-danger" v-if="form.errors.has('msg')" >登入失敗</small>
+                        
                     </div>
                     <div>
-                          <a @click.prevent="forgotPassword">忘記密碼</a>
-                      </div>
+                        <a @click.prevent="forgotPassword">忘記密碼</a>
+                    </div>
                 </div>
             </form>
         </div><!-- End panel-body-->

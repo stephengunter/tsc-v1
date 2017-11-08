@@ -6,8 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ config('app.name') . ' - 課程管理系統' }}</title>
-
-
+        
     </head>
     <body  style="display:none"> 
             <div id="app">
@@ -53,7 +52,3 @@
             @include('layouts.footer')
      </body>
 </html>
-
-<script>
-   
-</script>

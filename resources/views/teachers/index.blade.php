@@ -4,8 +4,9 @@
 @section('content')
    
     <teacher-index v-show="!selected" :hide_create="indexSettings.hide_create" 
-          :group="group"          :version="version"
-        @selected="onSelected"  @begin-create="onBeginCreate">
+        :center_options="{{ json_encode($centerOptions) }}"     
+        :group="group"          :version="version"
+        @details="onSelected"  @begin-create="onBeginCreate">
     </teacher-index> 
     <teacher-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
     @btn-back-clicked="backToIndex" @teacher-deleted="onTeacherDeleted">
@@ -39,9 +40,9 @@
         },
         computed: {
             indexMode() {
-                 if(this.selected) return false
-                  if(this.creating) return false
-                  return true
+                if(this.selected) return false
+                if(this.creating) return false
+                return true
             }
         },
         beforeMount() {

@@ -11,9 +11,12 @@
               
 
             <div>   
-                <a  v-if="showCreateBtn()" class="btn btn-primary btn-sm" @click.prevent="createClicked"
-                   v-text="create_text" >
-                </a>
+                <button  v-if="showCreateBtn()" class="btn btn-primary btn-sm" @click.prevent="createClicked">
+                    
+                   <span  class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                  
+                   <span v-text="create_text">  </span>
+                </button>
                 
                 <slot name="btn"></slot>
                 

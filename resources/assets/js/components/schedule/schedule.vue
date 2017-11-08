@@ -7,7 +7,12 @@
             </span>
             
             <div>
-               
+                <drop-btn text="ccc" type="primary">
+                    <li><a href="#dropdown">Action</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#dropdown">Separated link</a></li>
+                </drop-btn>
+                
                 <button v-if="can_edit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
                 </button>

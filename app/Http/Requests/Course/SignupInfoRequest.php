@@ -24,7 +24,7 @@ class SignupInfoRequest extends FormRequest
             'signupinfo.open_date' => 'required',
             'signupinfo.close_date'=> 'required',
             
-             'signupinfo.limit' => 'required|numeric',
+            'signupinfo.limit' => 'required|numeric',
 
             'signupinfo.tuition' =>'required|numeric',
             'signupinfo.cost' =>'required|numeric',
@@ -40,10 +40,10 @@ class SignupInfoRequest extends FormRequest
             'signupinfo.limit.required' => '必須填寫人數上限',
             'signupinfo.limit.numeric' => '人數上限必須為數字',
 
-             'signupinfo.tuition.required' => '必須填寫學費',
+            'signupinfo.tuition.required' => '必須填寫學費',
             'signupinfo.tuition.numeric' => '學費必須為數字',
 
-             'signupinfo.cost.required' => '必須填寫材料費',
+            'signupinfo.cost.required' => '必須填寫材料費',
             'signupinfo.cost.numeric' => '材料費必須為數字',
         ];
     }

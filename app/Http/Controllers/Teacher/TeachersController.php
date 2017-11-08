@@ -43,17 +43,19 @@ class TeachersController extends BaseController
         $request = request();
 
         if(!request()->ajax()){
+            $centerOptions=$this->centers->options();
             $group=(bool)$request->group;
             $menus=$this->menus($this->key);            
             return view('teachers.index')
                     ->with([ 'menus' => $menus,
-                             'group' => $group  
+                             'group' => $group,
+                             'centerOptions' => $centerOptions  
                           ]);
         }  
         
         
         $centerId=(int)$request->center;
-        $group=(bool)$request->group;
+        $group=(int)$request->group;
        
         $teacherList=[];
         if($centerId){
@@ -89,12 +91,9 @@ class TeachersController extends BaseController
         
 
         $teacherList=$teacherList->filterPaginateOrder();   
-        if(count($teacherList)){
-            foreach($teacherList as $teacher){
-                $teacher->centerNames=$teacher->centerNames();
-            }
-        }        
-                                    
+        foreach($teacherList as $teacher){
+            $teacher->centerNames=$teacher->centerNames();
+        }                         
         return response()->json([ 'model' => $teacherList ]);
 
     }
@@ -190,7 +189,7 @@ class TeachersController extends BaseController
     
     public function store(TeacherRequest $request)
     {
-       
+         
         $current_user=$this->currentUser();
         $updated_by=$current_user->id;
         $removed=false;

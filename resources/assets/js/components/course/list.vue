@@ -107,16 +107,12 @@
             },
         },
         beforeMount() {
-            
             this.init()
         },
         watch: {
             version(val){
                 this.current_version=val
             },
-            // course_id(value) {
-            //    this.searchParams.course=value
-            // }
         },
         data() {
             return {
@@ -137,7 +133,7 @@
 
                 title:Helper.getIcon('Courses') ,
                 current_version:0,
-                loaded:false,
+                
                 source: Course.source(),
                 
                 defaultSearch:'name',

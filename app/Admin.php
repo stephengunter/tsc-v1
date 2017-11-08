@@ -104,6 +104,8 @@ class Admin extends Model
 	}
 	public function canEditBy($user)
 	{
+        if($user->isDev()) return true;
+
 		if(!$user->isOwner()) return false;
 
         if($user->admin->fromHeadCenter()) return true;

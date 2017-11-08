@@ -2,7 +2,7 @@
    <tr>
         
         <td>
-            <a herf="#" @click.prevent="selected(category.id)">{{ category.name}}</a> 
+            <a href="#" @click.prevent="selected(category.id)">{{ category.name}}</a> 
         </td>
         <td>{{ category.code }}</td>
         <td v-html="getType(category)"></td> 

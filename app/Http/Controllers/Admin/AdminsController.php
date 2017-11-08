@@ -249,6 +249,7 @@ class AdminsController extends BaseController
     }
     public function update(Request $request ,$id)
     {
+        
         $current_user=$this->currentUser();
 
         $request = $request->get('admin');

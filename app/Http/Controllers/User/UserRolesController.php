@@ -4,7 +4,6 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\BaseController;
 
-use App\Http\Middleware\CheckAdmin;
 use Illuminate\Http\Request;
 
 use App\User;
@@ -18,17 +17,9 @@ use App\Support\Helper;
 class UserRolesController extends BaseController
  {
     
-    public function __construct(Users $users, CheckAdmin $checkAdmin)
+    public function __construct(Users $users)
     {
-          $exceptAdmin=[];
-          $allowVisitors=[];
-        
-		  $this->setMiddleware($exceptAdmin, $allowVisitors);
-        
-        
           $this->users=$users;
-         
-          $this->setCheckAdmin($checkAdmin);
           
 	}
 
@@ -37,12 +28,12 @@ class UserRolesController extends BaseController
     {
         $request = request();
         $user_id=(int)$request->user; 
+
         $user =$this->users->findOrFail($user_id);
         
-         return response()
-            ->json([
-                'roles' => $user->roles
-            ]);
+        return response()->json([ 'roles' => $user->roles  ]);            
+                
+          
     }
    
 
@@ -50,16 +41,21 @@ class UserRolesController extends BaseController
     {
         $user =$this->users->findOrFail($id);
         
-        $with_admin=$this->checkAdmin->isOwner();
-         return response()
-            ->json([
-                'roles' => $user->rolesCanAdd($with_admin)
-            ]);
+        $currentUser=$this->currentUser();
+        $with_admin=$currentUser->isOwner();
+
+        return response() ->json([
+                                    'roles' => $user->rolesCanAdd($with_admin)
+                                 ]);
+           
         
     }
 
     public function store(UserRequest $request)
     {
+
+        dd('UserRolesController.store');
+        $currentUser=$this->currentUser();
         $admin_id=$this->checkAdmin->getAdminId();
 
         $removed=false;
@@ -88,7 +84,7 @@ class UserRolesController extends BaseController
 
     public function update(UserRequest $request, $id)
     {
-        
+        dd('UserRolesController.update');
          $current_user=request()->user();        
          $user = User::findOrFail($id);
          if(!$user->canEditBy($current_user)){
@@ -105,6 +101,7 @@ class UserRolesController extends BaseController
 
     public function destroy($id)
     {
+        dd('UserRolesController.destroy');
         $current_user=$this->checkAdmin->getAdmin();
         
         $deleted=$this->users->delete($id ,$current_user);
@@ -122,11 +119,13 @@ class UserRolesController extends BaseController
     {
         $user =$this->users->findOrFail($id);
         
-        $with_admin=$this->checkAdmin->isOwner();
-         return response()
-            ->json([
-                'roles' => $user->rolesCanAdd($with_admin)
-            ]);
+        $currentUser=$this->currentUser();
+        $with_admin=$currentUser->isOwner();
+        
+        return response() ->json(['roles' => $user->rolesCanAdd($with_admin) ]);
+           
+                
+           
     }
     
     

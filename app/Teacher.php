@@ -88,7 +88,37 @@ class Teacher extends Model
             $this->user->detachRole($role);       
         } 
 		
-	}
+    }
+    
+    public function addGroupTeachers(array $teacher_ids)
+    {
+        if(!count($teacher_ids)) return;
+        
+        $current_ids=[];
+        if($this->teacher_ids)  $current_ids=explode( ',', $this->teacher_ids);
+       
+       
+        foreach($teacher_ids as $id){
+            if(!in_array($id, $current_ids)){
+                array_push($current_ids, $id); 
+            }
+        } 
+
+        $this->teacher_ids=Helper::strFromArray($current_ids);
+        $this->save();
+
+        $current_ids=explode( ',', $this->teacher_ids);
+        $center_ids=$this->centers->pluck('id')->toArray();
+        foreach($center_ids as $center_id){
+            foreach($current_ids as $id){
+                $teacher=static::findOrFail($id);
+                $teacher->attachCenter($center_id);
+            } 
+           
+        } 
+    }
+
+
     public function validCenters()
 	{
 		 return Helper::validCenters($this);

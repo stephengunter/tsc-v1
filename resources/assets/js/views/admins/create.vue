@@ -30,9 +30,10 @@
                     </div>
                     <div class="col-sm-4">
                         <label>所屬中心</label>
-                        <select v-model="form.admin.center_id"  name="admin.center_id" class="form-control" >
+                        <select v-model="form.admin.center_id" @change="clearErrorMsg('admin.center_id')"  name="admin.center_id" class="form-control" >
                             <option v-for="item in centerOptions" :key="item.id" :value="item.value" v-text="item.text"></option>
                         </select>
+                        <small v-if="form.errors.has('admin.center_id')" v-text="form.errors.get('admin.center_id')" class="text-danger"></small>
                     </div>
                     <div class="col-sm-4">
                         

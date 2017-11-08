@@ -251,82 +251,53 @@ class Teacher {
         //     })
         // }
 
-    static getGroupTeachersThead(canSelect) {
-        let thead = [{
-            title: 'ID',
-            key: 'id',
-            sort: false,
-            default: true
-        }, {
-            title: '名稱',
-            key: 'name',
-            sort: false,
-            default: true
-        }, {
-            title: '所屬中心',
-            key: 'centers',
-            sort: false,
-            default: true
-
-        }, {
-            title: '審核',
-            key: 'reviewed',
-            sort: true,
-            default: true
-        }, {
-            title: '更新時間',
-            key: 'updated_at',
-            sort: true,
-            default: true
-        }]
-
-        if (canSelect) {
-            let selectColumn = {
-                title: '',
-                key: '',
-                sort: false,
-                static: true,
-                default: true
-            }
-            thead.splice(0, 0, selectColumn);
-        }
-
-
-        return thead
-    }
 
     static getThead(canSelect) {
         let thead = [{
+            order: 1,
             title: '姓名',
             key: 'name',
-            sort: false,
-            default: true
+            static: true,
+
         }, {
+            order: 2,
+            title: '群組',
+            key: 'group',
+            sort: true,
+            static: true,
+        }, {
+            order: 3,
             title: '手機',
             key: 'user.phone',
             sort: false,
             default: true
         }, {
+            order: 4,
             title: '專長',
             key: 'specialty',
             sort: true,
             default: true
         }, {
+            order: 5,
             title: '所屬中心',
             key: 'centers',
+            static: true,
             sort: false,
-            default: true
 
         }, {
+            order: 6,
             title: '審核',
             key: 'reviewed',
+            static: true,
             sort: true,
-            default: true
+
         }, {
+            order: 7,
             title: '更新時間',
             key: 'updated_at',
+            static: true,
             sort: true,
-            default: true
+
         }]
 
         if (canSelect) {

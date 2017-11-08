@@ -202,9 +202,10 @@
             },
             
             onSubmitDisplayOrders(){
+               
                 this.hasError=true
                 let errors=0
-                for(let i=0; i<this.centers.length ; i++){
+                for(let i=0; i < this.centers.length ; i++){
                     let center=this.centers[i]
                     let val=center.display_order
                     if(isNaN(val) || val.length < 1){
@@ -214,10 +215,22 @@
                         center.error= ''
                     }
                 }
-                   
                 
+                if(errors==0) {
+                    this.updateDisplayOrder()
+                }
                 
-                let save=Center.updateDisplayOrder(form)
+            },
+            updateDisplayOrder(){
+               
+                let centers = this.centers.map(item=>{
+                    return {
+                                id:item.id,
+                                order:item.display_order
+                          }
+                })
+                
+                let save=Center.updateDisplayOrder(centers)
                 save.then(result => {
                         Helper.BusEmitOK()
                         this.init()
@@ -226,7 +239,6 @@
                          Helper.BusEmitError(error,'存檔失敗')
                     })
             },
-           
             
             
         },

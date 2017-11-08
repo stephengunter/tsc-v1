@@ -127,7 +127,10 @@ class Category {
                 })
         })
     }
-    static updateDisplayOrder(form) {
+    static updateDisplayOrder(categories) {
+        let form = new Form({
+            categories: categories
+        })
         return new Promise((resolve, reject) => {
 
             let url = this.storeUrl() + '/display-order'

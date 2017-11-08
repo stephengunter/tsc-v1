@@ -191,11 +191,15 @@
                 }
             },
             updateDisplayOrder(){
-               
-                let form=new Form({
-                    categories:this.categories
+                let categories = this.categories.map(item=>{
+                    return {
+                                id:item.id,
+                                order:item.order
+                          }
                 })
-                let save=Category.updateDisplayOrder(form)
+
+                
+                let save=Category.updateDisplayOrder(categories)
                 save.then(result => {
                         Helper.BusEmitOK()
                         this.init()

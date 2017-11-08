@@ -57,6 +57,7 @@ class CategoriesController extends BaseController
     }
     public function store(CategoryRequest $request)
     {
+       
         $current_user=$this->currentUser();
         if(!Category::canEdit($current_user)){
             return  $this->unauthorized(); 

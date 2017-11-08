@@ -18,8 +18,8 @@ Vue.component('date-picker', require('vue-datepicker'))
 Vue.component('time-picker', require('vue2-timepicker'))
 
 
-// import Auth from './packages/auth/Auth.js'
-// Vue.use(Auth)
+import Auth from './packages/auth/Auth.js'
+Vue.use(Auth)
 
 Vue.component('alert', require('./packages/components/Alert'))
 Vue.component('checkbox', require('./packages/components/CheckBox'))
@@ -29,6 +29,7 @@ Vue.component('html-editor', require('./packages/components/HtmlEditor'))
 Vue.component('modal', require('./packages/components/Modal'))
 Vue.component('pager', require('./packages/components/Pager'))
 Vue.component('toggle', require('./packages/components/Toggle'))
+Vue.component('drop-btn', require('./packages/components/DropBtn'))
 
 
 

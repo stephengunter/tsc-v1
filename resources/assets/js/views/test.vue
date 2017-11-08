@@ -1,43 +1,45 @@
 <template>
-     <div>
-         <button @click="beginEditPhoto(1)">upload</button>
-         <button @click="beginEditPhoto(0)">remove</button>
-         <photo-editor :user_id="photoEditorSettings.user_id" 
-            :entity_type="photoEditorSettings.entity_type" :entity_id="photoEditorSettings.entity_id"
-            :action="photoEditorSettings.action" :show="photoEditorSettings.show"
-            @canceled="onCancelEditPhoto" @photo-updated="onPhotoUpdated"
-            @photo-update-failed="onPhotoUpdateFailed">
-
-         </photo-editor>
+    <div>
+         <!-- <button @click="beginEditPhoto(1)">upload</button>
+         <button @click="beginEditPhoto(0)">remove</button> -->
         
-     </div>
+         <teacher-list v-if="ready" :no_page="listSettings.no_page" 
+            :can_edit_number="listSettings.canEditNumber"  :search_params="params"  
+            :hide_create="listSettings.hide_create" :version="listSettings.version"  
+            :can_select="listSettings.can_select"
+            @details="OnDetails"
+            @data-loaded="onTeachersLoaded"
+            @selected="onSelected" @begin-create="onBeginCreate"
+            @group-selected="onGroupSelected">
+        </teacher-list>
+        
+    </div>
 </template>
 
 <script>
-   
+    import TeacherList from '../components/teacher/list.vue'
     export default {
         name:'Test',
         components: {
-          
+           'teacher-list' :TeacherList
         },
         data() {
             return {
-                ready:false,
-                
-                photoEditorSettings:{
-                    user_id:1,
-                    entity_type:'user',
-                    entity_id:14,
-                    action:'upload',
-                    show:false
+                ready:true,
+                params:{
+                   
+                    center:0,
+                   
                 },
-                showAlert:false,
+                listSettings:{
+                    no_page:true,
+                    canEditNumber:true,
+                    can_select:false,
+                    hide_create:false,
+                    version:0
+                }
                 
                 
-           
-                
-
-                title_text:'課程審核'
             }
         },
         beforeMount(){
@@ -47,35 +49,22 @@
             init() {
                
             },
-            beginEditPhoto(val){
-                if(val){
-                    this.photoEditorSettings.action='upload'
-                    this.photoEditorSettings.show=true
-                }else{
-                    this.photoEditorSettings.action='delete'
-                    this.photoEditorSettings.show=true
-                }
+            onTeachersLoaded(data){
+               this.parentCourse = data.parentCourse
             },
-            onCancelEditPhoto() {
-                this.photoEditorSettings.show=false
-            }, 
-            onPhotoUpdated(photoId){
-                this.onCancelEditPhoto()
-
-                let msg = '刪除相片成功'
-                if(photoId){
-                    msg = '更新相片成功'
-                }
-                Helper.BusEmitOK(msg)
+            OnDetails(id){
+                this.$emit('details',id)
             },
-            onPhotoUpdateFailed(photoId){
-                this.onCancelEditPhoto()
-
-                let title = '刪除相片失敗'
-                if(photoId){
-                    title = '更新相片失敗'
-                }
-                Helper.BusEmitError(error,title)    
+            onSelected(id){
+                this.$emit('selected',id)
+            },
+            onGroupSelected(id){
+                this.params.parent=id  
+            },
+            onBeginCreate(){
+                let parent=0
+                if(this.parentTeacher) parent= this.parentTeacher.id
+                this.$emit('begin-create',parent)
             },
             
             

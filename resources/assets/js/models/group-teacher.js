@@ -40,19 +40,7 @@ class GroupTeacher {
 
         })
     }
-    static show(id) {
-        return new Promise((resolve, reject) => {
-            let url = this.showUrl(id)
-            axios.get(url)
-                .then(response => {
-                    resolve(response.data)
-                })
-                .catch(error => {
-                    reject(error);
-                })
 
-        })
-    }
     static store(form) {
         let url = this.storeUrl()
         let method = 'post'
@@ -66,19 +54,7 @@ class GroupTeacher {
                 })
         })
     }
-    static index(id) {
-        let url = this.source() + '/group-teachers'
-        url += '?id=' + id
-        return new Promise((resolve, reject) => {
-                axios.get(url)
-                    .then(response => {
-                        resolve(response.data);
-                    })
-                    .catch(error => {
-                        reject(error);
-                    })
-            }) //End Promise
-    }
+
     static edit(id) {
         let url = this.editUrl(id)
         return new Promise((resolve, reject) => {

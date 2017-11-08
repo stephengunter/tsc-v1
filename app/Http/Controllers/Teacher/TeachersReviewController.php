@@ -7,6 +7,7 @@ use App\Http\Controllers\BaseController;
 use App\Http\Requests\Teacher\TeacherRequest;
 use Illuminate\Http\Request;
 
+use App\Center;
 use App\Teacher;
 use App\User;
 use App\Profile;
@@ -23,63 +24,53 @@ class TeachersReviewController extends BaseController
  {
     protected $key='teachers';
 
-    public function __construct(Teachers $teachers ,Centers $centers) 
-                                                              
+    public function __construct(Teachers $teachers ,Centers $centers)                                                               
     {
         $this->teachers=$teachers; 
         $this->centers=$centers; 
-
-       
          
-	}
+    }
+    private function centersCanReview($currentUser)
+    {
+        if($currentUser->isDev()) return Center::where('removed',false)->get();
+
+        return $currentUser->admin->validCenters();
+    }
 	public function index()
     {
+        $current_user=$this->currentUser();
+        $centersCanReview=$this->centersCanReview($current_user);
         
         if(!request()->ajax()){
-            $menus=$this->menus($this->key);            
-            return view('teachers.review')
-                    ->with(['menus' => $menus]);
+            $centerOptions=$this->centers->optionsConverting($centersCanReview);
+            $menus=$this->menus($this->key);   
+            return view('teachers.review')->with([ 
+                'menus' => $menus ,
+                'centerOptions' => $centerOptions
+            ]);          
+            
         }  
 
         $request = request();
        
         $centerId=(int)$request->center; 
 
-        $teacherList=[];
-        $centerOptions=[];
-        if($centerId){
-          
-            $teacherList=$this->teachers->getByCenter($centerId)
-                                        ->with('user.profile');
-                                       
-        }else{
-            
-            $centerOptions=$this->centers->optionsConverting($this->canAdminCenters());
-            
-            if(count($centerOptions)){
-                $centerId=$centerOptions[0]['value'];
-            }
-            
-            
-        }
+        if(!$centerId) abort(404);
+        
 
-        $teacherList=$this->teachers->getByCenter($centerId)
-                                    ->where('reviewed',false)->with('user.profile')
-                                    ->orderBy('updated_at','desc')->get();
+        $teacherList=$this->teachers->getByCenter($centerId)->with('user.profile')
+                                    ->where('reviewed',false) //->orderBy('updated_at','desc')
+                                    ->filterPaginateOrder();
+                                    
 
        
-        if(count($teacherList)){
-            foreach($teacherList as $teacher){
-                $teacher->centerNames=$teacher->centerNames();
-            }
+        foreach($teacherList as $teacher){
+            $teacher->centerNames=$teacher->centerNames();
         }
         
                                     
-        return response()
-            ->json([
-               'teacherList' => $teacherList,
-               'centerOptions' => $centerOptions             
-            ]);
+        return response()->json([ 'model' => $teacherList  ]);           
+           
     }
 
 

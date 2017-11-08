@@ -2,7 +2,8 @@
 
 @section('content')
     
-    <teacher-review :version="version"  @saved="onSaved">   
+    <teacher-review :version="version"  
+    :center_options="{{ json_encode($centerOptions) }}" @saved="onSaved">   
     </teacher-review>
     
     

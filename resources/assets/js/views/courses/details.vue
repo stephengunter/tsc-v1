@@ -1,14 +1,14 @@
 <template>
 <div>
     
-  <course v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
+   <course v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
      @saved="onCourseUpdated" @loaded="onDataLoaded" :version="version"
      @btn-back-clicked="onBtnBackClicked" @deleted="onCourseDeleted" 
      @review-updated="onReviewUpdated"> 
 
-  </course>
-
-  <div v-if="loaded" id="tabCourse" class="panel with-nav-tabs panel-default">
+   </course>
+  
+   <div v-if="loaded" id="tabCourse" class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
             <ul class="nav nav-tabs">
                 <li class="active">
@@ -23,16 +23,16 @@
                 <li>
                      <a @click="activeIndex=3" href="#schedule" data-toggle="tab">預定進度</a>
                 </li>
-                <li>
+                <li v-if="false">
                      <a @click="activeIndex=4" href="#signupRecord" data-toggle="tab">報名紀錄</a>
                 </li>
-                <li>
+                 <li v-if="false">
                      <a @click="activeIndex=5" href="#admits" data-toggle="tab">錄取名單</a>
                 </li>
-                <li>
+                  <li v-if="false">
                      <a @click="activeIndex=6" href="#registers" data-toggle="tab">註冊名單</a>
                 </li>
-                <li>
+                  <li v-if="false">
                      <a @click="activeIndex=7" href="#lesson" data-toggle="tab">課堂紀錄表</a>
                 </li>
                 

@@ -79,7 +79,7 @@ class Helper
 
     public static function validCenters($entity)
     {
-       if(!$entity->centers()->count()) return null;
+    //    if(!$entity->centers()->count()) return null;
        return $entity->centers()->where('removed',false)->get();
 
     }

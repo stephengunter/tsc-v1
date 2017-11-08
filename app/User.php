@@ -289,7 +289,8 @@ class User extends Authenticatable {
 	{
 		if($user->id==$this->id) return true;
 
-		if($this->isAdmin()){			
+		if($this->isAdmin()){	
+				
 			return	$this->admin->canEditBy($user);
 		}
 		if($this->isTeacher()){			

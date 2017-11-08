@@ -35,19 +35,26 @@ class GroupTeachersController extends BaseController
         $this->centers=$centers; 
          
     }
-    public function show($id)
+    public function index()
     {
-        $teachers=$this->teachers->teachersInGroup($id);
-        if(!$teachers || !count($teachers))  return response()->json([ 'teachers' => [] ]); 
+        $request = request();
+        $parent=(int)$request->parent;
 
-        $teachers=$teachers->get();
-        if(!count($teachers))  return response()->json([ 'teachers' => [] ]);
+        if(!$parent) abort(404);
+        
+
+        $teachers=$this->teachers->teachersInGroup($parent)
+                                 ->with('user.profile')
+                                 ->filterPaginateOrder();   
+        
 
         foreach($teachers as $teacher){
             $teacher->centerNames=$teacher->centerNames();
         }
-        return response()->json([ 'teachers' => $teachers ]); 
+
+        return response()->json([ 'model' => $teachers ]); 
     }
+    
     public function create()
     {
         $request = request();
@@ -65,11 +72,11 @@ class GroupTeachersController extends BaseController
 
         $teacherList=$teacherList->where('group',false);
         
-        $teacherGroupId=(int)$request->group_id;            
-        if($teacherGroupId){
-            $teacherGroup=$this->teachers->findOrFail($teacherGroupId);
+        $parentId=(int)$request->parent;            
+        if($parentId){
+            $teacherGroup=$this->teachers->findOrFail($parentId);
             $teacherIds=$teacherGroup->groupTeacherIds();           
-            array_push($teacherIds,$teacherGroupId);
+            array_push($teacherIds,$parentId);
         
         
             $teacherList=$teacherList
@@ -80,11 +87,9 @@ class GroupTeachersController extends BaseController
         
 
         $teacherList=$teacherList->filterPaginateOrder();   
-        if(count($teacherList)){
-            foreach($teacherList as $teacher){
-                $teacher->centerNames=$teacher->centerNames();
-            }
-        }        
+        foreach($teacherList as $teacher){
+            $teacher->centerNames=$teacher->centerNames();
+        }       
                                     
         return response()->json([ 'model' => $teacherList ]);
        
@@ -92,9 +97,9 @@ class GroupTeachersController extends BaseController
     public function store(Request $request)
     {
         $group_id=$request['group_id'];
-        $teacher_id=$request['teacher_id'];
+        $teacher_ids=$request['teacher_ids'];
         if(!$group_id) abort(500);
-        if(!$teacher_id) abort(500);
+        if(!$teacher_ids) abort(500);
         
         $current_user=$this->currentUser();
 
@@ -102,28 +107,8 @@ class GroupTeachersController extends BaseController
         if(!$teacher_group->canEditBy($current_user)){
             return  $this->unauthorized();    
         }  
-        
-        $teacher=$this->teachers->findOrFail($teacher_id);   
 
-        if(!$teacher_group->teacher_ids) {
-            $teacher_group->teacher_ids=$teacher_id;
-            $teacher_group->save();
-            return response()->json([ 'success' => true ]);
-        }
-
-        $teacher_ids_array= explode( ',', $teacher_group->teacher_ids );
-        if(!in_array($teacher_id, $teacher_ids_array)){
-            $teacher_group->teacher_ids .= ',' .  $teacher_id;
-            $teacher_group->save();
-            
-        }
-
-        $center_ids=$teacher_group->centers->pluck('id')->toArray();
-        if(count($center_ids)){
-            foreach($center_ids as $center_id){
-                $teacher->attachCenter($center_id);
-            } 
-        }
+        $teacher_group->addGroupTeachers($teacher_ids);
         
         return response()->json([ 'success' => true ]);
     

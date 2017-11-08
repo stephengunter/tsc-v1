@@ -15,14 +15,10 @@ class AdminRequest extends FormRequest
     }
     public function rules()
     {  
-        $rules=[];
-        $id=$this->getAdminId();
-        if($id){
-            //Update
-            return $rules;
-        }
+        $rules=[
+            'admin.center_id' => 'required|numeric',
+        ];
         
-        // With User
         
         $user_id=$this->getUserId();       
         $userValues = $this['user'];
@@ -41,7 +37,9 @@ class AdminRequest extends FormRequest
 
     public function messages()
     {
-        $messages=[];
+        $messages=[
+            'admin.center_id.required' => '請選擇所屬中心',
+        ];
 
         $userMessages=User::getRuleMessages();
         return array_merge($messages,$userMessages);

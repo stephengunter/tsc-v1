@@ -1,12 +1,15 @@
 <template>
 <div>
+    <teacher-list :source_url="source"   :search_params="listSettings.params"
+        :version="version"  :title_text="listSettings.title_text"
+        :no_search="listSettings.no_search" :can_remove="listSettings.can_remove"
+        :no_page="listSettings.no_page"   :can_select="listSettings.can_select"
+        :create_text="listSettings.create_text" 
+        @details="onDetails"
+        @begin-create="beginEdit" @remove-clicked="beginDelete">
     
-    <list :group_id="teacherId" :can_edit="can_edit"  
-       :version="version"
-         @begin-edit="beginEdit"  @begin-delete="beginDelete" >                 
-     
-    </list>
-
+    </teacher-list>
+   
     <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
       @close="onDeleteCanceled" @confirmed="removeTeacher">        
     </delete-confirm>
@@ -22,15 +25,11 @@
            
         </div>
         <div slot="modal-body" class="modal-body">
-           
-            <teacher-list v-if="editSettings.show" 
-               :group_id="teacherId" :source_url="editSettings.source"
-               :hide_create="editSettings.hide_create" 
-                @selected="onTeacherSelected">
-            </teacher-list>
-            
- 
-      
+            <teacher-selector v-if="editSettings.show" 
+            :source_url="selectorSettings.source" :details_link="selectorSettings.details_link"
+            :params="selectorSettings.params" :title_text="selectorSettings.title"
+            @submit="onTeacherSelected"  >
+            </teacher-selector>
         </div>
     </modal> 
     
@@ -38,13 +37,13 @@
 </div>
 </template>
 <script>
-    import List from './list.vue'
+    
     import TeacherList from '../../../components/teacher/list.vue'
-
+    import TeacherSelector from '../../../components/teacher/selector.vue'
     export default {
         name:'GroupTeacherView',
         components: {
-            List,
+            'teacher-selector':TeacherSelector,
             'teacher-list':TeacherList
         },
         props: {
@@ -56,9 +55,32 @@
         },
         data() {
             return {
-              
+                source:GroupTeacher.source(),
                 version:0,
                 can_edit:false,
+
+                listSettings:{
+                    no_page:true,
+                    title_text:'群組教師',
+                    create_text:'加入教師',
+                    no_search:true,
+                    can_select:false,
+                    can_remove:true,
+                    params:{
+                        parent : this.teacher.user_id
+                    }
+                },
+
+                selectorSettings:{
+                    title:'請選擇要加入此群組的教師',
+                    details_link:false,
+                    params:{
+                        center:0,
+                        parent:this.teacher.user_id
+                    },
+                    source:GroupTeacher.createUrl(),
+                },
+
                 teacherId:0,
                 deleteConfirm:{
                     id:0,
@@ -90,9 +112,16 @@
                this.teacherId=this.teacher.user_id
                this.can_edit= Helper.isTrue(this.teacher.canEdit)
             },      
+            refresh(){
+                this.version +=1
+            },
             onDataLoaded(admin){
                 this.$emit('data-loaded',admin)
-            },        
+            },     
+            onDetails(id){
+                let path='/teachers/' + id
+                Helper.newWindow(path)
+            },   
             beginEdit() {
                 this.editSettings.show=true               
             },
@@ -115,18 +144,18 @@
                 this.deleteConfirm.id=values.id
                 this.deleteConfirm.show=true                 
             },  
-            onTeacherSelected(id,isLink){
-                this.addTeacher(id)
+            onTeacherSelected(teacher_ids){
+               this.addTeachers(teacher_ids)
             },
-            addTeacher(add_teacher_id){
+            addTeachers(teacher_ids){
                 let form=new Form({
                     group_id:this.teacherId,
-                    teacher_id:add_teacher_id
+                    teacher_ids:teacher_ids
                 })
                 let save=GroupTeacher.store(form)
                 save.then(result => {
                     Helper.BusEmitOK('新增成功')
-                    this.version += 1
+                    this.refresh()
                     this.endEdit()
                 })
                 .catch(error => {
