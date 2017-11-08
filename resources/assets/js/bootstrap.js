@@ -1,13 +1,15 @@
 window.$ = window.jQuery = require('jquery');
-require('../css/app.css');
-require('../css/font-awesome.css');
-require('../css/site.css');
-require('../summernote/summernote.css');
 
-require('bootstrap-sass');
 
-require('../summernote/summernote.js');
-require('../summernote/lang/summernote-zh-TW.js');
+require('../css/app.css')
+require('../css/font-awesome.css')
+require('../css/site.css')
+require('../summernote/summernote.css')
+
+require('bootstrap-sass')
+
+require('../summernote/summernote.js')
+require('../summernote/lang/summernote-zh-TW.js')
 
 import Vue from 'vue';
 
@@ -29,7 +31,6 @@ Vue.component('html-editor', require('./packages/components/HtmlEditor'))
 Vue.component('modal', require('./packages/components/Modal'))
 Vue.component('pager', require('./packages/components/Pager'))
 Vue.component('toggle', require('./packages/components/Toggle'))
-Vue.component('drop-btn', require('./packages/components/DropBtn'))
 
 
 
@@ -177,6 +178,7 @@ import Score from './models/score.js'
 import SignupInfo from './models/signupinfo.js'
 import Classtime from './models/classtime.js'
 import Schedule from './models/schedule.js'
+import ScheduleImport from './models/schedule-import'
 import Lesson from './models/lesson.js'
 import LessonParticipant from './models/lesson-participant.js'
 import Leave from './models/leave.js'
@@ -234,6 +236,7 @@ window.Score = Score
 window.SignupInfo = SignupInfo
 window.Classtime = Classtime
 window.Schedule = Schedule
+window.ScheduleImport = ScheduleImport
 window.Lesson = Lesson
 window.LessonParticipant = LessonParticipant
 window.Leave = Leave

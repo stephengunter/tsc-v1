@@ -114,6 +114,7 @@
         },
         methods: {
             init(){
+                this.$refs.fileinput.value = null
                 this.err_msg=''
                 this.loading=false
             },

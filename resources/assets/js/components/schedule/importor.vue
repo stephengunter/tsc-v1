@@ -1,22 +1,19 @@
 <template>
-     <div class="panel panel-default">
+    <div class="panel panel-default">
         <div class="panel-heading">
             <span  class="panel-title">
-                 <span  class="panel-title">
-                    <h4><i class="fa fa-calendar-o" aria-hidden="true"></i> 課程進度</h4>
-                  
-                  </span>
+                <span  class="panel-title">
+                    <h4><i class="fa fa-calendar-o" aria-hidden="true"></i> 課程預定進度</h4>                  
+                </span>
             </span>
-            <div   class="form-inline">   
+            <div class="form-inline">   
                 <select v-show="teacherOptions.length" v-model="form.import.teacher_id"  @change="loadCourseOptions" class="form-control" >
-                    <option v-for="item in teacherOptions" :value="item.value" v-text="item.text"></option>
+                    <option v-for="(item,index) in teacherOptions" :key="index" :value="item.value" v-text="item.text"></option>
                 </select>
                  &nbsp;&nbsp;
                 <select v-show="courseOptions.length" v-model="selectedCourse"  class="form-control" >
-                    <option v-for="item in courseOptions" :value="item.value" v-text="item.text"></option>
+                    <option v-for="(item,index)  in courseOptions" :key="index" :value="item.value" v-text="item.text"></option>
                 </select>
-                
-                
             </div>
             <div>
                 <button  v-show="isValid" @click.prevent="courseSelected" class="btn btn-success btn-sm" >確認送出</button>
@@ -51,7 +48,7 @@
             </thead>
             <tbody> 
                
-                <tr v-for="schedule in scheduleList"> 
+                <tr v-for="(schedule,index) in scheduleList" :key="index"> 
                     <th scope="row" v-text="schedule.order"></th> 
                     <td v-text="schedule.title"></td> 
                     <td v-text="schedule.content"></td>
@@ -73,14 +70,13 @@
 
 <script>
      export default {
+        name: 'ScheduleImportor', 
         props: {
             course_id: {
                 type: Number,
                 default: 0
             },  
         },
-        name: 'ScheduleImportor',
-       
         beforeMount() {
            this.init()
         },
@@ -133,10 +129,15 @@
                 })         
                 
 
-                let create=this.create()
+                let create=ScheduleImport.create(this.course_id)  //this.create()
 
-                create.then(() => {
+                create.then((data) => {
+                    this.form=new Form({
+                        import:data.import
+                    })
+                    this.teacherOptions = data.teacherOptions 
                     
+                    this.setCourseOptions(data.courseOptions)
                 }).catch(error => {
                     Helper.BusEmitError(error)
                     this.loaded = false
@@ -157,25 +158,6 @@
                     Helper.BusEmitError(error)
                     this.loaded = false
                 })
-            },
-            create(){
-                return new Promise((resolve, reject) => {
-                     let url = '/import-schedules/create?course=' + this.course_id 
-                     axios.get(url)
-                    .then(response => {
-                        this.form=new Form({
-                           import:response.data.import
-                        })
-                        this.teacherOptions = response.data.teacherOptions 
-                     
-                        this.setCourseOptions(response.data.courseOptions)
-
-                        resolve(true);
-                    })
-                    .catch(error => {
-                         reject(error);
-                    })
-                });
             },
             
             loadCourseOptions(){
@@ -231,15 +213,15 @@
                 })
             },
             submitImport(){
+                let store=ScheduleImport.store(this.form)
+                store.then(result => {
+                        this.$emit('success')
+                    })
+                    .catch(error => {
+                         this.$emit('failed',error)
+                    })
 
-                let url='/import-schedules'
-                this.form.post(url)
-                    .then(result => {
-                            this.$emit('success')
-                        })
-                        .catch(error => {        
-                             this.$emit('failed',error)
-                        })
+               
             }
         }
      }

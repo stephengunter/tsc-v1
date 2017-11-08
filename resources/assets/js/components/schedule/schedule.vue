@@ -6,16 +6,29 @@
                 <h4><i class="fa fa-calendar-o" aria-hidden="true"></i> 課程預定進度</h4>
             </span>
             
-            <div>
-                <drop-btn text="ccc" type="primary">
-                    <li><a href="#dropdown">Action</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="#dropdown">Separated link</a></li>
-                </drop-btn>
-                
-                <button v-if="can_edit" class="btn btn-primary btn-sm" @click.prevent="beginCreate">
-                   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
-                </button>
+            <div class="form-inline">
+                <div class="form-group">
+                    <button :disabled="loading" class="btn btn-warning btm-sm" @click.prevent="beginImport">
+                     從舊課程複製
+                    </button>
+
+                    <button v-if="loading" class="btn btn-default">
+                         <i class="fa fa-spinner fa-spin"></i> 
+                         處理中
+                    </button>
+                    <label v-else :disabled="loading" class="btn  btn-success btn-file" @click="initExcel">
+                       <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                       Excel 匯入
+                       <input :disabled="loading" type="file"  ref="fileinput"  name="schedules_file" style="display: none;"  
+                       @change="onFileChange" >
+                    </label>
+                    <small class="text-danger" v-if="hasError" v-text="err_msg"></small>
+                </div>
+                <div class="form-group">
+                    <button :disabled="loading" v-if="can_edit" class="btn btn-primary btm-sm" @click.prevent="beginCreate">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
+                    </button>
+                </div>
             </div>
             
         </div>  <!-- End panel-heading-->
@@ -68,7 +81,7 @@
             <button id="close-button" type="button" class="close" data-dismiss="modal" @click="importCanceled">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
             </button>
-           <h3>從舊課程中匯入</h3>
+           <h3>從舊課程複製</h3>
           </div>
         <div slot="modal-body" class="modal-body">
            
@@ -119,6 +132,10 @@
                 if(this.creating) return false
                 if(this.seleted) return false
                     return true
+            },
+            hasError(){
+                if(this.err_msg) return true
+                    return false
             }
         },
         data() {
@@ -139,7 +156,12 @@
                     course_id:0,
                     show:false,
                     width:1000,
-                }
+                },
+
+                loading:false,
+                files: [],
+
+                err_msg:'',
                
             }
         },
@@ -246,7 +268,47 @@
             onImportFailed(error){
                 this.importSettings.show=false
                 Helper.BusEmitError(error,'匯入失敗')
-            }
+            },
+            initExcel(){
+                this.err_msg=''
+                this.loading=false
+            },
+            onFileChange(e) {
+              
+                var files = e.target.files || e.dataTransfer.files
+                if (!files.length)  return
+                   
+                this.files = e.target.files
+
+                this.submitExcelImport()
+            },
+            submitExcelImport() {
+                this.loading=true
+               
+                let form = new FormData()
+                for (let i = 0; i < this.files.length; i++) {
+                    form.append('schedules_file', this.files[i])
+                    form.append('course_id', this.course_id)
+                    
+                }
+
+                let store=ScheduleImport.excelImport(form)
+                store.then(result => {
+                        Helper.BusEmitOK()
+                        this.loading=false
+                                                
+                    })
+                    .catch(error => {
+                        
+                        if(error.response.data.code==422){
+                            this.err_msg=error.response.data.error
+                        }
+                       
+                        Helper.BusEmitError(error,'存檔失敗')
+
+                        this.loading=false
+                    })
+            },
             
            
         },

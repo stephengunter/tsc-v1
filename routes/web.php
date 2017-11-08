@@ -1,5 +1,9 @@
 <?php
-
+Route::get('/test', function(){
+    
+    return view('test');
+    
+});
 //  Route::get('/test', function(){
 //    //  Artisan::call('migrate');
 //   Artisan::call('db:seed');
@@ -30,11 +34,7 @@ Route::get('reset-password/user/{user}/token/{token}','\App\Http\Controllers\Aut
 
 Route::group(['middleware' => 'admin'], function()
 {
-    Route::get('/test', function(){
-        
-        return view('test');
-        
-    });
+    
     Route::get('/', 'HomeController@index');
     Route::get('/downloads', 'DownloadsController@index');
 
@@ -93,6 +93,12 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::resource('courses-review', '\App\Http\Controllers\Course\CoursesReviewController',
     ['only' => ['index','store','update']]);
+
+    Route::resource('schedules', '\App\Http\Controllers\Course\SchedulesController');
+
+    Route::post('schedules-import/excel', '\App\Http\Controllers\Course\SchedulesImportController@excelImport');
+    Route::resource('schedules-import', '\App\Http\Controllers\Course\SchedulesImportController', 
+    ['only' => ['create','store']]);
     
     
     Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
@@ -167,9 +173,7 @@ Route::group(['middleware' => 'admin'], function()
 
     
     
-    Route::resource('schedules', '\App\Http\Controllers\Course\SchedulesController');
-    Route::resource('import-schedules', '\App\Http\Controllers\Course\ImportSchedulesController', 
-                                        ['only' => ['create','store']]);
+    
     Route::resource('lessons', '\App\Http\Controllers\Course\LessonsController');
     Route::resource('lessons-initialize', '\App\Http\Controllers\Course\LessonsInitializeController', 
                                         ['only' => ['create','store']]);   
