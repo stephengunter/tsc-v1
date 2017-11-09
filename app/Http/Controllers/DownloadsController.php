@@ -22,30 +22,28 @@ class DownloadsController extends BaseController
 
     private function importTemps($key)
     {
+        $files=[
+            'teachers' => 'teachers.xlsx',
+            'teacher-groups' => 'teacher-groups.xlsx',
+
+            'admins' => 'admins.xlsx',
+            'centers' => 'centers.xlsx',
+            'categories' => 'categories.xlsx',
+
+            'courses' => 'courses.xlsx',
+            'group-courses' => 'group-courses.xlsx',
+            'course-infoes' => 'course-infoes.xlsx',
+
+            'schedules' => 'schedules.xlsx',
+        ];
+
         $path='import/';
         $file_name='';
-        if($key=='teachers'){
-            $file_name = 'teachers.xlsx';
-        }else if($key=='teacher-groups'){
-            $file_name = 'teacher-groups.xlsx';
-        }
-        else if($key=='admins'){
-            $file_name = 'admins.xlsx';
-        }else if($key=='centers'){
-            $file_name = 'centers.xlsx';
-        }
-        else if($key=='categories'){
-            $file_name = 'categories.xlsx';
-        }
-        else if($key=='courses'){
-            $file_name = 'courses.xlsx';
-        }else if($key=='group-courses'){
-            $file_name = 'group-courses.xlsx';
-        }else if($key=='course-infoes'){
-            $file_name = 'course-infoes.xlsx';
-        }
+        
 
-       
+        if(array_key_exists($key,$files)){
+            $file_name=$files[$key];
+        } 
 
         if(!$file_name) abort(404);
 

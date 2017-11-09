@@ -1,6 +1,22 @@
 <?php
 Route::get('/test', function(){
-    
+    $files=[
+        'teachers' => 'teachers.xlsx',
+        'teacher-groups' => 'teacher-groups.xlsx',
+
+        'admins' => 'admins.xlsx',
+        'centers' => 'centers.xlsx',
+        'categories' => 'categories.xlsx',
+
+        'courses' => 'courses.xlsx',
+        'group-courses' => 'group-courses.xlsx',
+        'course-infoes' => 'course-infoes.xlsx',
+    ];
+
+    $key='courses';
+
+    if (array_key_exists($key,$files)) dd($files[$key]);
+    dd('no');
     return view('test');
     
 });

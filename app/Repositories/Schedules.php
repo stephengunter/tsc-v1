@@ -5,6 +5,8 @@ namespace App\Repositories;
 use App\Schedule;
 use App\Support\Helper;
 
+use Excel;
+
 class Schedules 
 {
     public function initialize($course_id)
@@ -83,6 +85,47 @@ class Schedules
         }
 
         return $options;
+    }
+
+    public function importSchedules($file,$course_id,$current_user)
+    {
+        $err_msg='';
+        
+        $excel=Excel::load($file, function($reader) {             
+            $reader->limitColumns(16);
+            $reader->limitRows(100);
+        })->get();
+        
+
+        $scheduleList=$excel->toArray()[0];
+        for($i = 1; $i < count($scheduleList); ++$i) {
+            $row=$scheduleList[$i];
+            
+            $title=trim($row['title']);
+            if(!$title)continue;
+
+            $order=(int)trim($row['order']);
+
+            $content=trim($row['content']);
+            $materials=trim($row['materials']);
+            
+
+            $values=[
+                'course_id' => $course_id,
+                'order' => $order ,
+                'title' => $title , 
+                'content' => $content,
+                'materials' => $materials,
+
+                'updated_by' => $current_user->id
+            ];
+
+            
+            $schedule = Schedule::create($values);
+            
+        }
+
+        return $err_msg;
     }
    
    

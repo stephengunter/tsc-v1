@@ -120,15 +120,10 @@ class SchedulesImportController extends BaseController
         $course_id=(int)$form['course_id'];
         $file=Input::file('schedules_file'); 
 
-        dd($course_id);
+        $course=Course::findOrFail($course_id);
 
-        $err_msg='';
-        if($type){
-            $err_msg=$this->teachers->importTeachers($file,$current_user);
-           
-        }else{
-            $err_msg=$this->teachers->importTeacherGroups($file,$current_user);
-        }  
+       
+        $err_msg=$this->schedules->importSchedules($file,$course_id,$current_user);
         
 
         if($err_msg) {

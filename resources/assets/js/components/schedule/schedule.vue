@@ -23,6 +23,10 @@
                        @change="onFileChange" >
                     </label>
                     <small class="text-danger" v-if="hasError" v-text="err_msg"></small>
+
+                    <a href="/downloads?type=import&key=schedules" target="_blank" class="btn btn-default btn-primary">
+                        <i class="fa fa-download" aria-hidden="true"></i>下載範例檔
+                    </a> 
                 </div>
                 <div class="form-group">
                     <button :disabled="loading" v-if="can_edit" class="btn btn-primary btm-sm" @click.prevent="beginCreate">
@@ -296,7 +300,7 @@
                 store.then(result => {
                         Helper.BusEmitOK()
                         this.loading=false
-                                                
+                        this.init()                        
                     })
                     .catch(error => {
                         
