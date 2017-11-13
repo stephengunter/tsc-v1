@@ -25,15 +25,13 @@ use Config;
 class NoticesController extends BaseController
 {
     protected $key='notices';
-    public function __construct(Notices $notices,Files $files,CheckAdmin $checkAdmin)                                          
+    public function __construct(Notices $notices,Files $files)                                          
     {
-         $exceptAdmin=[];
-         $allowVisitors=[];
-		 $this->setMiddleware( $exceptAdmin, $allowVisitors);
+         
 		
          $this->notices=$notices;
          $this->files=$files;
-         $this->setCheckAdmin($checkAdmin);
+       
 
 	}
     public function index()

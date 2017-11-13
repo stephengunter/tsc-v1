@@ -89,16 +89,18 @@ class Helper
         if($entity->centers()->count()){
 			
             $centerIds =$entity->centers()->pluck('id');
-			return Center::where('removed',false)->whereNotIn('id' , $centerIds)->get();
+            return Center::where('removed',false)->where('oversea',false)
+                            ->whereNotIn('id' , $centerIds)->get();
 		
 
 		}else{
-          	return Center::where('removed',false)->get();
+          	return Center::where('removed',false)->where('oversea',false)->get();
 		}
 
     }
     public static function centersCanAddByUser($entity,$user)
 	{
+        
         if($user->isAdmin()) return static::centersCanAddByAdmin($entity,$user->admin);
 
         if(!$user->isDev()) return [];

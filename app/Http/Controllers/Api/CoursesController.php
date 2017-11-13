@@ -58,13 +58,35 @@ class CoursesController extends BaseController
             ]);
 
     }
+    
     public function index()
     {
         $request = request();
-        $category=$request->category;       
-        $center=$request->center;
+        $categoryId=(int)$request->category;       
+        $centerId=(int)$request->center;
 
-        return $this->getCourses($category,$center);
+        if($centerId && $categoryId){
+            $courses= $this->getCourses($categoryId,$centerId);
+            return response() ->json(['courses' => $courses  ]); 
+        }  
+
+        $oversea=false;
+        $centers=$this->centers->index($oversea)
+                              ->where('active',true)->get();
+
+        $order=true;
+        $categories= $this->categories->activeCategories($order)->get();
+
+        $categoryId=$categories[0]->id;
+        $centerId=$categories[0]->id;
+
+        $courses= $this->getCourses($categoryId,$centerId);
+        return response() ->json([ 
+                                    'courses' => $courses , 
+                                    'categories' => $categories,   
+                                    'centers' => $centers
+                                ]); 
+        
        
     }
 
@@ -80,6 +102,8 @@ class CoursesController extends BaseController
         
         $center=0;
         return $this->getCourses($category->id,$center);
+
+        return response() ->json(['courses' => $courses  ]); 
        
     }
     
@@ -149,36 +173,20 @@ class CoursesController extends BaseController
         
     }
 
-    private function getCourses($category,$center)
+    private function getCourses(int $categoryId,int $centerId)
     {
-        $courses=[];
-        return response() ->json(['courses' => $courses  ]); 
-        $categoryId=(int)$category;       
-        $centerId=(int)$center;
+        
+        $courses=$this->courses->getActiveCourses($categoryId,$centerId)->get();
+        
+        $canEditNumber=false;
+        $photo=true;
+        foreach ($courses as $course) {
+            $course->populateViewData($canEditNumber,$photo);
+            
+        }
 
-        $courses=$this->courses->activeCourses();
-        if($centerId){
-            $courses=$courses->where('center_id',$centerId);       
-        }
-        $courses= $courses->whereHas('categories', function($query) use ($categoryId) {
-                                            $query->where('id', $categoryId );
-                                     });
-        $courses= $courses->get();
-        if(count($courses)){
-            foreach ($courses as $course) {
-                $course->photo= $course->photo();
-                if(!$centerId){
-                    $course->center;
-                }
-                
-                foreach ($course->classTimes as $classTime) {
-                    $classTime->weekday;
-                }
-            }           
-        }
+        return $courses;
         
-        
-        return response() ->json(['courses' => $courses  ]); 
     }
     
     

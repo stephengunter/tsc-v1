@@ -11,7 +11,7 @@
     
 
     export default {
-        name: 'TeacherIndex',       
+        name: 'CenterIndex',       
         components: {
             'center-list':CenterList
         },

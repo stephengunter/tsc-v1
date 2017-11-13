@@ -38,6 +38,7 @@ class Notice extends Model
 
     public function canEditBy($user)
 	{
+        if($user->isDev()) return true;
         return $user->isAdmin();
           
 	}

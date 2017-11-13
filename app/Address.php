@@ -27,23 +27,32 @@ class Address extends Model
 
     public function fullText()
     {
-        $city=City::select('name')->find($this->city_id)->name;
-        $district=District::select('name')->find($this->district_id)->name;
+        $city='';
+        if($this->city_id) $city=City::select('name')->find($this->city_id)->name;
+        
+        $district='';
+        if($this->district_id) $district=District::select('name')->find($this->district_id)->name;
 
         return $city . $district . $this->streetAddress;
     }
 
     public static function initializeByZipcode($zipcode,$street,$updated_by)
     {
-       
-        $district=District::where('zipcode', $zipcode)->first();
-       
-        if(!$district) return null;
+        $city_id=0;
+        $district_id=0;
+
+        $district=null;
+        if($zipcode) $district=District::where('zipcode', $zipcode)->first();
+
+        if($district){
+            $district_id=$district->id;
+            $city_id=$district->city->id;
+        }
 
       
         return [            
-			 'city_id' => $district->city->id,
-			 'district_id' => $district->id,
+			 'city_id' => $city_id,
+			 'district_id' => $district_id,
 		     'zipcode' =>  $zipcode,
              'streetAddress' => $street,
              'updated_by' => $updated_by
@@ -55,8 +64,6 @@ class Address extends Model
     public static function createByZipcode($zipcode,$street,$updated_by)
     {
         $values=static::initializeByZipcode($zipcode,$street,$updated_by);
-      
-        if(!$values) return null;
 
         return static::create($values);
     }
@@ -64,8 +71,6 @@ class Address extends Model
     public function updateByZipcode($zipcode,$street,$updated_by)
     {
         $values=static::initializeByZipcode($zipcode,$street,$updated_by);
-        if($values){
-            $this->update($values);
-        } 
+        $this->update($values);
     }
 }

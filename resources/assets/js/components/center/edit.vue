@@ -47,6 +47,18 @@
                             </div> 
                                 
                         </div>   <!-- End Row   --> 
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">                           
+                                    <label>台灣/海外</label>
+                                    <div>
+                                        <toggle :items="overseaOptions"   :default_val="form.center.oversea" @selected="setOversea"></toggle>
+                                    </div>
+                                </div>
+                            </div>  
+                            
+                                
+                        </div>   <!-- End Row   --> 
                         <div v-if="isCreate" class="row">
                             <div class="col-sm-4">
                                 <div class="form-group">                           
@@ -62,6 +74,16 @@
                                     <small class="text-danger" v-if="form.errors.has('contact_info.fax')" v-text="form.errors.get('contact_info.fax')"></small>
                                 </div>                                                            
                             </div> 
+                                
+                        </div>   <!-- End Row   -->
+                        <div v-if="isCreate" v-show="isOversea" class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">                           
+                                    <label>地址</label>
+                                    <input type="text" name="contact_info.addressText" class="form-control" v-model="form.contact_info.addressText">
+                                </div>
+                            </div>  
+                            
                                 
                         </div>   <!-- End Row   -->
                         <div  class="row">
@@ -104,6 +126,8 @@
                 title:Helper.getIcon('Centers'),
               
                 loaded:false,
+
+                overseaOptions:Center.overseaOptions() ,
                
                 form: {},
                 
@@ -123,6 +147,9 @@
         computed:{
             isCreate(){
                 return this.id == 0
+            },
+            isOversea(){
+                return this.form.center.oversea
             },
 
         }, 
@@ -185,6 +212,9 @@
                 })
                 
             },
+            setOversea(val) {
+                this.form.center.oversea = val
+            },
             endEdit(){
                 this.$emit('canceled')
             },
@@ -207,13 +237,6 @@
             clearErrorMsg(name) {
                 this.form.errors.clear(name);
             },
-            
-           
-            // onImageUploadCanceled() {
-            //     this.imageUpload.show=false
-            // },
-           
-            
             
              //photoe functions
             editPhoto(val){

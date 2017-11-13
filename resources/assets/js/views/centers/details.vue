@@ -17,7 +17,7 @@
         <div class="panel-body">
             <div class="tab-content">
                 <div class="tab-pane fade active in" id="contactinfo">
-                    <contact-info v-if="activeIndex==0"  
+                    <contact-info v-if="activeIndex==0"  :can_options="contactInfoSettings.can_options"
                      :id="contactInfoSettings.id" :center_id="contactInfoSettings.center_id" 
                      :canEdit="contactInfoSettings.canEdit" :show_residence="contactInfoSettings.show_residence" 
                      @created="onContactInfoCreated" @deleted="onContactInfoDeleted" >             
@@ -61,8 +61,6 @@
         },
         data(){
             return{
-                
-              
                 center:{
                    contact_info:0
                 },
@@ -81,6 +79,7 @@
                     can_edit:true,
 
                     show_residence:false,
+                    can_options:true
                 },
                 signupSettings:{
                     disable_edit:true
@@ -118,9 +117,11 @@
                
             },
             onCenterLoaded(center){
-                 this.center=center
-                 this.setContactInfo(center.contact_info)
-                 this.centerLoaded=true
+               
+                this.center=center
+                this.contactInfoSettings.can_options=!Helper.isTrue(center.oversea) 
+                this.setContactInfo(center.contact_info)
+                this.centerLoaded=true
             },
             onCenterSaved(center){  
                 this.center=center   

@@ -2,18 +2,23 @@
 <div>
     <form @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
         <div class="form-inline">
-
-            <select :disabled="isReadOnly"  v-model="address.city_id" @change="loadDistricts" style="width:auto;" class="form-control selectWidth">
+            
+            <select v-if="can_options" :disabled="isReadOnly"  v-model="address.city_id" @change="loadDistricts" style="width:auto;" class="form-control selectWidth">
                 <option v-for="(city,index) in cities" :key="index" :value="city.id" v-text="city.name" >
-                </option>
+            </option>
+            
             </select>
-            <select :disabled="isReadOnly"  v-model="address.district_id" style="width:auto;" class="form-control selectWidth">
+            <select  v-if="can_options" :disabled="isReadOnly"  v-model="address.district_id" style="width:auto;" class="form-control selectWidth">
                 <option v-for="(d,index) in districts" :key="index" :value="d.id" v-text="d.name">
                 </option>
             </select>
-            <input :readonly="isReadOnly" type="text"  name="address.streetAddress" v-model="address.streetAddress" style="width:50%" class="form-control" >
-          <small class="text-danger" v-if="form.errors.has('address.streetAddress')" v-text="form.errors.get('address.streetAddress')"></small>
-         &nbsp;
+           
+
+            
+            
+            <input :readonly="isReadOnly" type="text"  name="address.streetAddress" v-model="address.streetAddress" :style="inputStyle" class="form-control" >
+            <small class="text-danger" v-if="form.errors.has('address.streetAddress')" v-text="form.errors.get('address.streetAddress')"></small>
+            &nbsp;
             <button v-show="isReadOnly" class="btn btn-primary btn-xs" @click.prevent="beginEdit">
                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
             </button>
@@ -58,12 +63,16 @@
         name: 'EditAddress',
         props: {
             id: {
-              type: Number,
-              default: 0
+                type: Number,
+                 default: 0
             },
             name:{
-               type: String,
-               default: ''
+                type: String,
+                default: ''
+            },
+            can_options:{
+                type: Boolean,
+                default: true
             }
         },
         data() {
@@ -83,8 +92,15 @@
 
             }
         },
+        computed:{
+            inputStyle(){
+                if(this.can_options) return 'width:50%'
+                    return 'width:85%'
+            }
+
+        },
         mounted() {
-           this.init(this.id);
+            this.init(this.id);
         },
         methods: {
             init(id){
@@ -107,18 +123,23 @@
             },
             fetchData(id) {
                 let getData = null
-                if (id > 0) {
+                if (id) {
                     getData = Address.edit(id)          
                 } else {
-                  getData = Address.create() 
+                    getData = Address.create() 
                 }
                 getData.then(data => {
                             this.address = data.address
-                            this.cities = data.cities
-                            this.districts = data.districts
-                            if (!this.address.district_id) {
-                                this.address.district_id = this.districts[0].id
+                            
+
+                            if(this.can_options){
+                                this.cities = data.cities
+                                this.districts = data.districts
+                                if (!this.address.district_id) {
+                                    this.address.district_id = this.districts[0].id
+                                }
                             }
+                            
                         }).catch(error=> {
                             Helper.BusEmitError(error)
                         })

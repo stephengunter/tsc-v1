@@ -9,22 +9,17 @@ use App\Http\Requests\PhotoRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Input;
 
-use App\Http\Middleware\CheckAdmin;
 use App\Repositories\Files;
 
 class FilesController extends BaseController
 {
     
    
-    public function __construct(Files $files,CheckAdmin $checkAdmin)                                
+    public function __construct(Files $files)                                
     {
-          $exceptAdmin=['store','show'];
-          $allowVisitors=['defaultProfile','defaultCenter','defaultCourse'];
-
-          $this->setMiddleware( $exceptAdmin, $allowVisitors);        
+                  
           
           $this->files=$files;
-          $this->checkAdmin=$checkAdmin;
           
     }
     public function upload(Request $form)

@@ -28,13 +28,19 @@ class CentersController extends BaseController
     {
         $centers=$this->centers->activeCenters()->get();
       
+        // foreach ($centers as $center) {
+        //     $center->contactInfo= $center->contactInfo();
+        //     $center->photo= $center->photo();
+        //     if($center->contactInfo)
+        //     {
+        //         $center->contactInfo->addressA=$center->contactInfo->addressA();
+        //     }
+        // }
+
         foreach ($centers as $center) {
-            $center->contactInfo= $center->contactInfo();
-            $center->photo= $center->photo();
-            if($center->contactInfo)
-            {
-                $center->contactInfo->addressA=$center->contactInfo->addressA();
-            }
+            $photo=true;
+            $center->populateViewData($photo);
+            
         }
         
         return response()->json(['centers' => $centers ]);

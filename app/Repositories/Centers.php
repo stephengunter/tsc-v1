@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Center;
 use App\ContactInfo;
+use App\Address;
 use Excel;
 use DB;
 
@@ -30,6 +31,13 @@ class Centers
         $code=strtoupper($code);
         return $this->getAll()->where('code',$code)->first();
     }
+
+    public function index(bool $oversea)
+    {
+        return $this->getAll()->where('oversea',$oversea)
+                              ->orderBy('display_order','desc');
+        
+    }
     
     public function store($centerValues)
     {
@@ -45,6 +53,31 @@ class Centers
         
         return  $center;
       
+    }
+
+    public function createOverseaCenter(array $centerValues,$tel,$fax,$street,$updated_by)
+    {
+        $addressId=0;
+        if($street){
+            $address=Address::create([
+                'streetAddress' => $street,
+                'updated_by' => $updated_by
+            ]); 
+            $addressId=$address->id;
+        }
+        $contactInfo=ContactInfo::create([
+            'tel' => $tel,
+            'fax' => $fax,
+            'contactAddress' => $addressId,
+            'updated_by' => $updated_by
+        ]);
+
+        $centerValues['contact_info']=$contactInfo->id;
+        $centerValues['oversea']=true;
+
+        return $this->store($centerValues);
+
+        
     }
    
     public function updateDisplayOrder($id,$order,$updated_by)
@@ -71,7 +104,8 @@ class Centers
 
     public function options($empty_item=false)
     {
-        $centerList=$this->getAll()->get();
+        $isOversea=false;
+        $centerList=$this->index($isOversea)->get();
         return $this->optionsConverting($centerList,$empty_item);
        
     }
@@ -115,7 +149,8 @@ class Centers
     public function activeCenters()
     {
        return  $this->getAll()->where('active',true)
-                ->orderBy('display_order','desc');
+                            ->orderBy('display_order','desc');
+                
         
     }
 
@@ -144,8 +179,7 @@ class Centers
             }
             
             $exist_center=$this->getByCode($code);
-             
-                        
+
             $order=(int)trim($row['order']);
             $active=true;
             if($order>=0){
@@ -155,18 +189,22 @@ class Centers
             }
 
             $course_tel=trim($row['course_tel']);
-
+            
             $zipcode=trim($row['zipcode']);
             $street=trim($row['street']);
             $tel=trim($row['tel']);
             $fax=trim($row['fax']);
-           
+
+
+            
+            $oversea=(int)trim($row['oversea']) > 0 ? true:false;
 
             $updated_by=$current_user->id;
-
+            
             $values=[
                 'name' => $name,
                 'code' => $code,
+                'oversea' => $oversea,
                 'course_tel' => $course_tel,
                 'display_order' => $order,
                 'active' => $active,
@@ -174,16 +212,26 @@ class Centers
             ];
 
 
-            if($exist_center){
-                $exist_center->updateContactInfo($tel ,$fax, $zipcode, $street,$updated_by);                    
-                $exist_center->update($values);
-            }else{
+            if($oversea){
+                if($exist_center){
+                    $exist_center->updateContactInfo($tel ,$fax, $zipcode, $street,$updated_by);                    
+                    $exist_center->update($values);
+                }else{
+                    $center= $this->createOverseaCenter($values,$tel,$fax,$street,$updated_by);
+                }
                 
-                $contactInfo=ContactInfo::createByAddress($zipcode, $street, $updated_by,$tel,$fax);
-                if($contactInfo) $values['contact_info'] = $contactInfo->id;
-               
-                $center=$this->store($values);
-            
+            }else{
+                if($exist_center){
+                    $exist_center->updateContactInfo($tel ,$fax, $zipcode, $street,$updated_by);                    
+                    $exist_center->update($values);
+                }else{
+                    
+                    $contactInfo=ContactInfo::createByAddress($zipcode, $street, $updated_by,$tel,$fax);
+                    if($contactInfo) $values['contact_info'] = $contactInfo->id;
+                   
+                    $center=$this->store($values);
+                
+                }
             }
 
         }  //end for  

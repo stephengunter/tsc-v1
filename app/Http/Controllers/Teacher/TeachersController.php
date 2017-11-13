@@ -27,15 +27,11 @@ class TeachersController extends BaseController
     public function __construct(Teachers $teachers ,Users $users, Courses $courses,
                                 Centers $centers)                               
     {
-        
-        
         $this->teachers=$teachers;
            
         $this->users=$users;  
         $this->courses=$courses; 
         $this->centers=$centers; 
-
-       
          
 	}
 	public function index()

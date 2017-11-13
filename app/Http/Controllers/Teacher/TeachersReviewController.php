@@ -32,7 +32,10 @@ class TeachersReviewController extends BaseController
     }
     private function centersCanReview($currentUser)
     {
-        if($currentUser->isDev()) return Center::where('removed',false)->get();
+        if($currentUser->isDev()){
+            return Center::where('removed',false)
+                            ->where('oversea',false)->get();
+        } 
 
         return $currentUser->admin->validCenters();
     }

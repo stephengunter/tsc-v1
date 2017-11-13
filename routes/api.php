@@ -7,6 +7,11 @@ Route::get('/user', function (Request $request) {
      return $user;
 })->middleware('auth:api');
 
+Route::get('/contents', ['uses' => '\App\Http\Controllers\Api\ContentsController@index']);
+
+Route::get('/latest-courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@latest']);
+Route::resource('/courses', '\App\Http\Controllers\Api\CoursesController');
+
 Route::resource('/users', '\App\Http\Controllers\Api\UsersController',
                                      ['except' => ['index','destroy']]);
 
@@ -27,9 +32,9 @@ Route::get('/notices', ['uses' => '\App\Http\Controllers\Api\NoticesController@i
 Route::get('/latest-notices', ['uses' => '\App\Http\Controllers\Api\NoticesController@latest']);
 Route::get('/notices/{id}', ['uses' => '\App\Http\Controllers\Api\NoticesController@show']);
 
-Route::get('/courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@index']);
-Route::get('/courses/{id}', ['uses' => '\App\Http\Controllers\Api\CoursesController@show']);
-Route::get('/latest-courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@latest']);
+// Route::get('/courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@index']);
+// Route::get('/courses/{id}', ['uses' => '\App\Http\Controllers\Api\CoursesController@show']);
+// Route::get('/latest-courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@latest']);
 
 
 Route::post('/register',['uses'=>'\App\Http\Controllers\Api\RegisterController@store']);
@@ -48,6 +53,9 @@ Route::post('/photoes',['uses'=>'\App\Http\Controllers\Api\PhotoesController@sto
 
 Route::group(['middleware' => 'auth:api'], function()
 {
+    
+    
+
     Route::resource('/teacher', '\App\Http\Controllers\Api\Teachers\TeachersController',
     ['only' => ['index','store']]);
     Route::resource('/teacher/courses', '\App\Http\Controllers\Api\Teachers\CoursesController',

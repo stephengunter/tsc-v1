@@ -3,23 +3,24 @@
    
     <show v-if="readOnly"  :id="contactInfo.id" 
         can_edit="can_edit"  :show_residence="show_residence"
-         @begin-edit="beginEdit" @begin-create="beginCreate"
+        @begin-edit="beginEdit" @begin-create="beginCreate"
         @data-loaded="onDataLoaded"
         @btn-delete-clicked="beginDelete"  >               
        
     </show>
 
-    <edit v-else :id="contactInfo.id" :show_residence="show_residence"
-       :user_id="user_id"  :center_id="center_id"
-       @created="onCreated"
-       @updated="onUpdated"   @canceled="onEditCanceled" >                 
+    <edit v-else :id="contactInfo.id" :can_options="can_options"
+        :show_residence="show_residence"
+        :user_id="user_id"  :center_id="center_id"
+        @created="onCreated"
+        @updated="onUpdated"   @canceled="onEditCanceled" >                 
     </edit>
     
     
     
     
     <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
-      @close="closeConfirm" @confirmed="deleteContactInfo">        
+        @close="closeConfirm" @confirmed="deleteContactInfo">        
     </delete-confirm>
 </div>
 </template>
@@ -55,6 +56,10 @@
             center_id:{
               type: Number,
               default: 0
+            },
+            can_options:{
+                type: Boolean,
+                default: true
             }
         },
         

@@ -1,62 +1,64 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-heading">           
-       <span class="panel-title">
-             <h4 v-html="title"></h4>                  
-       </span>           
-    </div>
-    <div v-if="loaded" class="panel-body">
-       <form class="form-horizontal" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
-           <div class="row">
-              <div class="form-group">
-                <label  class="col-md-2 control-label" >市話</label>
-                <div class="col-md-8">
-                   <input type="text" name="contactInfo.tel" v-model="form.contactInfo.tel" class="form-control"  >
-                   <small class="text-danger" v-if="form.errors.has('contactInfo.tel')" v-text="form.errors.get('contactInfo.tel')"></small>
-                </div>
-              </div>
-              <div class="form-group">
-                  <label class="col-md-2 control-label" >傳真</label>
-                  <div class="col-md-8">
-                      <input type="text" name="contactInfo.fax" v-model="form.contactInfo.fax" class="form-control"  >
-                      <small class="text-danger" v-if="form.errors.has('contactInfo.fax')" v-text="form.errors.get('contactInfo.fax')"></small>
-                  </div>
-              </div>
-              <div class="form-group">
-                  <label class="col-md-2 control-label" >通訊地址</label>
-                  <div class="col-md-8  form-inline">
-                      <address-info v-if="loaded" :id="parseInt(form.contactInfo.contactAddress)" name="通訊地址"
-                          @saved="contactAddressSaved" @editting="onAddressEditting"
-                          @canceled="onAddressEndEdit" @deleted="contactAddressDeleted">              
-                      </address-info>
-        
-                  </div>
-              </div> 
-              <div v-show="show_residence"  class="form-group">
-                  <label class="col-md-2 control-label" >戶籍地址</label>
-                  <div class="col-md-8 form-inline">
-                      <address-info v-if="loaded" :id="parseInt(form.contactInfo.residenceAddress)" name="戶籍地址"
-                         @saved="residenceAddressSaved" @editting="onAddressEditting" 
-                         @canceled="onAddressEndEdit" @deleted="residenceAddressDeleted">
-                      </address-info>                    
-                  </div>
-              </div> 
-              <div class="form-group">
-                  <div class="col-md-2">
-                    <input type="hidden" name="contactInfo.user_id" v-model="form.contactInfo.user_id">
-                    <input type="hidden" name="contactInfo.center_id" v-model="form.contactInfo.center_id">
-                  </div>   
+    <div class="panel panel-default">
+        <div class="panel-heading">           
+            <span class="panel-title">
+                <h4 v-html="title"></h4>                  
+            </span>           
+        </div>
+        <div v-if="loaded" class="panel-body">
+            <form class="form-horizontal" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
+                <div class="row">
+                    <div class="form-group">
+                        <label  class="col-md-2 control-label" >市話</label>
+                        <div class="col-md-8">
+                        <input type="text" name="contactInfo.tel" v-model="form.contactInfo.tel" class="form-control"  >
+                        <small class="text-danger" v-if="form.errors.has('contactInfo.tel')" v-text="form.errors.get('contactInfo.tel')"></small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" >傳真</label>
+                        <div class="col-md-8">
+                            <input type="text" name="contactInfo.fax" v-model="form.contactInfo.fax" class="form-control"  >
+                            <small class="text-danger" v-if="form.errors.has('contactInfo.fax')" v-text="form.errors.get('contactInfo.fax')"></small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" >通訊地址</label>
+                        <div class="col-md-8  form-inline">
+                            <address-info v-if="loaded" :can_options="can_options"
+                                :id="parseInt(form.contactInfo.contactAddress)" name="通訊地址"
+                                @saved="contactAddressSaved" @editting="onAddressEditting"
+                                @canceled="onAddressEndEdit" @deleted="contactAddressDeleted">              
+                            </address-info>
+                
+                        </div>
+                    </div> 
+                    <div v-show="show_residence"  class="form-group">
+                        <label class="col-md-2 control-label" >戶籍地址</label>
+                        <div class="col-md-8 form-inline">
+                            <address-info v-if="loaded" :can_options="can_options"
+                                :id="parseInt(form.contactInfo.residenceAddress)" name="戶籍地址"
+                                @saved="residenceAddressSaved" @editting="onAddressEditting" 
+                                @canceled="onAddressEndEdit" @deleted="residenceAddressDeleted">
+                            </address-info>                    
+                        </div>
+                    </div> 
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <input type="hidden" name="contactInfo.user_id" v-model="form.contactInfo.user_id">
+                            <input type="hidden" name="contactInfo.center_id" v-model="form.contactInfo.center_id">
+                        </div>   
 
-                  <div v-show="!hideButtons" class="col-md-8">
-                      <button class="btn btn-success"  type="submit">確認送出</button>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      <button class="btn btn-default"  @click.prevent="cancelEdit">取消</button>
-                  </div>   
-              </div>    
-           </div><!--  Row  -->
-       </form>
-    </div>
-  </div><!--  Panel  -->
+                        <div v-show="!hideButtons" class="col-md-8">
+                            <button class="btn btn-success"  type="submit">確認送出</button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-default"  @click.prevent="cancelEdit">取消</button>
+                        </div>   
+                    </div>    
+                </div><!--  Row  -->
+            </form>
+        </div>
+    </div><!--  Panel  -->
 </template>
 <script>
     import Address from '../../components/Address.vue'
@@ -85,6 +87,10 @@
             center_id:{
               type: Number,
               default: 0
+            },
+            can_options:{
+                type: Boolean,
+                default: true
             }
         },
         data() {
@@ -94,7 +100,9 @@
                 loaded:false,
                 form:{},
 
-                hideButtons:false
+                hideButtons:false,
+
+               
 
             }
         },
@@ -124,6 +132,7 @@
              
                 getData.then(data => {
                     let contactInfo=data.contactInfo 
+
                     contactInfo.user_id=this.user_id   
                     contactInfo.center_id=this.center_id   
 

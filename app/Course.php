@@ -186,7 +186,7 @@ class Course extends Model
         
     }
 
-    public function populateViewData($editNumber=false){
+    public function populateViewData($editNumber=false,$photo=false){
         $this->getParentCourse();
         foreach ($this->classTimes as $classTime) {
             $classTime->weekday;
@@ -207,6 +207,8 @@ class Course extends Model
             }
 
         }
+
+        if($photo) $this->photo= $this->photo();
 
         
     }

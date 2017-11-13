@@ -11,6 +11,7 @@ use App\Http\Requests\Settings\CenterRequest;
 
 use App\Center;
 use App\ContactInfo;
+use App\Address;
 use App\Support\Helper;
 
 class CentersController extends BaseController
@@ -26,21 +27,25 @@ class CentersController extends BaseController
 
     public function index()
     { 
-       
+        
         if(!request()->ajax()){
             
             $menus=$this->menus($this->key);            
             return view('centers.index')
                     ->with(['menus' => $menus]);                
         }  
-        $centers=$this->centers->getAll()->orderBy('display_order','desc')->get();
+
+       
+
+        $oversea=request()->get('oversea');
+        $isOversea=false;
+        if($oversea) $isOversea=true;
+        
+        $centers=$this->centers->index($isOversea)->get();
+        
       
         foreach ($centers as $center) {
-            $center->contactInfo= $center->contactInfo();
-            if($center->contactInfo)
-            {
-                 $center->contactInfo->addressA=$center->contactInfo->addressA();
-            }
+            $center->populateViewData();
 
             $center->error='';
             
@@ -76,12 +81,24 @@ class CentersController extends BaseController
         $removed=false;
 
         $centerValues=$request->getCenterValues($updated_by,$removed);
-        
-        
-        $contactInfo=ContactInfo::create($request->get('contact_info'));
+        $contactInfoValues=$request->getContactInfoValues($updated_by);
 
-        $centerValues['contact_info']=$contactInfo->id;
-        $center=$this->centers->store($centerValues);
+        $center=null;
+        if($request->isOversea())
+        {
+            $tel=$contactInfoValues['tel'];
+            $fax=$contactInfoValues['fax'];
+            $street=$contactInfoValues['addressText'];
+            $center= $this->centers->createOverseaCenter($centerValues,$tel,$fax,$street,$updated_by);
+        }else{
+            $contactInfo=ContactInfo::create($contactInfoValues);
+            
+            $centerValues['contact_info']=$contactInfo->id;
+            $center=$this->centers->store($centerValues);
+        }
+        
+        
+        
 
         return response()->json($center);
       
@@ -102,10 +119,7 @@ class CentersController extends BaseController
         $center->canEdit=$center->canEditBy($current_user);
         $center->canDelete=$center->canDeleteBy($current_user);
         
-         return response()
-                ->json([
-                    'center' => $center
-                ]);
+        return response()->json(['center' => $center ]);  
        
     }
     public function edit($id)
@@ -116,10 +130,12 @@ class CentersController extends BaseController
             return  $this->unauthorized();       
         }
 
-         return response()
-                ->json([
-                    'center' => $center
-                ]);        
+        
+
+        return response()->json(['center' => $center ]);     
+                
+                    
+                  
     }
     public function update(CenterRequest $request, $id)
     {

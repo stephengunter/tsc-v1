@@ -21,7 +21,8 @@ class ContactInfo extends Model {
              'tel' => '', 
 			 'fax' => '',
 			 'residenceAddress' => 0,
-		     'contactAddress' =>  0
+			 'contactAddress' =>  0,
+			 'addressText' => '',
         ];
     }
 

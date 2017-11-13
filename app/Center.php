@@ -13,7 +13,7 @@ class Center extends Model
 	use FilterPaginateOrder;
 	
 	protected $fillable = ['name', 'code' , 'course_tel',
-							'active',  'display_order',
+							'oversea','active',  'display_order',
 						   'contact_info','removed','updated_by'];
 	
     protected $filter = [
@@ -30,6 +30,7 @@ class Center extends Model
          return [
 			 'name' => '',
 			 'active' => 0,
+			 'oversea' => 0,
 			 'course_tel' => '',
 			 'display_order' => -1
 			 
@@ -75,7 +76,6 @@ class Center extends Model
 		if(!$this->contact_info) return null;
         return ContactInfo::find($this->contact_info);
 
-
 	}
 
 
@@ -100,6 +100,20 @@ class Center extends Model
 	{
 		 return $this->belongsToMany('App\Admin','center_admin','center_id','admin_id');
 		     
+	}
+
+	public function populateViewData($photo=false)
+	{
+		$contactInfo=$this->contactInfo();
+		
+		if($contactInfo)
+		{
+			$contactInfo->addressA=$contactInfo->addressA();
+		}
+
+		$this->contactInfo = $contactInfo;
+
+		if($photo) $this->photo= $this->photo();
 	}
 
 	public function addressText()

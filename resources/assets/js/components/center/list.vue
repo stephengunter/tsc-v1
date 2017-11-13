@@ -6,6 +6,11 @@
                 </h4>
             </div>
             <div>
+                <select @change="onParamChanged"  v-model="params.oversea" style="width:auto;" class="form-control selectWidth">
+                    <option v-for="(item,index) in overseaOptions" :key="index" :value="item.value" v-text="item.text"></option>
+                </select>
+            </div>
+            <div>
                 
                 <a @click="beginCreate" class="btn btn-primary">
                     新增開課中心
@@ -17,10 +22,16 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                         
-                        <th v-for="(item,index) in thead" :key="index" >
+                        <th>名稱</th>
+                        <th>代碼</th>
+                        <th style="width:25%">地址</th>
+                        <th v-if="!isOversea">課程洽詢電話</th>
+                        <th>電話</th>
+                        <th>傳真</th>
+                        <th>狀態</th>
+                        <!-- <th v-for="(item,index) in thead" :key="index" >
                             {{item.title}}
-                        </th>
+                        </th> -->
                         <th v-show="!edittingOrder">
                             順序
                             <button v-show="hasData" @click="beginEditOrder" class="btn btn-primary btn-xs">
@@ -47,7 +58,7 @@
                         <td>{{ center.code }}</td>
                         <td v-text="addressText(center.contactInfo)"></td>
 
-                        <td v-text="center.course_tel"></td>
+                        <td v-if="!isOversea" v-text="center.course_tel"></td>
 
                         <td v-text="telText(center.contactInfo)"></td>
                         <td v-text="faxText(center.contactInfo)"></td>   
@@ -135,7 +146,10 @@
                     }],
                 
                 edittingOrder: false,
-
+                overseaOptions:Center.overseaOptions() ,
+                params:{
+                    oversea:0
+                },
                 centers:[]
                 
              
@@ -145,6 +159,9 @@
             hasData() {
               return this.centers.length > 0
             },
+            isOversea(){
+              return  parseInt(this.params.oversea) > 0
+            }
         },
         beforeMount() {
            this.init()
@@ -157,7 +174,8 @@
                 this.fetchData()
             },
             fetchData(){
-                let getData=Center.index()
+                
+                let getData=Center.index(this.params.oversea)
                 getData.then(data => {
                     let centers = data.centers
                     this.centers=centers
@@ -169,6 +187,9 @@
                 .catch(error=> {
                     Helper.BusEmitError(error)
                 })
+            },
+            onParamChanged(){
+                this.fetchData()
             },
             addressText(contactInfo) {
                 if(!contactInfo) return ''

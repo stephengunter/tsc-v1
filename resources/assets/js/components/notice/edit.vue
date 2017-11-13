@@ -35,7 +35,7 @@
                     <label  class="col-sm-2 control-label">狀態</label>
                     <div class="col-sm-10">
                         <input type="hidden" v-model="form.notice.active"  >
-                        <toggle :items="activeOptions"   :default_val="form.notice.active" @selected=setActive></toggle>
+                        <toggle :items="activeOptions"   :default_val="form.notice.active" @selected="setActive"></toggle>
                         
                     </div>
                 </div>
@@ -43,7 +43,7 @@
                     <label  class="col-sm-2 control-label">發佈到網站</label>
                     <div class="col-sm-2">
                         <input type="hidden" v-model="form.notice.public"  >
-                        <toggle :items="publicOptions"  :default_val="form.notice.public" @selected=setPublic></toggle>
+                        <toggle :items="publicOptions"  :default_val="form.notice.public" @selected="setPublic"></toggle>
                     
                     </div>
                 </div>

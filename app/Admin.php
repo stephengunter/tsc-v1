@@ -127,7 +127,9 @@ class Admin extends Model
     public function centersCanAdmin()
 	{
         if($this->isHeadCenterBoss()){
-            return Center::where('removed',false)->get();
+            return Center::where('removed',false)
+                        ->where('oversea',false)
+                        ->get();
         }
 
         return $this->validCenters();
@@ -156,7 +158,11 @@ class Admin extends Model
 	public function centersCanAdd()
 	{
         return Helper::centersCanAdd($this);
-	}
+    }
+    public function centersCanAddByUser($user)
+	{
+         return Helper::centersCanAddByUser($this,$user);
+    }
     public function centersCanAddByAdmin($admin)
 	{
          return Helper::centersCanAddByAdmin($this,$admin);

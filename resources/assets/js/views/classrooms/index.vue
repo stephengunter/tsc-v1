@@ -8,7 +8,7 @@
             
             <div>
                 <select v-model="center"  @change="doSearch" class="form-control" >
-                    <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
+                    <option v-for="(item,index) in centerOptions" :key="index" :value="item.value" v-text="item.text"></option>
                 </select>
             </div>
             <div>
@@ -35,7 +35,7 @@
                 
                 <edit v-if="creating" :center_id="center"  @saved="onCreated"  @canceled="onCreateCanceled" > </edit>  
             
-                <edit  v-for="classroom in classroomList"  :classroom="classroom" 
+                <edit  v-for="(classroom,index) in classroomList" :key="index"  :classroom="classroom" 
                     @saved="onUpdated"  @btn-delete-clicked="beginDelete" >
                 </edit>
 

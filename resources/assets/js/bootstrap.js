@@ -57,6 +57,7 @@ Vue.component('forgot-password', require('./components/auth/password/forgot'))
 Vue.component('reset-password', require('./components/auth/password/reset'))
 Vue.component('change-password', require('./components/auth/password/change'))
 
+Vue.component('download-index', require('./views/downloads/index'))
 
 Vue.component('signup-view', require('./views/signups/view'))
 Vue.component('signup-index', require('./views/signups/index'))
@@ -197,6 +198,7 @@ import Admin from './models/admin.js'
 import Discount from './models/discount.js'
 import Identity from './models/identity.js'
 import Notice from './models/notice.js'
+import Download from './models/download.js'
 
 import Term from './models/term.js'
 import Holiday from './models/holiday.js'
@@ -254,6 +256,7 @@ window.Center = Center
 window.Discount = Discount
 window.Identity = Identity
 window.Notice = Notice
+window.Download = Download
 
 window.Term = Term
 window.Holiday = Holiday

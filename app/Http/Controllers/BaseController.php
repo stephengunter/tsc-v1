@@ -26,10 +26,12 @@ class BaseController extends Controller
     }
     protected function canAdminCenters()
     {   
+
         $currentUser=$this->currentUser();
         if(!$currentUser) return [];    
 
-        if($currentUser->isDev()) return Center::where('removed',false)->get();
+        if($currentUser->isDev()) return Center::where('removed',false)
+                                                ->where('oversea',false)->get();
 
 
         $admin=$currentUser->admin;
@@ -280,6 +282,11 @@ class BaseController extends Controller
                     'text' => '學期設定',
                     'path' => '/terms',
                     'active' => $current=='terms'
+                ],[
+                    'id' => 6,
+                    'text' => '文件下載管理',
+                    'path' => '/downloads',
+                    'active' => $current=='downloads'
                 ],
                  
              );

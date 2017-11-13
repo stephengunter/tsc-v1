@@ -55,4 +55,15 @@ class CenterRequest extends FormRequest
         $values= Helper::setUpdatedBy($values,$updated_by);
         return Helper::setRemoved($values,$removed);
     }
+
+    public function getContactInfoValues($updated_by)
+    {
+        $values=$this->get('contact_info');
+        return Helper::setUpdatedBy($values,$updated_by);
+    }
+
+    public function isOversea()
+    {
+        return $this->get('center')['oversea'];
+    }
 }

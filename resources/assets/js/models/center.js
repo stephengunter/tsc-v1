@@ -49,9 +49,9 @@ class Center {
 
         })
     }
-    static index() {
+    static index(oversea) {
         return new Promise((resolve, reject) => {
-            let url = this.source()
+            let url = this.source() + '?oversea=' + oversea
             axios.get(url)
                 .then(response => {
                     resolve(response.data)
@@ -187,6 +187,16 @@ class Center {
                         reject(error);
                     })
             }) //End Promise
+    }
+
+    static overseaOptions() {
+        return [{
+            text: '台灣',
+            value: 0
+        }, {
+            text: '海外',
+            value: 1
+        }]
     }
 
 

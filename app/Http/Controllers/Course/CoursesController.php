@@ -65,6 +65,7 @@ class CoursesController extends BaseController
     }
     public function index()
     {
+        
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('courses.index')

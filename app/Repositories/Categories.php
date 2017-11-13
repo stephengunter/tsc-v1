@@ -127,9 +127,11 @@ class Categories
          $category->update($values);
         
     }
-    public function activeCategories()
+    public function activeCategories($order=false)
     {
-        return $this->getAll()->where('active',true);
+        $activeCategories=$this->getAll()->where('active',true);
+        if($order) $activeCategories=$activeCategories->orderBy('order','desc');
+        return $activeCategories;
     }
     public function findByName($name)
     {

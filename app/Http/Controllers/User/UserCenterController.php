@@ -82,7 +82,7 @@ class UserCenterController extends BaseController
     public function create()
     {
         $current_user=$this->currentUser();
-        $current_admin=$this->currentUser()->admin;
+       
         $request = request();
         
         $role=$request->role; 
@@ -96,16 +96,15 @@ class UserCenterController extends BaseController
         $centersCanAdd=[];
        
         if( $role == strtolower(Role::teacherRoleName()) ){
-
-            $centersCanAdd=$user->teacher->centersCanAddByUser($current_user);
+           $centersCanAdd=$user->teacher->centersCanAddByUser($current_user);
 
         }else if( $role == strtolower(Role::volunteerRoleName()) ){
 
-            $centersCanAdd=$user->volunteer->centersCanAddByAdmin($current_admin);
+            $centersCanAdd=$user->volunteer->centersCanAddByUser($current_user);
 
         }else if(in_array($role, Role::adminRoleNames(true))){
-
-            $centersCanAdd=$user->admin->centersCanAddByAdmin($current_admin);
+            
+            $centersCanAdd=$user->admin->centersCanAddByUser($current_user);
 
         }else{
             abort(404);

@@ -33,7 +33,7 @@
     </td>
     <td v-if="loaded">
          <input type="hidden" v-model="form.classroom.active"  >
-         <toggle :items="activeOptions"   :default_val="form.classroom.active" @selected=setActive></toggle>
+         <toggle :items="activeOptions"   :default_val="form.classroom.active" @selected="setActive"></toggle>
           
     </td>
     <td v-if="loaded">
