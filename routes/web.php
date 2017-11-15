@@ -52,7 +52,8 @@ Route::group(['middleware' => 'admin'], function()
 {
     
     Route::get('/', 'HomeController@index');
-  
+
+    Route::post('downloads/display-order',['uses'=>'DownloadsController@updateDisplayOrder']);
     Route::resource('downloads', 'DownloadsController',['except'=>['update']]);
 
     Route::resource('photoes', 'PhotoesController',['only'=>['show','store']]);

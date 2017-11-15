@@ -28,6 +28,10 @@ class DownloadsController extends BaseController
             $downloads=$this->downloads->getAll()
                                 ->orderBy('order','desc')->get();
             
+            foreach($downloads as $download){
+                $download->canDelete=$download->canDeleteBy($current_user);
+            }
+            
           
             return response()
             ->json([
@@ -124,8 +128,40 @@ class DownloadsController extends BaseController
         return response()->json(['download' => $download ]);        
                   
     }
+    public function updateDisplayOrder(Request $form)
+    {
+        $current_user=$this->currentUser();
 
-    
+        $downloads=$form['downloads'];
+        for($i = 0; $i < count($downloads); ++$i) {
+            $download=$downloads[$i];
+
+            $id=$download['id'];
+            $order=$download['order'];
+            $updated_by=$current_user->id;
+
+            $this->downloads->updateDisplayOrder($id,$order,$updated_by);
+            
+        }
+
+
+        return response()->json(['success' => true]);
+
+    }
+    public function destroy($id)
+    {
+        $current_user=$this->currentUser();
+        $download=Download::findOrFail($id);
+        if(!$download->canDeleteBy($current_user)){
+            return  $this->unauthorized();   
+        }
+        $this->downloads->delete($id,$current_user->id);
+
+        return response()
+            ->json([
+                'deleted' => true
+            ]);
+    }
 
     private function importTemps($key)
     {

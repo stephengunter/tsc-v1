@@ -106,10 +106,11 @@ export default {
         deleteDownload(){
             let id = this.deleteConfirm.id 
             let remove= Download.delete(id)
+           
             remove.then(result => {
                 Helper.BusEmitOK('刪除成功')
                 this.init()
-                this.$emit('deleted')
+                this.refresh()
             })
             .catch(error => {
                 Helper.BusEmitError(error,'刪除失敗')

@@ -116,9 +116,9 @@ class Download {
         })
 
     }
-    static updateDisplayOrder(categories) {
+    static updateDisplayOrder(downloads) {
         let form = new Form({
-            categories: categories
+            downloads: downloads
         })
         return new Promise((resolve, reject) => {
 

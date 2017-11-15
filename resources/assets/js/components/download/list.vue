@@ -35,6 +35,8 @@
                                 <span aria-hidden="true" class="glyphicon glyphicon-refresh"></span>
                             </button>
                         </th>
+                        
+                        <th> 狀態 </th>
                         <th style="width:10%;"></th>
                     </tr>
                 </thead>
@@ -51,6 +53,7 @@
                             <small class="text-danger" v-text="download.error"></small>
                         </td> 
                         <td v-else v-text="download.order"></td>
+                        <td v-html="$options.filters.activeLabel(download.active)"></td> 
                         <td>
                             <button v-if="download.canDelete"  class="btn btn-danger btn-xs"
                                 @click.prevent="btnDeleteClicked(download)">
@@ -178,10 +181,7 @@
                 }
             },
             updateDisplayOrder(){
-                 Helper.BusEmitOK()
-                        this.init()
-
-                        return
+                
                 let downloads = this.downloads.map(item=>{
                     return {
                                 id:item.id,
