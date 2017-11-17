@@ -176,7 +176,7 @@ class DownloadsController extends BaseController
 
         $path .= $file_name;
       
-          dd(storage_path($path));
+       
         return response()->download(storage_path($path));
     }
 
