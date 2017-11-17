@@ -13,7 +13,7 @@
             
         </div>  <!-- End panel-heading-->
         <div v-if="loaded" class="panel-body">
-            <table v-show="hasData" class="table table-striped" style="width: 95%;">
+            <table class="table table-striped" style="width: 95%;">
              <thead> 
                 <tr> 
                     <th style="width:10%">年度</th> 
@@ -27,7 +27,7 @@
             </thead>
             <tbody> 
                 <edit v-if="creating"  @saved="onCreated"  @canceled="onCreateCanceled" > </edit>
-                <edit v-for="term in termList"  :term="term" @canceled="onEditCanceled"
+                <edit v-for="(term,index) in termList" :key="index"  :term="term" @canceled="onEditCanceled"
                      @saved="onUpdated"  @btn-delete-clicked="onBtnDeleteClicked" >
                 </edit>
                  

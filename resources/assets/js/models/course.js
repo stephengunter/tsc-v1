@@ -395,13 +395,15 @@ class Course {
                 key: 'cost',
                 sort: true,
                 default: false
-            }, {
-                view: 2,
-                title: '報名日期',
-                key: 'open_date',
-                sort: true,
-                default: false
-            }, {
+            },
+            // {
+            //     view: 2,
+            //     title: '報名日期',
+            //     key: 'open_date',
+            //     sort: true,
+            //     default: false
+            // },
+            {
                 view: 2,
                 title: '人數上限',
                 key: 'limit',

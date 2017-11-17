@@ -117,7 +117,7 @@
         },
         data() {
             return {
-               loaded:false,
+                loaded:false,
                
                 form: new Form({
                    signupinfo:{}
@@ -173,6 +173,7 @@
                     if(!signupinfo.cost){
                        signupinfo.cost=0
                     }
+                    signupinfo.materials = Helper.replaceAll(signupinfo.materials, '<br>', '\n')
                     this.form = new Form({
                             signupinfo: signupinfo,
                         })

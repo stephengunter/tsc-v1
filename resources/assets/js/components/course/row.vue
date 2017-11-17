@@ -107,17 +107,17 @@
 
         <!-- viewing==2 --> 
         <!-- 材料 --> 
-        <td v-show="viewing==2" >
-            {{ course.materials}}
+        <td v-show="viewing==2" v-html="course.materials">
+           
         </td>    
         <!-- 材料費 --> 
         <td v-show="viewing==2">
-            {{ course.cost | formatMoney }}   材料費
+            {{ course.cost | formatMoney }}   
         </td>
 
         <!-- 報名日期 --> 
-        <td v-show="viewing==2" v-html="period(course.open_date , course.close_date)">            
-        </td>
+        <!-- <td v-show="viewing==2" v-html="period(course.open_date , course.close_date)">            
+        </td> -->
 
         <!-- 人數上限 --> 
         <td  v-show="viewing==2" >

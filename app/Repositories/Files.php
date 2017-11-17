@@ -14,10 +14,12 @@ class Files
          $this->disk=Storage::disk('upload_files');
 
 	}
-    private function create_file_name($file)
+    private function create_file_name($file, $type='')
     {
-        $timestamp = str_replace([' ', ':','-'], '', Carbon::now()->toDateTimeString());            
-        return 'attachment_' .  $timestamp .'.' .$file->getClientOriginalExtension();         
+        $timestamp = str_replace([' ', ':','-'], '', Carbon::now()->toDateTimeString());
+        $random_file_name= $timestamp .'.' .$file->getClientOriginalExtension(); 
+        if($type)   return    $type . '_' .   $random_file_name;    
+        else return  $random_file_name;             
     }
     public function save_temp_file($file) 
     {

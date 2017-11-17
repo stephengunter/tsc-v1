@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder {
 		$this->call(CityDistrictSeeder::class);
 
 		$this->call(RoleTableSeeder::class);
+		
 		$this->addDev();
 
 		
@@ -46,6 +47,7 @@ class DatabaseSeeder extends Seeder {
 		$this->call(AdminSeeder::class);
 
 		$this->call(ContentSeeder::class);
+		//$this->call(DownloadSeeder::class);
 
 		
 		 //$this->call(LeaveSeeder::class);

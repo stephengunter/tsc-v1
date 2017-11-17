@@ -19,7 +19,7 @@ class CreateDownloadsTable extends Migration
             $table->string('title');
             $table->string('name');
             $table->string('type');
-            $table->text('filedata');
+            $table->string('path');
 
             $table->integer('order')->default(0);
             $table->boolean('active')->default(true);

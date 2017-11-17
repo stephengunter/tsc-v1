@@ -15,6 +15,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th style="width:10%;"></th>
                         <th style="width:30%;"> 標題 </th>
                         <th> 檔案名稱 </th>
                         
@@ -42,7 +43,13 @@
                 </thead>
                 <tbody>
                     <tr v-for="(download,index) in downloads" :key="index">
-                        <td >
+                        <td>
+                            <a class="btn btn-success btn-xs" :href="getDownloadUrl(download.id)" >
+                                
+                                <i class="fa fa fa-download" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                        <td>
                             <a href="#" @click.prevent="onSelected(download.id)">{{ download.title}}</a> 
                         </td>
                         <td v-text="download.name"></td>
@@ -199,6 +206,9 @@
                          Helper.BusEmitError(error,'存檔失敗')
                     })
             },
+            getDownloadUrl(id){
+                return Download.showUrl(id)
+            }
             
             
         },

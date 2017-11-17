@@ -13,11 +13,12 @@ class ContentSeeder extends Seeder
 	 */
 	public function run()
 	{
-		 $contents = [
+		$path='app/public/contents/';
+		$contents = [
 			[
 				'key' => 'about',
 				'title'=> '單位理念',
-				'text'=> '',
+				'text'=> File::get(storage_path($path . 'about.target.html')),
 				'active' => 1,
 				'order' => 30,
                 
@@ -25,7 +26,7 @@ class ContentSeeder extends Seeder
 			[
 				'key' => 'about',
 				'title'=> '校本部簡介',
-				'text'=> '',
+				'text'=> File::get(storage_path($path . 'about.intro.html')),
 				'active' => 1,
 				'order' => 25,
                 
@@ -33,11 +34,21 @@ class ContentSeeder extends Seeder
 			[
 				'key' => 'about',
 				'title'=> '設置辦法',
-				'text'=> '',
+				'text'=> File::get(storage_path($path . 'about.law.html')),
 				'active' => 1,
 				'order' => 22,
                 
 			],
+
+			[
+				'key' => 'faq',
+				'title'=> '報名須知',
+				'text'=> File::get(storage_path($path . 'faq.must_know.html')),
+				'active' => 1,
+				'order' => 30,
+                
+			],
+			
            
 
 		];

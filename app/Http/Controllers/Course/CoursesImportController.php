@@ -73,6 +73,7 @@ class CoursesImportController extends BaseController
             if($group){
                 $err_msg=$this->courses->importGroupCourses($file,$current_user);
             }else{
+              
                 $err_msg=$this->courses->importCourses($file,$current_user);
             }  
         }

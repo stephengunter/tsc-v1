@@ -20,7 +20,7 @@
         <div class="panel-body" >
            
             <div class="row">
-                <div class="col-sm-3">
+                <!-- <div  class="col-sm-3">
                     <label class="label-title">報名起始日</label>
                     <p v-text="signupinfo.open_date"></p>  
                     
@@ -32,7 +32,7 @@
 
                     </p>  
                     
-                </div>
+                </div> -->
                 <div class="col-sm-3">
                                             
                     <label class="label-title">人數上限</label>

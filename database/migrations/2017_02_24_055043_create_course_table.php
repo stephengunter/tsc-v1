@@ -25,6 +25,7 @@ class CreateCourseTable extends Migration
             $table->integer('center_id')->unsigned();
 
             $table->string('name');
+            $table->string('level')->nullable(); 
             $table->string('number')->nullable(); 
 
             $table->integer('credit_count')->default(0);   //學分數

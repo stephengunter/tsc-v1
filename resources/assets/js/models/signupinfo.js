@@ -14,7 +14,7 @@ class SignupInfo {
 
         this.tuition = Helper.formatMoney(data.tuition)
 
-        this.materials = Helper.replaceAll(this.materials, '<br>', '\n')
+        // this.materials = Helper.replaceAll(this.materials, '<br>', '\n')
 
 
     }

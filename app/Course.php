@@ -16,7 +16,7 @@ class Course extends Model
     use FilterPaginateOrder;
    
     
-    protected $fillable = [ 'term_id', 'center_id', 'name', 
+    protected $fillable = [ 'term_id', 'center_id', 'name', 'level',
                             'group','parent','must','number', 'caution',
                             'credit_count' , 'credit_price' ,'net_signup' , 
                             'begin_date' ,  'end_date' , 'weeks', 'hours',

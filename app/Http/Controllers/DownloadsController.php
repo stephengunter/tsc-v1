@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Input;
 use App\Repositories\Downloads;
 use App\Download;
 
+use File;
+
 class DownloadsController extends BaseController
 {
     
@@ -65,48 +67,22 @@ class DownloadsController extends BaseController
 
     public function store(Request $form)
     {
-        
         $current_user=$this->currentUser();
-        if(!Download::canEdit($current_user)){
-            return  $this->unauthorized();       
-        }
 
-        
         $file=null;
         if(isset($_FILES['filedata']))  $file=Input::file('filedata');
 
         $id=(int)$form['id'];
         $title=$form['title'];
 
+        $download=null;
         if($id){
-            $download=Download::findOrFail($id); 
-            if(!$download->canEditBy($current_user)){
-                return  $this->unauthorized();       
-            }
-
-            if($file){
-                $download->update([
-                    'title' => $title,
-                    'name' => $file->getClientOriginalName(),
-                    'type' => $file->getClientOriginalExtension(),
-                    'filedata' => base64_encode(file_get_contents($file->getRealPath())),
-                    'updated_by' => $current_user->id
-                ]);
-            }else{
-                $download->update([
-                    'title' => $title,
-                    'updated_by' => $current_user->id
-                ]);
-            }
+            $download=$this->downloads->update($id,$current_user ,$title,$file);
+           
         }else{
             if($file){
-                Download::create([
-                    'title' => $title,
-                    'name' => $file->getClientOriginalName(),
-                    'type' => $file->getClientOriginalExtension(),
-                    'filedata' => base64_encode(file_get_contents($file->getRealPath())),
-                    'updated_by' => $current_user->id
-                ]);
+                $download=$this->downloads->store($title,$file,$current_user);
+                
             }else{
                 abort(500);
             }
@@ -115,6 +91,14 @@ class DownloadsController extends BaseController
         return response()->json($download);
 
        
+    }
+    public function show($id)
+    {
+        $download=Download::findOrFail($id);
+
+        
+       
+        return response()->download($download->getStoragePath());
     }
 
     public function edit($id)
@@ -192,7 +176,7 @@ class DownloadsController extends BaseController
 
         $path .= $file_name;
       
-        
+          dd(storage_path($path));
         return response()->download(storage_path($path));
     }
 

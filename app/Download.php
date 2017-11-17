@@ -4,10 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+use Storage;
+
 class Download extends Model
 {
     protected $fillable = ['title', 'name', 'order', 'type',
-    'filedata','active', 'removed','updated_by'];
+    'path','active', 'removed','updated_by'];
 
     public static function  canEdit($user)
     {
@@ -21,11 +23,28 @@ class Download extends Model
             'name' => '',
             'type' => '',
             'active' => 0,
-            'filedata' => '',
+            'path'=> '',
+            
             'removed' => 0,
-            'order' => -1
+            'order' => -1,
+
+
+            'filedata' => '',
 			 
         ];
+    }
+
+    public function  getStoragePath()
+    {
+        $storage = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
+        $folder='downloads/';
+       
+        return $storage .$folder . $this->path ;
+    }
+
+    public function  getUrl()
+    {
+        return config('app.backend.url') . '/downloads/' . $this->id;
     }
     
     public function canEditBy($user)

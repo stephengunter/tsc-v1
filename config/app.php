@@ -21,12 +21,18 @@ return [
 		
 		 'default_folder' => '/files/uploads/',
  
-	 ],
+	],
+
+	'downloads' => [
+		
+		'folder' => '/downloads/',
+ 
+	],
 
 	'group_category' => [
 		 'code' => '3',
 		 'name' => '學分班' 
-	 ],
+	],
  
 
 

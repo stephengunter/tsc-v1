@@ -8,6 +8,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:api');
 
 Route::get('/contents', ['uses' => '\App\Http\Controllers\Api\ContentsController@index']);
+Route::get('/downloads', ['uses' => '\App\Http\Controllers\Api\DownloadsController@index']);
 
 Route::get('/latest-courses', ['uses' => '\App\Http\Controllers\Api\CoursesController@latest']);
 Route::resource('/courses', '\App\Http\Controllers\Api\CoursesController');

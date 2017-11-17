@@ -323,11 +323,24 @@ class Courses
         
 
         $courseList=$excel->toArray()[0];
+        
         for($i = 1; $i < count($courseList); ++$i) {
             $row=$courseList[$i];
             
             $name=trim($row['name']);
             if(!$name)continue;
+
+            $number=trim($row['number']);
+            if($number){
+                $course=$this->findByNumber($number);
+                if($course) {
+                    $err_msg .= '代碼  ' .$number . ' 與現有課程重複'. ',';
+                   
+                    continue;
+                }
+                
+            }
+           
 
             $center_code=trim($row['center']);
             $center=$this->centers->getByCode($center_code);
@@ -343,13 +356,14 @@ class Courses
                 continue;
             }
 
-
+            $level=trim($row['level']);
             $begin_date=trim($row['begin_date']);
             $end_date=trim($row['end_date']);
             $weeks=trim($row['weeks']);
             $hours=trim($row['hours']);
 
             $courseValues=[
+                'number' => $number,
                 'group' => false,
                 'parent' => 0,
                 'term_id' => $term->id,
@@ -496,13 +510,22 @@ class Courses
 
             $tuition=(float)trim($row['tuition']);
             $materials=trim($row['materials']);
+            if($materials){
+               $materials= str_replace(';', '<br>',$materials);
+            }
+
+            
             $cost=(float)trim($row['cost']);
+
+
             $limit=trim($row['limit']);
             $min=trim($row['min']);
+            $target=trim($row['target']);
 
             $net_signup=(int)trim($row['net_signup']);
 
             $description=trim($row['description']);
+            $caution=trim($row['caution']);
 
             $courseValues=[
                 'credit_count' => $credit_count,
@@ -511,6 +534,7 @@ class Courses
                 'tuition' => $tuition,
                 'materials' => $materials,
                 'cost' => $cost,
+                'target' => $target,
                 'limit' => $limit,
                 'min' => $min,
                 'net_signup' => $net_signup,
