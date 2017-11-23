@@ -115,8 +115,10 @@ class Tuition {
 
     
 
-  static getThead(canSelect,refund){
-    let thead = [{
+    
+
+   static getThead(canSelect,refund){
+        let thead = [{
                     title: refund ? '退款日期' : '繳費日期',
                     static:true,
                     default:true

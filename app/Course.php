@@ -172,6 +172,12 @@ class Course extends Model
         return $this->ps;
 
     }
+    public function defaultAmount()
+    {
+        
+        return $this->tuition + $this->cost;
+
+    }
 
     public function copyParentCourseValues($parent_id)
     {

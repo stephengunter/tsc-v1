@@ -10,40 +10,55 @@ class Tuition extends Model
 {
     use FilterPaginateOrder;
 
-    protected $fillable = ['signup_id', 'date', 'amount', 
-                        'pay_by', 'updated_by', 'refund',
-                        'bank_branch', 'account_owner','account_number',
-                        ];
+    protected $fillable = [
+                            'signup_id', 'date', 'amount', 
+                            'pay_by', 'updated_by', 'refund', 'ps'
+                        // 'bank_branch', 'account_owner','account_number',
+                          ];
 
-     protected $filter =  ['date'];
+    protected $filter =  ['date'];
 
                                 
     public function signup()
     {
 		   return $this->belongsTo('App\Signup');
-	}
+    }
     
-
-    public static function initialize($signup,$refund=null)
+    public static function initialize($signup_id=0,$amount=0,$refund=false)
     {
-        $amount=$signup->tuition;
-        $isRefund=0;
-        if($refund){
-            $amount=$refund->getTotal();
-            $isRefund=1;
-        }
+        
         return [            
             
-            'signup_id' => $signup->id,
-            'date' => Carbon::now()->toDateString(),
-            'refund' => $isRefund,
+            'signup_id' => $signup_id,
+            'date' => '',
+            'refund' => $refund,
             'amount' => $amount,
             'pay_by' => 0,
-             'bank_branch'=>'',
-             'account_owner'=>'',
-            'account_number'=>'',
+            'ps' => ''
         ];
     }  
+    
+
+    // public static function initialize($signup,$refund=null)
+    // {
+    //     $amount=$signup->tuition;
+    //     $isRefund=0;
+    //     if($refund){
+    //         $amount=$refund->getTotal();
+    //         $isRefund=1;
+    //     }
+    //     return [            
+            
+    //         'signup_id' => $signup->id,
+    //         'date' => Carbon::now()->toDateString(),
+    //         'refund' => $isRefund,
+    //         'amount' => $amount,
+    //         'pay_by' => 0,
+    //          'bank_branch'=>'',
+    //          'account_owner'=>'',
+    //         'account_number'=>'',
+    //     ];
+    // }  
 
     public function canViewBy($user)
     {

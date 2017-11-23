@@ -1,7 +1,9 @@
 <template>
     <tr v-if="readOnly" >
         
-        <td v-text="discount.name"></td> 
+        <td>
+            {{ discount.name }}  {{ discount.ps }}
+        </td> 
         <td v-html="$options.filters.okSign(discount.all_courses)"></td> 
         <td v-text="pointText(discount.points_one)"></td> 
         <td v-text="pointText(discount.points_two)"></td> 
@@ -31,8 +33,10 @@
     <tr v-else>
         
         <td>
-            <textarea rows="5" cols="50" name="discount.name" class="form-control" v-model="form.discount.name"> </textarea>
+            <textarea rows="3" cols="50" name="discount.name" class="form-control" v-model="form.discount.name"> </textarea>
             <small class="text-danger" v-if="form.errors.has('discount.name')" v-text="form.errors.get('discount.name')"></small>
+            <label>備註</label>
+            <textarea rows="3" cols="50" name="discount.ps" class="form-control" v-model="form.discount.ps"> </textarea>
         </td>
         <td>
             <toggle :items="boolOptions"   :default_val="form.discount.all_courses" @selected="setAllCourses"></toggle>

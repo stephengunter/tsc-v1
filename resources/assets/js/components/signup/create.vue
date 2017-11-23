@@ -33,7 +33,7 @@
                         </div>
                         <div v-else class="form-group"> 
                             <label>報名課程</label>
-                            <combination-select 
+                            <combination-select :search_params="courseSearchParams"
                               @ready="onCombinationReady">
                             </combination-select>
 
@@ -99,11 +99,11 @@
                         <div class="form-group"> 
                            <label>電話</label>
                            <div class=" form-inline">
-                              <input class="form-control" type="text"  :value="user.phone" disabled>
-                              &nbsp;&nbsp;
-                              <button @click.prevent="onEditUser" class="btn btn-primary btn-xs" >
-                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                              </button>
+                                <input class="form-control" type="text"  :value="user.phone" disabled>
+                                &nbsp;&nbsp;
+                                <button @click.prevent="onEditUser" class="btn btn-primary btn-xs" >
+                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                </button>
                            </div>
                          </div>  
                    </div>
@@ -136,15 +136,15 @@
                         <div class="form-group"> 
                            <label>電話</label>
                            <div class=" form-inline">
-                              <input type="text" name="user.phone" class="form-control" v-model="editUserForm.user.phone" @keydown="clearEditUserError('user.phone')">
-                              <small class="text-danger" v-if="editUserForm.errors.has('user.phone')" v-text="editUserForm.errors.get('user.phone')"></small>
-                               &nbsp;&nbsp;
-                                 <button class="btn btn-success btn-xs" @click.prevent="saveUser">
+                                <input type="text" name="user.phone" class="form-control" v-model="editUserForm.user.phone" @keydown="clearEditUserError('user.phone')">
+                                <small class="text-danger" v-if="editUserForm.errors.has('user.phone')" v-text="editUserForm.errors.get('user.phone')"></small>
+                                &nbsp;&nbsp;
+                                <button class="btn btn-success btn-xs" @click.prevent="saveUser">
                                     <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-                                 </button> 
-                                 <button class="btn btn-default btn-xs" @click.prevent="cancelEditUser">
+                                </button> 
+                                <button class="btn btn-default btn-xs" @click.prevent="cancelEditUser">
                                     <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>               
-                                 </button> 
+                                </button> 
                            </div>
                          </div>  
                    </div>
@@ -164,8 +164,8 @@
                    <div class="col-sm-12">
                         <div class="form-group"> 
                             <label>折扣優惠</label>
-                            <discounts-selector :course_id="course_id" :discount_id="discount_id"
-                              @selected="onDiscountSelected">
+                            <discounts-selector :course_id="course_id" :discount_id="form.signup.discount_id"
+                              :date="form.signup.date" @selected="onDiscountSelected">
                             </discounts-selector>
                           
                         </div>  
@@ -189,12 +189,15 @@
                     </div>
                     <div  class="col-sm-3">    
                         <div class="form-group"> 
-                            <label>合計</label>
+                            <label>合計應繳</label>
                             <input disabled type="text" :value="total" name="signup.cost" class="form-control"  >
                             
                         </div> 
                     </div>
                 </div>  
+                <tuition-inputs v-if="isPay" :form="form" :payways="payways">
+
+                </tuition-inputs>
                 <div class="row" >
                     <div  class="col-sm-6">
                         <button type="submit"  class="btn btn-success" :disabled="!canSubmit">確定</button>
@@ -213,11 +216,13 @@
 <script>
     import SubCourseSelector from '../../components/course/sub/selector.vue'
     import DiscountSelector from './discounts-selector.vue'
+    import TuitionInputs from '../../components/tuition/inputs.vue'
     export default {
         name: 'CreateSignup',
         components: {
             'sub-course-selector':SubCourseSelector,
-            'discounts-selector':DiscountSelector
+            'discounts-selector':DiscountSelector,
+            'tuition-inputs':TuitionInputs
         },
         props: {
             course_id:{
@@ -246,12 +251,19 @@
                 },
                 editUserForm:{},
                 
-
+                courseSearchParams:{
+                    term:0,
+                    center:0,
+                    parent:0,
+                    sub:0,
+                    reviewed:1
+                },
                 
                 courseName:'',
-                discount_id:0,
+               
                 form: new Form({
-                   signup:{}
+                   signup:{},
+                   tuition:{}
                 }),
 
                 userOptions:[],
@@ -273,7 +285,8 @@
 
                 subCourseError:false,
 
-                pay:0
+                pay:0,
+                payways:[],
 
             }
         },
@@ -343,7 +356,8 @@
                     
 
                     this.form=new Form({
-                        signup:signup
+                        signup:signup,
+                        tuition:data.tuition
                     })
 
                     if(data.course){
@@ -359,7 +373,7 @@
                     this.courseOptions=data.courseOptions
                     this.userOptions=data.userOptions   
 
-                   
+                    this.payways=data.payways
 
                     this.initialized=true
                    

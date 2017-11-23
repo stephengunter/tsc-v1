@@ -68,9 +68,10 @@ class Discount extends Model
 
 	public function getNameWithDiscount()
 	{
-		if(!$this->points)  return $this->name;
+		$name=$this->name . $this->ps;
+		if(!$this->points)  return $name;
 		 
-		return $this->name . ' ' .$this->getFormattedPoints($this->points);
+		return $name . ' ' .$this->getFormattedPoints($this->points);
           
 	}
 	

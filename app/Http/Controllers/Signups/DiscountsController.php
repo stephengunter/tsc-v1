@@ -16,6 +16,7 @@ use App\Http\Middleware\CheckAdmin;
 use App\Support\Helper;
 
 use Carbon\Carbon;
+use Exception;
 
 class DiscountsController extends BaseController
 {
@@ -31,7 +32,7 @@ class DiscountsController extends BaseController
 
     public function index()
     {
-        dd(new Carbon('2017-'));
+        
         $centerOptions=$this->centers->options();
 
         if(!request()->ajax()){
@@ -169,13 +170,19 @@ class DiscountsController extends BaseController
     public function options()
     {
         $course_id=(int)request()->course;
-        $date_string=request()->date;
+        $date=null;
+        try {
+            $date = Carbon::parse(request()->date);
+        }
+        catch (Exception $err) {
+            $date=Carbon::today();
+        }
 
 
 
         $course=$this->courses->findOrFail($course_id);
 
-        $activeDiscounts=$this->discounts->getValidDiscounts($course);
+        $activeDiscounts=$this->discounts->getValidDiscounts($course,$date);
         
         $options=$this->discounts->optionsConverting($activeDiscounts);
       
@@ -189,6 +196,15 @@ class DiscountsController extends BaseController
         $course_id=(int)request()->course;
         $discount_id=(int)request()->discount;
 
+        
+        $date=null;
+        try {
+            $date = Carbon::parse(request()->date);
+        }
+        catch (Exception $err) {
+            $date=Carbon::today();
+        }
+
         $course=$this->courses->findOrFail($course_id);
 
         if(!$discount_id){ 
@@ -200,7 +216,7 @@ class DiscountsController extends BaseController
         } 
 
         
-        $discount=$this->discounts->countTuition($course,$discount_id);
+        $discount=$this->discounts->countTuition($course,$discount_id,$date);
 
         return response()->json($discount);  
     }

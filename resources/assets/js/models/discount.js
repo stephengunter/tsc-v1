@@ -163,9 +163,10 @@ class Discount {
                 return options
 
     }
-    static options(course_id){
+    static options(course_id,date){
         let url =this.source() + '/options' 
         url+= '?course=' + course_id
+        url+= '&date=' + date
         return new Promise((resolve, reject) => {
                      axios.get(url)
                     .then(response => {
@@ -176,10 +177,11 @@ class Discount {
                     })
                 })  
     }
-    static countTuition(course_id,discount_id){
+    static countTuition(course_id,discount_id,date){
         let url =this.source() + '/count-tuition' 
         url+= '?course=' + course_id
         url+= '&discount=' + discount_id
+        url+= '&date=' + date
         return new Promise((resolve, reject) => {
                      axios.get(url)
                     .then(response => {

@@ -32,13 +32,18 @@ export default {
 			selected:0,
 			tuition:0,
       }
-   },
+	},
+	watch: {
+		date(){
+			this.init()
+		}
+	},
    methods: {
       init() {
          this.fetchData() 
       },
       fetchData(){
-			let getData=Discount.options(this.course_id)
+			let getData=Discount.options(this.course_id,this.date)
 							
 			getData.then(data => {
 					let options=data.options
@@ -56,7 +61,7 @@ export default {
       countTuition(val) {
 			this.selected=val
 			
-			let action=Discount.countTuition(this.course_id,val)
+			let action=Discount.countTuition(this.course_id,val,this.date)
 						
 			action.then(data => {
 				this.tuition=data.tuition

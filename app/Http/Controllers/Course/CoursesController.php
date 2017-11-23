@@ -439,22 +439,35 @@ class CoursesController extends BaseController
     public function options()
     {
         $options=[];
-        $request = request();
-        $teacher_id=(int)$request->teacher; 
+        
+       
+        $teacher_id=(int)request()->teacher;
+        // $teacher_id=array_key_exists('teacher', $params) ? (int)$params['teacher'] : 0 ;
         if($teacher_id){
+            
             $courseList=$this->courses->getByTeacher($teacher_id)->get();
             $options=$this->courses->optionsConverting($courseList);
-            return response()  ->json(['options' => $options ]);   
-        }
-              
+            return response()  ->json(['options' => $options ]); 
+        }     
+
         
-        $term_id=(int)$request->term; 
-        $center_id=(int)$request->center;
-        $parent_course_id=(int)$request->parent;
-        
-        $sub_course_id=(int)$request->sub;
-        
+
+        $term_id= (int)request()->term; 
+        $center_id=(int)request()->center;
+        $parent_course_id=(int)request()->parent;
+        $sub_course_id=(int)request()->sub;
+
         $parentCourses=$this->courses->parentCourses();
+
+        $params = request()->toArray();                    
+        $hasReviewed =array_key_exists('reviewed', $params);
+        if($hasReviewed){
+            $reviewed=(bool)$params['reviewed'];
+            $parentCourses=$parentCourses->where('reviewed',$reviewed);
+        };
+        
+        
+        
         $parentCourses=$parentCourses->where('term_id',$term_id)
                                      ->where('center_id',$center_id)
                                      ->orderBy('credit_count')

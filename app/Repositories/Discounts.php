@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Discount;
 use App\Course;
 
+use Carbon\Carbon;
 use Exception;
 
 class Discounts 
@@ -132,10 +133,10 @@ class Discounts
         return $options;
     }
 
-    public function countTuition(Course $course,$discount_id)
+    public function countTuition(Course $course,$discount_id,$date=null)
     {
-        
-        $activeDiscountIds=$this->getValidDiscounts($course);
+
+        $activeDiscountIds=$this->getValidDiscounts($course,$date);
         
         $discount = $activeDiscountIds->filter(function($item) use($discount_id) {
             return $item->id == $discount_id;

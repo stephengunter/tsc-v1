@@ -27,6 +27,7 @@ class CreateTuitionsTable extends Migration
             $table->string('account_number')->nullable();
             $table->decimal('amount', 8, 2);
 
+            $table->string('ps')->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();
         });

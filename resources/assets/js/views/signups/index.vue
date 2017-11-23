@@ -3,7 +3,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
                
-            <combination-select 
+            <combination-select :search_params="search_params"
                 @ready="onCombinationReady" >
             </combination-select>
 
@@ -75,6 +75,14 @@
                 can_edit:true,
                 can_back:true,
                 can_select:false,
+
+                search_params:{
+                    term:0,
+                    center:0,
+                    parent:0,
+                    sub:0,
+                    reviewed:1
+                },
                 
 
                 groupAndParent:false,

@@ -24,7 +24,7 @@
             <table  class="table table-striped" >
                 <thead> 
                     <tr> 
-                        <th style="width:25%">名稱</th> 
+                        <th style="width:35%">名稱</th> 
                         <th style="width:10%">不限課程</th>
                         <th style="width:12%">第一階段折扣</th>
                         <th style="width:12%">第二階段折扣</th>

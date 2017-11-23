@@ -31,7 +31,10 @@
     export default {
         name: 'CombinationSelect',  
         props: {
-           
+            search_params:{
+                type: Object,
+                default: null
+            },
             empty_course: {
               type: Boolean,
               default: false
@@ -48,12 +51,8 @@
                 centerOptions:[],
                 parentCourseOptions:[],
                 subCourseOptions:[],
-                params:{
-                    term:0,
-                    center:0,
-                    parent:0,
-                    sub:0,
-                },
+                params:{},
+                   
 
                 course:0,
 
@@ -71,10 +70,31 @@
             
         }, 
         beforeMount() {
-             this.init()
+            if(this.search_params){
+                for(let property in this.search_params){
+                    this.params[property]=this.search_params[property]
+                }
+            }
+            
+            let defaults=[
+                'term','center','parent','sub'
+            ]
+
+            defaults.forEach((key)=>{
+                if(!this.params.hasOwnProperty(key)){
+                    this.params[key] = 0
+                }
+            })
+            
+            this.init()
         },
         methods: {
+            setDefaultParam(key){
+               if(this.search_params.hasOwnProperty(key)) return
+               this.search_params[key]=0
+            },
             init(){
+                
 
                 let options=Signup.indexOptions()
                 options.then(data => {

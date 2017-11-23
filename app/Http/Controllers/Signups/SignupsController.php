@@ -19,6 +19,7 @@ use App\Repositories\Centers;
 use App\Signup;
 use App\User;
 use App\Course;
+use App\Tuition;
 
 use App\Support\Helper;
 
@@ -67,7 +68,6 @@ class SignupsController extends BaseController
 
     public function index()
     {
-       
 
         $request = request();
           
@@ -156,8 +156,12 @@ class SignupsController extends BaseController
         $signup=Signup::initialize($user_id,$course_id);
         $signup['net_signup'] = 0;
         $signup['sub_courses']=$selectedSub;
-
         if($course) $signup['cost'] = $course->cost;
+
+        $defaultAmount=$course->defaultAmount();
+        $tuition=Tuition::initialize();
+
+        $payways=$this->payways->getAll();
 
         return response()
         ->json([
@@ -165,9 +169,13 @@ class SignupsController extends BaseController
             'subCourses' => $subCourses ,
             'userOptions' => $userOptions,
             
-            'signup' => $signup,
             'course' => $course,
             'user' => $user,
+
+            'signup' => $signup,
+            'tuition' => $tuition,
+            'payways' => $payways
+
 
         ]);
          
