@@ -22,12 +22,12 @@ class Discounts
          
     }
 
-    public function getValidDiscounts(Course $course)
+    public function getValidDiscounts(Course $course,$date=null)
     {
         //該中心折扣
         $activeDiscounts=$this->activeDiscounts($course->center_id);
         //今天是哪個階段
-        $isStageOne=Discount::isStageOne($course->term);
+        $isStageOne=Discount::isStageOne($course->term,$date);
        
         $validDiscounts=[];
         //過濾0折扣

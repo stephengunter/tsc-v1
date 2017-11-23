@@ -214,8 +214,7 @@ class SignupsController extends BaseController
             return   response()->json(['signup.user_id' => $errMsg ]  ,  422);
         }
 
-        $date=Carbon::now()->toDateString();
-        $values['date']=$date;
+        $date=$values['date'];
 
         $signup=null;
         if($course->groupAndParent())
@@ -360,9 +359,9 @@ class SignupsController extends BaseController
         $signup->subCourses=$signup->subSignupCourses();
         
         
-        if(!$signup->canViewBy($current_user)){
-            return  $this->unauthorized(); 
-        }
+        // if(!$signup->canViewBy($current_user)){
+        //     return  $this->unauthorized(); 
+        // }
        
         
         $signup->canEdit=$signup->canEditBy($current_user);

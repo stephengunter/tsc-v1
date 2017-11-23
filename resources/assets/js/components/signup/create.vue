@@ -16,7 +16,7 @@
         <div class="panel-body">
             <form v-if="initialized" @submit.prevent="onSubmit" class="form">
                <div class="row">
-                   <div v-if="false" class="col-sm-3">
+                   <div class="col-sm-3">
                         <div class="form-group"> 
                            <label>報名日期</label>
                             <div>

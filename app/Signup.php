@@ -19,7 +19,7 @@ class Signup extends Model
     protected $fillable =  ['course_id',  'user_id', 'date', 'parent',
                               'tuition','cost' ,'points' ,   'discount' ,
                              'identity' , 'discount_id', 'net_signup',
-                   【          'status' ,  'removed' , 'updated_by'
+                             'status' ,  'removed' , 'updated_by'
                         	];
 
     protected $filter =  ['date','status','tuition','discount'];
@@ -48,7 +48,13 @@ class Signup extends Model
     public function user() 
     {
 	  	  return $this->belongsTo('App\User');
-  	}
+    }
+      
+
+    public function tuitions() 
+	{
+		return $this->hasMany('App\Tuition');
+	}
     public function refund() 
 	{
 		return $this->hasOne(Refund::class);
@@ -71,11 +77,7 @@ class Signup extends Model
     {
         return $this->tuitions()->where('refund',false);
     }
-
-    public function tuitions() 
-	{
-		return $this->hasMany('App\Tuition');
-	}
+   
 
 
     public function canViewBy($user)

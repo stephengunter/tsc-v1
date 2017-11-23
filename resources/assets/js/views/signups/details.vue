@@ -7,7 +7,7 @@
 
   </signup>
 
-  <div v-if="loaded" id="tabSignup" class="panel with-nav-tabs panel-default">
+  <div v-if="false" id="tabSignup" class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
             <ul class="nav nav-tabs">
                 <li class="active">

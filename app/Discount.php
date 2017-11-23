@@ -33,11 +33,12 @@ class Discount extends Model
 		];
 	}
 
-	public static function isStageOne(Term $term)
+	public static function isStageOne(Term $term,$date=null)
 	{
-		 $today=Carbon::today();
-		 $bird = Carbon::parse($term->bird_date);
-		 return $today->lte($bird);
+		if(!$date) $date=Carbon::today();
+	
+		$bird = Carbon::parse($term->bird_date);
+		return $date->lte($bird);
 	}
 
 	public static function canCreate($user,$center)

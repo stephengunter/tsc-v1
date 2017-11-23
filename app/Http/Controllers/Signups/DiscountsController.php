@@ -15,6 +15,8 @@ use App\Repositories\Centers;
 use App\Http\Middleware\CheckAdmin;
 use App\Support\Helper;
 
+use Carbon\Carbon;
+
 class DiscountsController extends BaseController
 {
     
@@ -29,7 +31,7 @@ class DiscountsController extends BaseController
 
     public function index()
     {
-        
+        dd(new Carbon('2017-'));
         $centerOptions=$this->centers->options();
 
         if(!request()->ajax()){
@@ -167,6 +169,10 @@ class DiscountsController extends BaseController
     public function options()
     {
         $course_id=(int)request()->course;
+        $date_string=request()->date;
+
+
+
         $course=$this->courses->findOrFail($course_id);
 
         $activeDiscounts=$this->discounts->getValidDiscounts($course);

@@ -8,6 +8,10 @@
 export default {
    name: 'DiscountSelector',
    props: {
+		date:{
+         type: String,
+         default: ''
+      },
       discount_id:{
          type: Number,
          default: 0
