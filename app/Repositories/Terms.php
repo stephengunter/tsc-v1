@@ -72,8 +72,6 @@ class Terms
        
         foreach ($term->courses as $course) {
             $course->open_date=$term->open_date;
-            $course->close_date=$term->close_date;
-            
             $course->save();
            
         }

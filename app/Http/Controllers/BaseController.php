@@ -74,7 +74,7 @@ class BaseController extends Controller
                     'id' => 1,
                     'text' => '報名與繳費',
                     'path' => '/signups',
-                    'active' => $current !='signups/new-user'
+                    'active' => $current =='signups'
                 ],
                 [
                     'id' => 2,
@@ -82,6 +82,13 @@ class BaseController extends Controller
                     'path' => '/signups/new-user',
                     'active' => $current=='signups/new-user'
                 ],
+                [
+                    'id' => 3,
+                    'text' => '折扣設定',
+                    'path' => '/discounts',
+                    'active' => $current=='discounts'
+                ]
+                
             );
         } 
         if($key=='refunds'){

@@ -23,6 +23,14 @@ class Categories
     {
          return Category::where('removed',false);
     }
+
+    public function getFrontEndCategories($centerId)
+    {
+        return $this->getAll()->where('active',true)->whereHas('courses', function($q) use($centerId) {
+            $q->where('center_id', $centerId);
+        })->orderBy('order','desc');
+         
+    }
     
     public function findOrFail($id)
     {

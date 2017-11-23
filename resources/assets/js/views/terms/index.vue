@@ -18,8 +18,10 @@
                 <tr> 
                     <th style="width:10%">年度</th> 
                     <th style="width:7%">順序</th> 
-                    <th style="width:12%">名稱</th> 
-                    <th >報名期間</th>
+                    <th style="width:10%">名稱</th> 
+                    <th>報名起始日</th>
+                    <th>早鳥截止日</th>
+                    <th>開課決定日</th>
                     <th style="width:10%">狀態</th>
                     <th style="width:10%">最後更新</th> 
                     <th style="width:7%"></th>

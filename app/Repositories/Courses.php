@@ -364,6 +364,7 @@ class Courses
 
             $courseValues=[
                 'number' => $number,
+                'level' => $level,
                 'group' => false,
                 'parent' => 0,
                 'term_id' => $term->id,
@@ -526,8 +527,12 @@ class Courses
 
             $description=trim($row['description']);
             $caution=trim($row['caution']);
+            if($caution){
+                $caution= str_replace(';', '<br>',$caution);
+            }
 
             $courseValues=[
+                'caution' => $caution,
                 'credit_count' => $credit_count,
                 'credit_price' => $credit_price,
                 'must' => $must,
@@ -629,7 +634,7 @@ class Courses
         }
         foreach($courseList as $course)
         {
-            $item=[ 'text' => $course->number . ' ' . $course->name , 
+            $item=[ 'text' => $course->fullName(), 
                      'value' => $course->id , 
                  ];
             array_push($options,  $item);

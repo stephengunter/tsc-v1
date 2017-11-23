@@ -172,9 +172,9 @@
             },
            
             onSubmitDisplayOrders(){
-               this.hasError=true
-               let errors=0
-               for(let i=0; i<this.categories.length ; i++){
+                this.hasError=true
+                let errors=0
+                for(let i=0; i<this.categories.length ; i++){
                     let category=this.categories[i]
                     let val=category.order
                     if(isNaN(val) || val.length < 1){

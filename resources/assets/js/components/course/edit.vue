@@ -35,7 +35,14 @@
                                     <small class="text-danger" v-if="form.errors.has('course.name')" v-text="form.errors.get('course.name')"></small>
                                 </div>
                             </div>  
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
+                                <div class="form-group">                           
+                                    <label>程度</label>
+                                    <input type="text" name="course.level" class="form-control" v-model="form.course.level">
+                                </div>
+                                                        
+                            </div> 
+                            <div class="col-sm-3">
                                 <div class="form-group">                           
                                     <label>開課中心</label>
                                     <select @change="onCenterChanged"  v-model="form.course.center_id"  name="course.center_id" class="form-control" >
@@ -44,7 +51,7 @@
                                 </div>
                                                         
                             </div> 
-                            <div class="col-sm-4">
+                            <div class="col-sm-2">
                                 <div class="form-group">
                                     <label>學期別</label>
                                     <select @change="onTermChanged"  v-model="form.course.term_id"  name="course.term_id" class="form-control" >

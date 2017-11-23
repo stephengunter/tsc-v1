@@ -26,7 +26,7 @@ class DiscountRequest extends FormRequest
     {
        
         return [
-            'discount.name' => 'required|max:255',
+            'discount.name' => 'required',
         ];
     }
     public function messages()
@@ -46,7 +46,7 @@ class DiscountRequest extends FormRequest
     }
     public function getValues($updated_by,$removed)
     {
-        $values=array_except($this->get('discount'), ['canDelete']); 
+        $values = $this['discount'];
         $values= Helper::setUpdatedBy($values,$updated_by);
         return Helper::setRemoved($values,$removed);
         

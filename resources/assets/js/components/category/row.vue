@@ -13,7 +13,7 @@
                             
         </td> 
         <td v-show="editting_order">
-            <input @keydown="clearErrorMsg" type="text" name="category.display_order" class="form-control" v-model="category.order">
+            <input @keydown="clearErrorMsg" type="text" name="category.order" class="form-control" v-model="category.order">
   
             <small class="text-danger" v-text="category.error"></small>
         </td>     

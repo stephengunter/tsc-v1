@@ -464,11 +464,22 @@ class Course {
         }
         return html
     }
-    static getFormatedCourseName(course, text) {
-        if (text) {
-            return course.name + '  (編號 ' + course.number + ' )'
+    static getFormatedCourseName(course, text=true) {
+        let space= text ? ' ' : '&nbsp'
+       
+
+        let fullname='' 
+        if(course.number){
+            fullname= course.number + space + course.name
+        }else{
+            fullname=  course.name
+        } 
+
+        if(course.level){
+            fullname += ' - ' + course.level
         }
-        return course.name + ' &nbsp (編號 ' + course.number + ' )'
+        
+        return fullname
     }
     static weeksOptions() {
         return Helper.numberOptions(1, 30)

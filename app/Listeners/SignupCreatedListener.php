@@ -23,6 +23,9 @@ class SignupCreatedListener  implements ShouldQueue
     public function handle(SignupCreated $event)
     {
         $signup=$event->signup;
-        dispatch(new SendSignupEmail($signup));   
+        if($signup->net_signup){
+            dispatch(new SendSignupEmail($signup));  
+        }
+         
     }
 }

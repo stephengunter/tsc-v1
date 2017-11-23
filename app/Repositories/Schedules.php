@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Schedule;
+use App\Course;
 use App\Support\Helper;
 
 use Excel;
@@ -85,6 +86,58 @@ class Schedules
         }
 
         return $options;
+    }
+
+    public function importAllSchedules($file,$current_user)
+    {
+        $err_msg='';
+        
+        $excel=Excel::load($file, function($reader) {             
+            $reader->limitColumns(16);
+            $reader->limitRows(500);
+        })->get();
+        
+
+        $scheduleList=$excel->toArray()[0];
+        for($i = 1; $i < count($scheduleList); ++$i) {
+            $row=$scheduleList[$i];
+
+            $number=trim($row['number']);
+            if(!$number){
+                continue;
+            }
+
+            $course=Course::where('removed',false)->where('number',$number)->first();
+            if(!$course){
+                $err_msg .= '代碼  ' .$number . ' 錯誤'. ',';
+                continue;
+            }
+            
+            $title=trim($row['title']);
+            if(!$title)continue;
+
+            $order=(int)trim($row['order']);
+
+            $content=trim($row['content']);
+            $materials=trim($row['materials']);
+            
+
+            $values=[
+                'course_id' => $course->id,
+                'order' => $order ,
+                'title' => $title , 
+                'content' => $content,
+                'materials' => $materials,
+
+                'updated_by' => $current_user->id
+            ];
+
+            
+            $schedule = Schedule::create($values);
+            
+        }
+
+        return $err_msg;
     }
 
     public function importSchedules($file,$course_id,$current_user)

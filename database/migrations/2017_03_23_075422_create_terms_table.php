@@ -20,7 +20,8 @@ class CreateTermsTable extends Migration
             $table->string('name');
             $table->integer('number');
 
-            $table->date('open_date')->nullable();  
+            $table->date('open_date')->nullable(); 
+            $table->date('bird_date')->nullable();  
             $table->date('close_date')->nullable();  
             
             $table->boolean('active')->default(false);

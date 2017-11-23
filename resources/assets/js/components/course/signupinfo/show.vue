@@ -20,7 +20,7 @@
         <div class="panel-body" >
            
             <div class="row">
-                <!-- <div  class="col-sm-3">
+                <div v-if="false" class="col-sm-3">
                     <label class="label-title">報名起始日</label>
                     <p v-text="signupinfo.open_date"></p>  
                     
@@ -32,7 +32,7 @@
 
                     </p>  
                     
-                </div> -->
+                </div>
                 <div class="col-sm-3">
                                             
                     <label class="label-title">人數上限</label>
@@ -43,12 +43,29 @@
                     <label class="label-title">最低人數</label>
                     <p v-text="signupinfo.min"></p>  
                 </div>
+                <div class="col-sm-3">
+                        <label class="label-title">網路報名</label>
+                    <p>
+                        {{ signupinfo.net_signup | boolText  }}
+                        <span v-html="$options.filters.yesOrNoSign(signupinfo.net_signup)"></span>
+                        
+                    </p>
+                </div>
             </div>
             <div class="row">
                 <div class="col-sm-3">
                                             
                     <label class="label-title">學費</label>
                     <p v-text="signupinfo.tuition"></p>  
+                    
+                </div>
+                 <div class="col-sm-3">
+                                            
+                    <label class="label-title">折扣優惠</label>
+                    <p>
+                         {{ signupinfo.canDiscount }}
+                        <span v-html="$options.filters.yesOrNoSign(signupinfo.discount)"></span>    
+                    </p>  
                     
                 </div>
                 <div class="col-sm-3">
@@ -58,14 +75,7 @@
                     
                 </div>
                 
-                <div class="col-sm-3">
-                        <label class="label-title">網路報名</label>
-                    <p>
-                        {{ signupinfo.net_signup | boolText  }}
-                        <span v-html="$options.filters.yesOrNoSign(signupinfo.net_signup)"></span>
-                        
-                    </p>
-                </div>
+                
             </div>
             <div class="row">
                 <div class="col-sm-12">
@@ -112,9 +122,7 @@
         },
          
         methods: {  
-            getMaterials(signupinfo){
-                return 'ikik'
-            },
+           
             btnEditCilcked(){
                this.$emit('begin-edit');
             },

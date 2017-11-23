@@ -22,19 +22,16 @@ use App\Course;
 use App\Events\UserCreated;
 
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 class NewUserSignupsController extends BaseController
 {
     protected $key='signups';
     public function __construct(Courses $courses, Discounts $discounts,
                                 Terms $terms , Centers $centers, 
-                                  Signups $signups, Users $users, CheckAdmin $checkAdmin) 
+                                  Signups $signups, Users $users) 
                                
     {
-         $exceptAdmin=[];
-         $allowVisitors=[];
-		 $this->setMiddleware( $exceptAdmin, $allowVisitors);
+       
 
 		 $this->courses=$courses;
          $this->discounts=$discounts;
@@ -43,12 +40,13 @@ class NewUserSignupsController extends BaseController
          $this->signups=$signups;
          $this->users=$users;
 
-         $this->setCheckAdmin($checkAdmin);
+         
 
 	}
 
     public function create()
     {
+        
         if(!request()->ajax()){
             $menus=$this->menus($this->key); 
             return view('signups.new user')->with(['menus' => $menus]);
@@ -58,13 +56,12 @@ class NewUserSignupsController extends BaseController
         $user= $this->users->initialize($with_password);
         $signup=Signup::initialize();
 
-        $discountOptions=$this->getDiscountOptions();
+       
 
         return response()
             ->json([
                 'user' => $user,
-                'signup' => $signup,
-                'discountOptions' => $discountOptions,
+                'signup' => $signup               
             ]);
          
     }

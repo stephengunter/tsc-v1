@@ -16,7 +16,7 @@ class Course extends Model
     use FilterPaginateOrder;
    
     
-    protected $fillable = [ 'term_id', 'center_id', 'name', 'level',
+    protected $fillable = [ 'term_id', 'center_id', 'name', 'level', 'discount',
                             'group','parent','must','number', 'caution',
                             'credit_count' , 'credit_price' ,'net_signup' , 
                             'begin_date' ,  'end_date' , 'weeks', 'hours',
@@ -55,6 +55,7 @@ class Course extends Model
         }
         return [            
             'name' => '',
+            'discount' => 1,
             'group' => $group ,
             'center_id' => $center_id,
             'term_id' => $term_id,
@@ -187,7 +188,12 @@ class Course extends Model
     }
 
     public function populateViewData($editNumber=false,$photo=false){
+        $withNumber=false;
+        $this->fullName($withNumber);
+
         $this->getParentCourse();
+
+        $this->sortClassTimes();
         foreach ($this->classTimes as $classTime) {
             $classTime->weekday;
         }
@@ -282,7 +288,7 @@ class Course extends Model
     public function validSignups()
     {
         return $this->signups()->where('removed',false)
-                                ->where('status' > -1);
+                                ->where('status' , '>','-1' );
     }
     
    
@@ -365,19 +371,37 @@ class Course extends Model
 
     public function hasSignupBy($user_id)
     {
-        if(!count($this->validSignups())) {
-               return false;
-        }
+        
+        $validSignups=$this->validSignups()->get();
+       
+        if(!count($validSignups)) return false;
 
-        if($this->validSignups()->where('user_id',$user_id)->count()){
-            return true;
-        }else{
-            return false;
-        }
+
+        $filtered = $validSignups->filter(function ($signup) use($user_id) {
+            return $signup->user_id==$user_id;
+        })->all();
+        
+      
+
+        if(count($filtered)) return true;
+            
+        return false;
     }
-    public function fullName()
+    public function fullName($withNumber=true)
     {
-        return $this->number . ' ' . $this->name;
+        $fullname=$this->name;
+        if($this->level) $fullname .= ' - ' . $this->level;
+        
+        
+        if($withNumber) $fullname=$this->number . ' ' . $fullname;
+
+        $this->fullname=$fullname;
+        return $this->fullname;
+    }
+    public function sortClassTimes()
+    {
+         $this->classTimes= $this->classTimes->sortBy('weekday_id')
+                                             ->sortBy('on')->values()->all();
     }
     public function nameWithNumber()
     {

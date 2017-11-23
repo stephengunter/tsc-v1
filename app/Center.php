@@ -62,15 +62,18 @@ class Center extends Model
 		return static::where('head',true)->where('removed',false)->first();
 	}
 
-    public function courses() 
+   public function courses() 
 	{
 		return $this->hasMany('App\Course');
 	}
 	public function users()
-    {
+   {
         return $this->belongsToMany('App\User','user_center');
-    }
-
+   }
+	public function discounts() 
+	{
+		return $this->hasMany('App\Discount');
+	}
 	public function contactInfo() 
 	{
 		if(!$this->contact_info) return null;

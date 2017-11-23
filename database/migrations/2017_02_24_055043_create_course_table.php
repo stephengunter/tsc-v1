@@ -52,7 +52,7 @@ class CreateCourseTable extends Migration
             $table->integer('limit')->nullable();    //人數上限 
             $table->integer('min')->default(0);    //人數下限
 
-            
+            $table->boolean('discount')->default(true);
 
             $table->integer('display_order')->default(0);
             $table->integer('photo_id')->unsigned()->nullable();

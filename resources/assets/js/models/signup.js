@@ -162,6 +162,19 @@ class Signup {
                     })
                 })   //End Promise
     }
+    static discountOptions(courseId){
+        let url =this.source() + '/discount-options' 
+        url += '?course=' + courseId
+        return new Promise((resolve, reject) => {
+                     axios.get(url)
+                    .then(response => {
+                        resolve(response.data);
+                    })
+                    .catch(error => {
+                        reject(error);
+                    })
+                })   //End Promise
+    }
     static newUserCreate(){
         let url = this.source() + '/new-user'
         return new Promise((resolve, reject) => {

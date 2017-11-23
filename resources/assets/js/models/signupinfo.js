@@ -10,6 +10,11 @@ class SignupInfo {
             this.canNetSignup = '否'
         }
 
+        this.canDiscount = '可以'
+        if (Helper.tryParseInt(data.discount) < 1) {
+            this.canDiscount = '不行'
+        }
+
         this.cost = Helper.formatMoney(data.cost)
 
         this.tuition = Helper.formatMoney(data.tuition)

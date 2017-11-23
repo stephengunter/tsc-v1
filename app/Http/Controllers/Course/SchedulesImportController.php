@@ -103,20 +103,17 @@ class SchedulesImportController extends BaseController
   
     public function excelImport(Request $form)
     {
-        
+           
         $current_user=$this->currentUser();
-        
-        // if(!$current_user->isDev()){
-        //     if(!$this->defaultCenter()) return  $this->unauthorized(); 
-        // }
-        
 
         if(!$form->hasFile('schedules_file')){
+           
             return   response()
                         ->json(['schedules_file' => ['無法取得上傳檔案'] 
                             ]  ,  422);      
         }
 
+       
         $course_id=(int)$form['course_id'];
         $file=Input::file('schedules_file'); 
 

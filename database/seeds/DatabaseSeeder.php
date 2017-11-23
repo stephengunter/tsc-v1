@@ -47,6 +47,11 @@ class DatabaseSeeder extends Seeder {
 		$this->call(AdminSeeder::class);
 
 		$this->call(ContentSeeder::class);
+
+		$this->call(DiscountSeeder::class);
+
+		$this->call(UserSeeder::class);
+		
 		//$this->call(DownloadSeeder::class);
 
 		
@@ -61,7 +66,7 @@ class DatabaseSeeder extends Seeder {
 		 
 
 
-		  //$this->call(DiscountSeeder::class);
+		  
 
 		 //$this->call(PermissionTableSeeder::class);
    		 
@@ -74,7 +79,7 @@ class DatabaseSeeder extends Seeder {
 		 
 		 //this->call(CategoryTableSeeder::class);
 
-		// $this->call(UserSeeder::class);
+		
 
 		 
 

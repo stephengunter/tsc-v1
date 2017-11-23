@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Term extends Model
 {
 	protected $fillable = [  'year', 'order', 'name',
-							 'number','open_date','close_date',
+							 'number','open_date', 'bird_date','close_date',
 							 'active','removed', 'updated_by'
 							
 						  ];
@@ -29,6 +29,7 @@ class Term extends Model
 			 'order' => '',
 			 'name' => '',
 			 'open_date' => '',
+			 'bird_date' => '',
 			 'close_date' => '',
 			 'active' => 1
         ];

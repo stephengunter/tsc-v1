@@ -19,7 +19,7 @@
                        <div class="form-group">                          
                           <label>性別</label>
                            <div>
-                              <toggle :items="genderOptions"   :default_val="form.user.profile.gender" @selected=setGender></toggle>
+                              <toggle :items="genderOptions"   :default_val="form.user.profile.gender" @selected="setGender"></toggle>
                             </div>
                        </div>
                    </div>  
@@ -55,31 +55,38 @@
                             <small class="text-danger" v-if="form.errors.has('signup.date')" v-text="form.errors.get('signup.date')"></small>
                         </div>
                    </div>  
-                   <div class="col-sm-6"> 
+                   <div class="col-sm-7"> 
                        <div class="form-group">                          
-                          <label>報名課程</label>
+                            <label>報名課程</label>
 
-                         <combination-select :with_course="combinationSettings.withCourse"
-                          @ready="onCombinationReady" @course-changed="setCourse"></combination-select>
+                            <combination-select   @ready="onCombinationReady">                           
+                            </combination-select>
 
-                          <input type="hidden" name="signup.course_id" class="form-control" v-model="form.signup.course_id"  >
-                          <small v-if="form.errors.has('signup.course_id')" v-text="form.errors.get('signup.course_id')" class="text-danger" >身分證號</small>
-                             
+                            <input type="hidden" name="signup.course_id" class="form-control" v-model="form.signup.course_id"  >
+                            <small v-if="form.errors.has('signup.course_id')" v-text="form.errors.get('signup.course_id')" class="text-danger" >身分證號</small>
+                                
                         </div>
                    </div>
-                </div>
-                <div class="row" v-if="user_checked">
-                   <div  class="col-sm-9"> 
-                       
-                       <div class="form-group">
-                            <label>折扣優惠</label>
+                   <div v-if="hasCourse" class="col-sm-2">
+                        <div class="form-group"> 
+                            <label>是否繳費</label>
                             <div>
-                               <toggle :items="discountOptions"   default_val="0" @selected=setDiscount></toggle>
-                           </div>
-                        </div>
-                   </div>  
-                   
+                                <toggle :items="boolOptions"   :default_val="pay" @selected="setPay"></toggle>
+                            </div>
+                        </div>  
+                   </div>
                 </div>
+                <div v-if="isPay" class="row">
+                   <div class="col-sm-12">
+                        <div class="form-group"> 
+                            <label>折扣優惠</label>
+                            <discounts-selector :course_id="form.signup.course_id" :discount_id="form.signup.discount_id">
+                            </discounts-selector>
+                          
+                        </div>  
+                   </div>
+                   
+               </div>  
                 <div class="row" v-show="user_checked">
                     <div class="col-sm-6">
                         <button type="submit"  class="btn btn-success" :disabled="form.errors.any()">確認送出</button>
@@ -116,11 +123,13 @@
 <script>
     import UserChecker from '../../components/user/checker.vue'
     import UserSelector from '../../components/user/selector.vue'
+    import DiscountSelector from '../../components/signup/discounts-selector.vue'
     export default {
         name: 'NewUserSignup',
         components: {
             'user-checker':UserChecker,
-            'user-selector':UserSelector
+            'user-selector':UserSelector,
+            'discounts-selector':DiscountSelector
         },
         props: {
             user_valid:{
@@ -145,6 +154,9 @@
                 user_checked: false,
                 loaded:false,
 
+                pay:0,
+                boolOptions:Helper.boolOptions(),
+                
                
                 dob: {
                     time: ''
@@ -155,7 +167,7 @@
                 genderOptions:Helper.genderOptions(),
                 datePickerOption: Helper.datetimePickerOption(),
                 
-                discountOptions:[],
+               
                 signupDate: {
                     time: Helper.todayString()
                 },
@@ -171,10 +183,17 @@
                 modalSettings:{
                    width:1200,
                 },
-                combinationSettings:{
-                   withCourse:true,
-                },
+                
 
+            }
+        },
+        computed: {
+            hasCourse(){
+                if(!this.form.signup) return false
+                return Helper.isTrue(this.form.signup.course_id)
+            },
+            isPay(){
+                return Helper.isTrue(this.pay)
             }
         },
         watch:{
@@ -231,15 +250,18 @@
                 this.userList=[]
                 this.showUserList=false
 
+                this.fetchData()
+                
+            },
+            fetchData(){
                 let create=Signup.newUserCreate()
                 create.then(data=>{
                      this.form.user=data.user
                      this.form.signup=data.signup
-                     this.loadDiscountOptions(data.discountOptions)
+                    
                 }).catch(error =>{
                      Helper.BusEmitError(error)
                 })
-                
             },
             canceled(){
                 this.init()
@@ -270,25 +292,26 @@
             clearErrorMsg(name) {
                 this.form.errors.clear(name)
             },
-            onCombinationReady(params){
-                this.setCourse(params.course)
+
+            onCombinationReady(course_id){
+               alert(course_id)
+                this.setCourse(course_id)
 
             },
             setGender(val) {
                 this.form.user.profile.gender = val;
             },
+            setPay(val){
+                this.pay=val
+            },
             setCourse(val){
+              
                 this.form.signup.course_id=val
-                 this.clearErrorMsg('signup.course_id')
+                this.clearErrorMsg('signup.course_id')
             },
             setDiscount(val) {
                 this.form.signup.discount_id = val;
             },
-            loadDiscountOptions(options){
-                this.discountOptions=options
-                let noDiscount={ text:'無' , value:'0' }
-                this.discountOptions.splice(0, 0, noDiscount);
-            },    
             onSubmit() {
                 this.formSubmitting=true
                 this.userCheckerSettings.status+=1

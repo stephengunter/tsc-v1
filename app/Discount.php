@@ -3,60 +3,76 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Identity;
+
+use App\Course;
+use App\Term;
+use Carbon\Carbon;
+use Exception;
 
 class Discount extends Model
 {
-    protected $fillable = [ 'key','name', 'identity_id', 
-							'points', 'ps', 
+   protected $fillable = [ 'name', 'center_id', 'all_courses',
+							'points_one', 'points_two' ,'ps', 
    						    'removed','active','updated_by'
 						  ];
+	
+
     
-    public static function initialize()
+   public static function initialize()
 	{
 		return [
-			'key'=>'',
+			
 			'name' => '',
-			'identity_id' => '',
-			'points' => '',
+			'all_courses' => 0,
+			'center_id' => 0,
+			'points_one' => '',
+			'points_two' => '',
 			'ps' => '',
 			'active' => 1,
 			
 		];
 	}
 
-    public function identity() 
+	public static function isStageOne(Term $term)
 	{
-        if(!$this->identity_id) return null;
-
-		return Identity::find($this->identity_id);
-	}
-    public function identityName() 
-	{
-        $identity=$this->identity();
-        if(!$identity) return '';
-
-		return $identity->name;
+		 $today=Carbon::today();
+		 $bird = Carbon::parse($term->bird_date);
+		 return $today->lte($bird);
 	}
 
-    public function canEditBy($user)
+	public static function canCreate($user,$center)
 	{
-        return $user->isAdmin();
+		if($user->isDev()) return true;
+		if(!$user->isOwner()) return false;
+		return $user->admin->canAdminCenter($center);
+	} 
+
+   public function canEditBy($user)
+	{
+		if($user->isDev()) return true;
+		if(!$user->isOwner()) return false;
+		
+		return $user->admin->canAdminCenter($this->center);
           
 	}
-	public function canDeleteBy($user)
+	public function getFormattedPoints($points)
 	{
-		if($this->canDelete()){
-			return $this->canEditBy($user);
-		}else{
-			return false;
-		}
+		if(!$points) return '';
+		$points=str_replace('0','',(string)$points);
 		
+		if($points) $points .= ' 折';
+
+		return $points;
 	}
 
-	public function canDelete()
+	public function getNameWithDiscount()
 	{
-         return  true;
+		if(!$this->points)  return $this->name;
+		 
+		return $this->name . ' ' .$this->getFormattedPoints($this->points);
+          
 	}
+	
+
 
 }

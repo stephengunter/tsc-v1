@@ -21,7 +21,8 @@ class TermTableSeeder extends Seeder
 				'name' => '1064',
 				'number' => 1064,
 				'open_date' => '2017-9-1',
-				'close_date' => '2017-10-31',
+				'bird_date' => '2017-9-30',
+				'close_date' => '2017-10-11',
 				'updated_by' =>51,
 				'active'=>true
 			],
@@ -31,7 +32,8 @@ class TermTableSeeder extends Seeder
 				'name' => '1071',
 				'number' => 1071,
 				'open_date' => '2018-1-1',
-				'close_date' => '2018-2-28',
+				'bird_date' => '2018-1-31',
+				'close_date' => '2018-2-15',
 				'updated_by' =>51,
 				'active'=>true
 			],

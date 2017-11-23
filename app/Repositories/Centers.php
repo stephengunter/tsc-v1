@@ -17,6 +17,10 @@ class Centers
     {
          return Center::where('removed',false);
     }
+    public function hasCoursesCenters()
+    {
+         return $this->getAll()->has('courses');
+    }
     public function findOrFail($id)
     {
         $center = Center::findOrFail($id);

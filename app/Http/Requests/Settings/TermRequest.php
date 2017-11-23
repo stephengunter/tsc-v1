@@ -27,6 +27,7 @@ class TermRequest extends FormRequest
        
         return [
             'term.open_date' => 'required',
+            'term.bird_date' => 'required',
             'term.close_date'=> 'required', 
         ];
     }
@@ -34,6 +35,7 @@ class TermRequest extends FormRequest
     {
         return [
             'term.open_date.required' => '必須填寫報名起始日',
+            'term.bird_date.required' => '必須填寫早鳥優惠截止日',
             'term.close_date.required' => '必須填寫報名截止日',     
         ];
     }

@@ -8,6 +8,12 @@ class Discount {
        
 
     }
+    static pointText(points){
+        if(!points) return '無折扣'
+       
+        return String(points).replace('0','') + ' 折' 
+    }
+    
     static title(){
        return 'Discounts'
     }
@@ -32,9 +38,9 @@ class Discount {
     static deleteUrl(id){
          return this.source() + '/' + id
     }
-    static index(){
+    static index(center_id){
         return new Promise((resolve, reject) => {
-            let url = this.source() 
+            let url = this.source() + '?center=' + center_id
             axios.get(url)
                 .then(response => {
                    resolve(response.data)
@@ -125,6 +131,23 @@ class Discount {
                 })
         })
     }
+    static updateDisplayOrder(discounts) {
+        let form = new Form({
+            discounts: discounts
+        })
+        return new Promise((resolve, reject) => {
+
+            let url = this.storeUrl() + '/display-order'
+            form.post(url)
+                .then(data => {
+                    resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
+        })
+
+    }
     static pointOptions(){
                 let options = []
                 let max = 95
@@ -140,8 +163,9 @@ class Discount {
                 return options
 
     }
-    static options(){
+    static options(course_id){
         let url =this.source() + '/options' 
+        url+= '?course=' + course_id
         return new Promise((resolve, reject) => {
                      axios.get(url)
                     .then(response => {
@@ -150,7 +174,21 @@ class Discount {
                     .catch(error => {
                         reject(error);
                     })
-                })   //End Promise
+                })  
+    }
+    static countTuition(course_id,discount_id){
+        let url =this.source() + '/count-tuition' 
+        url+= '?course=' + course_id
+        url+= '&discount=' + discount_id
+        return new Promise((resolve, reject) => {
+                     axios.get(url)
+                    .then(response => {
+                        resolve(response.data);
+                    })
+                    .catch(error => {
+                        reject(error);
+                    })
+                })  
     }
    
 

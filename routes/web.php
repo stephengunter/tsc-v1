@@ -1,25 +1,68 @@
 <?php
 Route::get('/test', function(){
-    $files=[
-        'teachers' => 'teachers.xlsx',
-        'teacher-groups' => 'teacher-groups.xlsx',
-
-        'admins' => 'admins.xlsx',
-        'centers' => 'centers.xlsx',
-        'categories' => 'categories.xlsx',
-
-        'courses' => 'courses.xlsx',
-        'group-courses' => 'group-courses.xlsx',
-        'course-infoes' => 'course-infoes.xlsx',
-    ];
-
-    $key='courses';
-
-    if (array_key_exists($key,$files)) dd($files[$key]);
-    dd('no');
+    
     return view('test');
     
 });
+
+Route::post('/test-import-schedules', function(Request $form){
+    $form=request();
+    if(!$form->hasFile('schedules_file')){
+        
+         return   response()
+                     ->json(['schedules_file' => ['無法取得上傳檔案'] 
+                         ]  ,  422);      
+    }
+
+    $current_user=auth()->user();
+     $file=$form->file('schedules_file'); 
+
+    $schedules=new \App\Repositories\Schedules();
+    
+
+     $err_msg=$schedules->importAllSchedules($file,$current_user);
+     
+
+     if($err_msg) {
+          return response()->json(['error' => $err_msg,'code' => 422 ], 422);
+      
+     }
+
+    
+
+     return response()->json(['success' => true]);
+    
+});
+Route::post('/test-import-classtimes', function(){
+    $form=request();
+    if(!$form->hasFile('classtimes_file')){
+        
+         return   response()
+                     ->json(['classtimes_file' => ['無法取得上傳檔案'] 
+                         ]  ,  422);      
+    }
+
+   
+
+    $current_user=auth()->user();
+     $file=$form->file('classtimes_file'); 
+
+    $classtimes=new \App\Repositories\Classtimes();
+    
+
+     $err_msg=$classtimes->importAll($file,$current_user);
+     
+
+     if($err_msg) {
+          return response()->json(['error' => $err_msg,'code' => 422 ], 422);
+      
+     }
+
+    
+
+     return response()->json(['success' => true]);
+     
+ });
 //  Route::get('/test', function(){
 //    //  Artisan::call('migrate');
 //   Artisan::call('db:seed');
@@ -118,17 +161,39 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('schedules-import', '\App\Http\Controllers\Course\SchedulesImportController', 
     ['only' => ['create','store']]);
     
+    Route::post('discounts/display-order',['uses'=>'\App\Http\Controllers\Signups\DiscountsController@updateDisplayOrder']);
+    Route::get('discounts/options', '\App\Http\Controllers\Signups\DiscountsController@options');
+    Route::get('discounts/count-tuition', '\App\Http\Controllers\Signups\DiscountsController@countTuition');
+    Route::resource('discounts', '\App\Http\Controllers\Signups\DiscountsController');
+
+
+
+    Route::get('signups/index-options', '\App\Http\Controllers\Signups\SignupsController@indexOptions');
+    Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsController@statusOptions');
+    
+    Route::get('signups/{id}/print', '\App\Http\Controllers\Signups\SignupsController@print');
+    Route::post('signups/update-user', '\App\Http\Controllers\Signups\SignupsController@updateUser');
+
+    Route::get('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@create');
+    Route::post('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@store');
+
+  
+    Route::resource('signups', '\App\Http\Controllers\Signups\SignupsController');
+
+
+
+    
+    
     
     Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
     Route::put('users/{user}/update-photo',['uses'=>'\App\Http\Controllers\User\UsersController@updatePhoto']);
     Route::post('users/find-users', ['uses' => '\App\Http\Controllers\User\UsersController@findUsers']);
 
-    Route::get('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@create');
-    Route::post('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@store');
-    Route::post('signups/update-user', '\App\Http\Controllers\Signups\SignupsController@updateUser');
-    Route::get('signups/index-options', '\App\Http\Controllers\Signups\SignupsController@indexOptions');
-    Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsController@statusOptions');
-    Route::get('signups/{id}/print', '\App\Http\Controllers\Signups\SignupsController@print');
+    
+    
+    
+    
+    
 
     Route::get('refunds/status-options', '\App\Http\Controllers\Signups\RefundsController@statusOptions');
     Route::get('refunds/{id}/print', '\App\Http\Controllers\Signups\RefundsController@print');
@@ -173,7 +238,7 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('cities', '\App\Http\Controllers\Contact\CitiesController', ['only' => ['index']]);
     Route::resource('districts', '\App\Http\Controllers\Contact\DistrictsController', ['only' => ['index']]);
 
-    Route::resource('signups', '\App\Http\Controllers\Signups\SignupsController');
+    
     Route::resource('tuitions', '\App\Http\Controllers\Signups\TuitionsController');
     Route::resource('back-tuitions', '\App\Http\Controllers\Signups\BackTuitionsController');
     Route::resource('refunds', '\App\Http\Controllers\Signups\RefundsController');
@@ -208,7 +273,7 @@ Route::group(['middleware' => 'admin'], function()
 
     
 
-    Route::resource('discounts', '\App\Http\Controllers\Discounts\DiscountsController');
+    
     Route::resource('identities', '\App\Http\Controllers\Discounts\IdentitiesController');
 
     Route::resource('terms', '\App\Http\Controllers\Settings\TermsController');

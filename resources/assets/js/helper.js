@@ -247,7 +247,7 @@ class Helper {
 
     static formatMoney(money, wantInt) {
         if (!money) {
-            if (wantInt) return 0
+            if (wantInt)  return 0
             return ''
         }
         money = String(money)
@@ -257,7 +257,9 @@ class Helper {
         let cents = parseInt(money.substring(pos + 1))
         if (cents > 0) return money
 
-        return money.substring(0, pos)
+        let text= money.substring(0, pos)
+        if(wantInt && !text) return 0
+        return text
     }
     static yearOptions() {
 

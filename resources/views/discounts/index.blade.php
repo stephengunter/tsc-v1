@@ -4,7 +4,8 @@
 @section('content')
 
 
-    <discount-index></discount-index>
+    <discount-index :center_options="{{ json_encode($centerOptions) }}">
+    </discount-index>
        
        
 @endsection

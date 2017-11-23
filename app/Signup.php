@@ -19,7 +19,7 @@ class Signup extends Model
     protected $fillable =  ['course_id',  'user_id', 'date', 'parent',
                               'tuition','cost' ,'points' ,   'discount' ,
                              'identity' , 'discount_id', 'net_signup',
-                             'status' ,  'removed' , 'updated_by'
+                   【          'status' ,  'removed' , 'updated_by'
                         	];
 
     protected $filter =  ['date','status','tuition','discount'];
@@ -32,6 +32,8 @@ class Signup extends Model
             'course_id' => $course_id,
             'parent' => 0,
             'discount_id' => 0,
+            'tuition' => 0,
+            'cost'=>0,
             'status' => 0,
             'net_signup' => 1,
             'sub_courses' => []

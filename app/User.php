@@ -287,6 +287,8 @@ class User extends Authenticatable {
 	
 	public function canEditBy($user)
 	{
+		if($user->isDev()) return true;
+		
 		if($user->id==$this->id) return true;
 
 		if($this->isAdmin()){	

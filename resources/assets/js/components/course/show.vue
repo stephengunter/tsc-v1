@@ -29,7 +29,7 @@
                     <div class="row">
                         <div class="col-sm-4">
                             <label class="label-title">名稱</label>
-                            <p>{{course.name}}</p>
+                            <p>{{course.fullname}}</p>
                         </div>  
                         <div class="col-sm-4">
                             <label class="label-title">開課中心</label>  
@@ -112,6 +112,7 @@
                         <div class="col-sm-12">
                             <label class="label-title">注意事項</label>
                             <p v-html="course.caution"></p>
+                           
                         </div>  
                           
                     </div> 

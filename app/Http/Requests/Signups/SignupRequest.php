@@ -22,6 +22,8 @@ class SignupRequest extends FormRequest
             'signup.date' => 'required',
             'signup.course_id' => 'required',
             'signup.user_id'=> 'required',
+            'signup.tuition'=> 'numeric',
+            'signup.cost'=> 'numeric',
         ];
     }
     public function messages()
@@ -30,6 +32,9 @@ class SignupRequest extends FormRequest
             'signup.date.required' => '必須選擇日期',
             'signup.course_id.required' => '必須選擇報名課程',
             'signup.user_id.required' => '必須選擇姓名',
+
+            'signup.tuition.numeric' => '必須是數字',
+            'signup.cost.numeric' => '必須是數字',
         ];
     }
     public function getValues($updated_by)

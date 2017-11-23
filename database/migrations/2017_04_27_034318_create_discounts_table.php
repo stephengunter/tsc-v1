@@ -15,13 +15,18 @@ class CreateDiscountsTable extends Migration
     {
         Schema::create('discounts', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('key')->nullable();
+            
             $table->string('name')->nullable();
 
-            $table->integer('identity_id')->unsigned()->nullable();
-            $table->integer('points')->unsigned();
-            $table->string('ps')->nullable();
+            $table->integer('center_id')->unsigned()->nullable();
+            $table->integer('points_one')->unsigned()->nullable();
+            $table->integer('points_two')->unsigned()->nullable();
+            $table->boolean('all_courses')->default(false);
 
+            $table->string('ps')->nullable();
+            
+
+            $table->integer('order')->default(0);
             $table->boolean('active')->default(false);
             $table->boolean('removed')->default(false);
             $table->integer('updated_by')->unsigned()->nullable();

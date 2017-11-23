@@ -1,9 +1,11 @@
 <template>
     <tr v-if="isReadOnly" >
-        <th  scope="row" v-text="term.year"></th> 
-        <td  v-text="term.order"></td> 
-        <td  v-text="term.name"></td>
-        <td  v-html="period(term.open_date , term.close_date)"></td> 
+        <th scope="row" v-text="term.year"></th> 
+        <td v-text="term.order"></td> 
+        <td v-text="term.name"></td>
+        <td v-text="term.open_date"></td>
+        <td v-text="term.bird_date"></td>
+        <td v-text="term.close_date"></td> 
         <td  v-html="$options.filters.activeLabel(term.active)" ></td>
         <td> 
             <a v-if="term.updated_by"  href="#" @click.prevent="showUpdatedBy" >
@@ -42,7 +44,16 @@
             <date-picker :option="datePickerOption" :date="open_date" ></date-picker>
             <input  type="hidden" v-model="form.term.open_date"  >
             <small class="text-danger" v-if="form.errors.has('term.open_date')" v-text="form.errors.get('term.open_date')"></small>
-            起至
+           
+        </td>
+        <td v-if="loaded">
+            <date-picker :option="datePickerOption" :date="bird_date" ></date-picker>
+            <input  type="hidden" v-model="form.term.bird_date"  >
+            <small class="text-danger" v-if="form.errors.has('term.bird_date')" v-text="form.errors.get('term.bird_date')"></small>
+           
+        </td>
+        <td v-if="loaded">
+            
             <date-picker :option="datePickerOption" :date="close_date" ></date-picker>
             <input  type="hidden" v-model="form.term.close_date"  >
             <small class="text-danger" v-if="form.errors.has('term.close_date')" v-text="form.errors.get('term.close_date')"></small>
@@ -99,6 +110,9 @@
                 open_date: {
                     time: ''
                 },
+                bird_date: {
+                    time: ''
+                },
                 close_date: {
                     time: ''
                 },
@@ -111,6 +125,13 @@
               handler: function () {
                   this.form.term.open_date=this.open_date.time
                   this.clearErrorMsg('term.open_date')
+              },
+              deep: true
+            },
+            bird_date: {
+              handler: function () {
+                  this.form.term.bird_date=this.bird_date.time
+                  this.clearErrorMsg('term.bird_date')
               },
               deep: true
             },
@@ -155,6 +176,7 @@
                     }) 
 
                     this.open_date.time=term.open_date
+                    this.bird_date.time=term.bird_date
                     this.close_date.time=term.close_date
 
 

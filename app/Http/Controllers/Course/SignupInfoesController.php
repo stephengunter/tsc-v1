@@ -45,7 +45,6 @@ class SignupInfoesController extends BaseController
             return  $this->unauthorized(); 
         }
 
-        $course->open_date=Helper::checkDateString($course->open_date);
         $course->close_date=Helper::checkDateString($course->close_date);
        
         return response()->json(['signupinfo' => $course]);  
@@ -62,7 +61,7 @@ class SignupInfoesController extends BaseController
         $updated_by=$current_user->id;
 
         $values=$request->getValues($updated_by,$removed);
-
+       
         $course->update($values);
         event(new CourseUpdated($course, $current_user));
 

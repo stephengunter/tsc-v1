@@ -71,16 +71,23 @@ class CoursesController extends BaseController
         }  
 
         $oversea=false;
-        $centers=$this->centers->index($oversea)
-                              ->where('active',true)->get();
+        $centers=$this->centers->hasCoursesCenters()
+                               ->where('oversea',$oversea)
+                               ->where('active',true)
+                               ->orderBy('display_order','desc')
+                               ->get();
 
-        $order=true;
-        $categories= $this->categories->activeCategories($order)->get();
+
+        $centerId=$centers[0]->id;
+
+        
+        $categories= $this->categories->getFrontEndCategories($centerId)->get();
 
         $categoryId=$categories[0]->id;
-        $centerId=$categories[0]->id;
+        
 
         $courses= $this->getCourses($categoryId,$centerId);
+        
         return response() ->json([ 
                                     'courses' => $courses , 
                                     'categories' => $categories,   

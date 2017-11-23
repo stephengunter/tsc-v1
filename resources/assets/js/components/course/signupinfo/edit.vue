@@ -11,7 +11,7 @@
         <div class="panel-body">
             <form class="form" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
                 <div class="row">
-                    <div class="col-sm-3">
+                    <div v-if="false" class="col-sm-3">
                         <div class="form-group">                           
                             <label>報名起始日</label>
                             <div>
@@ -44,8 +44,16 @@
                             <input type="text" name="signupinfo.min" class="form-control" v-model="form.signupinfo.min">
                             <small class="text-danger" v-if="form.errors.has('signupinfo.min')" v-text="form.errors.get('signupinfo.min')"></small>
                         </div>
-                       
                         
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">                           
+                            <label>網路報名</label>
+                            <div>
+                                <input type="hidden" v-model="form.signupinfo.net_signup"  >
+                                <toggle :items="boolOptions"   :default_val="form.signupinfo.net_signup" @selected="setNetSignup"></toggle>
+                            </div>
+                        </div>
                     </div>
                 </div>
                  <div class="row">
@@ -58,20 +66,21 @@
                     </div>
                     <div class="col-sm-3">
                         <div class="form-group">                           
+                            <label>折扣</label>
+                            <div>
+                                <input type="hidden" v-model="form.signupinfo.discount"  >
+                                <toggle :items="discountOptions"   :default_val="form.signupinfo.discount" @selected="setDiscount"></toggle>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">                           
                             <label>教材費</label>
                             <input type="text" name="signupinfo.cost" class="form-control" v-model="form.signupinfo.cost">
                             <small class="text-danger" v-if="form.errors.has('signupinfo.cost')" v-text="form.errors.get('signupinfo.cost')"></small>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">                           
-                            <label>網路報名</label>
-                            <div>
-                                <input type="hidden" v-model="form.signupinfo.net_signup"  >
-                                <toggle :items="boolOptions"   :default_val="form.signupinfo.net_signup" @selected="setNetSignup"></toggle>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
                 <div class="row">
                   
@@ -132,7 +141,13 @@
                 },
 
                 boolOptions:Helper.boolOptions(),
-
+                discountOptions:[{
+                    text: '可以',
+                    value: 1
+                }, {
+                    text: '不行',
+                    value: 0
+                }]
            
 
             }
@@ -194,6 +209,9 @@
             
             setNetSignup(val){
                 this.form.signupinfo.net_signup = val
+            },
+            setDiscount(val){
+                this.form.signupinfo.discount = val
             },
             clearErrorMsg(name) {
                 this.form.errors.clear(name)

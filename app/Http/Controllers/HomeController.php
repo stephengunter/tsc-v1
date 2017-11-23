@@ -33,7 +33,8 @@ class HomeController extends BaseController
         //         'discounts',
         //         'notices','reports'];
                 $keys=[ 
-                    
+                    'signups',
+                  
                     'courses',
                     'teachers',
                     'main_settings',

@@ -235,25 +235,15 @@ class CoursesController extends BaseController
         $current_user=$this->currentUser();
         $with=['status','center','term','categories','teachers','classTimes'];
         $course = Course::with($with)->findOrFail($id);
+
+        $course->populateViewData();
         
         $course->canEdit=$course->canEditBy($current_user);
         $course->canDelete=$course->canDeleteBy($current_user);
         $course->canReview=$course->canReviewBy($current_user);
 
-        
-
         $course->getParentCourse();
-       
-        foreach ($course->classTimes as $classTime) {
-                $classTime->weekday;
-        }
-        $course->classTimes= $course->classTimes->sortBy('weekday_id')
-                                                ->sortBy('on')->values()->all();
         
-        
-        foreach ($course->teachers as $teacher) {
-                $teacher->name=$teacher->getName();
-        }
         return response()->json(['course' => $course]);
     }
     public function edit($id)
@@ -456,10 +446,8 @@ class CoursesController extends BaseController
             $options=$this->courses->optionsConverting($courseList);
             return response()  ->json(['options' => $options ]);   
         }
-       
-        
               
-        $request = request();
+        
         $term_id=(int)$request->term; 
         $center_id=(int)$request->center;
         $parent_course_id=(int)$request->parent;

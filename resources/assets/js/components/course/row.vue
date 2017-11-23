@@ -38,11 +38,11 @@
         <!-- 名稱 -->
         <td  v-if="details_link">
             <a href="#" @click.prevent="details(course.id)">
-                   {{ course.name }}
+                   {{ course.fullname }}
             </a>
         </td> 
         <td  v-else>
-            {{ course.name }}
+            {{ course.fullname }}
         </td>
         <!-- End Static Columns -->
 

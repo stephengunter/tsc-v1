@@ -2,11 +2,10 @@
 <div>
     <div class="panel panel-default">
         <div class="panel-heading">
-           
-                
-                <combination-select :with_course="combinationSettings.withCourse"
-                  @ready="onCombinationReady" @course-changed="setCourse">
-               </combination-select>
+               
+            <combination-select 
+                @ready="onCombinationReady" >
+            </combination-select>
 
             <button @click="viewSub"  v-show="groupAndParent" type="button" class="btn-sm btn btn-warning">
                <span aria-hidden="true" class="glyphicon glyphicon-search"></span>
@@ -76,10 +75,7 @@
                 can_edit:true,
                 can_back:true,
                 can_select:false,
-
-                combinationSettings:{
-                    withCourse:true,
-                },
+                
 
                 groupAndParent:false,
                 subSettings:{
@@ -100,13 +96,14 @@
                 
              
             },
-            
             onCombinationReady(course){
+               
                 this.setCourse(course)
                 this.ready=true
             },
            
             setCourse(val){
+               
                 this.course_id=val
             },
             onSignupListLoaded(data){

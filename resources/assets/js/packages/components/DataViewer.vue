@@ -171,6 +171,10 @@
                type: Boolean,
                default: false
             },
+            page_size:{
+               type: Number,
+               default: 10
+            },
             show_header:{
                type: Boolean,
                default: true
@@ -209,7 +213,8 @@
         watch: {
             search_params: {
               handler: function () {
-                 this.fetchData()
+                
+                this.fetchData()
               },
               deep: true
             },
@@ -233,7 +238,7 @@
                     data: []
                 }
 
-                let perPage=10
+                let perPage=this.page_size
                 if(this.no_page) perPage=150
                 this.params={
                     column: this.default_order,  
