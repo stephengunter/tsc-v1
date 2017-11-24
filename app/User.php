@@ -122,14 +122,21 @@ class User extends Authenticatable {
 		$this->attributes['password'] = bcrypt($value);
 	}
 
-    public static function initialize()
+    public static function initialize($with_password=false)
     {
-        return [
-             'email' => '', 
-			 'name' => '',
-			 'phone' => '',
-		     'profile' =>  Profile::initialize()
-        ];
+         $user= [
+				'id'=>0,
+				'email' => '', 
+				'name' => '',
+				'phone' => '',
+				'profile' =>  Profile::initialize()
+		   ];
+		  
+		   if($with_password){
+			   $user['password']= '000000';
+			}
+
+		   return $user;
     }
 
 

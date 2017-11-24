@@ -7,41 +7,29 @@ use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use App\Http\Requests\Signups\NewUserSignupRequest;
 
-use App\Repositories\Courses;
-use App\Repositories\Discounts;
-use App\Repositories\Signups;
-use App\Repositories\Users;
-use App\Repositories\Terms;
-use App\Repositories\Centers;
-use DB;
+use App\Services\User\UserService;
+use App\Services\Signup\SignupService;
 
 use App\Signup;
 use App\User;
+use App\Profile;
 use App\Course;
+use App\Tuition;
 
 use App\Events\UserCreated;
 
 use App\Support\Helper;
 
+use Exception;
+
 class NewUserSignupsController extends BaseController
 {
     protected $key='signups';
-    public function __construct(Courses $courses, Discounts $discounts,
-                                Terms $terms , Centers $centers, 
-                                  Signups $signups, Users $users) 
-                               
+    
+    public function __construct(SignupService $signupService, UserService $userService) 
     {
-       
-
-		 $this->courses=$courses;
-         $this->discounts=$discounts;
-         $this->terms=$terms;
-         $this->centers=$centers;
-         $this->signups=$signups;
-         $this->users=$users;
-
-         
-
+        $this->userService=$userService;
+        $this->signupService=$signupService;
 	}
 
     public function create()
@@ -53,15 +41,20 @@ class NewUserSignupsController extends BaseController
         }  
 
         $with_password=true;
-        $user= $this->users->initialize($with_password);
+        $user= User::initialize($with_password);
         $signup=Signup::initialize();
+        $signup['net_signup'] = 0;
 
-       
+        $tuition=Tuition::initialize();
+        
+        $payways=$this->signupService->getPayways();
 
         return response()
             ->json([
                 'user' => $user,
-                'signup' => $signup               
+                'signup' => $signup,
+                'tuition' => $tuition,
+                'payways' => $payways               
             ]);
          
     }
@@ -69,45 +62,151 @@ class NewUserSignupsController extends BaseController
     
     public function store(NewUserSignupRequest $request)
     {  
-         $current_user=$this->checkAdmin->getAdmin();
-         $updated_by=$current_user->id;
-         $removed=false;
+        
+        $current_user=$this->currentUser();        
+        $updated_by=$current_user->id;
 
-         $values=$request->getValues($updated_by);
-         $date=$values['date'];
-         $course_id=$values['course_id'];
-         $discount_id=(int)$values['discount_id'];
+        $isPay=$request->isPay();
 
-         $course=$this->courses->findOrFail($course_id);
-         if(!$course->canSignup()){
-              $errMsg= ['此課程目前無法報名'] ;
-              return   response()->json(['signup.course_id' => $errMsg ]  ,  422);
-         }
+        $values=$request->getValues($updated_by);
 
-         $discount=null;
-         if($discount_id > 0){
-            $discount=$this->discounts->findOrFail($discount_id);           
-         }
-         
+        $course_id=$values['course_id'];
+        $course=Course::findOrFail($course_id);
 
-         $userValues=$request->getUserValues($updated_by,$removed);
-         $profileValues=$request->getProfileValues($updated_by);
-         $userValues['name']=$profileValues['fullname'];
-         
-         $userRepository=$this->users;
-         $signupRepository=$this->signups;
-         $signup= DB::transaction(function() 
-         use($userRepository,$signupRepository,$userValues,$profileValues,
-                $course, $discount, $updated_by, $date ) {
+        $userValues=$request->getUserValues($updated_by);
+        $profileValues=$request->getProfileValues($updated_by);
+        $userValues['name']=$profileValues['fullname'];
 
-              $user=$userRepository->store($userValues, $profileValues);
-              $user_id=$user->id;
-              $signup=$signupRepository->store($course,$discount,$user_id,$updated_by,$date);
-              
-              return $signup;
-         });
+        $user=new User($userValues);
+        $profile=new Profile($profileValues);
 
-         return response()->json($signup);
+        $user=$this->userService->store($user,$profile);
+
+        if(!$user) throw new Exception();
+
+        try {
+
+            $canSignup=$this->signupService->canSignup($course, $user);
+
+            $tuition=null;
+            
+            if($isPay){
+                $tuitionValues=$request->getTuitionValues($updated_by); 
+                $tuitionValues['date']=$values['date'];
+                $tuition=new Tuition($tuitionValues);
+            }else{
+                $values['discount_id'] = 0;
+            }
+            
+            $signup=new Signup($values);
+           
+            $signup->user_id=$user->id;
+
+            
+            $signup=$this->signupService->store($course,$user,$signup,$tuition);
+
+            return response()->json($signup);
+        }
+        catch (Exception $err) {
+            $user->delete();
+
+            throw $err;
+        }
+
+
+
+        
+
+        dd('done');
+
+
+        
+
+        
+
+        $tuitionValues=null;
+      
+        if($isPay){
+            $tuitionValues=$request->getTuitionValues($updated_by);           
+        }else{
+            $values['discount_id'] = 0;
+        } 
+
+        $signup=new Signup($values);
+        
+        if($signup->discount_id){
+            $discount=$this->discounts->countTuition($course,$discount_id);
+            if($discount->tuition!=$signup->tuition){  
+                return $this->requestError('signup.tuition','課程費用錯誤');                
+            }
+
+            $signup->discount=$discount->name;
+            $signup->points=$discount->points;
+        }
+
+        $signup=$this->signupService->storeNewUserSignup($course,$user,$profile,$signup);
+
+        //event(new SignupCreated($signup));
+
+        return response()->json($signup);
+
+
+
+
+        dd('done');
+
+
+        $course_id=$values['course_id'];
+        $course=$this->courses->findOrFail($course_id);
+
+        
+        
+        // if(!$course->canSignup()){
+        //     $errMsg= ['此課程目前無法報名'] ;
+        //     return   response()->json(['signup.course_id' => $errMsg ]  ,  422);
+        // }
+
+        $discount=null;
+        $discount_id=(int)$values['discount_id'];
+        if($discount_id > 0){
+            $discount=$this->discounts->findOrFail($discount_id);
+        
+        }
+
+        $userValues=$request->getUserValues($updated_by);
+        $profileValues=$request->getProfileValues($updated_by);
+        $userValues['name']=$profileValues['fullname'];
+
+        $user=$this->users->store($userValues, $profileValues);
+
+        $signup=new Signup($values);
+        // if($discount_id){
+        //     $discount=$this->discounts->countTuition($course,$discount_id);
+           
+        //     if($discount->tuition!=$values['tuition']){                    
+               
+        //         return $this->requestError('signup.tuition','課程費用錯誤');
+               
+        //     }
+            
+        //     $signup->discount=$discount->name;
+        //     $signup->points=$discount->points;    
+
+        // }
+
+        $user->signups()->save($signup);
+        
+        if($isPay){
+            $tuition=new Tuition($tuitionValues);
+            $tuition->date=$signup->date;
+            $signup->tuitions()->save($tuition);
+            
+        }
+        
+        
+        
+
+        return response()->json($signup);
 
          
          // dispatch(new SendEmailConfirmationMail($user));
@@ -117,46 +216,29 @@ class NewUserSignupsController extends BaseController
          
             
     }
+
     
-    private function check($course, $user, $discount)
-    {
-        if($course){
-            if(!$course->canSignup()){
-              return   '此課程目前無法報名' ;
-            }
-        }
+    
+   
+    
+    // private function  getCourseOptions($course)
+    // {
+    //      $courseOptions=[];
          
-        if($discount){
-               if(!$discount->active){
-                return   '折扣已過期' ;
-            }
-        }
-
-        return '';
-    }
-    private function getDiscountOptions()
-    {
-        $activeDiscounts=$this->discounts->activeDiscounts()->get();
-        return $this->discounts->optionsConverting($activeDiscounts);
-    }
-    private function  getCourseOptions($course)
-    {
-         $courseOptions=[];
-         
-         if($course){
-             $item=$course->toOption();
-             array_push($courseOptions,  $item);
-         }else
-         {
-             $courseList=$this->courses->canSignupCourses();
-             if($courseList->count()){
-                 $courseOptions=$this->courses->optionsConverting($courseList->get());
-             }
+    //      if($course){
+    //          $item=$course->toOption();
+    //          array_push($courseOptions,  $item);
+    //      }else
+    //      {
+    //          $courseList=$this->courses->canSignupCourses();
+    //          if($courseList->count()){
+    //              $courseOptions=$this->courses->optionsConverting($courseList->get());
+    //          }
             
-         }
+    //      }
 
-         return $courseOptions;
-    }
+    //      return $courseOptions;
+    // }
    
     
 }

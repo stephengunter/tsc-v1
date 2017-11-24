@@ -36,40 +36,45 @@ export default {
 	watch: {
 		date(){
 			this.init()
+		},
+		course_id(){
+			
+			this.init()
 		}
 	},
    methods: {
       init() {
+			
          this.fetchData() 
       },
       fetchData(){
-			let getData=Discount.options(this.course_id,this.date)
-							
-			getData.then(data => {
-					let options=data.options
-					
-					let noDiscount={ text:'無' , value:'0' }
-					options.splice(0, 0, noDiscount)
-					this.discountOptions=options
+         let getData=Discount.options(this.course_id,this.date)
+                
+         getData.then(data => {
+            let options=data.options
+            
+            let noDiscount={ text:'無' , value:'0' }
+            options.splice(0, 0, noDiscount)
+            this.discountOptions=options
 
-					this.countTuition(this.discount_id)
-			})
-			.catch(error=> {
-					Helper.BusEmitError(error)                        
-			})
+            this.countTuition(this.discount_id)
+        })
+        .catch(error=> {
+            Helper.BusEmitError(error)                        
+        })
       },
       countTuition(val) {
-			this.selected=val
-			
-			let action=Discount.countTuition(this.course_id,val,this.date)
-						
-			action.then(data => {
+         this.selected=val
+        
+         let action=Discount.countTuition(this.course_id,val,this.date)
+              
+         action.then(data => {
 				this.tuition=data.tuition
 				
 				this.$emit('selected',data)
 			})
 			.catch(error=> {
-				Helper.BusEmitError(error)                        
+				  Helper.BusEmitError(error)                        
 			})
       },  
    }

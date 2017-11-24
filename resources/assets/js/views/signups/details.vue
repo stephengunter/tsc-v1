@@ -85,7 +85,7 @@
             },
             can_edit:{
                type: Boolean,
-               default: true
+               default: false
             },
             can_back:{
                type: Boolean,

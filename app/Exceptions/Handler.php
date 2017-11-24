@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use App\Exceptions\EmailUnconfirmed;
+use App\Exceptions\RequestError;
 
 class Handler extends ExceptionHandler
 {
@@ -49,6 +50,10 @@ class Handler extends ExceptionHandler
              return $this->emailUnconfirmed($request, $exception);
         } 
 
+        if ($exception instanceof RequestError) {
+            return $this->requestError($request, $exception);
+        } 
+
         return parent::render($request, $exception);
     }
 
@@ -76,6 +81,14 @@ class Handler extends ExceptionHandler
            
         }
         return redirect()->route('email-unconfirmed', ['email' => $e->email]);
+        
+    }
+    protected function requestError($request, RequestError $e)
+    {
+        $err=$e->getError();
+        $key=$err['key'];
+        $msg=$err['value'];
+        return response()->json([ $key =>  [$msg] ]  ,  422);
         
     }
 }

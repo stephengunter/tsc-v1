@@ -22,12 +22,12 @@
     import Show from '../../components/signup/show.vue'
     import Edit from '../../components/signup/edit.vue'
 
-
     export default {
         name:'Signup',
         components: {
             Show,
-            Edit,
+            Edit
+            
         },
         props: {
             id: {

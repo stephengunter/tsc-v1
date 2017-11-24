@@ -63,6 +63,14 @@ class BaseController extends Controller
     {
          throw new AuthenticationException();
     }
+
+    protected function requestError($key,$msg)
+    {
+        return   response()->json([ $key =>  [$msg] ]  ,  422);
+       
+    }
+
+
     protected function menus($key)
     {
         $current=Route::current()->uri();

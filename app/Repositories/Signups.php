@@ -21,6 +21,11 @@ class Signups
         return Signup::findOrFail($id);
        
     }
+
+    public function getByCourseId($course_id)
+    {
+        return $this->getAll()->where('course_id',$course_id);
+    }
    
     public function statusOptions()
     {
@@ -256,7 +261,7 @@ class Signups
          $signup->update($values);
      }
 
-     public function getByUser($user_id)
+     public function getByUserId($user_id)
      {
         return $this->getAll()->where('user_id', $user_id);
      }

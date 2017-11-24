@@ -9,9 +9,9 @@
       @saved="onCreated" @canceled="onCreateCanceled">
     </create>
 
-    <edit v-if="mode=='edit'"  :id="selected" 
+    <!-- <edit v-if="mode=='edit'"  :id="selected" 
       @saved="onUpdated" @canceled="onEditCanceled">
-    </edit>
+    </edit> -->
 </div>    
 </template>
 
@@ -19,14 +19,14 @@
 <script>
     import List from '../../components/signup/list.vue'
     import Create from '../../components/signup/create.vue'
-    import Edit from '../../components/signup/edit.vue'
+    // import Edit from '../../components/signup/edit.vue'
 
     export default {
         name: 'SignupView',
         components: {
             List,
             Create,
-            Edit
+            // Edit
         },
         props: {
             course_id: {

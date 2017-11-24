@@ -23,7 +23,7 @@
                                 <date-picker :option="datePickerOption" :date="date" ></date-picker>
                             </div>
                             <input type="hidden" name="signup.date" class="form-control" v-model="form.signup.date"  >
-                            <small v-if="form.errors.has('user.profile.fullname')" v-text="form.errors.get('user.profile.fullname')" class="text-danger"></small>
+                            <small v-if="form.errors.has('signup.date')" v-text="form.errors.get('signup.date')" class="text-danger"></small>
                         </div>  
                    </div>
                    <div class="col-sm-9">
@@ -160,44 +160,11 @@
                    
                    </div> 
                 </div> 
-                <div v-if="isPay" class="row">
-                   <div class="col-sm-12">
-                        <div class="form-group"> 
-                            <label>折扣優惠</label>
-                            <discounts-selector :course_id="course_id" :discount_id="form.signup.discount_id"
-                              :date="form.signup.date" @selected="onDiscountSelected">
-                            </discounts-selector>
-                          
-                        </div>  
-                   </div>
-                   
-                </div>  
-                <div v-if="isPay" class="row">
-                    <div  class="col-sm-3">
-                        <div class="form-group"> 
-                            <label>學費</label>
-                            <input disabled type="text" name="signup.tuition" class="form-control" v-model="form.signup.tuition" @keydown="clearErrorMsg('signup.tuition')"  >
-                            <small class="text-danger" v-if="form.errors.has('signup.tuition')" v-text="form.errors.get('signup.tuition')"></small>
-                        </div>  
-                    </div>
-                    <div  class="col-sm-3">    
-                        <div class="form-group"> 
-                            <label>材料費</label>
-                            <input disabled type="text" name="signup.cost" class="form-control" v-model="form.signup.cost" @keydown="clearErrorMsg('signup.cost')"  >
-                            <small class="text-danger" v-if="form.errors.has('signup.cost')" v-text="form.errors.get('signup.cost')"></small>
-                        </div> 
-                    </div>
-                    <div  class="col-sm-3">    
-                        <div class="form-group"> 
-                            <label>合計應繳</label>
-                            <input disabled type="text" :value="total" name="signup.cost" class="form-control"  >
-                            
-                        </div> 
-                    </div>
-                </div>  
-                <tuition-inputs v-if="isPay" :form="form" :payways="payways">
-
-                </tuition-inputs>
+                
+                <pay-inputs  v-if="isPay"  :form="form" :payways="payways"
+                   @discount-selected="onDiscountSelected" @clear-error="clearErrorMsg">
+                </pay-inputs>
+               
                 <div class="row" >
                     <div  class="col-sm-6">
                         <button type="submit"  class="btn btn-success" :disabled="!canSubmit">確定</button>
@@ -215,14 +182,12 @@
 </template>
 <script>
     import SubCourseSelector from '../../components/course/sub/selector.vue'
-    import DiscountSelector from './discounts-selector.vue'
-    import TuitionInputs from '../../components/tuition/inputs.vue'
+    import PayInputs from './pay-inputs.vue'
     export default {
         name: 'CreateSignup',
         components: {
             'sub-course-selector':SubCourseSelector,
-            'discounts-selector':DiscountSelector,
-            'tuition-inputs':TuitionInputs
+            'pay-inputs':PayInputs
         },
         props: {
             course_id:{
@@ -263,7 +228,8 @@
                
                 form: new Form({
                    signup:{},
-                   tuition:{}
+                   tuition:{},
+                   pay:0
                 }),
 
                 userOptions:[],
@@ -309,9 +275,7 @@
             isPay(){
                 return Helper.isTrue(this.pay)
             },
-            total(){
-                return Number(this.form.signup.tuition) + Number(this.form.signup.cost)
-            }
+            
         },
         watch: {
             selectedUser: function () {
@@ -357,7 +321,8 @@
 
                     this.form=new Form({
                         signup:signup,
-                        tuition:data.tuition
+                        tuition:data.tuition,
+                        pay:0
                     })
 
                     if(data.course){
@@ -486,13 +451,14 @@
                 this.form.errors.clear(name)
             },
             submitForm() {
-
+                this.form.pay=this.pay
+                
                 let store=Signup.store(this.form)
                 
                 store.then(data => {
 
                     Helper.BusEmitOK()
-                    this.$emit('saved',data)                            
+                    //this.$emit('saved',data)                            
                 })
                 .catch(error => {
                     Helper.BusEmitError(error) 

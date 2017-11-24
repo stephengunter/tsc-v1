@@ -1,43 +1,25 @@
 <template>
     <div>
-         <!-- <button @click="beginEditPhoto(1)">upload</button>
-         <button @click="beginEditPhoto(0)">remove</button> -->
-        
-         <teacher-list v-if="ready" :no_page="listSettings.no_page" 
-            :can_edit_number="listSettings.canEditNumber"  :search_params="params"  
-            :hide_create="listSettings.hide_create" :version="listSettings.version"  
-            :can_select="listSettings.can_select"
-            @details="OnDetails"
-            @data-loaded="onTeachersLoaded"
-            @selected="onSelected" @begin-create="onBeginCreate"
-            @group-selected="onGroupSelected">
-        </teacher-list>
+        <new-user-signup>
+           
+        </new-user-signup>
         
     </div>
 </template>
 
 <script>
-    import TeacherList from '../components/teacher/list.vue'
+    import CreateSignup from '../components/signup/create.vue'
+   
     export default {
         name:'Test',
         components: {
-           'teacher-list' :TeacherList
+           'create-signup':CreateSignup
         },
         data() {
             return {
                 ready:true,
-                params:{
-                   
-                    center:0,
-                   
-                },
-                listSettings:{
-                    no_page:true,
-                    canEditNumber:true,
-                    can_select:false,
-                    hide_create:false,
-                    version:0
-                }
+                course_id:31,
+                user_id:0,
                 
                 
             }

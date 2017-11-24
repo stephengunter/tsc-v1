@@ -82,6 +82,7 @@ class Signup extends Model
 
     public function canViewBy($user)
 	{
+        if($user->isDev()) return true;
 		if($user->id==$this->user_id) return true;
         if($user->isAdmin()){
            return true;

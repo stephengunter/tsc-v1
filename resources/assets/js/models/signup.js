@@ -323,6 +323,10 @@ class Signup {
         return `<span class="${style}" > ${text} </span>`
     }
 
+    payed(){
+        return parseInt(this.status)==1
+    }
+
 
 
 

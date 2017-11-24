@@ -23,7 +23,7 @@ class Discounts
          
     }
 
-    public function getValidDiscounts(Course $course,$date=null)
+    public function getValidDiscounts(Course $course,Carbon $date=null)
     {
         //該中心折扣
         $activeDiscounts=$this->activeDiscounts($course->center_id);

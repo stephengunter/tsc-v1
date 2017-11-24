@@ -59,8 +59,10 @@
                        <div class="form-group">                          
                             <label>報名課程</label>
 
-                            <combination-select   @ready="onCombinationReady">                           
+                            <combination-select  :search_params="search_params"
+                               @ready="onCombinationReady">                           
                             </combination-select>
+                            
 
                             <input type="hidden" name="signup.course_id" class="form-control" v-model="form.signup.course_id"  >
                             <small v-if="form.errors.has('signup.course_id')" v-text="form.errors.get('signup.course_id')" class="text-danger" >身分證號</small>
@@ -76,20 +78,13 @@
                         </div>  
                    </div>
                 </div>
-                <div v-if="isPay" class="row">
-                   <div class="col-sm-12">
-                        <div class="form-group"> 
-                            <label>折扣優惠</label>
-                            <discounts-selector :course_id="form.signup.course_id" :discount_id="form.signup.discount_id">
-                            </discounts-selector>
-                          
-                        </div>  
-                   </div>
-                   
-               </div>  
+                <pay-inputs  v-if="isPay"  :form="form" :payways="payways"
+                   @discount-selected="onDiscountSelected" @clear-error="clearErrorMsg">
+                </pay-inputs>
+               
                 <div class="row" v-show="user_checked">
                     <div class="col-sm-6">
-                        <button type="submit"  class="btn btn-success" :disabled="form.errors.any()">確認送出</button>
+                        <button type="submit"  class="btn btn-success" :disabled="!hasCourse">確認送出</button>
                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                       <button class="btn btn-default" @click.prevent="canceled">取消</button>
                     </div>
@@ -123,13 +118,13 @@
 <script>
     import UserChecker from '../../components/user/checker.vue'
     import UserSelector from '../../components/user/selector.vue'
-    import DiscountSelector from '../../components/signup/discounts-selector.vue'
+    import PayInputs from '../../components/signup/pay-inputs.vue'
     export default {
         name: 'NewUserSignup',
         components: {
             'user-checker':UserChecker,
             'user-selector':UserSelector,
-            'discounts-selector':DiscountSelector
+            'pay-inputs':PayInputs
         },
         props: {
             user_valid:{
@@ -148,11 +143,21 @@
                           fullname:'',
                        }
                     },
-                    signup:{}
+                    signup:{},
+                    tuition:{},
+                    pay:0
                 }),
                 formSubmitting:false,
                 user_checked: false,
                 loaded:false,
+
+                search_params:{
+                    term:0,
+                    center:0,
+                    parent:0,
+                    sub:0,
+                    reviewed:1
+                },
 
                 pay:0,
                 boolOptions:Helper.boolOptions(),
@@ -228,7 +233,8 @@
                     },
                     signup:{
                        date:{}
-                    }
+                    },
+
                 })
                 this.formSubmitting=false
                 this.user_checked= false
@@ -256,8 +262,17 @@
             fetchData(){
                 let create=Signup.newUserCreate()
                 create.then(data=>{
-                     this.form.user=data.user
-                     this.form.signup=data.signup
+                    
+                    let signup=data.signup
+                    signup.cost=Helper.formatMoney(signup.cost,true)
+
+                    this.form=new Form({
+                        user:data.user,
+                        signup:signup,
+                        tuition:data.tuition,
+                        pay:0
+                    })
+                    this.payways=data.payways
                     
                 }).catch(error =>{
                      Helper.BusEmitError(error)
@@ -309,19 +324,21 @@
                 this.form.signup.course_id=val
                 this.clearErrorMsg('signup.course_id')
             },
-            setDiscount(val) {
-                this.form.signup.discount_id = val;
+            onDiscountSelected(discount){
+                this.form.signup.discount_id=discount.id
+                this.form.signup.tuition=Helper.formatMoney(discount.tuition,true)                
             },
+           
             onSubmit() {
                 this.formSubmitting=true
                 this.userCheckerSettings.status+=1
             },
             submitForm() {
-
+                this.form.pay=this.pay
                 let store=Signup.newUserStore(this.form)
                     .then(data => {
                        Helper.BusEmitOK()
-                       this.$emit('saved',data)                            
+                       //this.$emit('saved',data)                            
                     })
                     .catch(error => {
                         if(error.status==422){
