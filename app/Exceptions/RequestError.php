@@ -6,14 +6,25 @@ use Exception;
 
 class RequestError extends Exception
 {
-   public function __construct(array $err)
+   public function __construct( $key , $value)
    {
-        $this->err = $err;
+        $this->err = [
+           'key'=> $key,
+           'value' => $value
+        ];
    }
 
    public function getError()
    {
       return $this->err;
+   }
+   public function getErrorKey()
+   {
+      return $this->err['key'];
+   }
+   public function getErrorMsg()
+   {
+      return $this->err['value'];
    }
     
 }

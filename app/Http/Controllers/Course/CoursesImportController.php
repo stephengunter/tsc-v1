@@ -6,10 +6,10 @@ use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
 use App\Course;
+use App\Term;
+use App\Center;
 
-use App\Repositories\Courses;
-use App\Repositories\Centers;
-use App\Repositories\Terms;
+use App\Services\Course\CourseService;
 
 use Illuminate\Support\Facades\Input;
 
@@ -18,31 +18,32 @@ class CoursesImportController extends BaseController
  {
     protected $key='courses';
 
-    public function __construct(Courses $courses,Centers $centers,Terms $terms)                               
+    public function __construct(CourseService $courseService)                               
     {
         
-        $this->courses=$courses;
-        $this->centers=$centers;  
-        $this->terms=$terms; 
-	}
+        $this->courseService=$courseService;
+    }
+    
 	public function index()
     {
-        $menus=$this->menus($this->key);  
 
-        $from=request()->get('from');       
-        if(!$from) $from='';
+        $menus=$this->menus($this->key); 
+        return view('courses.import')->with([ 'menus' => $menus  ]);  
 
-        if(strtolower($from)=='excel'){
-            return view('courses.import')->with([ 'menus' => $menus  ]); 
-        }else{
-            $termOptions=$this->terms->options();
-            $centerOptions=$this->centers->optionsConverting($this->canAdminCenters());
-            return view('courses.copy')->with([ 
-                'menus' => $menus ,
-                'termOptions' => $termOptions,
-                'centerOptions' => $centerOptions
-            ]); 
-        }
+        // $from=request()->get('from');       
+        // if(!$from) $from='';
+
+        // if(strtolower($from)=='excel'){
+        //     return view('courses.import')->with([ 'menus' => $menus  ]); 
+        // }else{
+        //     $termOptions=$this->courseService->termOptions();
+        //     $centerOptions=$this->courseService->centerOptions($this->canAdminCenters());
+        //     return view('courses.copy')->with([ 
+        //         'menus' => $menus ,
+        //         'termOptions' => $termOptions,
+        //         'centerOptions' => $centerOptions
+        //     ]); 
+        // }
     
     }
 
@@ -62,71 +63,60 @@ class CoursesImportController extends BaseController
                             ]  ,  422);      
         }
 
-        $group=(int)$form['group'];
+       
         $isUpdate=(int)$form['update'];
         $file=Input::file('courses_file'); 
 
         $err_msg='';
-        if($isUpdate){
-            $err_msg=$this->courses->importCourseInfoes($file,$current_user);
-        }else{
-            if($group){
-                $err_msg=$this->courses->importGroupCourses($file,$current_user);
-            }else{
-              
-                $err_msg=$this->courses->importCourses($file,$current_user);
-            }  
-        }
+        if($isUpdate) $err_msg=$this->courseService->importCourseInfoes($file,$current_user);
+        else   $err_msg=$this->courseService->importCourses($file,$current_user);
         
 
-        if($err_msg) {
-             return response()->json(['error' => $err_msg,'code' => 422 ], 422);
-         
-        }
+        if($err_msg)   return response()->json(['error' => $err_msg,'code' => 422 ], 422);
 
         return response()->json(['success' => true]);
 
        
     }
 
-    public function copy(Request $request)
-    {
-        $current_user=$this->currentUser();
-        $updated_by=$current_user->id;
-        $values=$request->get('copy');
+    // public function copy(Request $request)
+    // {
+    //     $current_user=$this->currentUser();
+    //     $updated_by=$current_user->id;
+    //     $values=$request->get('copy');
         
-        $term_id=$values['term'];
-        $center_id=$values['center'];
-        $course_ids=$values['course_ids'];
+    //     $term_id=$values['term'];
+    //     $center_id=$values['center'];
+    //     $course_ids=$values['course_ids'];
 
-        $selected_courses=Course::whereIn('id',$course_ids)->get();
+    //     $selected_courses=Course::whereIn('id',$course_ids)->get();
 
-        foreach ($selected_courses as $old_course) {
+    //     foreach ($selected_courses as $old_course) {
 
-            $new_course=$this->courses->copyCourse($old_course,$term_id, $center_id,$updated_by); 
+    //         $new_course=$this->courses->copyCourse($old_course,$term_id, $center_id,$updated_by); 
 
-            if($old_course->groupAndParent()){
+    //         if($old_course->groupAndParent()){
 
-                $this->copySubCourses($old_course , $new_course,$updated_by);
+    //             $this->copySubCourses($old_course , $new_course,$updated_by);
            
-            }
+    //         }
                                             
-        }
+    //     }
         
-        return response()->json(['saved' => true ]); 
+    //     return response()->json(['saved' => true ]); 
 
        
-    }
+    // }
 
-    private function copySubCourses($old_course , $new_course,$updated_by)
-    {
-        $subCourses = $this->courses->subCourses($old_course->id)->get();
+    // private function copySubCourses($old_course , $new_course,$updated_by)
+    // {
+    //     $subCourses = $this->courses->subCourses($old_course->id)->get();
         
-        foreach ($subCourses as $sub_course){
-            $parent=$new_course->id;
-            $this->courses->copyCourse($sub_course,$new_course->term_id, $new_course->center_id,$updated_by,$parent); 
-        }
-    }
+    //     foreach ($subCourses as $sub_course){
+    //         $parent=$new_course->id;
+    //         $this->courses->copyCourse($sub_course,$new_course->term_id, $new_course->center_id,$updated_by,$parent); 
+    //     }
+    // }
 
 	
 }

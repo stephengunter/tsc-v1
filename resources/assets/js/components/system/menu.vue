@@ -72,6 +72,9 @@
                     case 'courses':
                         html += ' 課程管理'
                          break
+                    case 'credit_courses':
+                        html += ' 學分班課程管理'
+                         break     
                     case 'students':
                         html += ' 學員管理'
                         break

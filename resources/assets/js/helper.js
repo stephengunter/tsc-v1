@@ -1,3 +1,4 @@
+
 class Helper {
     static getScrollBarWidth() {
         return CommonService.getScrollBarWidth()
@@ -32,6 +33,10 @@ class Helper {
     static boolText(val) {
         if (this.isTrue(val)) return '是'
         return '否'
+    }
+    static canOrCannotText(val) {
+        if (this.isTrue(val)) return '可以'
+        return '不行'
     }
     static getOptions(list, valueKey, textKey) {
         let options = []
@@ -71,6 +76,9 @@ class Helper {
             case 'courses':
                 html = '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>'
                 break;
+            case 'credit_courses':
+            html = '<i class="fa fa-graduation-cap" aria-hidden="true"></i>'
+            break;
             case 'lessons':
                 html = '<i class="fa fa-calendar-check-o" aria-hidden="true"></i>'
                 break;
@@ -336,14 +344,7 @@ class Helper {
         return hasMatch
     }
     static buildQuery(url, searchParams) {
-        url += '?'
-        for (let field in searchParams) {
-
-            let value = searchParams[field]
-            url += field + '=' + value + '&'
-
-        }
-        return url.substr(0, url.length - 1);
+        return UrlService.buildQuery(url, searchParams)
 
     }
     static removeItem(list, item) {

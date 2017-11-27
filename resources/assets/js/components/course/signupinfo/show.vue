@@ -20,19 +20,7 @@
         <div class="panel-body" >
            
             <div class="row">
-                <div v-if="false" class="col-sm-3">
-                    <label class="label-title">報名起始日</label>
-                    <p v-text="signupinfo.open_date"></p>  
-                    
-                </div>
-                <div class="col-sm-3">
-                    <label class="label-title">報名截止日</label>
-                    <p>
-                        {{ signupinfo.close_date }}
-
-                    </p>  
-                    
-                </div>
+                
                 <div class="col-sm-3">
                                             
                     <label class="label-title">人數上限</label>
@@ -44,12 +32,20 @@
                     <p v-text="signupinfo.min"></p>  
                 </div>
                 <div class="col-sm-3">
-                        <label class="label-title">網路報名</label>
+                    <label class="label-title">網路報名</label>
                     <p>
-                        {{ signupinfo.net_signup | boolText  }}
-                        <span v-html="$options.filters.yesOrNoSign(signupinfo.net_signup)"></span>
-                        
-                    </p>
+                         {{ signupinfo.canNetSignup }}
+                        <span v-html="$options.filters.yesOrNoSign(signupinfo.discount)"></span>    
+                    </p>  
+                </div>
+                <div class="col-sm-3">
+                                            
+                    <label class="label-title">折扣優惠</label>
+                    <p>
+                         {{ signupinfo.canDiscount }}
+                        <span v-html="$options.filters.yesOrNoSign(signupinfo.discount)"></span>    
+                    </p>  
+                    
                 </div>
             </div>
             <div class="row">
@@ -59,29 +55,27 @@
                     <p v-text="signupinfo.tuition"></p>  
                     
                 </div>
-                 <div class="col-sm-3">
-                                            
-                    <label class="label-title">折扣優惠</label>
-                    <p>
-                         {{ signupinfo.canDiscount }}
-                        <span v-html="$options.filters.yesOrNoSign(signupinfo.discount)"></span>    
-                    </p>  
-                    
-                </div>
+                 
                 <div class="col-sm-3">
                                         
                     <label class="label-title">教材費</label>
                     <p v-text="signupinfo.cost"></p>  
                     
                 </div>
-                
+                <div class="col-sm-6">
+                                        
+                     <label class="label-title">教材</label>
+                    <p v-html="signupinfo.materials"></p>  
+                    
+                </div>
                 
             </div>
+           
             <div class="row">
                 <div class="col-sm-12">
                                             
-                    <label class="label-title">教材</label>
-                    <p v-html="signupinfo.materials"></p>  
+                    <label class="label-title">注意事項</label>
+                    <p v-html="signupinfo.caution"></p>  
                     
                 </div>
             </div>    

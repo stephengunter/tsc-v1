@@ -6,9 +6,7 @@
             <span class="panel-title">
                  <h4 v-html="title"></h4>  
             </span>   
-            <!-- <button  v-if="!id" @click.prevent="onImportClicked"  class="btn btn-warning btn-sm" >
-                 <span class="glyphicon glyphicon-import" aria-hidden="true"></span> 從舊課程匯入
-            </button>      -->
+           
         </div>
         <div class="panel-body">
             <form v-if="loaded" class="form" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
@@ -61,36 +59,7 @@
                                 
                             </div>    
                         </div>  <!-- End Row   --> 
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">                           
-                                    <label>群組課程</label>
-                                    <div>
-                                        <input type="hidden" v-model="form.course.group"  >
-                                        <toggle :items="groupOptions"   :default_val="form.course.group" @selected="setGroup"></toggle>
-                                    </div>
-                                </div>
-                            </div>  
-                            <div class="col-sm-4">
-                                <div class="form-group">                           
-                                    <label>父課程</label>
-                                    <select :disabled="!isGroup" @change="onParentChanged" v-model="form.course.parent"  name="course.parent" class="form-control" >
-                                        <option  v-for="(item,index) in parentOptions" :key="index" :value="item.value" v-text="item.text"></option>
-                                    </select>
-                                </div>
-                                                        
-                            </div> 
-                            <div class="col-sm-4">
-                                <div class="form-group">                           
-                                    <label>學分班</label>
-                                    <div>
-                                        <input type="hidden" v-model="form.course.isCredit"  >
-                                        <toggle :items="groupOptions"   :default_val="form.course.isCredit" @selected="setCreditCourse"></toggle>
-                                    </div>
-                                </div>
-                                
-                            </div>    
-                        </div>  <!-- End Row   --> 
+                        
                         <div class="row">
                             <div v-if="!isCreate" class="col-sm-4">
                                  <div class="form-group">  
@@ -121,36 +90,7 @@
                                 
                             </div>    
                         </div>  <!-- End Row   --> 
-                        <div v-show="isCreditCourse" class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">   
-                                    <label>學分數</label>
-                                    <select @change="onCreditCountChanged"  v-model="form.course.credit_count"  name="course.credit_count" class="form-control" >
-                                        <option v-for="(item,index) in creditCountOptions" :key="index" :value="item.value" v-text="item.text"></option>
-                                    </select>
-                                    <small class="text-danger" v-if="form.errors.has('course.credit_count')" v-text="form.errors.get('course.credit_count')"></small>
-                                </div>
-                            </div>  
-                            <div class="col-sm-4">
-                                <div  class="form-group">                           
-                                    <label>必修</label>
-                                    <div>
-                                        <input type="hidden" v-model="form.course.must"  >
-                                        <toggle :items="mustOptions"   :default_val="form.course.must" @selected="setMust"></toggle>
-                                    </div>
-                                </div>
-                                                        
-                            </div> 
-                            <div class="col-sm-4">
-                                <div class="form-group"> 
-                                    <label>學分單價</label>
-                                    <div>
-                                        <input type="text" name="course.credit_price" class="form-control" v-model="form.course.credit_price">
-                                        <small class="text-danger" v-if="form.errors.has('course.credit_price')" v-text="form.errors.get('course.credit_price')"></small>
-                                    </div>
-                                </div>
-                            </div>    
-                        </div>    
+                          
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">  
@@ -200,38 +140,8 @@
                             </div> 
                             
                         </div>      <!-- End Row   --> 
-                        <!-- <div v-if="!isCreate" v-show="form.course.canReview" class="row">
-                            <div class="col-sm-4">
-                                <div  class="form-group">  
-                                    <label>狀態</label>
-                                    <div>
-                                        <input type="hidden" v-model="form.course.active"  >
-                                        <toggle :items="activeOptions"   :default_val="form.course.active" @selected="setActive"></toggle>
-                                    </div>
-                                </div>
-                            </div> 
-                            <div class="col-sm-4">
-                                <div class="form-group">  
-                                    <label>審核</label>
-                                    <div>
-                                        <input type="hidden" v-model="form.course.reviewed"  >
-                                        <toggle :items="reviewedOptions"   :default_val="form.course.reviewed" @selected="setReviewed"></toggle>
-                                    </div>
-                                </div>
-                            </div> 
-                            
-                        </div>      -->
-                        <div  class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">  
-                                    <label>注意事項</label>
-                                    <textarea rows="4" cols="50" class="form-control" name="course.caution"  v-model="form.course.caution">
-                                    </textarea>
-                                    <small class="text-danger" v-if="form.errors.has('course.caution')" v-text="form.errors.get('course.descripcautiontion')"></small>
-                                </div> 
-                               
-                            </div>
-                        </div> 
+                        
+                      
                         <div  class="row">
                             <div class="col-sm-4">
                                 <button type="submit" class="btn btn-success" :disabled="form.errors.any()">確認送出</button>
@@ -275,10 +185,7 @@
               type: Number,
               default: 0
             },
-            parent: {
-              type: Number,
-              default: 0
-            },
+           
         },
        
         data() {
@@ -291,10 +198,7 @@
                    course:{}
                 }),
 
-                parentCourse:null,
-                groupCourses:[],
-                groupOptions: Helper.boolOptions(),
-                mustOptions: Helper.boolOptions(),
+               
 
                 datePickerOption:Helper.datetimePickerOption(),
                 begin_date: {
@@ -303,17 +207,19 @@
                 end_date: {
                     time: ''
                 },
-                
-                categories:[],
-                teachers:[],
+                weeksOptions:Course.weeksOptions(),
                
+                termOptions:[],
                 centerOptions:[],
                 categoryOptions: [],
-                parentOptions:[],
-                teacherOptions:[],   
-                termOptions:[],
-                creditCountOptions:Helper.numberOptions(0,60),
-                weeksOptions:Course.weeksOptions(),
+              
+                teacherOptions:[],  
+
+                categories:[],
+                teachers:[], 
+               
+               
+                // weeksOptions:Course.weeksOptions(),
                 activeOptions:[{
                     text: '正常開課',
                     value: '1'
@@ -321,7 +227,7 @@
                     text: '停止開課',
                     value: '0'
                 }],
-                reviewedOptions:Helper.reviewedOptions(),
+                
 
                 photo_id: 0,
                 imageUpload:{
@@ -370,21 +276,6 @@
             isCreate(){
                 return !Helper.isTrue(this.id) 
             },
-            isCreditCourse(){
-                return Helper.isTrue(this.form.course.isCredit)  
-            },
-            isGroup(){
-                return Helper.isTrue(this.form.course.group)  
-            },
-            hasParent(){
-                return Helper.isTrue(this.form.course.parent)
-            },
-            hideTeacher(){
-                return this.groupAndParent
-            },
-            groupAndParent(){
-                return this.isGroup && !this.hasParent
-            }
 
         }, 
         beforeMount() {
@@ -405,7 +296,7 @@
                         msg:''
                  }
 
-                this.parentCourse=null
+               
             },
             fetchData() {
                 let id=this.id
@@ -418,12 +309,12 @@
                 
                 getData.then(data=>{
                     let course = data.course
-                    course.caution = Helper.replaceAll(course.caution, '<br>', '\n')
+                    
                     this.form = new Form({
                             course: course,
                         })
                         
-                    this.setCreditPrice(course.credit_price)
+                   
 
 
                     this.begin_date.time=course.begin_date
@@ -432,18 +323,16 @@
                     this.categories=Helper.getOptions(course.categories, 'id', 'name')
                     this.teachers=Helper.getOptions(course.teachers, 'user_id', 'name')
 
+                    
+                    
+                    this.termOptions= data.termOptions
                     this.centerOptions=data.centerOptions
+                   
+
                     this.categoryOptions=data.categoryOptions
                     this.teacherOptions=data.teacherOptions
-                    this.termOptions= data.termOptions
 
-                    if(data.groupCourses){
-                        this.groupCourses=data.groupCourses
-                    }
-
-                    if(data.groupOptions){
-                        this.parentOptions=data.groupOptions
-                    }
+                   
 
                     this.photo_id =Helper.tryParseInt(course.photo_id)
 
@@ -459,7 +348,7 @@
             },
             onCenterChanged(){
                 this.loadTeacherOptions()
-                this.loadParentOptions()
+              
             },
             onTermChanged(){
                  this.loadParentOptions()
@@ -494,58 +383,11 @@
                 this.form.course.credit_price=Helper.formatMoney(val)
                
             },
-            setCreditCourse(val){
-                this.form.course.isCredit=val
-                this.clearErrorMsg('')
-            }, 
-            setGroup(val){
-                this.form.course.group=val
-             
-                if(Helper.isTrue(val)){
-                    this.loadParentOptions()                    
-                }
-
-                this.clearErrorMsg('')
-            },
-            setMust(val){
-                this.form.course.must = val
-            },
-            loadParentOptions(){
-                
-                if(!this.isGroup) return false
-                let center=this.form.course.center_id
-                let term=this.form.course.term_id
-                let params={ 
-                    center:center,
-                    term:term
-                }
-                let options=Course.groupOptions(params)
-                options.then(data => {
-                    this.parentOptions=data.options
-                    this.groupCourses=data.groupCourses
-                })
-                .catch(error=>{
-                       Helper.BusEmitError(error) 
-                    
-                })   
-            },
-            onParentChanged(){
-                if(!this.isCreate) return 
-
-                this.parentCourse=this.groupCourses.find(item=>{
-                    return item.id == this.form.course.parent
-                })
-
-                this.setCreditPrice()
-             
-            },
+            
             setActive(val) {
                 this.form.course.active = val
             },
-            setReviewed(val) {
-               
-                this.form.course.reviewed = val
-            },
+            
             clearErrorMsg(name) {
                 
                 if(name) this.form.errors.clear(name)
@@ -556,10 +398,7 @@
                 this.form.course.teachers=this.teachers
                 this.form.course.categories=this.categories
 
-                if(this.form.course.caution){
-                   let caution=Helper.replaceAll( this.form.course.caution, '\n','<br>')
-                   this.form.course.caution=caution
-                }
+                
                 this.submitForm()
             },
             submitForm() {
@@ -627,9 +466,7 @@
                     Helper.BusEmitError(error,title)                        
                 })
             },
-            onImportClicked(){
-                this.$emit('import')
-            }
+          
 
 
 

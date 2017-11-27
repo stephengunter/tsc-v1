@@ -30,6 +30,7 @@
                         <div v-if="course_id" class="form-group"> 
                            <label>報名課程</label>
                            <input class="form-control" type="text"  :value="courseName" disabled>
+                           <small v-if="form.errors.has('signup.course_id')" v-text="form.errors.get('signup.course_id')" class="text-danger" ></small>
                         </div>
                         <div v-else class="form-group"> 
                             <label>報名課程</label>
@@ -37,7 +38,7 @@
                               @ready="onCombinationReady">
                             </combination-select>
 
-                            <small v-if="form.errors.has('signup.course_id')" v-text="form.errors.get('signup.course_id')" class="text-danger" >身分證號</small>
+                            <small v-if="form.errors.has('signup.course_id')" v-text="form.errors.get('signup.course_id')" class="text-danger" ></small>
                         </div>  
                    </div>
                </div>
@@ -150,16 +151,7 @@
                    </div>
                 </div>
                
-                <div v-if="needSelect" class="row">
-                   <div class="col-sm-12" >
-                       <sub-course-selector :courses="subCourses"
-                        :show_submit="selectorSettings.show_submit" :version="selectorSettings.version"
-                         :default_selected="selectorSettings.default_selected"
-                         @submit-courses="onSubCourseSelected" >
-                       </sub-course-selector>
-                   
-                   </div> 
-                </div> 
+              
                 
                 <pay-inputs  v-if="isPay"  :form="form" :payways="payways"
                    @discount-selected="onDiscountSelected" @clear-error="clearErrorMsg">
@@ -168,7 +160,7 @@
                 <div class="row" >
                     <div  class="col-sm-6">
                         <button type="submit"  class="btn btn-success" :disabled="!canSubmit">確定</button>
-                        <small class="text-danger" v-if="subCourseError" >請選擇課程</small>
+                      
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <button class="btn btn-default" @click.prevent="canceled">取消</button>
                     </div>  
@@ -204,7 +196,7 @@
                 title:Helper.getIcon('Signups')  + '  新增報名表',
                 initialized:false,
 
-                subCourses:[],
+                
 
                 selectedUser:null,
                 user:null,
@@ -219,8 +211,7 @@
                 courseSearchParams:{
                     term:0,
                     center:0,
-                    parent:0,
-                    sub:0,
+                 
                     reviewed:1
                 },
                 
@@ -243,13 +234,7 @@
                 },
 
                
-                selectorSettings:{
-                   default_selected:[],
-                   show_submit:false,
-                   version:0,
-                },
-
-                subCourseError:false,
+               
 
                 pay:0,
                 payways:[],
@@ -268,9 +253,6 @@
                 if(!this.user) return false
 
                 return true
-            },
-            needSelect(){
-                return this.subCourses.length > 0  
             },
             isPay(){
                 return Helper.isTrue(this.pay)
@@ -308,15 +290,15 @@
 
             },
             fetchData() {
+                
                 let getData=Signup.create(this.course_id,this.user_id)
                      
                 getData.then(data => {
                     let signup=data.signup
                     signup.cost=Helper.formatMoney(signup.cost,true)
                    
-                    this.subCourses=data.subCourses
+                  
                     this.date.time=signup.date
-                    this.selectorSettings.default_selected=signup.sub_courses
                     
 
                     this.form=new Form({
@@ -399,15 +381,7 @@
                 this.form.signup.net_signup=val
             },     
             
-            onSubCourseSelected(selectedIds){
-                this.form.signup.sub_courses=selectedIds
-                if(selectedIds.length){
-                   this.subCourseError=false
-                   this.submitForm()
-                }else{
-                    this.subCourseError=true
-                }
-            },
+           
             onDiscountSelected(discount){
                 this.form.signup.discount_id=discount.id
                 this.form.signup.tuition=Helper.formatMoney(discount.tuition,true)
@@ -438,11 +412,7 @@
                   return false
                }
 
-               if(this.needSelect){
-                  this.selectorSettings.version +=1
-               }else{
-                  this.submitForm()
-               }
+                this.submitForm()
 
             
                 

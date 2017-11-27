@@ -1,7 +1,7 @@
 <template>
     <data-viewer v-if="ready"  :default_search="defaultSearch" :default_order="defaultOrder"
       :source="source" :search_params="search_params"  :thead="getThead()" :no_search="no_search"  
-      :filter="filter"  :title="title" :create_text="createText" 
+      :filter="filter"  :title="title" create_text="" 
       :show_header="show_header" :show_title="show_title"  :no_page="no_page" :editting="editting"
       :data_list="courseList" :version="current_version"  
       @refresh="init"  @beginCreate="beginCreate"
@@ -24,9 +24,9 @@
                 :details_link="details_link" :can_remove="can_remove"
                 :single_select="single_select" :multi_select="multi_select"
                 :been_selected="beenSelected(props.item.id)"  
-                :editting_number="edittingNumber"  :can_select_group="canSelectGroup" 
+                :editting_number="edittingNumber" 
                 @details="onDetails" @clear-error="onClearRowError"
-                @selected="onRowSelected" @group-selected="onGroupSelected"
+                @selected="onRowSelected" 
                 @checked ="onRowChecked" @unchecked="onRowUnChecked">
                 
             </row>
@@ -167,11 +167,6 @@
             edittingNumber(){
                 return this.editting=='number'
             },
-            canSelectGroup(){
-                if(!this.search_params) return true
-                if(!this.search_params.hasOwnProperty('parent')) return true
-                return parseInt(this.search_params.parent) > -1
-            }
         },
         methods: {
            
@@ -240,9 +235,7 @@
                     this.setCanEditNumber(false)
                 } 
 
-                if(data.parentCourse){
-                    courseList.splice(0,0,data.parentCourse)                   
-                }
+               
                 
                 this.courseList=courseList
 
@@ -283,9 +276,6 @@
 
                 return this.selected_ids.includes(id)
             },
-            onGroupSelected(id){
-                 this.$emit('group-selected',id)
-            },
             onEdit(key){
                 this.editting=key
             },
@@ -298,7 +288,7 @@
                 if(key=='number') this.submitUpdateNumbers()
             },
             onClearRowError(index,name){
-                //name=='number'
+               
                 this.courseList[index].numberError=''
             },
             submitUpdateNumbers(){

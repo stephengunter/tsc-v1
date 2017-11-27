@@ -114,28 +114,9 @@ class Centers
        
     }
 
-    public function optionsConverting($centerList,$empty_item=false)
+    public function optionsConverting($centers,$empty_item=false)
     {
-        if(Helper::isNullOrEmpty($centerList)) return [];
-        
-        $centerOptions=[];
-
-        if($empty_item){
-            $item=[ 'text' => '全部開課中心' , 
-                    'value' => 0 , 
-                  ];
-            array_push($centerOptions,  $item);
-        }
-
-        foreach($centerList as $center)
-        {
-            $item=[ 'text' => $center->name , 
-                     'value' => $center->id , 
-                 ];
-            array_push($centerOptions,  $item);
-        }
-
-        return $centerOptions;
+        return Center::optionsConverting($centers,$empty_item);
     }
     public function delete($id,$admin_id)
     {

@@ -70,18 +70,22 @@ class CourseStatus {
     static getSignupLabel(data){
         let label=''
         switch (Number(data.signup)) {
+            case -3 :
+            label = '<span class="label label-danger">報名已額滿</span>'
+            break
+            case -2 :
+            label = '<span class="label label-default">報名已截止</span>'
+            break
             case -1 :
-                label = '<span class="label label-default">未開始</span>'
+                label = '<span class="label label-default">報名尚未開始</span>'
             break
             case 0 :
-                label = '<span class="label label-danger">已停止</span>'
+                label = '<span class="label label-danger">報名已停止</span>'
             break
             case 1 :
-                label = '<span class="label label-success">進行中</span>'
+                label = '<span class="label label-success">報名進行中</span>'
             break
-            case 2 :
-                label = '<span class="label label-default">已截止</span>'
-            break
+           
 
         }
         return label

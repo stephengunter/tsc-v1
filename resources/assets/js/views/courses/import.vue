@@ -15,9 +15,7 @@
                 <div class="col-sm-4">
                     <toggle :items="isUpdateOptions"   :default_val="0" @selected="setIsUpdate"></toggle>
                 </div>
-                <div class="col-sm-4">
-                    <toggle v-show="isCreate" :items="groupOptions"   :default_val="0" @selected="onTypeSelected"></toggle>
-                </div>
+                
                 <div class="col-sm-4" >
                     <button v-if="loading" class="btn btn-default">
                          <i class="fa fa-spinner fa-spin"></i> 
@@ -59,20 +57,15 @@
                 
                 loading:false,
 
-                group:0,
+              
                 isUpdate:0,
+                credit:0,
 
                 files: [],
 
                 err_msg:'',
 
-                groupOptions:[{
-                    text: '一般課程',
-                    value: '0'
-                }, {
-                    text: '群組課程',
-                    value: '1'
-                }],
+                
 
                 isUpdateOptions:[{
                     text: '建立新課程',
@@ -80,16 +73,12 @@
                 }, {
                     text: '更新課程資料',
                     value: '1'
-                }]
-
-
+                }],
                
             }
         },
         computed:{
-            isGroup(){
-               return Helper.isTrue(this.group)
-            },
+            
             isCreate(){
                return !Helper.isTrue(this.isUpdate)
             },
@@ -99,12 +88,9 @@
             },
             downloadUrl(){
                 let url='/downloads?type=import&key='
-                if(this.isGroup) {
-                    return  url+'group-courses'
-                }else{
-                    if(this.isCreate)  return  url+'courses'
-                    else return  url+'course-infoes'
-                }
+
+                if(this.isCreate)  return  url+'courses'
+                else return  url+'course-infoes'
                 
             }
         
@@ -117,10 +103,6 @@
                 this.$refs.fileinput.value = null
                 this.err_msg=''
                 this.loading=false
-            },
-            
-            onTypeSelected(val){
-                this.group=val              
             },
             setIsUpdate(val){
                 this.isUpdate=val
@@ -141,7 +123,7 @@
                 let form = new FormData()
                 for (let i = 0; i < this.files.length; i++) {
                     form.append('courses_file', this.files[i])
-                    form.append('group', this.group)
+                   
                     form.append('update', this.isUpdate)
                 }
 
@@ -149,7 +131,7 @@
                 store.then(result => {
                         Helper.BusEmitOK()
                         this.loading=false
-                        this.$emit('imported',this.isGroup)                         
+                        //this.$emit('imported',this.isGroup)                         
                     })
                     .catch(error => {
                         

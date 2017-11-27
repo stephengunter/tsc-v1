@@ -43,7 +43,18 @@ class BaseController extends Controller
     protected function canAdminCenter($center)
     {   
         return $this->canAdminCenters()->contains($center);
-        
+    }
+    protected function canAdminCreditCourse()
+    {   
+        $canAdminCenters = $this->canAdminCenters();
+
+        $canAdminCenterCodes =array_map('strtolower', $canAdminCenters->pluck('code')->toArray());
+        $credit_center_codes=array_map('strtolower' , config('app.course.credit_centers'));
+
+        $intersect= array_intersect($canAdminCenterCodes,$credit_center_codes);
+       
+        if(count($intersect)) return true;
+        return false;
         
     }
     protected function defaultCenter()
@@ -187,7 +198,7 @@ class BaseController extends Controller
                
             );
         }
-        if($key =='courses'  || $key =='categories')
+        if($key =='courses')
         {
            return array(
                 [
@@ -207,24 +218,55 @@ class BaseController extends Controller
                     'text' => '匯入課程',
                     'path' => '/courses-import',
                     'active' => $current=='courses-import',
-                    'items' => array(
-                        [
-                            'text' => '從舊課程複製',
-                            'path' => '/courses-import',
-                        ],
-                        [
-                            'text' => 'Excel 匯入',
-                            'path' => '/courses-import?from=excel',
-                        ]
+                    // 'items' => array(
+                    //     [
+                    //         'text' => '從舊課程複製',
+                    //         'path' => '/courses-import',
+                    //     ],
+                    //     [
+                    //         'text' => 'Excel 匯入',
+                    //         'path' => '/courses-import?from=excel',
+                    //     ]
 
-                    )
+                    // )
+                ],
+                // [
+                //     'id' => 4,
+                //     'text' => '新增課程',
+                //     'path' => '/courses/create',
+                //     'active' => $current=='courses/create'
+                // ],
+                // [
+                //     'id' => 4,
+                //     'text' => '狀態查詢',
+                //     'path' => '/statuses',
+                //     'active' => $current=='statuses'
+                // ],
+                
+            );
+        }
+        if($key =='credit_courses')
+        {
+           return array(
+                [
+                    'id' => 1,
+                    'text' => '學分班課程管理',
+                    'path' => '/credit-courses',
+                    'active' => $current=='credit-courses'
                 ],
                 [
-                    'id' => 4,
-                    'text' => '新增課程',
-                    'path' => '/courses/create',
-                    'active' => $current=='courses/create'
+                    'id' => 2,
+                    'text' => '匯入學分班課程',
+                    'path' => '/credit-courses-import',
+                    'active' => $current=='credit-courses-import',
+                    
                 ],
+                // [
+                //     'id' => 4,
+                //     'text' => '新增課程',
+                //     'path' => '/courses/create',
+                //     'active' => $current=='courses/create'
+                // ],
                 // [
                 //     'id' => 4,
                 //     'text' => '狀態查詢',

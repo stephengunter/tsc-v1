@@ -2,7 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\BaseCourse;
+
 use App\Category;
 use App\Photo;
 use App\Support\FilterPaginateOrder;
@@ -11,191 +12,108 @@ use Carbon\Carbon;
 
 use App\Support\Helper;
 
-class Course extends Model
+class Course extends BaseCourse
 {
-    use FilterPaginateOrder;
-   
     
-    protected $fillable = [ 'term_id', 'center_id', 'name', 'level', 'discount',
-                            'group','parent','must','number', 'caution',
-                            'credit_count' , 'credit_price' ,'net_signup' , 
+    protected $fillable = [ 'term_id', 'center_id', 'name', 'level', 
+                            'number', 'caution', 'limit','min',
                             'begin_date' ,  'end_date' , 'weeks', 'hours',
-                            'tuition', 'cost' , 'materials',
                             'description','target',
-                            'open_date' , 'close_date', 'limit','min',
-                            'display_order' , 'reviewed', 'active'	,       
+                            'tuition', 'cost' , 'materials','discount',
+
+                            'net_signup' , 'open_date' , 'close_date',
+                            
+                            'reviewed', 'active',       
                             'removed' , 'updated_by'  
                             
                             ];
 	
-    protected $filter =  [ 'name',  'weeks', 'hours', 'number', 'group' ,
-                           'net_signup' , 'credit_count' ,'credit_price' ,
-                           'begin_date' ,   'tuition' , 'cost' , 
-                           'open_date' ,  'limit' , 'active',	
-                         ];
+    
 
-    public static function initialize($center_id=0, Course $parent_course=null)
+    public static function initialize($term_id,$center_id)
     {   
-        $group=0;
-        $parent=0;
-        $term_id=0;
+       
         $begin_date=Carbon::now()->toDateString();
         $end_date=Carbon::now()->addMonths(2)->toDateString();
         $weeks=6;
-        $net_signup=1;
+        $hours=12;
+       
         
-        if($parent_course){
-            $group = 1;
-            $parent=$parent_course->id;
-            $term_id = $parent_course->term_id;
-            $center_id = $parent_course->center_id;
-            $begin_date= $parent_course->begin_date;
-            $end_date = $parent_course->end_date;
-            $net_signup = $parent_course->net_signup;
-        }
         return [            
             'name' => '',
             'discount' => 1,
-            'group' => $group ,
+          
             'center_id' => $center_id,
             'term_id' => $term_id,
-            'parent' => $parent,
-            'must' => 0,
+          
             'weeks' => $weeks,
-            'hours' => null,
+            'hours' => $hours,
             'begin_date'=> $begin_date,
             'end_date'=> $end_date,
             'photo_id'=> null,
-            'credit_count'=> 0 ,
-            'credit_price' => null,
            
-            'net_signup'=> $net_signup ,
+           
+            'net_signup'=> 1 ,
             'active'=> 1 ,
-
-            'ps' => '',
+           
             
             'categories'=> [],
             'teachers'=> [],
 
-            'isCredit'=> 0
+           
            
         ];
     }
 
-    public function status() 
-	{
-		return $this->hasOne('App\Status');
-	}
-
-    public function term() {
-		return $this->belongsTo('App\Term');
-	}
-
-    public function center() {
-		return $this->belongsTo('App\Center');
-	}
-
-    public function admission() 
-	{
-		return $this->hasOne('App\Admission');
-	}
-    public function register() 
-	{
-		return $this->hasOne('App\Register');
-	}
-
-	public function categories()
+    public function canSignup($isNetSignup)
     {
-        return $this->belongsToMany('App\Category','course_category');
-    }
-    
-    public function teachers()
-    {
-        return $this->belongsToMany('App\Teacher','course_teacher','course_id','teacher_id');
-    }
-    public function classTimes() 
-	{
-		return $this->hasMany('App\ClassTime');
-	}
-    public function schedules() 
-	{
-		return $this->hasMany('App\Schedule');
-	}
-    public function lessons() 
-	{
-		return $this->hasMany('App\Lesson');
-	}
-    public function signups() 
-	{
-		return $this->hasMany('App\Signup');
-	}
-    public function students() 
-	{
-		return $this->hasMany('App\Student');
-	}
-
-    public function classroom()
-    {
-          return $this->belongsTo('App\Classroom');
-    }
-    public function photo()
-	{
-		if(!$this->photo_id){
-			return Photo::defaultCourse();
-		}
-		return Photo::find($this->photo_id);
-
-	}
-    public function isGroup()
-    {
-        return $this->group;
-    }
-    public function isCredit()
-    {
-        $this->isCredit=false;
-        if($this->credit_count)  $this->isCredit=(int)$this->isCredit > 0;
-        return $this->isCredit;
-    }
-
-    public function isValid()
-    {
-        if($this->removed) return false;
-        if(!$this->active) return false;
-        return true;
-
-    }
-
-    public function getPS()
-    {
-        if(!$this->status) return '';
-        $this->ps=$this->status->ps;
-        return $this->ps;
-
-    }
-    public function defaultAmount()
-    {
-        
-        return $this->tuition + $this->cost;
-
-    }
-
-    public function copyParentCourseValues($parent_id)
-    {
-        $parent_course=static::findOrFail($parent_id);
-        $this->parent=$parent_id;
-        $this->term_id=$parent_course->term_id;
-        $this->center_id = $parent_course->center_id;
-        $this->open_date = $parent_course->open_date;
-        $this->close_date = $parent_course->close_date;
-        $this->limit = $parent_course->limit;
-        $this->min= $parent_course->min;
-        $this->net_signup= $parent_course->net_signup;
+        return $this->status->canSignup($isNetSignup);
         
     }
+    public function signupStatus()
+    {
+         $today=Carbon::today();
+         $open = Carbon::parse($this->open_date);
+         $close = Carbon::parse($this->close_date);
+
+         if($today->lt($open)) return 0;
+         if($today->gt($close)) return 2;
+         return 1;
+
+    }
+
+    public function hasSignupBy($user_id)
+    {
+        
+        $validSignups=$this->validSignups();
+       
+        if(!count($validSignups)) return false;
+
+
+        $filtered = $validSignups->filter(function ($signup) use($user_id) {
+            return $signup->user_id==$user_id;
+        })->all();
+        
+      
+
+        if(count($filtered)) return true;
+            
+        return false;
+    }
+   
 
     public function populateViewData($editNumber=false,$photo=false){
         $withNumber=false;
         $this->fullName($withNumber);
+
+        if($this->groupAndParent()){
+            $this->weeks=null;
+            $this->hours=null;
+
+            $this->tuition=$this->getTuition();
+            $this->cost=$this->getCost();
+            $this->credit_count=$this->getCreditCounts();
+        }
 
         $this->getParentCourse();
 
@@ -249,6 +167,7 @@ class Course extends Model
 
     public function updateStatus()
     {
+       
         $this->status->updateStatus();
     }
 
@@ -293,10 +212,17 @@ class Course extends Model
     }
     public function validSignups()
     {
-        return $this->signups()->where('removed',false)
-                                ->where('status' , '>','-1' );
+        return $this->signups->filter(function ($item) {
+            return $item->isValid();
+        })->all();
+
     }
-    
+    public function confirmedSignups()
+    {
+        return $this->signups->filter(function ($item) {
+            return $item->isConfirmed();
+        })->all();
+    }
    
     public function canCreateAdmit()
     {
@@ -355,44 +281,7 @@ class Course extends Model
         
 	}
 
-    public function canSignup()
-    {
-        if(!$this->isValid())  return  false;
-        $status=$this->signupStatus();
-        if($status==1) return true;
-        return false;
-        
-    }
-    public function signupStatus()
-    {
-         $today=Carbon::today();
-         $open = Carbon::parse($this->open_date);
-         $close = Carbon::parse($this->close_date);
-
-         if($today->lt($open)) return 0;
-         if($today->gt($close)) return 2;
-         return 1;
-
-    }
-
-    public function hasSignupBy($user_id)
-    {
-        
-        $validSignups=$this->validSignups()->get();
-       
-        if(!count($validSignups)) return false;
-
-
-        $filtered = $validSignups->filter(function ($signup) use($user_id) {
-            return $signup->user_id==$user_id;
-        })->all();
-        
-      
-
-        if(count($filtered)) return true;
-            
-        return false;
-    }
+    
     public function fullName($withNumber=true)
     {
         $fullname=$this->name;
@@ -431,6 +320,13 @@ class Course extends Model
         return $this->parentCourse;
     }
 
+    public function subCourses()
+    {
+        if(!$this->groupAndParent()) return null;
+
+        return static::where('removed',false)->where('parent',$this->id)->get();
+    }
+
     
     public function attachGroupCategory()
     {
@@ -454,6 +350,39 @@ class Course extends Model
         
         return $term->number . $center->code . $category->code . '-';
         
+    }
+    public function getTuition()
+    {
+        if($this->groupAndParent())
+        {
+            $subCourses=$this->subCourses();
+            if(!$subCourses) return 0;
+            return $subCourses->sum('tuition');
+        }
+
+        return $this->tuition;
+    }
+    public function getCreditCounts()
+    {
+        if($this->groupAndParent())
+        {
+            $subCourses=$this->subCourses();
+            if(!$subCourses) return 0;
+            return $subCourses->sum('credit_count');
+        }
+
+        return $this->credit_count;
+    }
+    public function getCost()
+    {
+        if($this->groupAndParent())
+        {
+            $subCourses=$this->subCourses();
+            if(!$subCourses) return 0;
+            return $subCourses->sum('cost');
+        }
+
+        return $this->cost;
     }
 
 }

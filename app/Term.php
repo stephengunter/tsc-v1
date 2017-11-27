@@ -22,6 +22,8 @@ class Term extends Model
 		return 	$user->admin->fromHeadCenter();
 	}
 
+	
+
 	public static function initialize()
     {
         return [

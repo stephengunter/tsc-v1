@@ -21,8 +21,8 @@ class SignupInfoRequest extends FormRequest
     {  
 
         return [
-            'signupinfo.open_date' => 'required',
-            'signupinfo.close_date'=> 'required',
+        //     'signupinfo.open_date' => 'required',
+        //     'signupinfo.close_date'=> 'required',
             
             'signupinfo.limit' => 'required|numeric',
 

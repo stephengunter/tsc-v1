@@ -14,9 +14,8 @@ class Course {
         this.canNetSignup = Course.canNetSignup(this)
 
         this.isCredit = Course.isCredit(this)
-        this.hasParent = Course.hasParent(this)
-        this.isGroup = Course.isGroup(this)
-        this.groupAndParent = Course.groupAndParent(this)
+        
+      
         this.hasReviewedBy = Course.hasReviewedBy(this)
 
         this.activeLabel = Course.activeLabel(this.active)
@@ -311,13 +310,7 @@ class Course {
                 sort: false,
                 default: true
 
-            }, {
-                view: 0,
-                title: '群組課程',
-                key: 'group',
-                sort: true,
-                default: true
-            }, {
+            },{
                 view: 0,
                 title: '上課時間',
                 key: 'time',
@@ -350,19 +343,7 @@ class Course {
                 key: 'teacherNames',
                 sort: false,
                 default: false
-            }, {
-                view: 1,
-                title: '學分數',
-                key: 'credit_count',
-                sort: true,
-                default: false
-            }, {
-                view: 1,
-                title: '學分單價',
-                key: 'credit_price',
-                sort: true,
-                default: false
-            }, {
+            },  {
                 view: 1,
                 title: '週數',
                 key: 'weeks',

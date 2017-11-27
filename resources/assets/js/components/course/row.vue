@@ -54,16 +54,7 @@
         <td v-show="viewing==0"  v-html="categoriesText(course.categories)">
         </td> 
 
-        <!-- 群組課程 -->
-        <td v-show="viewing==0">
-            <a v-if="canSelectGroup(course)" @click="onGroupSelected" 
-                v-html="$options.filters.okSign(true)" class="btn btn-sm">
-            </a>    
-            <span v-else v-show="isGroup(course)" v-html="$options.filters.okSign(true)"  ></span>
-
-
-            <span v-if="hasParent(course)" v-text="parentCourseName(course)" ></span>
-        </td> 
+       
 
         <!-- 上課時間 -->
         <td  v-show="viewing==0" v-html="getClassTimesText(course.class_times)">
@@ -85,13 +76,7 @@
         <!-- 教師 --> 
         <td v-show="viewing==1"  v-html="teachersText(course.teachers)">
         </td> 
-        <!-- 學分數 --> 
-        <td v-show="viewing==1" v-text="course.credit_count">
-        </td>
-        <!-- 學分單價 --> 
-        <td v-show="viewing==1" >
-            {{ course.credit_price | formatMoney }}
-        </td>
+       
         <!-- 週數 --> 
         <td v-show="viewing==1" v-text="course.weeks">            
         </td>
@@ -202,16 +187,7 @@
                 if(!this.can_select_group) return false
                 return this.isGroup(course)
             },
-            isGroup(course){
-                return Course.isGroup(course)
-            },
-            hasParent(course){
-                return Course.hasParent(course)
-            },
-            parentCourseName(course){
-                 if(course.parentCourse) return course.parentCourse.name
-                    return ''
-            },
+            
             activeLabel(active){
                 return Course.activeLabel(active)
             },
@@ -228,16 +204,7 @@
                 }
                 this.$emit('remove-clicked',values)
             },
-            onGroupSelected(){
-                let parent = 0
-                if(Course.hasParent(this.course)){
-                    parent=this.course.parent
-                }else{
-                    parent =this.course.id
-                }
-                
-                this.$emit('group-selected',parent)
-            },
+            
             onSelected(){
                  this.$emit('selected',this.course)
             },

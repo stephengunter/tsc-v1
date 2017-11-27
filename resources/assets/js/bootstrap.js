@@ -112,6 +112,8 @@ Vue.component('course-copy', require('./views/courses/copy'))
 Vue.component('course-review', require('./views/courses/review'))
 Vue.component('course-statuses', require('./views/courses/statuses'))
 
+Vue.component('credit-course-import', require('./views/credit-courses/import'))
+
 Vue.component('admission-index', require('./views/admissions/index'))
 Vue.component('register-index', require('./views/registers/index'))
 Vue.component('score-index', require('./views/scores/index'))
@@ -154,6 +156,7 @@ import Form from './utilities/Form';
 import Helper from './helper.js'
 import Config from './config.js'
 
+import UrlService from './services/url.js'
 import TimeService from './services/time.js'
 import CommonService from './services/common.js'
 import DataViewerService from './services/dataviewer.js'
@@ -171,6 +174,9 @@ import Course from './models/course.js'
 import CourseImport from './models/course-import.js'
 import CourseReview from './models/course-review.js'
 import CourseStatus from './models/course-status.js'
+
+import CreditCourse from './models/credit-course.js'
+
 import Admit from './models/admit.js'
 import Admission from './models/admission.js'
 import Register from './models/register.js'
@@ -206,13 +212,12 @@ import Classroom from './models/classroom.js'
 import Title from './models/title.js'
 
 
-// import Auth from './packages/auth/Auth.js'
-// Vue.use(Auth)
 
 window.Form = Form
 window.Helper = Helper
 window.Config = Config
 
+window.UrlService = UrlService
 window.TimeService = TimeService
 window.CommonService = CommonService
 window.DataViewerService = DataViewerService
@@ -230,6 +235,9 @@ window.Course = Course
 window.CourseImport = CourseImport
 window.CourseReview = CourseReview
 window.CourseStatus = CourseStatus
+
+window.CreditCourse=CreditCourse
+
 window.Admit = Admit
 window.Admission = Admission
 window.Register = Register
@@ -278,6 +286,9 @@ Vue.filter('tpeTime', function(datetime) {
 })
 Vue.filter('boolText', function(val) {
     return Helper.boolText(val)
+})
+Vue.filter('canOrCannotText', function(val) {
+    return Helper.canOrCannotText(val)
 })
 Vue.filter('genderText', function(gender) {
     if (parseInt(gender)) return '男'

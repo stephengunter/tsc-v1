@@ -2,41 +2,23 @@
 <div>
     <div class="panel panel-default">
         <div class="panel-heading">
-               
             <combination-select :search_params="search_params"
                 @ready="onCombinationReady" >
             </combination-select>
-
-            <button @click="viewSub"  v-show="groupAndParent" type="button" class="btn-sm btn btn-warning">
-               <span aria-hidden="true" class="glyphicon glyphicon-search"></span>
-               學分
-            </button>
+            <div v-if="hasCourse" v-html="statusHtml()">
+                
+            </div>
         </div>
+        
      </div>
      
-    <signup-list v-if="ready" :course_id="course_id" :hide_create="hide_create" 
+    <signup-list v-if="ready" :course_id="course_id" :hide_create="!canCreate" 
         :version="version" :can_select="can_select" :for_refund="for_refund"
         @loaded="onSignupListLoaded"
         @selected="onSelected" @begin-create="onBeginCreate">
     </signup-list>
 
-    <modal :showbtn="false" :width="subSettings.width" :show.sync="subSettings.show"  @closed="closeSub" 
-        effect="fade">
-          <div slot="modal-header" class="modal-header">
-           
-            <button id="close-button" type="button" class="close" data-dismiss="modal" @click="closeSub">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-            </button>
-           
-          </div>
-        <div slot="modal-body" class="modal-body">
-           
-            <sub-course-list  :courses="subCourses">
-            </sub-course-list>
-
-      
-        </div>
-    </modal> 
+    
 
 </div>
 
@@ -44,14 +26,12 @@
 
 <script>
     import SignupList from '../../components/signup/list.vue'
-    import SubCourseList from '../../components/course/sub/list.vue'
 
 
     export default {
         name: 'SignupIndex',       
         components: {
             'signup-list':SignupList,
-            'sub-course-list':SubCourseList
         },
         props: {
             version: {
@@ -71,6 +51,7 @@
             return {
                 ready:false,
                 course_id:0,
+                selectedCourse:null,
                
                 can_edit:true,
                 can_back:true,
@@ -79,23 +60,25 @@
                 search_params:{
                     term:0,
                     center:0,
-                    parent:0,
-                    sub:0,
+                 
                     reviewed:1
                 },
-                
-
-                groupAndParent:false,
-                subSettings:{
-                    width:800,
-                    show:false
-                },
-
-                subCourses:[]
-
              
             }
         },
+        computed:{
+           hasCourse(){
+               if(this.selectedCourse) return true
+               return false
+           },
+           canCreate(){
+               if(this.hide_create) return false
+               if(!this.hasCourse) return false
+
+               return this.selectedCourse.canSignup
+           }
+            
+        }, 
         beforeMount() {
              this.init()
         },
@@ -109,28 +92,20 @@
                 this.setCourse(course)
                 this.ready=true
             },
-           
+            
             setCourse(val){
                
                 this.course_id=val
             },
             onSignupListLoaded(data){
-               this.groupAndParent= data.groupAndParent
+                this.selectedCourse=data.course
             },
-            viewSub(){
-                let getData=Course.subCourses(this.course_id)
-                
-                getData.then(data=>{
-                    this.subCourses=data.courseList
-                    this.subSettings.show=true
-                }).catch(error=>{
-                    Helper.BusEmitError(error)  
-                 
-                }) 
+            statusHtml(){
+                if(!this.hasCourse) return ''
 
-            },
-            closeSub(){
-                this.subSettings.show=false
+                let html= '課程上限人數：' +  this.selectedCourse.limit  + '&nbsp;'
+
+               return  html + CourseStatus.getSignupLabel(this.selectedCourse.status)
             },
             onSelected(id){
                 this.$emit('selected',id)

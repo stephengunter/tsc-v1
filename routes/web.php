@@ -143,9 +143,15 @@ Route::group(['middleware' => 'admin'], function()
     Route::put('courses/{id}/update-photo',['uses'=>'\App\Http\Controllers\Course\CoursesController@updatePhoto']);
     Route::resource('courses', '\App\Http\Controllers\Course\CoursesController');
 
-    Route::post('courses-import/copy', '\App\Http\Controllers\Course\CoursesImportController@copy');
+    //Route::post('courses-import/copy', '\App\Http\Controllers\Course\CoursesImportController@copy');
     Route::resource('courses-import', '\App\Http\Controllers\Course\CoursesImportController',
     ['only' => ['index','store']]);
+
+    Route::resource('credit-courses-import', '\App\Http\Controllers\Course\Credit\ImportsController',
+    ['only' => ['index','store']]);
+
+
+
    
     Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
     ['only' => ['show','edit','update']]);

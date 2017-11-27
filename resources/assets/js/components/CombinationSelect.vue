@@ -11,15 +11,11 @@
             </select>
        </div>
        <div class="form-group">
-            <select  v-model="params.parent" @change="onParentCourseChanged" style="width:auto;" class="form-control selectWidth">
-                 <option v-for="(item,index) in parentCourseOptions" :key="index" :value="item.value" v-text="item.text"></option>
+            <select  v-model="course" @change="onCourseChanged" style="width:auto;" class="form-control selectWidth">
+                 <option v-for="(item,index) in courseOptions" :key="index" :value="item.value" v-text="item.text"></option>
             </select>
        </div>
-       <div v-if="groupReady"  class="form-group">&nbsp;&nbsp;群組課程
-             <select  v-model="params.sub"  @change="onSubCourseChanged" style="width:auto;"  class="form-control selectWidth" >
-                  <option v-for="(item,index) in subCourseOptions" :key="index" :value="item.value" v-text="item.text"></option>
-             </select>
-        </div>
+       
      
     </div>
 
@@ -49,24 +45,20 @@
                
                 termOptions:[],
                 centerOptions:[],
-                parentCourseOptions:[],
-                subCourseOptions:[],
+
+                courseOptions:[],
+               
                 params:{},
                    
 
                 course:0,
 
-                parentCourse:{}
+              
              
             }
         },
         computed:{
-            groupReady(){
-               
-                if(!this.parentCourse) return false
-                return  Helper.tryParseInt(this.parentCourse.credit_count) > 0
-                
-            },
+           
             
         }, 
         beforeMount() {
@@ -77,7 +69,7 @@
             }
             
             let defaults=[
-                'term','center','parent','sub'
+                'term','center'
             ]
 
             defaults.forEach((key)=>{
@@ -106,8 +98,7 @@
                     let center=this.centerOptions[0].value
                     this.params.center=center
 
-                    this.params.parent=0
-                    this.params.sub=0
+                  
                     this.loadCourses()
                 })
                 .catch(error => {
@@ -119,34 +110,15 @@
 
                 let options=Course.options(this.params)
                 options.then(data => {
-                  
-                    this.parentCourseOptions =data.parentOptions
-                    this.subCourseOptions = data.subOptions
+                    this.courseOptions = data.options 
 
-                    if(data.subOptions.length < 1){
-                        this.params.sub=0
+                    if(data.options.length)
+                    {
+                        this.course=data.options[0].value
+                    }else{
+                        this.course= 0
                     }
-
-
-                    this.parentCourse= data.parentCourse
-                    let empty={
-                          text:'-------',
-                          value: 0
-                    }
-                    this.subCourseOptions.splice(0, 0, empty)   
-                    if(this.empty_course){
-                       this.parentCourseOptions.splice(0, 0, empty)
-                    }
-
-                    let parent =Helper.tryParseInt(this.params.parent)
-                    if(!parent){
-                        this.params.parent=0
-                        if(this.parentCourseOptions.length){
-                             this.params.parent=this.parentCourseOptions[0].value
-                        }
-                       
-                    }
-
+                   
                     this.onReady()
                    
                 })
@@ -156,36 +128,22 @@
                 
             },
             onReady(){
-                let sub = Helper.tryParseInt(this.params.sub)
-                if(sub > 0){
-                     this.course=sub
-                }else{
-                    this.course=this.params.parent
-                }
-
-                this.$emit('ready' , this.course)
+               this.$emit('ready' , this.course)
             },
             
             onTermChanged(){
-                this.params.parent=0
-                this.params.sub=0
+              
                 this.loadCourses()
                 
             },
             onCenterChanged(){
-                
-                this.params.parent=0
-                this.params.sub=0
                 this.loadCourses()
                
             },
-            onParentCourseChanged(){
-                this.loadCourses()
-            },
-            onSubCourseChanged(){
+            onCourseChanged(){
                 this.onReady()
-            }
-            
+            },
+          
             
         },
 

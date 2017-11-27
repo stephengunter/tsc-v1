@@ -11,26 +11,7 @@
         <div class="panel-body">
             <form class="form" @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)">
                 <div class="row">
-                    <div v-if="false" class="col-sm-3">
-                        <div class="form-group">                           
-                            <label>報名起始日</label>
-                            <div>
-                                <date-picker :option="datePickerOption" :date="open_date" ></date-picker>
-                            </div>
-                            <input type="hidden" v-model="form.signupinfo.open_date"  >
-                            <small class="text-danger" v-if="form.errors.has('signupinfo.open_date')" v-text="form.errors.get('signupinfo.open_date')"></small>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                       <div class="form-group">                           
-                            <label>報名截止日</label>
-                            <div>
-                                <date-picker :option="datePickerOption" :date="close_date" ></date-picker>
-                            </div>
-                            <input  type="hidden" v-model="form.signupinfo.close_date"  >
-                             <small class="text-danger" v-if="form.errors.has('signupinfo.close_date')" v-text="form.errors.get('signupinfo.close_date')"></small>
-                         </div>
-                    </div>
+                    
                     <div class="col-sm-3">
                         <div class="form-group">                           
                             <label>人數上限</label>
@@ -51,7 +32,16 @@
                             <label>網路報名</label>
                             <div>
                                 <input type="hidden" v-model="form.signupinfo.net_signup"  >
-                                <toggle :items="boolOptions"   :default_val="form.signupinfo.net_signup" @selected="setNetSignup"></toggle>
+                                <toggle :items="discountOptions"   :default_val="form.signupinfo.net_signup" @selected="setNetSignup"></toggle>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">                           
+                            <label>折扣</label>
+                            <div>
+                                <input type="hidden" v-model="form.signupinfo.discount"  >
+                                <toggle :items="discountOptions"   :default_val="form.signupinfo.discount" @selected="setDiscount"></toggle>
                             </div>
                         </div>
                     </div>
@@ -64,15 +54,7 @@
                             <small class="text-danger" v-if="form.errors.has('signupinfo.tuition')" v-text="form.errors.get('signupinfo.tuition')"></small>
                         </div>
                     </div>
-                    <div class="col-sm-3">
-                        <div class="form-group">                           
-                            <label>折扣</label>
-                            <div>
-                                <input type="hidden" v-model="form.signupinfo.discount"  >
-                                <toggle :items="discountOptions"   :default_val="form.signupinfo.discount" @selected="setDiscount"></toggle>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <div class="col-sm-3">
                         <div class="form-group">                           
                             <label>教材費</label>
@@ -80,16 +62,24 @@
                             <small class="text-danger" v-if="form.errors.has('signupinfo.cost')" v-text="form.errors.get('signupinfo.cost')"></small>
                         </div>
                     </div>
-                    
+                    <div class="col-sm-6">
+                        <div class="form-group">                           
+                            <label>教材</label>
+                            <textarea rows="4" cols="50" class="form-control" name="signupinfo.materials"  v-model="form.signupinfo.materials">
+                            </textarea>
+                            
+                           <small class="text-danger" v-if="form.errors.has('signupinfo.materials')" v-text="form.errors.get('signupinfo.materials')"></small>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                   
                     <div class="col-sm-12">
                         <div class="form-group">                           
-                            <label>教材</label>
-                                <textarea rows="4" cols="50" class="form-control" name="signupinfo.materials"  v-model="form.signupinfo.materials">
+                            <label>注意事項</label>
+                                <textarea rows="4" cols="50" class="form-control" name="signupinfo.caution"  v-model="form.signupinfo.caution">
                                 </textarea>
-                            <small class="text-danger" v-if="form.errors.has('signupinfo.materials')" v-text="form.errors.get('signupinfo.materials')"></small>
+                            <small class="text-danger" v-if="form.errors.has('signupinfo.caution')" v-text="form.errors.get('signupinfo.caution')"></small>
                         </div>
                     </div>
                    
@@ -131,16 +121,7 @@
                 form: new Form({
                    signupinfo:{}
                 }),
-
-                datePickerOption:Helper.datetimePickerOption(),
-                open_date: {
-                    time: ''
-                },
-                close_date: {
-                    time: ''
-                },
-
-                boolOptions:Helper.boolOptions(),
+               
                 discountOptions:[{
                     text: '可以',
                     value: 1
@@ -151,22 +132,6 @@
            
 
             }
-        },
-        watch:{
-            open_date: {
-              handler: function () {
-                  this.form.signupinfo.open_date=this.open_date.time
-                  this.clearErrorMsg('signupinfo.open_date')
-              },
-              deep: true
-            },
-            close_date: {
-              handler: function () {
-                  this.form.signupinfo.close_date=this.close_date.time
-                  this.clearErrorMsg('signupinfo.close_date')
-              },
-              deep: true
-            },
         },
         beforeMount() {
             this.init()
@@ -189,12 +154,12 @@
                        signupinfo.cost=0
                     }
                     signupinfo.materials = Helper.replaceAll(signupinfo.materials, '<br>', '\n')
+                    signupinfo.caution = Helper.replaceAll(signupinfo.caution, '<br>', '\n')
                     this.form = new Form({
                             signupinfo: signupinfo,
                         })
 
-                    this.open_date.time=signupinfo.open_date
-                    this.close_date.time=signupinfo.close_date
+                 
 
                     this.loaded=true
 
@@ -219,7 +184,9 @@
             onSubmit() {
                 if(this.form.signupinfo.materials){
                    let materials=Helper.replaceAll( this.form.signupinfo.materials, '\n','<br>')
+                   let caution=Helper.replaceAll( this.form.signupinfo.caution, '\n','<br>')
                    this.form.signupinfo.materials=materials
+                   this.form.signupinfo.caution=caution
                 }
                 this.submitForm()
             },

@@ -15,21 +15,39 @@ class CreateCourseTable extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {			
             $table->increments('id');
-            $table->integer('term_id')->unsigned();
 
-            $table->boolean('group')->default(false); 
-
-            $table->integer('parent')->unsigned()->default(0);
-            $table->boolean('must')->default(false);
-
-            $table->integer('center_id')->unsigned();
+            $table->integer('term_id')->unsigned()->nullable(); 
+            $table->integer('center_id')->unsigned()->nullable(); 
 
             $table->string('name');
             $table->string('level')->nullable(); 
             $table->string('number')->nullable(); 
 
+            $table->boolean('group')->default(false); 
+
+            //學分班欄位
+            $table->boolean('credit')->default(false); 
+            $table->integer('parent')->unsigned()->default(0);
+            $table->integer('type_id')->unsigned()->nullable(); 
+            $table->integer('college_id')->unsigned()->nullable(); 
+
+            $table->string('time')->nullable();
+            $table->string('location')->nullable();
+            $table->string('tel')->nullable();
+            $table->boolean('must')->default(false);
             $table->integer('credit_count')->default(0);   //學分數
-            $table->decimal('credit_price', 8, 2)->nullable();   //學分單價
+            $table->decimal('credit_price', 8, 2)->nullable();   //學分單價            
+            $table->decimal('signup_charge', 8, 2)->nullable();   //報名費
+            
+            $table->date('decision_date')->nullable();   //放榜日期
+            //End 學分班欄位
+
+
+            
+
+            
+
+            
             $table->boolean('net_signup')->default(true);
 
 		

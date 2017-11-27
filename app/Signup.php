@@ -58,7 +58,24 @@ class Signup extends Model
     public function refund() 
 	{
 		return $this->hasOne(Refund::class);
-	}
+    }
+    
+    public function isValid()
+    {
+          //是否被有效
+        if($this->removed) return false; 
+
+        return (int)$this->status >= 0;
+       
+    }
+
+    public function isConfirmed()
+    {
+        //是否被取消
+        if(!$this->isValid()) return false; 
+
+        return (int)$this->status > 0;
+    }
 
     public function hasRefund() 
 	{
@@ -77,8 +94,10 @@ class Signup extends Model
     {
         return $this->tuitions()->where('refund',false);
     }
-   
-
+    public function refundRecords()
+    {
+        return $this->tuitions()->where('refund',true);
+    }
 
     public function canViewBy($user)
 	{
@@ -116,20 +135,25 @@ class Signup extends Model
          }else{
             return true;
          }
-  	}
+    }
+    public function totalIncome()
+    {
+        return $this->tuitions()->where('refund',false)->sum('amount');
+    }
+
     public function updateStatus()
     {
-         if($this->hasRefund()){
-             $this->status = -1;
-         }else{
-            $total = $this->tuitions()->where('refund',false)->sum('amount');
-            if($total>=$this->tuition){
-                $this->status=1;
-            }else{
-                $this->status=0;
-            }
-         }
-         $this->save();
+
+        if($this->hasRefund()){
+            $this->status = -1; //'已取消'
+        }else{
+            $total = $this->totalIncome();
+            if($total>=$this->tuition)  $this->status=1;   //已繳費
+            else   $this->status=0;   //待繳費
+        }
+        $this->save();
+
+        
     }    
     public function formattedPoints()
     {

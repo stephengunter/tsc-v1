@@ -15,32 +15,90 @@ class Status extends Model
       
 	];
 
-    public $signupStatusList=[
-        '-1' => '未開始',
-        '0' => '已停止',
-        '1' => '進行中',
-        '2' => '已截止',
+    public $signupStatusList=array(
+        [
+			'value' => -3,
+			'text' => '已額滿'
+		],
+        [
+			'value' => -2,
+			'text' => '已截止'
+		],
+        [
+			'value' => -1,
+			'text' => '尚未開始'
+		],
+		[
+			'value' => 0,
+			'text' => '已停止'
+		],
+		[
+			'value' => 1,
+			'text' => '進行中'
+        ],
+        
+    );
+    public $classStatusList=array(
+        [
+			'value' => -1,
+			'text' => '尚未開始'
+		],
+		[
+			'value' => 0,
+			'text' => '已停止'
+		],
+		[
+			'value' => 1,
+			'text' => '進行中'
+        ],
+        [
+			'value' => 2,
+			'text' => '已結束'
+        ],
+        
+    );
+    public $registerStatusList=[  
+        [
+			'value' => 0,
+			'text' => '未完成'
+		],
+		[
+			'value' => 1,
+			'text' => '已完成'
+		],     
+       
     ];
-    public $registerStatusList=[       
-        '0' => '未完成',
-        '1' => '已完成',
-    ];
-    public $classStatusList=[       
-       '-1' => '尚未開始',
-        '0' => '停止開課',
-        '1' => '進行中',
-        '2' => '已結束',
-    ];
+   
 
+    public function course() 
+    {
+		return $this->belongsTo('App\Course');
+    }
+    public function  canSignup($is_netSignup=true)
+    {
+        $signupStatus= (int)$this->signup;
+        if($is_netSignup){
+           
+            return $signupStatus >= 1;
+        }
+
+        if($signupStatus==-3) return false;  //已額滿
+
+        if($signupStatus==0) return false;   //已停止
+
+        return true;
+        
+    }
     public static function initialize($course)
     {
-        $ps='';
-        if($course->ps) $ps=$course->ps;
-        $signup=static::getSignupStatus($course);
         $class=static::getClassStatus($course);
+        $signup=static::getSignupStatus($course);
+
+        if(!$course->avtive) $signup=0; //已停止開課
+        
         
         return [   
-            'ps' => $ps,         
+            'ps' => '',         
             'signup' => $signup,
             'register' => 0,
             'class' => $class
@@ -55,6 +113,7 @@ class Status extends Model
         if($course->active){
             $this->class=static::getClassStatus($course);
             $this->signup=static::getSignupStatus($course);
+          
         }else{
             $this->class=0;  //已停止
             $this->signup=0;  //已停止
@@ -62,64 +121,55 @@ class Status extends Model
         
         $this->save();
 
+       
+
     }
 
-    public function course() {
-		return $this->belongsTo('App\Course');
-	}
-
-    public static function getSignupStatus($course) {
-       
-        $today=Carbon::today();
-        $open_date=$course->open_date;
-        if(!$open_date){
-            if($course->getParentCourse())
-            {
-                $open_date=$course->parentCourse->open_date;
-            }
-        }
-        $close_date=$course->close_date;
-        if(!$close_date){
-            if($course->getParentCourse())
-            {
-                $close_date=$course->parentCourse->close_date;
-            }
-        }
-        $open = Carbon::parse($open_date);
-        $close = Carbon::parse($close_date);
-
-        if($today->lt($open)) return -1;
-        if($today->gt($close)) return 2;
-        return 1;
-	}
+    
+    
     public static function getClassStatus($course) 
     {
+
+        if(!$course->active) return 0; //停止開課
+
         $today=Carbon::today();
         $begin_date=$course->begin_date;
-        if(!$begin_date){
-            if($course->getParentCourse())
-            {
-                $begin_date=$course->parentCourse->begin_date;
-            }
-        }
         $end_date=$course->end_date;
-        if(!$end_date){
-            if($course->getParentCourse())
-            {
-                $end_date=$course->parentCourse->end_date;
-            }
-        }
 
-
+        
         $begin = Carbon::parse($begin_date);
         $end = Carbon::parse($end_date);
 
-        if($today->lt($begin)) return -1;  //尚未開課
+       
+
+        if($today->lt($begin)) return -1;  //尚未開始
         if($today->gt($end)) return 2;   //已結束
         return 1;    //進行中
 
       
 	}
+
+    public static function getSignupStatus($course) 
+    {
+
+        $limit=(int)$course->limit;
+        
+        if(count($course->confirmedSignups())>= $limit)
+        {
+            return  -3; //已額滿
+        }
+
+
+        $today=Carbon::today();
+        $openDate=$course->openDate();
+        
+        $closeDate=$course->closeDate();
+
+        if($today->lt($openDate)) return -1;  // 尚未開始
+        if($today->gt($closeDate)) return -2;  //已截止
+        return 1;  //進行中
+	}
+    
 
     public function hasRemoved()
     {

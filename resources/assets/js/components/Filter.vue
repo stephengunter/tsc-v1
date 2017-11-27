@@ -22,7 +22,7 @@
             </select>
         </div>
 
-        <div v-if="hasParent()" class="form-group">&nbsp;&nbsp;群組課程：
+        <div v-if="false" class="form-group">&nbsp;&nbsp;群組課程：
             <span>
             &nbsp; {{ parent_course.name  }}
                 <button type="button" @click.prevent="clearParent" class="close">

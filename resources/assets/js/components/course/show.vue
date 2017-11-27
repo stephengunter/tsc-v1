@@ -55,34 +55,8 @@
                             <p v-html="course.teachersText"></p>
                         </div>    
                     </div>   
-                    <div v-if="course.isGroup" class="row">
-                        <div class="col-sm-4">
-                            <label class="label-title">群組課程</label>
-                            <p>
-                                <span class="glyphicon glyphicon-ok-sign text-success"></span>
-                            </p>
-                        </div>  
-                        <div v-if="course.hasParent" class="col-sm-4">
-                            <label class="label-title">父課程</label>
-                            <p v-html="course.parentCourse.name"></p>
-                        </div> 
-                        <div class="col-sm-4">
-                            
-                        </div>    
-                    </div>  
-                    <div v-if="course.isCredit" class="row">
-                        <div class="col-sm-4">
-                            <label class="label-title">學分數</label>
-                            <p v-html="creditCountText()">  </p>
-                        </div>  
-                        <div  class="col-sm-4">
-                            <label  class="label-title">學分單價</label>
-                            <p> {{ course.credit_price | formatMoney }} </p>
-                        </div> 
-                        <div class="col-sm-4">
-                           
-                        </div>    
-                    </div>  
+                     
+                    
                     <div class="row">
                         <div class="col-sm-12">
                             <label class="label-title">課程簡介</label>
@@ -108,14 +82,7 @@
                             <p>{{  course.hours }}</p>
                         </div>    
                     </div> 
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <label class="label-title">注意事項</label>
-                            <p v-html="course.caution"></p>
-                           
-                        </div>  
-                          
-                    </div> 
+                   
                     <div class="row">
                         <div class="col-sm-4">
                             <label class="label-title">狀態</label>

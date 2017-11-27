@@ -36,6 +36,7 @@ class HomeController extends BaseController
                     'signups',
                   
                     'courses',
+                    'credit_courses',
                     'teachers',
                     'main_settings',
                   

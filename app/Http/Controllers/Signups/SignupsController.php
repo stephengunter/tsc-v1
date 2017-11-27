@@ -25,10 +25,10 @@ use App\Tuition;
 
 use App\Support\Helper;
 
-use App\Events\SignupCreated;
 use App\Events\SignupChanged;
 use PDF;
 use Carbon\Carbon;
+use Exception;
 
 
 
@@ -36,43 +36,62 @@ class SignupsController extends BaseController
 {
     protected $key='signups';
     
-    public function __construct(SignupService $signupService,Courses $courses, 
-                                Users $users,Terms $terms , Centers $centers)
-                               
-                               
+    public function __construct(SignupService $signupService)                       
     {
         $this->signupService=$signupService;
-
-        $this->courses=$courses;
-      
-       
-        $this->terms=$terms;
-        $this->centers=$centers;
-       
-        $this->users=$users;
 
     }
     
     private function seed()
     {
-         // $users=User::all();
-        // foreach($users as $user){
-        //     Signup::create([
-        //         'course_id' => 1,
-        //         'user_id' => $user->id,
-        //         'net_signup' => ( $user->id %2 == 0 ),
-        //         'parent' => 0,
-        //         'status' => 0,
-        //         'date' => '2017-11-21'
+        $course_id=2;
+       
+        
 
-        //     ]);
-        // }
+        $users=User::all();
+        foreach($users as $user){
+            $course=Course::findOrFail($course_id);
+            $signup=new Signup([
+                'course_id' => 2,
+                'user_id' => $user->id,
+                'net_signup' =>  0,
+                'parent' => 0,
+                'status' => 0,
+                'date' => '2017-11-21'
+            ]);
+            
+           
+            try {
+                $canSignup=$this->signupService->canSignup($course, $user , $signup->net_signup);
+              
+            }
+            catch (Exception $err) {
+               
+                continue;
+            }    
+
+           
+    
+            $tuition=new Tuition([
+                'date' => $signup->date,
+                'pay_by' => 1,
+                'amount' => $course->tuition,
+
+            ]);    
+
+            
+    
+            $signup=$this->signupService->store($course,$user,$signup,$tuition);
+
+           
+    
+        }  //end for
     }
 
     public function indexOptions()
     {
-        $termOptions=$this->terms->options();
-        $centerOptions=$this->centers->options();
+        $termOptions=$this->signupService->termOptions();
+        $centerOptions=$this->signupService->centerOptions();
 
         return response()
             ->json([
@@ -84,7 +103,7 @@ class SignupsController extends BaseController
 
     public function index()
     {
-       
+        
         $request = request();
           
         if(!$request->ajax()){
@@ -93,28 +112,31 @@ class SignupsController extends BaseController
                     ->with(['menus' => $menus]);
         }  
         
-        $signupList=[];
+       
         $course_id=(int)$request->course; 
-        if($course_id > 0){
-            $groupAndParent=false;
-            $course=Course::find($course_id);
-            if($course) $groupAndParent=$course->groupAndParent();
+        $status=(int)$request->status;
+
+        if($course_id){
+            $course=Course::with('status')->findOrFail($course_id);
+            $net_signup=false;
+            $course->canSignup=$course->canSignup($net_signup);
+
 
             $signupList= $this->signupService->getByCourseId($course_id);
-
-
-            $status=(int)$request->status;
+            
             if( $status >= -1  && $status <=1 ){
                 $signupList=$signupList->where('status',$status);
             }
+
             $signupList=$signupList->with(['course','user.profile'])
                                     ->filterPaginateOrder();
+
             $summary=$this->signupService->getSummary($course_id);   
 
             return response() ->json([ 'model' => $signupList,
                                        'summary' => $summary,
-                                       'groupAndParent' => $groupAndParent
-                                      ]); 
+                                       'course' => $course
+                                     ]); 
         }
 
 
@@ -134,27 +156,10 @@ class SignupsController extends BaseController
         $user_id=(int)$request->user; 
 
         $course=null;
-        $subCourses=[];
-        $selectedSub=[];
-
-        $course=null;
-        if($course_id>0){
-            $course= $this->courses->findOrFail($course_id);
-            if($course->getParentCourse())
-            {
-                $course=$course->parentCourse;
-                $selectedSub=[$course_id];
-            }
-            
-            $subCourses=$this->courses->subCourses($course->id)
-                                        ->where('active',true)->get();
-            
-            if(!count($selectedSub) && count($subCourses)){
-                for($i=0; $i<count($subCourses); $i++){
-                    array_push($selectedSub, $subCourses[$i]->id);
-                }
-            }
+        if($course_id){
+            $course= Course::findOrFail($course_id);
         }
+
         $courseOptions=$this->getCourseOptions($course);
         if(empty($courseOptions)) {
             return   response()->json(['msg' => '無課程可報名' ]  ,  422);   
@@ -173,7 +178,7 @@ class SignupsController extends BaseController
 
         $signup=Signup::initialize($user_id,$course_id);
         $signup['net_signup'] = 0;
-        $signup['sub_courses']=$selectedSub;
+     
         if($course) $signup['cost'] = $course->cost;
 
         $defaultAmount=$course->defaultAmount();
@@ -184,7 +189,7 @@ class SignupsController extends BaseController
         return response()
         ->json([
             'courseOptions' => $courseOptions,
-            'subCourses' => $subCourses ,
+           
             'userOptions' => $userOptions,
             
             'course' => $course,
@@ -210,13 +215,16 @@ class SignupsController extends BaseController
 
         $values=$request->getValues($updated_by);
 
+        $net_signup=0;
+        $values['net_signup']=$net_signup;
+
         $course_id=$values['course_id'];
         $course=Course::findOrFail($course_id);
 
         $user_id=$values['user_id'];
         $user=User::findOrFail($user_id);
-
-        $canSignup=$this->signupService->canSignup($course, $user);
+        
+        $canSignup=$this->signupService->canSignup($course, $user, $net_signup);
 
         $tuition=null;
       
@@ -234,81 +242,9 @@ class SignupsController extends BaseController
 
         
 
-        event(new SignupCreated($signup));
+        
 
         return response()->json($signup);
-
-
-        // if($isPay){
-        //     $tuition=new Tuition($tuitionValues);
-        //     $tuition->date=$signup->date;
-        //     $signup->tuitions()->save($tuition);
-        
-        // }
-
-        // $signup=$this->signupService->store($course,$user);
-
-        
-        // if($course->hasSignupBy($user->id)){
-          
-        //     return $this->requestError('signup.user_id','此學員已報名過此課程了');
-           
-        // }
-
-        // $discount_id=0;
-        // if($isPay) $discount_id=(int)$values['discount_id'];        
-        // if($discount_id) $discount=$this->discounts->findOrFail($discount_id);
-
-        // $date=$values['date'];
-
-        // $signup=null;
-        // if($course->groupAndParent())
-        // {
-        //     $sub_course_ids=$values['sub_courses'];
-          
-        //     $parent=$course->id;
-          
-        //     $signup=$this->signups->createGroupSignup($parent,$sub_course_ids,$discount,$user_id,$updated_by,$date);
-            
-           
-        // }else{
-        //     $signup=new Signup($values);
-           
-        //     if($discount_id){
-        //         $discount=$this->discounts->countTuition($course,$discount_id);
-               
-        //         if($discount->tuition!=$values['tuition']){                    
-                   
-        //             return $this->requestError('signup.tuition','課程費用錯誤');
-                   
-        //         }
-                
-        //         $signup->discount=$discount->name;
-        //         $signup->points=$discount->points;
-
-        //     }else{
-        //         $signup->discount_id=0;
-        //         $signup->discount='';
-        //         $signup->points=0;
-        //         $signup->tuition=$course->tuition;
-        //         $signup->cost=$course->cost;
-        //     }
-
-        //     $signup->save();
-
-        //     if($isPay){
-        //         $tuition=new Tuition($tuitionValues);
-        //         $tuition->date=$signup->date;
-        //         $signup->tuitions()->save($tuition);
-               
-        //     }
-        //     //$signup=$this->signups->store($course,$discount,$user_id,$updated_by,$date);
-            
-        // }
-
-        // event(new SignupCreated($signup));
-
-        // return response()->json($signup);
 
             
     }
@@ -537,39 +473,38 @@ class SignupsController extends BaseController
     
     private function  getCourseOptions($course)
     {
-         $courseOptions=[];
-         
-         if($course){
-             $item=$course->toOption();
-             array_push($courseOptions,  $item);
-         }else
-         {
-             $courseList=$this->courses->canSignupCourses();
-             if($courseList->count()){
-                 $courseOptions=$this->courses->optionsConverting($courseList->get());
-             }
-            
-         }
+        $courseOptions=[];
+        
+        if($course){
+            $item=$course->toOption();
+            array_push($courseOptions,  $item);
+        }else
+        {
+            $courseList=$this->courses->canSignupCourses();
+            if($courseList->count()){
+                $courseOptions=$this->courses->optionsConverting($courseList->get());
+            }
+        
+        }
 
-         return $courseOptions;
+        return $courseOptions;
     }
 
     private function  getUserOptions($user)
     {
-         $userOptions=[];
-        
-         if($user){           
-             $item=$user->profile->toOption();             
-             array_push($userOptions,  $item);
-         }else
-         {
-             $userList=$this->users->getAll()->with('profile')->get();
-           
-             $userOptions=$this->users->optionsConverting($userList);
-             
-         }
+        $userOptions=[];
+    
+        if($user){           
+            $item=$user->profile->toOption();             
+            array_push($userOptions,  $item);
+        }else
+        {
+          
+            $userOptions=$this->signupService->userOptions();
+            
+        }
 
-         return $userOptions;
+        return $userOptions;
     }
 
    

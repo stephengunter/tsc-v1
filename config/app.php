@@ -29,10 +29,51 @@ return [
  
 	],
 
-	'group_category' => [
-		 'code' => '3',
-		 'name' => '學分班' 
+	'course' => [
+		
+		'close_before_days' => 14,  // 開始前??天截止報名
+		
 	],
+	
+	'credit_course' => [
+		'centers' => ['A'],  // 有學分班的中心
+		'types' => [
+			[
+				'value' => 1,
+				'text' => '進修學分班',
+				'attach' => false
+			],
+			[
+				'value' => 2,
+				'text' => '學士學分班隨班附讀',
+				'attach' => true
+			],
+			[
+				'value' => 3,
+				'text' => '碩士學分班隨班附讀',
+				'attach' => true
+			]
+		 ],
+		 'colleges' =>[
+			[
+				'value' => 1,
+				'text' => '文學院',
+				
+			],
+			[
+				'value' => 2,
+				'text' => '醫學院',
+				
+			],
+			[
+				'value' => 3,
+				'text' => '工學院',
+				
+			]
+		 ]
+   ],
+
+	
 
 	'payways' => [
 		[

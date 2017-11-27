@@ -5,9 +5,9 @@ class SignupInfo {
             this[property] = data[property];
         }
 
-        this.canNetSignup = '可'
+        this.canNetSignup = '可以'
         if (Helper.tryParseInt(data.net_signup) < 1) {
-            this.canNetSignup = '否'
+            this.canNetSignup = '不行'
         }
 
         this.canDiscount = '可以'

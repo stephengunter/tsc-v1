@@ -19,9 +19,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\NoticeMailCreated' => [
             'App\Listeners\SendEmailNotice',
         ],
-        'App\Events\SignupCreated' => [
-            'App\Listeners\SignupCreatedListener',
-        ],
+        // 'App\Events\SignupCreated' => [
+        //     'App\Listeners\SignupCreatedListener',
+        // ],
         'App\Events\AdmissionCreated' => [
             'App\Listeners\AdmissionCreatedListener',
         ],

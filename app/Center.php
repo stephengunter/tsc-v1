@@ -8,6 +8,8 @@ use App\ContactInfo;
 use App\Photo;
 use App\Repositories\Roles;
 
+use App\Support\Helper;
+
 class Center extends Model
 {
 	use FilterPaginateOrder;
@@ -36,7 +38,29 @@ class Center extends Model
 			 
         ];
 	}
+   public static function optionsConverting($centers,$empty_item=false)
+	{
+		if(Helper::isNullOrEmpty($centers)) return [];
+		
+		$centerOptions=[];
 
+		if($empty_item){
+			 $item=[ 'text' => '全部開課中心' , 
+						'value' => 0 , 
+					 ];
+			 array_push($centerOptions,  $item);
+		}
+
+		foreach($centers as $center)
+		{
+			 $item=[ 'text' => $center->name , 
+						 'value' => $center->id , 
+					];
+			 array_push($centerOptions,  $item);
+		}
+
+		return $centerOptions;
+  }
 	
 	
 	public static function canEdit($user)

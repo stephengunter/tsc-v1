@@ -9,9 +9,16 @@ use App\Tuition;
 
 use Carbon\Carbon;
 
-use App\Repositories\Signups;
+use App\Repositories\Courses;
 use App\Repositories\Discounts;
 use App\Repositories\Payways;
+use App\Repositories\Signups;
+use App\Repositories\Users;
+use App\Repositories\Terms;
+use App\Repositories\Centers;
+
+use App\Events\SignupCreated;
+
 use Exception;
 use DB;
 
@@ -19,11 +26,20 @@ use App\Exceptions\RequestError;
 
 class SignupService
 {
-    public function __construct(Signups $signups,Payways $payways, Discounts $discounts)
+    public function __construct(Signups $signups,Payways $payways, Discounts $discounts,Courses $courses, 
+                                Users $users,Terms $terms , Centers $centers)
+   
+   
     {
+       
         $this->signups=$signups;
         $this->payways=$payways;
         $this->discounts=$discounts;
+        $this->courses=$courses;
+
+        $this->users=$users;
+        $this->terms=$terms;
+        $this->centers=$centers;
 
         $this->statusOptions=array(
             [ 
@@ -39,6 +55,7 @@ class SignupService
                'value' => -1 , 
             ],
         );
+
     }
 
     public function statusOptions()
@@ -46,9 +63,40 @@ class SignupService
         return $this->statusOptions;
     }
 
+    public function termOptions()
+    {
+        return $this->terms->options();
+    }
+
+    public function centerOptions()
+    {
+        return $this->centers->options();
+    }
+
+    public function userOptions()
+    {
+        $userList=$this->users->getAll()->with('profile')->get();
+        $userOptions=$this->users->optionsConverting($userList);
+
+        return $userOptions;
+    }
+
     public function getPayways()
     {
         return $this->payways->getAll();
+    }
+
+    public function  getCanSignupCourses($term_id,$center_id)
+    {
+
+    }
+
+    public function  getCourseOptions($course)
+    {
+        $courseList=$this->courses->canSignupCourses();
+        if($courseList->count()){
+            $courseOptions=$this->courses->optionsConverting($courseList->get());
+        }
     }
 
     
@@ -109,7 +157,8 @@ class SignupService
 
     public function store(Course $course, User $user, Signup $signup , Tuition $tuition=null)
     {
-        $err=$this->canSignup($course, $user);
+      
+        $this->canSignup($course, $user, $signup->net_signup);
         
         if(!$tuition){
             $signup->discount_id=0;
@@ -124,11 +173,8 @@ class SignupService
             $date = Carbon::parse($signup->date);
         }
         catch (Exception $err) {
-            $err=[
-                'key' => 'signup.date',
-                'value' =>'日期錯誤'
-            ];
-            throw new RequestError($err);
+           
+            throw new RequestError('signup.date','日期錯誤');
         }
 
       
@@ -136,11 +182,8 @@ class SignupService
         if($signup->discount_id){
             $discount=$this->countTuition($course,$signup->discount_id,$date);
             if($discount->tuition!=$signup->tuition){                    
-                $err=[
-                        'key' => 'signup.tuition',
-                        'value' =>'課程費用錯誤'
-                    ];
-                throw new RequestError($err);
+                
+                throw new RequestError('signup.tuition', '課程費用錯誤');
                
                 
             }
@@ -154,15 +197,21 @@ class SignupService
                 $signup->save();
                
                 $signup->tuitions()->save($tuition);
-       
+
+                
                 return $signup;
                  
             });
 
-            return $signup;
+           
         }else{
             $signup->save();
         }
+
+        $signup->updateStatus();
+        $course->updateStatus();
+      
+        //event(new SignupCreated($signup));
 
         return $signup;
 
@@ -179,21 +228,15 @@ class SignupService
             $date = Carbon::parse($signup->date);
         }
         catch (Exception $err) {
-            $err=[
-                'key' => 'signup.date',
-                'value' =>'日期錯誤'
-            ];
-            throw new RequestError($err);
+           
+            throw new RequestError('signup.date','日期錯誤');
         }
        
         if($signup->discount_id){
             $discount=$this->countTuition($course,$signup->discount_id,$date);
             if($discount->tuition!=$signup->tuition){                    
-                $err=[
-                        'key' => 'signup.tuition',
-                        'value' =>'課程費用錯誤'
-                    ];
-                throw new RequestError($err);
+                
+                throw new RequestError('signup.tuition', '課程費用錯誤');
                
                 
             }
@@ -213,16 +256,18 @@ class SignupService
         return $signup;
     }
 
-    public function canSignup(Course $course, User $user)
+    public function canSignup(Course $course, User $user, $isNetSignup)
     {
+        
+        if(!$course->canSignup($isNetSignup))
+        {
+            throw new RequestError('signup.course_id','此課程目前無法報名');
+        }
         if($user->id){
             $validSignups=$this->getValidSignups($course->id)->where('user_id',$user->id)->get();
             if(count($validSignups) ) {
-                $err=[
-                'key' => 'signup.user_id',
-                'value' =>'此學員已報名過此課程了'
-                ];
-                throw new RequestError($err);
+                
+                throw new RequestError('signup.user_id','此學員已報名過此課程了');
             }
         }
       
