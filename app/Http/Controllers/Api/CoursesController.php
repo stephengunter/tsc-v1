@@ -124,7 +124,7 @@ class CoursesController extends BaseController
 
         $course->privateCategories=$course->privateCategories();
         $course->photo= $course->photo();
-        $course->canSignup= $course->canSignup();
+        $course->canSignup=true; //$course->canSignup();
         
         $course->classTimes= $course->classTimes->sortBy('weekday_id')
                                                 ->sortBy('on')->values()->all();

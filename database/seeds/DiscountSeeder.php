@@ -20,12 +20,22 @@ class DiscountSeeder extends Seeder
             'name' => '新生',
             'center_id' => $center->id,
             'points_one' => 85,
+            'need_prove' => 0,
             'active' => 1,
         ]);
         Discount::create([
-            'name' => '舊生、各級學校在校生、慈濟志業體同仁(含慈誠、委員、榮董)、同時報名兩科之新生',
+            'name' => '同時報名兩科以上',
             'center_id' => $center->id,
-            'points_one' => 80,
+            'course_count' => 2,
+            'points_one' => 85,
+            'need_prove' => 0,
+            'active' => 1,
+        ]);
+        Discount::create([
+            'name' => '舊生、各級學校在校生、慈濟志業體同仁(含慈誠、委員、榮董)',
+            'center_id' => $center->id,
+            'points_one' => 85,
+            'need_prove' => 1,
             'active' => 1,
         ]);
         Discount::create([
@@ -42,6 +52,7 @@ class DiscountSeeder extends Seeder
             'center_id' => $center->id,
             'points_one' => 80,
             'points_two' => 80,
+            'need_prove' => 1,
             'active' => 1,
         ]);
         Discount::create([
@@ -50,6 +61,7 @@ class DiscountSeeder extends Seeder
             'center_id' => $center->id,
             'points_one' => 50,
             'points_two' => 50,
+            'need_prove' => 1,
             'active' => 1,
         ]);
         Discount::create([
@@ -58,6 +70,7 @@ class DiscountSeeder extends Seeder
             'center_id' => $center->id,
             'points_one' => 50,
             'points_two' => 50,
+            'need_prove' => 1,
             'all_courses' => 1,
             'active' => 1,
         ]);

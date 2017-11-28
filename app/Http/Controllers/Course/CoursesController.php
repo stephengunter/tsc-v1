@@ -48,7 +48,7 @@ class CoursesController extends BaseController
     }
     public function index()
     {
-       
+        
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('courses.index')
@@ -103,59 +103,61 @@ class CoursesController extends BaseController
     }
     private function createCourse()
     {
-        $categoryOptions=$this->getCategoryOptions();    
-        $centerOptions=$this->getCenterOptions();    
-        $termOptions=$this->terms->options();
+        dd('err');
+        // $categoryOptions=$this->getCategoryOptions();    
+        // $centerOptions=$this->getCenterOptions();    
+        // $termOptions=$this->terms->options();
 
-        $center_id=$centerOptions[0]['value'];
-        $course= Course::initialize($center_id);
-        $course['term_id']=$termOptions[0]['value'];
+        // $center_id=$centerOptions[0]['value'];
+        // $course= Course::initialize($center_id);
+        // $course['term_id']=$termOptions[0]['value'];
 
-        $teacherOptions=$this->teachers->optionsByCenter($center_id);
+        // $teacherOptions=$this->teachers->optionsByCenter($center_id);
         
        
-        return response()
-            ->json([
-                'course' => $course,
-                'centerOptions' => $centerOptions,
-                'categoryOptions' => $categoryOptions,
-                'teacherOptions' => $teacherOptions,
-                'termOptions' => $termOptions
+        // return response()
+        //     ->json([
+        //         'course' => $course,
+        //         'centerOptions' => $centerOptions,
+        //         'categoryOptions' => $categoryOptions,
+        //         'teacherOptions' => $teacherOptions,
+        //         'termOptions' => $termOptions
                 
-            ]);
+        //     ]);
     }
     private function createGroupCourse($parent_id)
     {
-        $parentCourse=Course::find($parent_id); 
-        if(!$parentCourse) return $this->createCourse();
+        dd('err');
+        // $parentCourse=Course::find($parent_id); 
+        // if(!$parentCourse) return $this->createCourse();
 
-        $center_id=$parentCourse->center_id;
+        // $center_id=$parentCourse->center_id;
         
-        $course= Course::initialize( 0 ,$parentCourse);
+        // $course= Course::initialize( 0 ,$parentCourse);
 
-        $term_id=$course['term_id'];
-        $groupCourses= $this->courses->getGroupCourses($term_id,$center_id)->get();
+        // $term_id=$course['term_id'];
+        // $groupCourses= $this->courses->getGroupCourses($term_id,$center_id)->get();
                                                       
-        $with_empty=true;
-        $groupOptions=$this->courses->optionsConverting($groupCourses,$with_empty);
+        // $with_empty=true;
+        // $groupOptions=$this->courses->optionsConverting($groupCourses,$with_empty);
 
-        $centerOptions=$this->getCenterOptions();
-        $categoryOptions=$this->getCategoryOptions();
-        $teacherOptions=$this->teachers->optionsByCenter($center_id);
+        // $centerOptions=$this->getCenterOptions();
+        // $categoryOptions=$this->getCategoryOptions();
+        // $teacherOptions=$this->teachers->optionsByCenter($center_id);
         
-        $termOptions=$this->terms->options();
+        // $termOptions=$this->terms->options();
 
-        return response()->json([
+        // return response()->json([
                         
-                            'course' => $course,
-                            'centerOptions' => $centerOptions,
-                            'categoryOptions' => $categoryOptions,
-                            'teacherOptions' => $teacherOptions,
-                            'termOptions' => $termOptions,
-                            'groupOptions' => $groupOptions,
-                            'groupCourses' => $groupCourses
+        //                     'course' => $course,
+        //                     'centerOptions' => $centerOptions,
+        //                     'categoryOptions' => $categoryOptions,
+        //                     'teacherOptions' => $teacherOptions,
+        //                     'termOptions' => $termOptions,
+        //                     'groupOptions' => $groupOptions,
+        //                     'groupCourses' => $groupCourses
                             
-                        ]);
+        //                 ]);
     }
 
     
@@ -216,7 +218,11 @@ class CoursesController extends BaseController
             return  $this->unauthorized(); 
         }
 
-        
+       
+
+        $course->teachers->each(function ($item) {
+             $item->getName();
+        });
 
         $course->begin_date=Helper::checkDateString($course->begin_date);
         $course->end_date=Helper::checkDateString($course->end_date);
@@ -225,15 +231,18 @@ class CoursesController extends BaseController
         $termOptions=$this->courseService->termOptions();
         $centerOptions=$this->courseService->centerOptions();
         $categoryOptions=$this->courseService->categoryOptions();
-       
+
+        $teacherOptions=$this->courseService->teacherOptions($course->center_id);
 
         return response()
             ->json([
                 'course' => $course,
 
                 'termOptions' => $termOptions,
-                'categoryOptions' => $categoryOptions,
                 'centerOptions' => $centerOptions,
+                'teacherOptions' => $teacherOptions,
+                'categoryOptions' => $categoryOptions,
+                
               
             ]);
    

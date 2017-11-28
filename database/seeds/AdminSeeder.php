@@ -17,18 +17,18 @@ class AdminSeeder extends Seeder
     public function run()
     {
         $user=\App\User::create([
-			'name' => '花組長',
-			'email' =>'test@tcust.com.tw',
-			'phone' => '0932000000',
+			'name' => '莉玲',
+			'email' =>'liling@mail.tcu.edu.tw',
+			'phone' => '0912148533',
 			'password' => '000000',
 			'email_confirmed' => true,
 			'remember_token' => str_random(10),
 		]);
 		$profile=new \App\Profile([
 			'user_id' => $user->id,					
-			'fullname'=> '花組長',
-			'dob' =>'1970-1-1',
-			'gender' => 1,
+			'fullname'=> '蕭莉玲',
+			'dob' =>'1981-02-27',
+			'gender' => 0,
 		]);
         $user->profile()->save($profile); 
         
@@ -48,22 +48,22 @@ class AdminSeeder extends Seeder
 
 
         $user=\App\User::create([
-			'name' => '花組員',
-			'email' =>'test01@tcust.com.tw',
-			'phone' => '0936000000',
+			'name' => 'wisekind',
+			'email' =>'wisekind@gms.tcu.edu.tw',
+			'phone' => '0921565879',
 			'password' => '000000',
 			'email_confirmed' => true,
 			'remember_token' => str_random(10),
 		]);
 		$profile=new \App\Profile([
 			'user_id' => $user->id,					
-			'fullname'=> '花組員',
-			'dob' =>'1970-1-1',
-			'gender' => 1,
+			'fullname'=> '郭芝穎',
+			'dob' =>'1979-12-13',
+			'gender' => 0,
 		]);
         $user->profile()->save($profile); 
         
-        $roleName=Role::adminRoleName();
+        $roleName=Role::ownerRoleName();
 		$user->addRole($roleName);
 
         $adminValues = [

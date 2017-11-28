@@ -30,7 +30,7 @@ use PDF;
 use Carbon\Carbon;
 use Exception;
 
-
+use App\Exceptions\RequestError;
 
 class SignupsController extends BaseController
 {
@@ -158,6 +158,8 @@ class SignupsController extends BaseController
         $course=null;
         if($course_id){
             $course= Course::findOrFail($course_id);
+            $net_signup=false;
+            $course->canPay=$course->canSignup($net_signup);
         }
 
         $courseOptions=$this->getCourseOptions($course);
@@ -204,7 +206,27 @@ class SignupsController extends BaseController
          
     }
     
-   
+    private function storeBackUpSignup($values)
+    {
+        $course_id=$values['course_id'];
+        $user_id=$values['user_id'];
+        $isUserHasSignuped=$this->signupService->isUserHasSignuped($course_id, $user_id);
+
+        if($isUserHasSignuped){
+            throw new RequestError('signup.user_id','此學員已報名過此課程了');
+        }
+
+        $values['discount_id']=0;
+        $values['discount']='';
+        $values['points']=0;
+        $values['cost']=0;
+        $values['tuition']=0;
+        $signup=Signup::create($values);
+
+      //event(new SignupCreated($signup));
+
+        return response()->json($signup);
+    }
     
     public function store(SignupRequest $request)
     {  
@@ -218,8 +240,15 @@ class SignupsController extends BaseController
         $net_signup=0;
         $values['net_signup']=$net_signup;
 
+        $values['cost']=0;  //不代收材料費
+
         $course_id=$values['course_id'];
         $course=Course::findOrFail($course_id);
+
+        if(!$course->canSignup($net_signup))
+        {
+           return $this->storeBackUpSignup($values);
+        }
 
         $user_id=$values['user_id'];
         $user=User::findOrFail($user_id);

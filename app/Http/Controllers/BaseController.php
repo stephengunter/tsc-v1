@@ -174,13 +174,13 @@ class BaseController extends Controller
 
                     )
                 ],
-                [
-                    'id' => 2,
-                    'text' => '新增教師',
-                    'path' => '/teachers/create',
-                    'active' => $current=='teachers/create',
+                // [
+                //     'id' => 2,
+                //     'text' => '新增教師',
+                //     'path' => '/teachers/create',
+                //     'active' => $current=='teachers/create',
                     
-                ],
+                // ],
                 [
                     'id' => 3,
                     'text' => '匯入教師',
@@ -218,6 +218,23 @@ class BaseController extends Controller
                     'text' => '匯入課程',
                     'path' => '/courses-import',
                     'active' => $current=='courses-import',
+                    // 'items' => array(
+                    //     [
+                    //         'text' => '從舊課程複製',
+                    //         'path' => '/courses-import',
+                    //     ],
+                    //     [
+                    //         'text' => 'Excel 匯入',
+                    //         'path' => '/courses-import?from=excel',
+                    //     ]
+
+                    // )
+                ],
+                [
+                    'id' => 4,
+                    'text' => '匯入上課時間',
+                    'path' => '/classtimes-import',
+                    'active' => $current=='classtimes-import',
                     // 'items' => array(
                     //     [
                     //         'text' => '從舊課程複製',

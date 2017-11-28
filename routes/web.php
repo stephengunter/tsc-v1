@@ -156,6 +156,9 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
     ['only' => ['show','edit','update']]);
 
+    Route::resource('classtimes-import', '\App\Http\Controllers\Course\ClasstimesImportController',
+    ['only' => ['index','store']]);
+
     Route::resource('classtimes', '\App\Http\Controllers\Course\ClassTimesController');
 
     Route::resource('courses-review', '\App\Http\Controllers\Course\CoursesReviewController',

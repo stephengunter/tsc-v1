@@ -40,6 +40,11 @@ class Classtimes
                 $err_msg .= '代碼  ' .$number . ' 錯誤'. ',';
                 continue;
             }
+
+            if(!$course->canEditBy($current_user)){
+                $err_msg .= '您沒有編輯課程  ' .$number . ' 的權限'. ',';
+                continue;        
+            }
             
             $weekday=trim($row['weekday']);
             if(!$weekday)continue;
@@ -53,7 +58,7 @@ class Classtimes
             $weekday=(int)$weekday;
             $weekdayEntity=Weekday::where('val',$weekday)->first();
             if(!$weekdayEntity){
-                $err_msg .= '禮拜幾  ' .$number . ' 錯誤'. ',';
+                $err_msg .= '星期代碼  ' .$number . ' 錯誤'. ',';
                 continue;
             }
 
@@ -61,8 +66,6 @@ class Classtimes
 
             $on=(int)$on;
             $off=(int)$off;
-
-            
             
 
             $values=[

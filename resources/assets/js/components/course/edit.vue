@@ -165,9 +165,9 @@
                @uploaded="onPhotoUploaded">
             </image-upload>
         </div>
-     </modal>
+    </modal>
      
-     <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
+    <delete-confirm :showing="deleteConfirm.show" :message="deleteConfirm.msg"
       @close="onDeletePhotoCanceled" @confirmed="deletePhoto">        
     </delete-confirm>
 

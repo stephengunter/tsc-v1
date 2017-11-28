@@ -19,8 +19,12 @@ class CreateDiscountsTable extends Migration
             $table->string('name')->nullable();
 
             $table->integer('center_id')->unsigned()->nullable();
+
+            $table->integer('course_count')->default(1);
             $table->integer('points_one')->unsigned()->nullable();
             $table->integer('points_two')->unsigned()->nullable();
+            
+            $table->boolean('need_prove')->default(false);
             $table->boolean('all_courses')->default(false);
 
             $table->string('ps')->nullable();

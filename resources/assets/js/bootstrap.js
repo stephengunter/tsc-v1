@@ -112,6 +112,8 @@ Vue.component('course-copy', require('./views/courses/copy'))
 Vue.component('course-review', require('./views/courses/review'))
 Vue.component('course-statuses', require('./views/courses/statuses'))
 
+Vue.component('classtimes-import', require('./views/classtimes/import'))
+
 Vue.component('credit-course-import', require('./views/credit-courses/import'))
 
 Vue.component('admission-index', require('./views/admissions/index'))

@@ -57,14 +57,14 @@
                     
                     <div class="col-sm-3">
                         <div class="form-group">                           
-                            <label>教材費</label>
+                            <label>教材費用</label>
                             <input type="text" name="signupinfo.cost" class="form-control" v-model="form.signupinfo.cost">
                             <small class="text-danger" v-if="form.errors.has('signupinfo.cost')" v-text="form.errors.get('signupinfo.cost')"></small>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">                           
-                            <label>教材</label>
+                            <label>教材費用說明</label>
                             <textarea rows="4" cols="50" class="form-control" name="signupinfo.materials"  v-model="form.signupinfo.materials">
                             </textarea>
                             

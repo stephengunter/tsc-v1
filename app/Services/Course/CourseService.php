@@ -49,6 +49,13 @@ class CourseService
       return  $this->centers->options($empty_item);
 
    }
+
+   public function teacherOptions($center_id)
+   {
+       $reviewed=true;
+       return $this->teachers->optionsByCenter($center_id,$reviewed);
+   }
+
    public function categoryOptions($public=false)
    {
       return  $this->categories->options($public);

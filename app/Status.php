@@ -175,6 +175,13 @@ class Status extends Model
     {
         return $this->course->removed;
     }
+
+    
+    public function signupFulled()
+    {
+        $status=(int)$this->signup;
+        return ($status==-3);   //已額滿
+    }
     public function signupStopped()
     {
         $status=(int)$this->signup;

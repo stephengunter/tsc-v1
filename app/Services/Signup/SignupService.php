@@ -249,11 +249,21 @@ class SignupService
             $signup->discount='';
             $signup->points=0;
             $signup->tuition=$course->tuition;
-            $signup->cost=$course->cost;
         }
 
         $signup->save();
         return $signup;
+    }
+
+    public function isUserHasSignuped($course_id,$user_id)
+    {
+        $validSignups=$this->getValidSignups($course_id)->where('user_id',$user_id)->get();
+        if(count($validSignups) ) {
+            
+           return true;
+        }
+
+        return false;
     }
 
     public function canSignup(Course $course, User $user, $isNetSignup)

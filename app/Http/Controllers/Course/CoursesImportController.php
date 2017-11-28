@@ -28,23 +28,7 @@ class CoursesImportController extends BaseController
     {
 
         $menus=$this->menus($this->key); 
-        return view('courses.import')->with([ 'menus' => $menus  ]);  
-
-        // $from=request()->get('from');       
-        // if(!$from) $from='';
-
-        // if(strtolower($from)=='excel'){
-        //     return view('courses.import')->with([ 'menus' => $menus  ]); 
-        // }else{
-        //     $termOptions=$this->courseService->termOptions();
-        //     $centerOptions=$this->courseService->centerOptions($this->canAdminCenters());
-        //     return view('courses.copy')->with([ 
-        //         'menus' => $menus ,
-        //         'termOptions' => $termOptions,
-        //         'centerOptions' => $centerOptions
-        //     ]); 
-        // }
-    
+        return view('courses.import')->with([ 'menus' => $menus  ]); 
     }
 
     public function store(Request $form)

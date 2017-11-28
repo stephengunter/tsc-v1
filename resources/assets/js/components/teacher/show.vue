@@ -65,11 +65,7 @@
                     <label class="label-title">最高學歷</label>
                     <p v-text="teacher.education"></p>                      
                 </div>
-                <div class="col-sm-4">
-                    <label class="label-title">現職</label>
-
-                    <p v-text="teacher.job"></p>                     
-                </div>
+                
             </div>   <!-- End row-->
             <div  class="row">
                 <div class="col-sm-4">

@@ -70,15 +70,19 @@ class Helper {
             case 'categories':
                 html = '<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>'
                 break;
+           
             case 'volunteers':
                 html = '<i class="fa fa-handshake-o" aria-hidden="true"></i>'
                 break;
             case 'courses':
                 html = '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>'
                 break;
+            case 'classtimes':
+                html = '<i class="fa fa-clock-o" aria-hidden="true"></i> '
+                break;
             case 'credit_courses':
-            html = '<i class="fa fa-graduation-cap" aria-hidden="true"></i>'
-            break;
+                html = '<i class="fa fa-graduation-cap" aria-hidden="true"></i>'
+                break;
             case 'lessons':
                 html = '<i class="fa fa-calendar-check-o" aria-hidden="true"></i>'
                 break;

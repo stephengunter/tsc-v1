@@ -61,6 +61,8 @@ class SignupInfoesController extends BaseController
         $updated_by=$current_user->id;
 
         $values=$request->getValues($updated_by,$removed);
+
+        
        
         $course->update($values);
         event(new CourseUpdated($course, $current_user));

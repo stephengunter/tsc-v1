@@ -173,6 +173,8 @@ class Teachers
         if($reviewed){
             $teachers=$teachers->where('reviewed',true);
         }
+
+        
         
         
         return $this->optionsConverting($teachers->orderBy('group')->get());
@@ -413,7 +415,7 @@ class Teachers
 
             $education=trim($row['education']);
             $specialty=trim($row['specialty']);
-            $job=trim($row['job']);
+            // $job=trim($row['job']);
             $description=trim($row['description']);
             
             $experiences='';               
@@ -428,7 +430,7 @@ class Teachers
             $teacherValues=[
                 'education' => $education,
                 'specialty' => $specialty,
-                'job' => $job,
+                // 'job' => $job,
                 
                 'description' => $description,
                 'experiences' => $experiences,

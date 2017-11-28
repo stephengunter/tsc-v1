@@ -35,7 +35,7 @@
                     <label class="label-title">網路報名</label>
                     <p>
                          {{ signupinfo.canNetSignup }}
-                        <span v-html="$options.filters.yesOrNoSign(signupinfo.discount)"></span>    
+                        <span v-html="$options.filters.yesOrNoSign(signupinfo.net_signup)"></span>    
                     </p>  
                 </div>
                 <div class="col-sm-3">

@@ -63,7 +63,8 @@ class Teacher extends Model
 
     public function getName()
     {
-        return $this->user->profile->fullname;
+        $this->name= $this->user->profile->fullname;
+        return $this->name;
     }
     public function getPhoto()
     {

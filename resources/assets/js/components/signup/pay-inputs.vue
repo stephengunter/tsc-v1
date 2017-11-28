@@ -15,19 +15,19 @@
 	<div class="row">
 		<div  class="col-sm-3">
 			<div class="form-group"> 
-				<label>學費</label>
-				<input disabled type="text" name="signup.tuition" class="form-control" v-model="form.signup.tuition" @keydown="clearErrorMsg('signup.tuition')"  >
+				<label>應繳學費</label>
+				<input  type="text" name="signup.tuition" class="form-control" v-model="form.signup.tuition" @keydown="clearErrorMsg('signup.tuition')"  >
 				<small class="text-danger" v-if="form.errors.has('signup.tuition')" v-text="form.errors.get('signup.tuition')"></small>
 			</div>  
 		</div>
-		<div  class="col-sm-3">    
+		<div v-if="false" class="col-sm-3">    
 			<div class="form-group"> 
 				<label>材料費</label>
 				<input disabled type="text" name="signup.cost" class="form-control" v-model="form.signup.cost" @keydown="clearErrorMsg('signup.cost')"  >
 				<small class="text-danger" v-if="form.errors.has('signup.cost')" v-text="form.errors.get('signup.cost')"></small>
 			</div> 
 		</div>
-		<div  class="col-sm-3">    
+		<div v-if="false"  class="col-sm-3">    
 			<div class="form-group"> 
 				<label>合計應繳</label>
 				<input disabled type="text" :value="total" name="signup.cost" class="form-control"  >

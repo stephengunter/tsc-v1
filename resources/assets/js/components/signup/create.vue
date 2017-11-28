@@ -61,7 +61,7 @@
                            
                         </div>  
                    </div>
-                   <div class="col-sm-3">
+                   <div v-if="canPay" class="col-sm-3">
                         <div class="form-group"> 
                             <label>是否繳費</label>
                             <div>
@@ -190,6 +190,10 @@
                type: Number,
                default: 0
             },
+            can_pay:{
+               type: Boolean,
+               default: true
+            },
         },
         data() {
             return {
@@ -215,6 +219,7 @@
                     reviewed:1
                 },
                 
+                course:null,
                 courseName:'',
                
                 form: new Form({
@@ -253,6 +258,13 @@
                 if(!this.user) return false
 
                 return true
+            },
+            canPay(){
+                if(!this.can_pay) return false
+                if(this.course){
+                    return this.course.canPay
+                }
+                return this.can_pay
             },
             isPay(){
                 return Helper.isTrue(this.pay)
@@ -295,8 +307,7 @@
                      
                 getData.then(data => {
                     let signup=data.signup
-                    signup.cost=Helper.formatMoney(signup.cost,true)
-                   
+                    //signup.cost=Helper.formatMoney(signup.cost,true)
                   
                     this.date.time=signup.date
                     
@@ -308,6 +319,7 @@
                     })
 
                     if(data.course){
+                        this.course=data.course
                         this.courseName= Course.getFormatedCourseName(data.course,true)                   
                     }
 
