@@ -20,6 +20,8 @@ class CreateSignupsTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
+            $table->integer('bill_id')->unsigned()->nullable(); 
+            
             $table->integer('parent')->unsigned()->default(0);
             
             $table->date('date');

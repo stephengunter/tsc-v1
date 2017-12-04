@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use App\Course;
+use App\Center;
 
 use App\Repositories\Courses;
 use App\Repositories\Teachers;
@@ -65,34 +66,76 @@ class CoursesController extends BaseController
         $categoryId=(int)$request->category;       
         $centerId=(int)$request->center;
 
-        if($centerId && $categoryId){
-            $courses= $this->getCourses($categoryId,$centerId);
-            return response() ->json(['courses' => $courses  ]); 
+        $courses=[];
+
+        $center=null;
+        if($centerId)  $center=Center::find($centerId);   
+        
+        
+        $area_id=0;
+        if($center)$area_id=$center->area_id;            
+        else $area_id=$this->centers->getAllAreas()[0]['value'];
+            
+        $oversea=false;
+        $centers=$this->centers->index($oversea , $area_id)
+                                ->get();
+        
+        if($center) $centerId= $center->id;
+        else $centerId= $centers[0]->id;
+
+        $categories= $this->categories->getFrontEndCategories($centerId)
+                                      ->get();
+
+                                      
+        
+        if(!$categoryId && count($categories)){
+           $categoryId=$categories[0]->id;
+            
         }  
 
-        $oversea=false;
-        $centers=$this->centers->hasCoursesCenters()
-                               ->where('oversea',$oversea)
-                               ->where('active',true)
-                               ->orderBy('display_order','desc')
-                               ->get();
-
-
-        $centerId=$centers[0]->id;
-
-        
-        $categories= $this->categories->getFrontEndCategories($centerId)->get();
-
-        $categoryId=$categories[0]->id;
-        
 
         $courses= $this->getCourses($categoryId,$centerId);
-        
+
         return response() ->json([ 
-                                    'courses' => $courses , 
-                                    'categories' => $categories,   
-                                    'centers' => $centers
-                                ]); 
+            'courses' => $courses , 
+            'categories' => $categories,   
+            'centers' => $centers
+        ]); 
+
+
+
+
+        // if($centerId && $categoryId){
+        //     $courses= $this->getCourses($categoryId,$centerId);
+        //     return response() ->json(['courses' => $courses  ]); 
+        // }else{
+            
+        //     $area_id=$this->centers->getAllAreas()[0]['value'];
+        //     $centers=$this->centers->index($oversea , $area_id)
+        //                             ->get();
+            
+    
+        //     $centerId=$centers[0]->id;
+    
+            
+        //     $categories= $this->categories->getFrontEndCategories($centerId)
+        //                                   ->get();
+           
+        //     $categoryId=$categories[0]->id;
+
+        //     $courses= $this->getCourses($categoryId,$centerId);
+        // }  
+
+        
+        
+
+        
+        
+        // return response() ->json([ 
+        //                             'courses' => $courses , 
+        //                             'categories' => $categories,   
+        //                             'centers' => $centers
+        //                         ]); 
         
        
     }
@@ -123,19 +166,23 @@ class CoursesController extends BaseController
         $center->contactInfo->addressA=$center->contactInfo->addressA();
 
         $course->privateCategories=$course->privateCategories();
-        $course->photo= $course->photo();
-        $course->canSignup=true; //$course->canSignup();
+
+        // $defaultPhoto=false;
+        // $course->photo= $course->photo($defaultPhoto);
+        // $course->canSignup=true; //$course->canSignup();
+
+        $course->populateViewData();
         
-        $course->classTimes= $course->classTimes->sortBy('weekday_id')
-                                                ->sortBy('on')->values()->all();
+        // $course->classTimes= $course->classTimes->sortBy('weekday_id')
+        //                                         ->sortBy('on')->values()->all();
         
-        foreach ($course->classTimes as $classTime) {
-            $classTime->weekday;
-        }
-        foreach ($course->teachers as $teacher) {
-              $teacher->name=$teacher->getName();
-              $teacher->photo=$teacher->getPhoto();
-        }
+        // foreach ($course->classTimes as $classTime) {
+        //     $classTime->weekday;
+        // }
+        // foreach ($course->teachers as $teacher) {
+        //       $teacher->name=$teacher->getName();
+        //       $teacher->photo=$teacher->getPhoto();
+        // }
         return response()->json(['course' => $course]);
     }
 
@@ -182,7 +229,7 @@ class CoursesController extends BaseController
 
     private function getCourses(int $categoryId,int $centerId)
     {
-        
+       
         $courses=$this->courses->getActiveCourses($categoryId,$centerId)->get();
         
         $canEditNumber=false;

@@ -44,35 +44,37 @@ class DiscountsController extends BaseController
                           ]);
         } 
 
+        $current_user=$this->currentUser();
+
+        $globalDiscount=$this->discounts->globalDiscount()->get();
+
         $center_id=(int)request()->center;
         $center=$this->centers->findOrFail($center_id);
         
-        $canEdit=false;
+        $canEdit=Discount::canCreate($current_user,$center);
 
-        $discountList=$this->discounts->getAll()
-                                    ->where('center_id',$center_id)
-                                    ->orderBy('order','desc')
-                                    ->get();
-        $current_user=$this->currentUser();                          
-        if(count($discountList)){
-            
-            $canEdit=$discountList[0]->canEditBy($current_user);
-        }else{
-            $canEdit=Discount::canCreate($current_user,$center);
+        $centerDiscounts=$this->discounts->getAll()
+                                ->where('center_id',$center_id)
+                                ->orderBy('order','desc')
+                                ->get();
+
+        
+        $discounts=$globalDiscount->merge($centerDiscounts);
+                                 
+        
+        if(count($discounts)){
+           
+            foreach ($discounts as $discount) {
+                $discount->canEdit = $discount->canEditBy($current_user);
+                
+            }
         }
                               
-        // if(count($discountList)){
-        //     $current_user=$this->currentUser();
-        //     foreach ($discountList as $discount) {
-        //         $discount->canDelete = $discount->canDeleteBy($current_user);
-        //         $discount->canEdit = $discount->canEditBy($current_user);
-        //         $discount->identity = $discount->identity();
-        //     }
-        // }
+       
         
         return response()
         ->json([
-            'discountList' => $discountList,
+            'discountList' => $discounts,
             'canEdit' => $canEdit
         ]);
          

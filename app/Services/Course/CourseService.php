@@ -95,19 +95,68 @@ class CourseService
       return $this->courses->index($params ,$with);
    }
 
-   public function store(array $values, array $category_ids=[], array $teacher_ids=[] )
+   public function checkCourseDate(Course $course)
    {
-      $values['active'] =true;
-      $values['reviewed'] =false;
-      $values['credit'] =false;
-      $values['group'] =0;
-      $values['parent'] =0;
-
-      $course=new Course($values);
-      return $this->insertCourse($course,$category_ids,$teacher_ids);
+        $begin_date=FormatChecker::getCarbonDate($course->begin_date);
+        if(!$begin_date)  throw new RequestError('course.begin_date','開始日期錯誤');
+        
+        $end_date=FormatChecker::getCarbonDate($course->end_date);
+        if(!$end_date)  throw new RequestError('course.end_date','結束日期錯誤');
+        
+        if($end_date->lte($begin)) throw new RequestError('course.end_date','結束日期錯誤');
 
    }
+   public function canCreate(Course $course)
+   {
+       
+        if($course->number){
+            $numberExist=$this->courseNumberExist($number,0);
+             
+            if($numberExist) throw new RequestError('course.number','課程編號重複了');
+        }
 
+        $this->checkCourseDate($course);
+
+        
+        return true;
+     
+   }
+   public function canUpdate(Course $course)
+   {
+        if($course->number){
+            $numberExist=$this->courseNumberExist($number,$course->id);
+            if($numberExist) throw new RequestError('course.number','課程編號重複了');
+        }
+
+        $this->checkCourseDate($course);
+
+        return true;
+     
+   }
+
+   public function store(array $values, array $category_ids=[], array $teacher_ids=[] )
+   {
+        $values['active'] =1;
+        $values['reviewed'] =0;
+        $values['credit'] =0;
+        $values['group'] =0;
+        $values['parent'] =0;
+
+        $course=new Course($values);
+        return $this->insertCourse($course,$category_ids,$teacher_ids);
+
+   }
+   public function update(Course $course,array $values, array $category_ids=[], array $teacher_ids=[] )
+   {
+        
+        $values['credit'] =false;
+        $values['group'] =0;
+        $values['parent'] =0;
+
+        $course=$this->courses->update($course, $values,  $category_ids,  $teacher_ids);
+        return $course;
+
+   }
    
 
    private function storeGroupParentCourse(array $values, array $category_ids)
@@ -140,9 +189,10 @@ class CourseService
       $course= DB::transaction(function() use($course,$category_ids,$teacher_ids) {
 
          $course->save();
+
          
          $statusValues=Status::initialize($course);
-         
+        
          $status=new Status($statusValues);
          
          $course->status()->save($status);
@@ -201,6 +251,7 @@ class CourseService
          $teacherIds=$values['teacherIds'];
 
          $values['updated_by'] =$current_user->id;
+         $values['active'] =1;
          $course=$this->store($values , $categoryIds, $teacherIds);
       
          
@@ -308,8 +359,12 @@ class CourseService
          'weeks' => $weeks,
          'hours' => $hours,
 
+         
+
          'categoryIds' => $categoryIds,
          'teacherIds' => $teacherIds
+
+
          
       ];
       
@@ -424,6 +479,7 @@ class CourseService
 
 
          $course->update($courseValues);
+         $course->updateStatus();
 
 
       //    if($course->groupAndParent())

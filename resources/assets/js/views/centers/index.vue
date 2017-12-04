@@ -1,6 +1,6 @@
 <template>
     <center-list  :hide_create="hide_create" :version="version"  
-        :can_select="can_select"
+        :can_select="can_select" :area_options="area_options"
         @selected="onSelected" @begin-create="onBeginCreate">
     </center-list>
 
@@ -23,7 +23,11 @@
             hide_create:{
                type: Boolean,
                default: false
-            }
+            },
+            area_options:{
+               type: Array,
+               default: null
+            },
         },
         data() {
             return {

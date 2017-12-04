@@ -17,6 +17,35 @@ return [
 
 	'name' => '慈大社推中心',
 
+	'areas' => [
+		[
+			'value' => 1,
+			'text' => '宜花東'
+		],
+		[
+			'value' => 2,
+			'text' => '北北基'
+		],
+		[
+			'value' => 3,
+			'text' => '桃竹苗'
+		],
+		[
+			'value' => 4,
+			'text' => '中彰投'
+		],
+		[
+			'value' => 5,
+			'text' => '雲嘉南'
+		],
+		[
+			'value' => 6,
+			'text' => '高高屏'
+		]
+	 ],
+
+
+
 	'file_upload' => [
 		
 		 'default_folder' => '/files/uploads/',
@@ -31,7 +60,7 @@ return [
 
 	'course' => [
 		
-		'close_before_days' => 14,  // 開始前??天截止報名
+		'close_before_days' => 1,  // 開始前??天截止報名
 		
 	],
 	
@@ -82,7 +111,7 @@ return [
 		],
 		[
 			'value' => 1,
-			'text' => '銀行匯款'
+			'text' => '便利商店繳費'
 		],
 		[
 			'value' => 2,

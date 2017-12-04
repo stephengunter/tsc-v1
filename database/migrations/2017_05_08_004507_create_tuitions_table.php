@@ -17,7 +17,8 @@ class CreateTuitionsTable extends Migration
             $table->increments('id');
             $table->integer('signup_id')->unsigned();
             $table->foreign('signup_id')->references('id')->on('signups')->onDelete('cascade');
-            
+           
+            $table->boolean('confirmed')->default(false);
             $table->boolean('refund')->default(false);
 
             $table->date('date');

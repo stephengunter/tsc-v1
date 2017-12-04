@@ -328,6 +328,10 @@ Vue.filter('okSign', function(val) {
 Vue.filter('yesOrNoSign', function(val) {
     return Helper.yesOrNoSign(val)
 })
+Vue.filter('pointText', function(val) {
+    if(!val) return '無折扣'
+    return String(val).replace('0','') + ' 折' 
+})
 
 window.Bus = new Vue({});
 

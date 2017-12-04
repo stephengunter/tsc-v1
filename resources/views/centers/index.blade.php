@@ -3,6 +3,8 @@
 @section('content')
   
    <center-index v-show="indexMode"  :hide_create="indexSettings.hide_create" :version="version"
+   
+    :area_options="{{ json_encode($areaOptions) }}"
     @selected="onCenterSelected" @begin-create="beginCreate">
    </center-index> 
 

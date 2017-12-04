@@ -78,15 +78,11 @@ class Status extends Model
     {
         $signupStatus= (int)$this->signup;
         if($is_netSignup){
-           
-            return $signupStatus >= 1;
+           if($signupStatus > 0) return true;
+           return $signupStatus == -3 ;
         }
 
-        if($signupStatus==-3) return false;  //已額滿
-
-        if($signupStatus==0) return false;   //已停止
-
-        return true;
+        return $signupStatus!=0 ;
         
     }
     public static function initialize($course)
@@ -94,8 +90,9 @@ class Status extends Model
         $class=static::getClassStatus($course);
         $signup=static::getSignupStatus($course);
 
-        if(!$course->avtive) $signup=0; //已停止開課
         
+       
+        if(!$course->active) $signup=0; //已停止開課
         
         return [   
             'ps' => '',         
@@ -124,7 +121,13 @@ class Status extends Model
        
 
     }
+    //是否額滿
+    public function peopleFulled()
+    {
+        return $this->signup == -3;
+    }
 
+    
     
     
     public static function getClassStatus($course) 
@@ -153,7 +156,7 @@ class Status extends Model
     {
 
         $limit=(int)$course->limit;
-        
+       
         if(count($course->confirmedSignups())>= $limit)
         {
             return  -3; //已額滿

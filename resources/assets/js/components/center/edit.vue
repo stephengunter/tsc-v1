@@ -56,7 +56,14 @@
                                     </div>
                                 </div>
                             </div>  
-                            
+                            <div v-show="!isOversea" class="col-sm-4">
+                                <div class="form-group">                           
+                                    <label>區域</label>
+                                    <select  v-model="form.center.area_id" style="width:auto;" class="form-control selectWidth">
+                                        <option v-for="(item,index) in areas" :key="index" :value="item.value" v-text="item.text"></option>
+                                    </select>
+                                </div>
+                            </div> 
                                 
                         </div>   <!-- End Row   --> 
                         <div v-if="isCreate" class="row">
@@ -128,6 +135,8 @@
                 loaded:false,
 
                 overseaOptions:Center.overseaOptions() ,
+
+                areas:[],
                
                 form: {},
                 
@@ -149,7 +158,7 @@
                 return this.id == 0
             },
             isOversea(){
-                return this.form.center.oversea
+                return Helper.isTrue(this.form.center.oversea)
             },
 
         }, 
@@ -194,11 +203,15 @@
                             contact_info:data.contact_info
                         })
 
+                        
+
                     }else{
                         this.form = new Form({
                             center: center,
                         })
                     }
+
+                    this.areas=data.areas
 
                     this.photo_id =Helper.tryParseInt(center.photo_id)
 

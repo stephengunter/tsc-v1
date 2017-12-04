@@ -48,7 +48,7 @@ class UsersController extends BaseController
             return  $this->unauthorized();       
         }
 
-        $user->profile->photo=$user->profile->photo();
+        $user->getPhoto();
      
         return response()->json(['user' => $user]);        
         
@@ -57,19 +57,25 @@ class UsersController extends BaseController
     public function update(UserRequest $request, $id)
     {
         
-         $current_user=$this->currentUser();      
-         $user = User::findOrFail($id);
-         if(!$user->canEditBy($current_user)){
+        $current_user=$this->currentUser();      
+        $user = User::findOrFail($id);
+        if(!$user->canEditBy($current_user)){
             return  $this->unauthorized();       
-         }
-         $updated_by=$current_user->id;
-         $removed=false;
-         $userValues=$request->getUserValues($updated_by,$removed);       
-         $profileValues=$request->getProfileValues($updated_by);
-       
-         $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
+        }
+
+
+        $updated_by=$current_user->id;
+        $removed=false;
+        $userValues=$request->getUserValues($updated_by,$removed);       
+        $profileValues=$request->getProfileValues($updated_by);
+
+    
+        $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
+
         
-         return response()->json($user);
+        
+        $user->getPhoto();
+        return response()->json($user);
     }
 
     public function updatePhoto(Request $request, $id)

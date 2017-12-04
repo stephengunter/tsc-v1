@@ -5,14 +5,21 @@
                 <h4 v-html="title">
                 </h4>
             </div>
-            <div>
-                <select @change="onParamChanged"  v-model="params.oversea" style="width:auto;" class="form-control selectWidth">
-                    <option v-for="(item,index) in overseaOptions" :key="index" :value="item.value" v-text="item.text"></option>
-                </select>
+            <div class="form-inline">
+                <div class="form-group">
+                    <select @change="onParamChanged"  v-model="params.oversea" style="width:auto;" class="form-control selectWidth">
+                        <option v-for="(item,index) in overseaOptions" :key="index" :value="item.value" v-text="item.text"></option>
+                    </select>
+                </div>
+                <div v-show="!isOversea" class="form-group">
+                    <select  @change="onParamChanged"  v-model="params.area" style="width:auto;" class="form-control selectWidth">
+                        <option v-for="(item,index) in area_options" :key="index" :value="item.value" v-text="item.text"></option>
+                    </select>
+                </div>
             </div>
             <div>
                 
-                <a @click="beginCreate" class="btn btn-primary">
+                <a v-if="false" @click="beginCreate" class="btn btn-primary">
                     新增開課中心
                 </a>
                 
@@ -29,9 +36,7 @@
                         <th>電話</th>
                         <th>傳真</th>
                         <th>狀態</th>
-                        <!-- <th v-for="(item,index) in thead" :key="index" >
-                            {{item.title}}
-                        </th> -->
+                        
                         <th v-show="!edittingOrder">
                             順序
                             <button v-show="hasData" @click="beginEditOrder" class="btn btn-primary btn-xs">
@@ -93,6 +98,10 @@
                type: Boolean,
                default: false
             },
+            area_options:{
+               type: Array,
+               default: null
+            },
             version:{
                type: Number,
                default: 0
@@ -148,7 +157,8 @@
                 edittingOrder: false,
                 overseaOptions:Center.overseaOptions() ,
                 params:{
-                    oversea:0
+                    oversea:0,
+                    area:0
                 },
                 centers:[]
                 
@@ -164,10 +174,14 @@
             }
         },
         beforeMount() {
-           this.init()
+            if(!this.area_options || !this.area_options.length)  return false
+            
+            this.params.area=this.area_options[0].value
+            this.init()
         },
         methods: {
             init() {
+                
                 this.edittingOrder=false
                 this.centers=[]
 
@@ -175,7 +189,7 @@
             },
             fetchData(){
                 
-                let getData=Center.index(this.params.oversea)
+                let getData=Center.index(this.params.oversea,this.params.area)
                 getData.then(data => {
                     let centers = data.centers
                     this.centers=centers

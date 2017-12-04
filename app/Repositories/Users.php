@@ -66,10 +66,23 @@ class Users
    
     public function updateUserAndProfile($userValues,$profileValues, $user)
     {
-        $user->update($userValues);
-        $user->profile->update($profileValues);
+        $emailChanged=false;
+        $email=$userValues['email'];
+        if($email!=$user->email) $emailChanged=true;
         
 
+        $phoneChanged=false;
+        $phone=$userValues['phone'];
+        if($phone!=$user->phone) $phoneChanged=true;
+
+
+        $user->profile->update($profileValues);
+
+        $user->fill($userValues);
+        if($emailChanged) $user->email_confirmed=false;
+        if($phoneChanged) $user->phone_confirmed=false;
+        
+        $user->save();
         return $user;
     }
     public function updateUser($values, $id)
@@ -85,6 +98,11 @@ class Users
         $user->profile->update($values);
 
         return $user;
+    }
+
+    public function checkPhoneEmailUpdate($email, $phone)
+    {
+
     }
     
    

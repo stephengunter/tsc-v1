@@ -29,19 +29,22 @@ class CentersController extends BaseController
     { 
         
         if(!request()->ajax()){
-            
+            $areaOptions=$this->centers->getAllAreas();
             $menus=$this->menus($this->key);            
             return view('centers.index')
-                    ->with(['menus' => $menus]);                
+                    ->with(['menus' => $menus,
+                            'areaOptions' => $areaOptions
+                    ]);                
         }  
 
-       
+        $request=request();
+        $oversea=(int)$request['oversea'];
+        $area_id=(int)$request['area'];
 
-        $oversea=request()->get('oversea');
-        $isOversea=false;
-        if($oversea) $isOversea=true;
+
+       
         
-        $centers=$this->centers->index($isOversea)->get();
+        $centers=$this->centers->index($oversea, $area_id)->get();
         
       
         foreach ($centers as $center) {
@@ -116,6 +119,11 @@ class CentersController extends BaseController
         $center=$this->centers->findOrFail($id);        
         $current_user=$this->currentUser();
 
+        $area=$this->centers->findArea($center->area_id);
+        if($area)  $center->areaName=$area['text'];
+
+        
+
         $center->canEdit=$center->canEditBy($current_user);
         $center->canDelete=$center->canDeleteBy($current_user);
         
@@ -130,9 +138,12 @@ class CentersController extends BaseController
             return  $this->unauthorized();       
         }
 
-        
+        $areas=$this->centers->getAllAreas();
 
-        return response()->json(['center' => $center ]);     
+        return response()->json([
+                                    'center' => $center ,
+                                    'areas' => $areas
+                                ]);     
                 
                     
                   

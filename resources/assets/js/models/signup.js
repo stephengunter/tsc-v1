@@ -44,7 +44,7 @@ class Signup {
         let url = this.createUrl() 
         url += '?course=' + courseId
         if(userId){
-            url += '&user_id=' + userId
+            url += '&user=' + userId
         }
         return new Promise((resolve, reject) => {
             axios.get(url)

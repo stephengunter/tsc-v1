@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\User;
+use App\Role;
 use App\Support\Helper;
 
 class UserRequest extends FormRequest
@@ -19,13 +20,19 @@ class UserRequest extends FormRequest
         $email=$userValues['email'];   
 
         $user_id=$this->getUserId();
-        $role=$this->getRole();
+        $role='';
         if($user_id){
            $user = User::findOrFail($user_id);
-           if($user->roles()->first()){
-              $role=$user->roles()->first()->name;
-           }
 
+           if($user->isAdmin()) $role='Admin';
+           else if ($user->isTeacher()) $role=Role::teacherRoleName();
+           else if ($user->isStudent()) $role='Student';
+           else if ($user->isVolunteer()) $role=Role::volunteerRoleName();
+
+          
+
+        }else{
+            $role=$this->getRole();
         }
         
         

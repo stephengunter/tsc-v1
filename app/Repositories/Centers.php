@@ -36,11 +36,44 @@ class Centers
         return $this->getAll()->where('code',$code)->first();
     }
 
-    public function index(bool $oversea)
-    {
-        return $this->getAll()->where('oversea',$oversea)
-                              ->orderBy('display_order','desc');
+    public function getLocalCenters($area_id=0)    
+    {   
+        if($area_id){
+            return $this->getAll()->where('oversea',false)
+                                    ->where('area_id' , $area_id);
+        }else{
+            return $this->getAll()->where('oversea',false);
+        }   
         
+    }
+    public function getOverseaCenters()
+    {
+       
+        return $this->getAll()->where('oversea',true);
+                             
+    }
+
+    public function getAllAreas()
+    {
+
+        return config('app.areas');
+    }
+    public function findArea($id)
+    {
+        $areas=$this->getAllAreas();
+        
+        return collect($areas)->first(function ($item) use($id) {
+            return $item['value'] ==$id ;
+        });
+    }
+
+    public function index($oversea , $area_id=0)
+    {
+        $centers=null;
+        if($oversea) $centers=$this->getOverseaCenters();
+        else $centers=$this->getLocalCenters($area_id);
+
+        return $centers->orderBy('display_order','desc');
     }
     
     public function store($centerValues)
@@ -110,6 +143,7 @@ class Centers
     {
         $isOversea=false;
         $centerList=$this->index($isOversea)->get();
+        
         return $this->optionsConverting($centerList,$empty_item);
        
     }
@@ -162,6 +196,21 @@ class Centers
                 $err_msg .= '必須填寫中心代碼';
                 continue;
             }
+
+            $area_id=trim($row['area_id']);  
+            if(!$area_id){
+                $err_msg .= '必須填寫區域代碼';
+                continue;
+            }
+
+            $area = $this->findArea($area_id);
+            if(!$area){
+                $err_msg .= '區域代碼 ' . $area_id . ' 錯誤' ;
+                continue;
+            }
+
+
+
             
             $exist_center=$this->getByCode($code);
 
@@ -189,6 +238,7 @@ class Centers
             $values=[
                 'name' => $name,
                 'code' => $code,
+                'area_id' => $area_id,
                 'oversea' => $oversea,
                 'course_tel' => $course_tel,
                 'display_order' => $order,

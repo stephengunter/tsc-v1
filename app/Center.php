@@ -14,7 +14,7 @@ class Center extends Model
 {
 	use FilterPaginateOrder;
 	
-	protected $fillable = ['name', 'code' , 'course_tel',
+	protected $fillable = ['name', 'code' , 'course_tel', 'area_id' ,
 							'oversea','active',  'display_order',
 						   'contact_info','removed','updated_by'];
 	
@@ -173,6 +173,8 @@ class Center extends Model
 		return Photo::find($this->photo_id);
 
 	}
+	
+	
 
 
 	public function canEditBy($user)

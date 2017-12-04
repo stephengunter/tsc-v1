@@ -43,6 +43,10 @@
                         </div>
                     </div>    <!-- End Row -->     
                     <div class="row">
+                        <div v-show="!isOverSea()" class="col-sm-4">
+                            <label class="label-title">區域</label>
+                            <p> {{ center.areaName }} </p>
+                        </div> 
                         <div class="col-sm-4">
                             <label class="label-title">課程洽詢電話</label>
                             <p> {{ center.course_tel }} </p>
@@ -131,6 +135,10 @@
                     Helper.BusEmitError(error)
                 })
             },   
+            isOverSea(){
+                if(this.center) return Helper.isTrue(this.center.oversea)
+                return false
+            },
             showUpdatedBy(){
                let updated_by=Helper.tryParseInt(this.center.updated_by)
                if(updated_by){

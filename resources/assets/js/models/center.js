@@ -49,9 +49,10 @@ class Center {
 
         })
     }
-    static index(oversea) {
+    static index(oversea,area) {
         return new Promise((resolve, reject) => {
             let url = this.source() + '?oversea=' + oversea
+            url += '&area=' + area
             axios.get(url)
                 .then(response => {
                     resolve(response.data)

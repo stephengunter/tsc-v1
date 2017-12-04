@@ -26,7 +26,34 @@ class CentersController extends BaseController
 
     public function index()
     {
-        $centers=$this->centers->activeCenters()->get();
+        $allAreas=$this->centers->getAllAreas();
+
+        $oversea=false;
+
+        for($i=0; $i<count($allAreas); ++$i){
+
+            $area_id=$allAreas[$i]['value'];
+            $centers=$this->centers->index($oversea , $area_id)
+                                   ->where('active',true)->get();            
+            
+            $centers->each(function ($item) {
+                $photo=true;
+                $item->populateViewData($photo);
+            });
+
+           
+            $allAreas[$i]['centers']=$centers;
+           
+        }
+       
+        $oversea=true;
+        $overseaCenters=$this->centers->index($oversea);
+        $overseaCenters->each(function ($item) {
+            $photo=true;
+            $item->populateViewData($photo);
+        });
+
+        //$centers=$this->centers->activeCenters()->get();
       
         // foreach ($centers as $center) {
         //     $center->contactInfo= $center->contactInfo();
@@ -37,13 +64,13 @@ class CentersController extends BaseController
         //     }
         // }
 
-        foreach ($centers as $center) {
-            $photo=true;
-            $center->populateViewData($photo);
+        // foreach ($centers as $center) {
+        //     $photo=true;
+        //     $center->populateViewData($photo);
             
-        }
+        // }
         
-        return response()->json(['centers' => $centers ]);
+        return response()->json(['areas' => $allAreas , 'overseas' => $overseaCenters ]);
        
     }
    

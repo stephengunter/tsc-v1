@@ -8,13 +8,6 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Signups\SignupRequest;
 use App\Http\Requests\Signups\SignupUserRequest;
 
-use App\Repositories\Courses;
-use App\Repositories\Discounts;
-use App\Repositories\Payways;
-use App\Repositories\Signups;
-use App\Repositories\Users;
-use App\Repositories\Terms;
-use App\Repositories\Centers;
 
 use App\Services\Signup\SignupService;
 
@@ -26,8 +19,8 @@ use App\Tuition;
 use App\Support\Helper;
 
 use App\Events\SignupChanged;
-use PDF;
 use Carbon\Carbon;
+use PDF;
 use Exception;
 
 use App\Exceptions\RequestError;
@@ -103,7 +96,6 @@ class SignupsController extends BaseController
 
     public function index()
     {
-        
         $request = request();
           
         if(!$request->ajax()){
@@ -151,9 +143,20 @@ class SignupsController extends BaseController
     public function create()
     {
         $request = request();
-    
         $course_id=(int)$request->course; 
         $user_id=(int)$request->user; 
+
+        if(!$request->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('signups.create')
+                    ->with([
+                        'menus' => $menus,
+                        'user_id' => $user_id,
+                        'course_id' => $course_id
+                    ]);
+        }  
+    
+        
 
         $course=null;
         if($course_id){
@@ -162,9 +165,9 @@ class SignupsController extends BaseController
             $course->canPay=$course->canSignup($net_signup);
         }
 
-        $courseOptions=$this->getCourseOptions($course);
-        if(empty($courseOptions)) {
-            return   response()->json(['msg' => '無課程可報名' ]  ,  422);   
+        $courseOptions=[];
+        if($course){
+            array_push($courseOptions,  $course->toOption());
         }
         
         
@@ -176,14 +179,18 @@ class SignupsController extends BaseController
         }else{
             $userOptions = $this->getUserOptions($user);
         }       
+
+       
         
 
         $signup=Signup::initialize($user_id,$course_id);
         $signup['net_signup'] = 0;
      
-        if($course) $signup['cost'] = $course->cost;
+        // if($course){
+        //     $signup['cost'] = $course->cost;
+        // } 
 
-        $defaultAmount=$course->defaultAmount();
+        //$defaultAmount=$course->defaultAmount();
         $tuition=Tuition::initialize();
 
         $payways=$this->signupService->getPayways();
@@ -245,10 +252,10 @@ class SignupsController extends BaseController
         $course_id=$values['course_id'];
         $course=Course::findOrFail($course_id);
 
-        if(!$course->canSignup($net_signup))
-        {
-           return $this->storeBackUpSignup($values);
-        }
+        // if(!$course->canSignup($net_signup))
+        // {
+        //    return $this->storeBackUpSignup($values);
+        // }
 
         $user_id=$values['user_id'];
         $user=User::findOrFail($user_id);
@@ -477,28 +484,7 @@ class SignupsController extends BaseController
 
     
 
-    private function check($course, $user, $discount)
-    {
-        if($course){
-            if(!$course->canSignup()){
-              return   '此課程目前無法報名' ;
-            }
-        }
-
-        if($user){
-            if($course->hasSignupBy($user->id)){
-              return   '您已報名過此課程了' ;
-            }
-        }
-         
-        if($discount){
-               if(!$discount->active){
-                return   '折扣已過期' ;
-            }
-        }
-
-        return '';
-    }
+    
     
     private function  getCourseOptions($course)
     {
@@ -509,10 +495,8 @@ class SignupsController extends BaseController
             array_push($courseOptions,  $item);
         }else
         {
-            $courseList=$this->courses->canSignupCourses();
-            if($courseList->count()){
-                $courseOptions=$this->courses->optionsConverting($courseList->get());
-            }
+            return $this->signupService->getCourseOptions();
+            
         
         }
 

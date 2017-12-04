@@ -1,5 +1,5 @@
 <template>
-
+<div>
     <div class="panel panel-default">
         <div class="panel-heading ">           
        
@@ -35,14 +35,29 @@
        
     </div>  <!--  panel  -->
 
-   
+    <div v-show="areas">
+        <h3>區域代碼對照表</h3>
+        <ul style="font-size:1.5em">
+            <li v-for="(area,index) in areas" :key="index">
+                {{ area.text }}： {{ area.value }}
+            </li>
+        </ul>
+       
+    </div>
+
+</div>   
 </template>
 
 <script>
     
     export default {
         name: 'CenterImport',
-        
+        props: {
+            areas:{
+               type: Array,
+               default: null
+            },
+        },
         data() {
             return {
                 title:Helper.getIcon('centers')  + '  Excel 匯入開課中心',

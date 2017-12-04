@@ -51,9 +51,16 @@ class Discount extends Model
    public function canEditBy($user)
 	{
 		if($user->isDev()) return true;
+
 		if(!$user->isOwner()) return false;
+
+		if($this->center){
+			return $user->admin->canAdminCenter($this->center);
+		}else{
+			return $user->admin->fromHeadCenter();
+		}
 		
-		return $user->admin->canAdminCenter($this->center);
+		
           
 	}
 	public function getFormattedPoints($points)

@@ -6,6 +6,8 @@ use App\Course;
 use App\User;
 use App\Profile;
 use App\Tuition;
+use App\Discount;
+use App\Bill;
 
 use Carbon\Carbon;
 
@@ -58,6 +60,11 @@ class SignupService
 
     }
 
+    public function updateUser($userValues,$profileValues, $user)
+    {
+        return $this->users->updateUserAndProfile($userValues,$profileValues, $user);
+    }
+
     public function statusOptions()
     {
         return $this->statusOptions;
@@ -91,12 +98,87 @@ class SignupService
 
     }
 
-    public function  getCourseOptions($course)
+    public function  getCourseOptions()
     {
         $courseList=$this->courses->canSignupCourses();
         if($courseList->count()){
             $courseOptions=$this->courses->optionsConverting($courseList->get());
         }
+    }
+
+    public function  initOnlinePayBill($signups)
+    {
+        $total = $signups->sum(function ($item) {
+            return $item->course->tuition;
+        });
+        
+        $bill=Bill::init();
+
+        $bill['total']=$total;
+
+        $courseCount=count($signups);
+         //判斷折扣
+        $discount=$this->autoDecideDiscount($courseCount);
+
+        if($discount){
+            $points=$discount->points;
+
+            $bill['discount_id']=$discount->id;
+            $bill['discount']=$discount->name;
+            $bill['points']=$points;
+
+            $bill['amount']=round($points * $total/100);
+        }else{
+            $bill['discount_id']='';
+            $bill['discount']='';
+            $bill['points']=0;
+
+            $bill['amount']=$total;
+        }
+
+
+        return $bill;
+        
+    }
+
+    public function saveBill(Bill $bill , $signups)
+    {
+        $bill->save();
+
+        foreach($signups as $signup){
+            $signup->bill_id=$bill->id;
+            $signup->save();
+        }
+
+        return $bill;
+    }
+
+    public function  autoDecideDiscount($courseCount)
+    {
+        $term=$this->terms->latest();
+        //今天是哪個階段
+        $isStageOne=Discount::isStageOne($term);
+      
+       
+        $activeDiscounts=$this->discounts->getOnlineDiscounts($isStageOne , $courseCount);
+        
+        $discount=null;
+        if(count($activeDiscounts)){
+           //最低的折扣
+           $sorted = $activeDiscounts->sortBy('points');            
+           $discount= $sorted->values()->first();
+        }
+
+        if($discount){
+            $discount->isStageOne=$isStageOne;
+            if($isStageOne){
+                $discount->name .= ' ' . $term->bird_date .  '前繳費' ;
+            }
+            
+
+        } 
+
+        return $discount;
     }
 
     
@@ -165,7 +247,7 @@ class SignupService
             $signup->discount='';
             $signup->points=0;
             $signup->tuition=$course->tuition;
-            $signup->cost=$course->cost;
+            //$signup->cost=$course->cost;
         }
 
         $date =null;
@@ -217,6 +299,15 @@ class SignupService
 
 
     }
+
+    public function delete(Signup $signup, User $current_user)
+    {
+        $this->canDelete($signup, $current_user);
+        $signup->removed=1;
+        $signup->save();
+
+    }
+
     public function update(Signup $signup, $values)
     {
         $signup->fill($values);
@@ -287,13 +378,42 @@ class SignupService
         return true;
       
     }
+    public function canDelete(Signup $signup, User $user)
+    {
+         
 
+        if(!$signup->canDeleteBy($user))
+        {
+            throw new RequestError('signup.user_id','此報名無法刪除');
+        }
+        // if($user->id){
+        //     $validSignups=$this->getValidSignups($course->id)->where('user_id',$user->id)->get();
+        //     if(count($validSignups) ) {
+                
+        //         throw new RequestError('signup.user_id','此學員已報名過此課程了');
+        //     }
+        // }
+      
+       
+      
+    }
+    public function isUserDataComplete($user)
+    {
+        if(!$user->profile->fullname) return false;
+        if(!$user->profile->SID) return false;
+        if(!$user->profile->dob) return false;
+        
+        if(!$user->email) return false;
+        if(!$user->phone) return false;
+
+        return true;
+    }
    
 
     public function getValidSignups($course_id)
     {
-      //沒有被刪除/取消的有效報名
-      return $this->getByCourseId($course_id)->where('status' , '>','-1' );
+        //沒有被刪除/取消的有效報名
+        return $this->getByCourseId($course_id)->where('status' , '>','-1' );
       
     }
 
@@ -316,5 +436,15 @@ class SignupService
         
 
         return $discount;
+    }
+
+    public function payByCreditCard($payway_id)
+    {
+        return $this->payways->payByCreditCard($payway_id);
+    }
+
+    public function payBySeven($payway_id)
+    {
+        return $this->payways->payBySeven($payway_id);
     }
 }

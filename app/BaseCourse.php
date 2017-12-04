@@ -139,13 +139,13 @@ class BaseCourse extends Model
     {
           return $this->belongsTo('App\Classroom');
     }
-    public function photo()
+    public function photo($default=true)
 	{
-		if(!$this->photo_id){
-			return Photo::defaultCourse();
-		}
-		return Photo::find($this->photo_id);
+        if($this->photo_id) return Photo::find($this->photo_id);
 
+        if(!$default) return null;		
+           
+		return Photo::defaultCourse();
 	}
     public function isGroup()
     {

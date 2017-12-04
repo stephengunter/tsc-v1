@@ -15,6 +15,7 @@ class Terms
         return $this->getAll()->where('active',true);
          
     }
+   
     public function latest()
     {
         return  $this->activeTerms()

@@ -116,7 +116,7 @@
         computed: {
             createText(){
                 if(this.hide_create) return ''
-                if(!this.searchParams.course) return ''
+                // if(!this.searchParams.course) return ''
                 return '新增報名'
             },
         },

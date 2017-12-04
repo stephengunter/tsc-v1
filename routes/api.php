@@ -14,12 +14,16 @@ Route::get('/latest-courses', ['uses' => '\App\Http\Controllers\Api\CoursesContr
 Route::resource('/courses', '\App\Http\Controllers\Api\CoursesController');
 
 Route::resource('/users', '\App\Http\Controllers\Api\UsersController',
-                                     ['except' => ['index','destroy']]);
+['except' => ['index','destroy']]);
 
 Route::resource('/resumes', '\App\Http\Controllers\Api\ResumesController',
-                                     ['except' => ['edit','create']]);
+['except' => ['edit','create']]);
+
 Route::resource('/signups', '\App\Http\Controllers\Api\SignupsController',
-                                     ['except' => ['edit','update']]);  
+['except' => ['edit','update']]); 
+
+Route::resource('/pay', '\App\Http\Controllers\Api\PayController',
+['except' => ['edit','update']]); 
                                      
                                    
 

@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Discount;
 use App\Course;
+use App\Term;
+
 
 use Carbon\Carbon;
 use Exception;
@@ -16,45 +18,88 @@ class Discounts
        return Discount::where('removed',false);
          
     }
-    public function activeDiscounts($center_id)
+    public function globalDiscount()
     {
-       return $this->getAll()->where('active',true)
-                             ->where('center_id',$center_id);
+        return $this->getAll()->where('need_prove',false);
+    }
+    public function activeDiscounts($center_id=0)
+    {
+        $globalDiscount=$this->globalDiscount()->where('active',true)->get();
+
+        if(!$center_id)  return $globalDiscount;
+
+       
+
+        $centerDiscounts= $this->getAll()->where('active',true)
+                             ->where('center_id',$center_id)->get();
+
+        return $globalDiscount->merge($centerDiscounts);
          
     }
 
-    public function getValidDiscounts(Course $course,Carbon $date=null)
+    public function getOnlineDiscounts(bool $isStageOne , int $courseCount)
     {
-        //該中心折扣
-        $activeDiscounts=$this->activeDiscounts($course->center_id);
-        //今天是哪個階段
-        $isStageOne=Discount::isStageOne($course->term,$date);
-       
+        $activeDiscounts=$this->activeDiscounts();
+
+        $activeDiscounts = $activeDiscounts->filter(function ($item) use($courseCount) {
+            return $courseCount >= $item->course_count;
+        });
+
+        //過濾0折扣
+        $validDiscounts=$this->filterDiscount($activeDiscounts , $isStageOne);
+        
+
+        return $validDiscounts;
+    }
+
+    private function filterDiscount($activeDiscounts , $isStageOne)
+    {
         $validDiscounts=[];
         //過濾0折扣
         if($isStageOne){
-            $validDiscounts= $activeDiscounts->where('points_one', '>' , 0)
-                                             ->orderBy('order','desc')->get();
+            $validDiscounts = $activeDiscounts->filter(function ($item) {
+                return $item->points_one > 0 ;
+            });
+
+            
             foreach($validDiscounts as $discount){
                 $discount->points=$discount->points_one;
             }
         }else{
-            $validDiscounts= $activeDiscounts->where('points_two' , '>' , 0)
-                                             ->orderBy('order','desc')->get();
+            $validDiscounts = $activeDiscounts->filter(function ($item) {
+                return $item->points_two > 0 ;
+            });
+            
             foreach($validDiscounts as $discount){
                 $discount->points=$discount->points_two;
             }
         }
 
-        if($course->discount)    return $validDiscounts;
+        return $validDiscounts;
+    }
 
-        //不限課程的優惠
-
-        $filtered = $validDiscounts->filter(function ($discount) {
-            return $discount->all_courses;
-        });
+    public function getValidDiscounts(Course $course,Carbon $date=null)
+    {
+        $activeDiscounts=$this->activeDiscounts($course->center_id);
         
-        return $filtered->all();
+        //今天是哪個階段
+        $isStageOne=Discount::isStageOne($course->term,$date);
+
+       //過濾0折扣
+        $validDiscounts=$this->filterDiscount($activeDiscounts , $isStageOne);
+        
+
+        return $validDiscounts;
+
+        //if($course->discount)    return $validDiscounts;
+
+        //不限課程的優惠,針對"不優惠課程"
+
+        // $filtered = $validDiscounts->filter(function ($discount) {
+        //     return $discount->all_courses;
+        // });
+        
+        // return $filtered->all();
         
     }
 

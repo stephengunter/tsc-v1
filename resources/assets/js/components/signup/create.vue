@@ -157,7 +157,7 @@
                    @discount-selected="onDiscountSelected" @clear-error="clearErrorMsg">
                 </pay-inputs>
                
-                <div class="row" >
+                <div v-show="!edittingUser" class="row" >
                     <div  class="col-sm-6">
                         <button type="submit"  class="btn btn-success" :disabled="!canSubmit">確定</button>
                       
@@ -273,20 +273,24 @@
         },
         watch: {
             selectedUser: function () {
+                
                 this.user=null
                 this.edittingUser=false
                 this.getUser()               
             },
             date: {
               handler: function () {
+                 
                   this.form.signup.date=this.date.time
                   this.clearErrorMsg('signup.date')
               },
               deep: true
             },
             dob: {
-              handler: function () {
-                  this.editUserForm.user.profile.dob=this.dob.time        
+              handler: ()=> {
+                
+                  this.editUserForm.user.profile.dob=this.dob.time  
+                  
               },
               deep: true
             },
@@ -307,8 +311,6 @@
                      
                 getData.then(data => {
                     let signup=data.signup
-                    //signup.cost=Helper.formatMoney(signup.cost,true)
-                  
                     this.date.time=signup.date
                     
 
@@ -450,14 +452,14 @@
                 this.$emit('canceled')
             },
             onEditUser(){
-             
+               
                 this.editUserForm=new Form({
                     user:this.user
                 })
                 this.dob.time=this.user.profile.dob
                 this.genderOptions= Helper.genderOptions()
 
-                this.user=null 
+                // this.user=null 
                 this.edittingUser=true
 
             },

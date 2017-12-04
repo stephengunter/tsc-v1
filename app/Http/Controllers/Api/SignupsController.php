@@ -3,157 +3,206 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\BaseController;
-
 use Illuminate\Http\Request;
-use App\Repositories\Courses;
-use App\Repositories\Discounts;
-use App\Repositories\Signups;
-use App\Repositories\Users;
-use App\Repositories\Terms;
-use App\Repositories\Centers;
+
+use App\Http\Requests\Signups\SignupRequest;
+use App\Http\Requests\Signups\OnlineSignupRequest;
+
+
+use App\Services\Signup\SignupService;
 
 use App\Signup;
 use App\User;
 use App\Course;
-
-use Carbon\Carbon;
-use App\Http\Requests\Course\SignupRequest;
+use App\Tuition;
 
 use App\Support\Helper;
+
+use App\Events\SignupChanged;
+use Carbon\Carbon;
+use PDF;
+use Exception;
+
+use App\Exceptions\RequestError;
 
 class SignupsController extends BaseController
 {
     
-    public function __construct(Courses $courses, Discounts $discounts,
-                                Terms $terms , Centers $centers, 
-                                  Signups $signups, Users $users) 
-                               
+    public function __construct(SignupService $signupService)                       
     {
-         $this->middleware('auth:api',['except' => ['create'] ]);
-       
+        $this->middleware('auth:api');
+        $this->signupService=$signupService;
 
-		 $this->courses=$courses;
-         $this->discounts=$discounts;
-         $this->terms=$terms;
-         $this->centers=$centers;
-         $this->signups=$signups;
-         $this->users=$users;
-
-	}
-
-    
+    }
 
     public function index()
     {
-        $user=request()->user();
-        $signupList=$this->signups->getAll()       
-                                ->where('user_id',$user->id)
-                                ->where('status','>','-1')
-                                ->orderBy('date','desc')
-                                ->with(['course','user.profile'])
-                                ->get();
-        foreach ($signupList as $signup) {
-              $signup->points=$signup->formattedPoints();    
+        $request = request();
+        $status=(int)$request['status'];
+        $user=$this->currentUser();
+
+        $signups=$this->signupService->getByUserId($user->id)  
+                                     ->with(['course','user.profile']);
+                                     
+                                     
+        if($status){
+            // 顯示全部
+        }else{
+             // 只顯示待繳費的
+            $signups=$signups->where('status', 0);
+        }
+
+        $signups=$signups->orderBy('date','desc')->get();
+                                
+        foreach ($signups as $signup) {
+              $signup->populateViewData();    
         }                       
 
-        return response() ->json([ 'signupList' => $signupList ]);
+        return response() ->json([ 'signups' => $signups ]);
        
     }
 
     public function create()
     {
-         $request = request();
+       
+        $request = request();
         
-         $course_id=(int)$request->course; 
-         $user_id=(int)$request->user; 
+        $course_id=(int)$request->course;  
+        $course=Course::findOrFail($course_id);
 
-         $course=null;
-         if(!$course_id){
-            abort(404);
-         }
-         $course= $this->courses->findOrFail($course_id);
-         $center=$course->center;
-         $center->contactInfo=$center->contactInfo();
-         $center->contactInfo->addressA=$center->contactInfo->addressA();
-         foreach ($course->classTimes as $classTime) {
-            $classTime->weekday;
-         }
+        $user=$this->currentUser();
+
+        //可否線上報名
+        $net_signup=true;
+        $canSignup=$this->signupService->canSignup($course, $user, $net_signup);
+
+        
+
+        $course->populateViewData();
+        $course->center->populateViewData();
+
+        $signup=Signup::initialize($user->id,$course->id);
+        $signup['net_signup'] = 1;
+
          
-         $signup=Signup::initialize($user_id,$course_id);
 
-         $discounts=$this->discounts->activeDiscounts()->get();
+        //資料是否齊全
+        $editUser= true;//!$this->signupService->isUserDataComplete($user);
+        if($editUser) $user->profile;
+       
+        
+        return response()->json([
+            'course' => $course,
+            'user' => $user,
+            'signup' => $signup,
+            'editUser' => $editUser
+        ]);
+       
 
-         return response()
-            ->json([
-                'discounts' => $discounts,
-                'signup' => $signup,
-                'course' => $course
-            ]);
+
+
+
+        
+
+         
+            
+               
+                
+            
+
+
+        //  $course= $this->courses->findOrFail($course_id);
+
+         
+        //  $center=$course->center;
+        //  $center->contactInfo=$center->contactInfo();
+        //  $center->contactInfo->addressA=$center->contactInfo->addressA();
+        //  foreach ($course->classTimes as $classTime) {
+        //     $classTime->weekday;
+        //  }
+         
+        //  $signup=Signup::initialize($user_id,$course_id);
+
+        //  $discounts=$this->discounts->activeDiscounts()->get();
+
+        //  return response()
+        //     ->json([
+        //         'discounts' => $discounts,
+        //         'signup' => $signup,
+        //         'course' => $course
+        //     ]);
          
     }
     
-    public function store(Request $request)
+    public function store(OnlineSignupRequest $request)
     {
-         $values=$request->get('signup');
+        $user=$this->currentUser();
+        $updated_by=$user->id;
+       
 
-         $user=request()->user();
-         $updated_by=$user->id;
-         
-         $user_id=$user->id;
+        if($request->hasUser())
+        {
+            $userValues=$request->getUserValues($updated_by);       
+            $profileValues=$request->getProfileValues($updated_by);
 
-         $course_id=$values['course_id'];
-         $course=$this->courses->findOrFail($course_id);
+            $user= $this->signupService->updateUser($userValues,$profileValues, $user);
+            
+        }
 
-         $discount=null;
-         $discount_id=(int)$values['discount_id'];
-         if($discount_id > 0){
-            $discount=$this->discounts->findOrFail($discount_id);
-           
-         }
+        //課程是否可以線上報名
+
+        $values=$request->getSignupValues($updated_by);
+
+        $course_id=$values['course_id'];
+        $course=Course::findOrFail($course_id);
+
+        $net_signup=1;
+        // if(!$course->canSignup($net_signup))
+        // {
+        //    return $this->storeBackUpSignup($values);
+        // }
+
+        
         //  $errMsg=$this->check($course, $user, $discount);
         //  if(!empty($errMsg))
         //  {
         //        return   response()->json(['msg' => $errMsg ]  ,  422);
         //  }
 
+        $values['date']=Carbon::today();
+
+        $signup=new Signup($values);
         
+        $signup=$this->signupService->store($course,$user,$signup);
          
-         $signup=$this->signups->netSignup($course,$discount,$user_id,$updated_by);
-         
-         return response()->json($signup);
+        return response()->json($signup);
             
     }
     
-    public function show($id)
-    {     
-        $current_user=request()->user();
+    // public function show($id)
+    // {     
+    //     $current_user=request()->user();
 
-        $signup=Signup::with('course','user.profile')->findOrFail($id);
-        if(!$signup->canViewBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);
-        }
-        $signup->points=$signup->formattedPoints();
-        $signup->canEdit=$signup->canEditBy($current_user);
-        $signup->canDelete=$signup->canDeleteBy($current_user);
-        $signup->hasRefund=$signup->hasRefund();
+    //     $signup=Signup::with('course','user.profile')->findOrFail($id);
+    //     if(!$signup->canViewBy($current_user)){
+    //         return   response()->json(['msg' => '權限不足' ]  ,  401);
+    //     }
+    //     $signup->points=$signup->formattedPoints();
+    //     $signup->canEdit=$signup->canEditBy($current_user);
+    //     $signup->canDelete=$signup->canDeleteBy($current_user);
+    //     $signup->hasRefund=$signup->hasRefund();
 
-        return response()->json([ 'signup' => $signup ]);
+    //     return response()->json([ 'signup' => $signup ]);
        
-    }
+    // }
     public function destroy($id)
     {
-        $signup=$this->signups->findOrFail($id); 
-        $current_user=request()->user();
+        $signup=Signup::findOrFail($id); 
+        $current_user=$this->currentUser();
 
-        if(!$signup->canCancelBy($current_user)){
-            return   response()->json(['msg' => '權限不足' ]  ,  401);    
-        }    
+        $this->signupService->delete($signup, $current_user);
 
-        $this->signups->cancel($id, $current_user->id);
-
-        return response()->json([ 'canceled' => true ]);
-               
-                   
+        return response()->json([ 'deleted' => true ]);
                
     }
    

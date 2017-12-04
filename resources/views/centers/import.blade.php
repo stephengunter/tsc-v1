@@ -2,7 +2,7 @@
 
 @section('content')
    
-    <center-import 
+    <center-import  :areas="{{ json_encode($areas) }}"  
     @canceled="onCanceled" @imported="onImported">
     </center-import>
 

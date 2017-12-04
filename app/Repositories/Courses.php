@@ -114,12 +114,16 @@ class Courses
         $courseList=$courseList->whereIn('term_id',$activeTermIds);
         
         
+
+
         if($categoryId){
              $courseList= $courseList->whereHas('categories', function($q)  use ($categoryId)
              {
                 $q->where('id', $categoryId );
              });
         }
+
+        
 
         if($centerId) $courseList=$courseList->where('center_id',$centerId);
 
@@ -224,6 +228,8 @@ class Courses
    
     public function store($courseValues , $categoryIds, $teacherIds)
     {
+        dd('removed');
+
         $parent=(int)$courseValues['parent'];
         $course=new Course($courseValues);
         if($parent){           
@@ -276,7 +282,7 @@ class Courses
 
         return $course;
     }
-    public function update($courseValues , $categoryIds, $teacherIds, Course $course)
+    public function update(Course $course ,$courseValues , $categoryIds, $teacherIds)
     {
         $course->update($courseValues);
 

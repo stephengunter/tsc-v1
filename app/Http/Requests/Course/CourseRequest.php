@@ -30,13 +30,13 @@ class CourseRequest extends FormRequest
         $courseValues=$this->get('course');
         
         //是否為學分班
-        $isCredit=$courseValues['isCredit'];
-        if($isCredit){
-            $extraRules=[
-                'course.credit_count' => 'integer|min:1' , 
-                'course.credit_price' => 'required|numeric',
-            ];
-        }
+        // $isCredit=$courseValues['isCredit'];
+        // if($isCredit){
+        //     $extraRules=[
+        //         'course.credit_count' => 'integer|min:1' , 
+        //         'course.credit_price' => 'required|numeric',
+        //     ];
+        // }
 
         $rules=array_merge($rules,$extraRules);
 

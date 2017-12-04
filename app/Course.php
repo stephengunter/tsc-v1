@@ -65,6 +65,18 @@ class Course extends BaseCourse
         ];
     }
 
+    //是否額滿
+    public function peopleFulled()
+    {
+        return $this->status->peopleFulled();
+    }
+
+    //是否停止開課
+    public function canceled()
+    {
+        return !$this->active;
+    }
+
     public function canSignup($isNetSignup)
     {
         return $this->status->canSignup($isNetSignup);
@@ -106,16 +118,16 @@ class Course extends BaseCourse
         $withNumber=false;
         $this->fullName($withNumber);
 
-        if($this->groupAndParent()){
-            $this->weeks=null;
-            $this->hours=null;
+        // if($this->groupAndParent()){
+        //     $this->weeks=null;
+        //     $this->hours=null;
 
-            $this->tuition=$this->getTuition();
-            $this->cost=$this->getCost();
-            $this->credit_count=$this->getCreditCounts();
-        }
+        //     $this->tuition=$this->getTuition();
+        //     $this->cost=$this->getCost();
+        //     $this->credit_count=$this->getCreditCounts();
+        // }
 
-        $this->getParentCourse();
+        //$this->getParentCourse();
 
         $this->sortClassTimes();
         foreach ($this->classTimes as $classTime) {

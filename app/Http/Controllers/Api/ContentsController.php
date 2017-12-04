@@ -14,8 +14,6 @@ class ContentsController extends BaseController
    
     public function __construct() 
     {
-       
-       
 		
 	}
 

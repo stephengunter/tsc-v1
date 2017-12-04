@@ -37,7 +37,7 @@ class Term extends Model
         ];
     }
 	
-    public function courses() {
+   public function courses() {
 		return $this->hasMany(Course::class);
 	}
 

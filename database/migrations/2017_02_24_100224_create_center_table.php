@@ -12,6 +12,7 @@ class CreateCenterTable extends Migration
             $table->increments('id');
             $table->boolean('head')->default(false);
             $table->boolean('oversea')->default(false);
+            $table->integer('area_id')->unsigned()->nullable();
 
             $table->string('name')->nullable();
             $table->string('code')->nullable();

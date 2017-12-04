@@ -50,17 +50,17 @@ class User extends Authenticatable {
 	public static function getRules($email,$id,$role='User')
 	{
 		$basicRules=[];
-        if($email){
-            $basicRules= [
-                 'user.name' => 'required|max:255',
-                 'user.email'      => 'email|unique:users,email,'.$id,  
-				 'profile.fullname'  => 'max:255',                
-              ];
+      if($email){
+			$basicRules= [
+					'user.name' => 'required|max:255',
+					'user.email'      => 'email|unique:users,email,'.$id,  
+					'profile.fullname'  => 'max:255',                
+			];
 		}else{
               $basicRules= [
                  'user.name' => 'required|max:255',
                  'user.phone' => 'required|min:6|unique:users,phone,'.$id,
-				 'profile.fullname'  => 'max:255',  
+				 	  'profile.fullname'  => 'max:255',  
              ];
 		}
 
@@ -71,17 +71,17 @@ class User extends Authenticatable {
 			$extraRules=[
 			  'user.profile.fullname' => 'required|max:255',
 			  'user.profile.dob' => 'required',
-              'user.profile.SID' =>'required|unique:profiles,SID,'.$id .',user_id',
+           'user.profile.SID' =>'required|unique:profiles,SID,'.$id .',user_id',
 			  'user.phone' =>'required|min:6|unique:users,phone,'.$id,
 		    ];
-		}else if($role =='Teacher'){
+		}else if($role ==Role::teacherRoleName() || $role =='Student'){
 			$extraRules=[
 			  'user.profile.fullname' => 'required|max:255',
 			  'user.profile.dob' => 'required',
-              'user.profile.SID' =>'required|unique:profiles,SID,'.$id .',user_id',
+				'user.profile.SID' =>'required|unique:profiles,SID,'.$id .',user_id',
 			  'user.phone' =>'required|min:6|unique:users,phone,'.$id,
 		    ];
-		}else if($role =='Volunteer'){
+		}else if($role ==Role::volunteerRoleName()){
 			$extraRules=[
 			  'user.profile.fullname' => 'required|max:255',
 			  'user.phone' =>'required|min:6|unique:users,phone,'.$id,
@@ -182,6 +182,12 @@ class User extends Authenticatable {
 	public function students() 
 	{
 		return $this->hasMany('App\Student');
+	}
+
+	public function getPhoto() 
+	{
+		$this->profile->photo=$this->profile->photo();
+		return $this->profile->photo();
 	}
 
 	public function getContactInfo() 

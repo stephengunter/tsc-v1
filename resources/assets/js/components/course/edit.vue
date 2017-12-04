@@ -315,7 +315,7 @@
                         })
                         
                    
-
+ 
 
                     this.begin_date.time=course.begin_date
                     this.end_date.time=course.end_date

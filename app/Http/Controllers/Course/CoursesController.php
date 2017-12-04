@@ -180,9 +180,9 @@ class CoursesController extends BaseController
         $teacherIds = $request->getTeacherIds();
         $categoryIds = $request->getCategoryIds(); 
 
-        if($course) return $this->courses->update($courseValues , $categoryIds, $teacherIds ,$course);
+        if($course) return $this->courseService->update($course , $courseValues , $categoryIds, $teacherIds);
 
-        return $this->courses->store($courseValues,$categoryIds,$teacherIds);
+        return $this->courseService->store($courseValues,$categoryIds,$teacherIds);
         
     }
     public function show($id)
@@ -256,17 +256,8 @@ class CoursesController extends BaseController
         if(!$course->canEditBy($current_user)){
             return  $this->unauthorized();         
         }
-        $number=$request->getCourseNumber();
-        if($number){
-            $number_exist=$this->courses->numberExist($number,$id);
-            if($number_exist) return response()->json([ 'course.number' => ['課程編號重複了']], 422);
-        }
-        
-        
        
         $course=$this->createOrUpdate($request,$course);
-        
-        
         
         return response()->json($course);     
                

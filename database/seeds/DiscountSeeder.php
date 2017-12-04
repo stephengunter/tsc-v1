@@ -13,24 +13,24 @@ class DiscountSeeder extends Seeder
 	 * @return void
 	 */
 	public function run()
-	{
-        $center=Center::where('code','A')->first();
-
+	{   
         Discount::create([
             'name' => '新生',
-            'center_id' => $center->id,
-            'points_one' => 85,
+            'points_one' => 90,
             'need_prove' => 0,
             'active' => 1,
         ]);
         Discount::create([
             'name' => '同時報名兩科以上',
-            'center_id' => $center->id,
             'course_count' => 2,
             'points_one' => 85,
             'need_prove' => 0,
             'active' => 1,
         ]);
+
+        $center=Center::where('code','A')->first();
+
+        
         Discount::create([
             'name' => '舊生、各級學校在校生、慈濟志業體同仁(含慈誠、委員、榮董)',
             'center_id' => $center->id,
@@ -44,6 +44,7 @@ class DiscountSeeder extends Seeder
             'center_id' => $center->id,
             'points_one' => 90,
             'points_two' => 90,
+            'need_prove' => 1,
             'active' => 1,
         ]);
         Discount::create([

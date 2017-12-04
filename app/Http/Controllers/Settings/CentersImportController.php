@@ -31,8 +31,11 @@ class CentersImportController extends BaseController
         
         if(request()->ajax()) abort(404);
        
-        $menus=$this->menus($this->key);            
-        return view('centers.import')->with([ 'menus' => $menus ]);        
+        $menus=$this->menus($this->key);       
+        $areas=$this->centers->getAllAreas();     
+        return view('centers.import')->with([ 'menus' => $menus ,
+                                                'areas' => $areas
+                                            ]);        
        
     
     }

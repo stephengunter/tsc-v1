@@ -45,6 +45,7 @@ class CenterTableSeeder extends Seeder
 		]);
 		$center=Center::create([
 			'name' => '花蓮中心',
+			'area_id' => 1,
 			'head' => 1,
 			'contact_info' => $contactinfo->id,
 			'code' => 'A',

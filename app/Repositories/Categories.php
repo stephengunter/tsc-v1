@@ -76,6 +76,7 @@ class Categories
         {
             $item=[ 'text' => $category->name , 
                      'value' => $category->id , 
+                     'icon' => $category->icon
                  ];
             array_push($options,  $item);
         }

@@ -57,6 +57,8 @@ class SignupInfoesController extends BaseController
             return  $this->unauthorized();         
         }
 
+        dd($request->toArray());
+
         $removed=false;
         $updated_by=$current_user->id;
 
