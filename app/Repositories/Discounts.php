@@ -63,7 +63,7 @@ class Discounts
 
             
             foreach($validDiscounts as $discount){
-                $discount->points=$discount->points_one;
+                $discount->populateViewData($isStageOne);
             }
         }else{
             $validDiscounts = $activeDiscounts->filter(function ($item) {
@@ -71,11 +71,29 @@ class Discounts
             });
             
             foreach($validDiscounts as $discount){
-                $discount->points=$discount->points_two;
+                $discount->populateViewData($isStageOne);
             }
         }
 
         return $validDiscounts;
+    }
+
+    public function getDiscountOptions(int $center_id )
+    {
+        $date=Carbon::today();
+        $term=Term::defaultTerm();
+
+        $activeDiscounts=$this->activeDiscounts($center_id);
+        
+        //今天是哪個階段
+        $isStageOne=Discount::isStageOne($term,$date);
+
+       //過濾0折扣
+        $validDiscounts=$this->filterDiscount($activeDiscounts , $isStageOne);
+        
+
+        return $this->optionsConverting($validDiscounts);
+        
     }
 
     public function getValidDiscounts(Course $course,Carbon $date=null)
@@ -102,6 +120,7 @@ class Discounts
         // return $filtered->all();
         
     }
+    
 
 
     public function findOrFail($id)
@@ -170,7 +189,8 @@ class Discounts
         {
              $item=[ 'text' => $discount->getNameWithDiscount() , 
                      'value' => $discount->id ,
-                     'selected' => false 
+                     'points' => $discount->points ,
+                     'bird' => $discount->isBird() 
                  ];
             array_push($options,  $item);
         }

@@ -1,17 +1,17 @@
 <template>
-    <create-signup :course_id="course_id" :user_id="user_id"
+    <create-by-user :user_id="user_id"
       @canceled="onCanceled" @saved="onSaved">
           
-    </create-signup>
+    </create-by-user>
 </template>
 
 <script>
-    import CreateSignup from '../../components/signup/create.vue'
+    import CreateByUser from '../../components/signup/create-by-user.vue'
 
     export default {
         name: 'SignupCreate',
         components: {
-            'create-signup':CreateSignup
+            'create-by-user':CreateByUser
         },
         props: {
             course_id:{

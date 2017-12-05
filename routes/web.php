@@ -189,6 +189,8 @@ Route::group(['middleware' => 'admin'], function()
   
     Route::resource('signups', '\App\Http\Controllers\Signups\SignupsController');
 
+    Route::get('bills/discount-options', '\App\Http\Controllers\Signups\BillsController@discountOptions');
+    Route::resource('bills', '\App\Http\Controllers\Signups\BillsController');
 
 
     

@@ -2,7 +2,7 @@
 
 @section('content')
                   
-  <new-user-signup @saved="onSaved"></new-user-signup> 
+  <new-user-signup ></new-user-signup> 
 
  
 @endsection
@@ -26,9 +26,7 @@
             init(){
 
             },
-            onSaved(signup){
-                Helper.redirect('/signups/' + signup.id)
-            }
+            
            
 
         },

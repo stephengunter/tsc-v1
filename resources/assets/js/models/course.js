@@ -8,7 +8,7 @@ class Course {
         this.teachersText = Course.teachersText(data.teachers)
         this.categoriesText = Course.categoriesText(data.categories)
         this.classTimesText = Course.getClassTimesText(data.class_times)
-
+        this.period=Helper.period(data.begin_date,data.end_date)
 
 
         this.canNetSignup = Course.canNetSignup(this)
@@ -92,6 +92,7 @@ class Course {
     static show(id) {
         return new Promise((resolve, reject) => {
             let url = this.showUrl(id)
+           
             axios.get(url)
                 .then(response => {
                     resolve(response.data)

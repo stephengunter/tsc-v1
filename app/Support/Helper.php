@@ -228,7 +228,7 @@ class Helper
         $str='';
         for($i = 0; $i < count($arrVal); ++$i) {
             if(isset($arrVal[$i])) {
-                $str .=  $arrVal[$i] . ',';
+                $str .=  $arrVal[$i] . $split;
             } 
             
         }

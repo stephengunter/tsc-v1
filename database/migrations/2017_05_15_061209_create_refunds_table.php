@@ -26,12 +26,10 @@ class CreateRefundsTable extends Migration
             $table->decimal('tuition', 8, 2);  
             $table->decimal('cost', 8, 2)->nullable();
             $table->decimal('charge', 8, 2)->nullable();
-
             $table->integer('pay_by')->unsigned();
             $table->string('bank_branch')->nullable();
             $table->string('account_owner')->nullable();
             $table->string('account_number')->nullable();
-
             $table->integer('status')->default(0);
             $table->integer('updated_by')->unsigned()->nullable();
             $table->boolean('removed')->default(false);

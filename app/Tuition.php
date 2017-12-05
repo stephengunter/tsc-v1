@@ -3,6 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+
+use App\Bill;
+use App\Refund;
+
 use App\Support\FilterPaginateOrder;
 use Carbon\Carbon;
 
@@ -11,63 +15,84 @@ class Tuition extends Model
     use FilterPaginateOrder;
 
     protected $fillable = [
-                            'signup_id', 'date', 'amount', 
-                            'pay_by', 'updated_by', 'refund', 'ps'
+                            'bill_id', 'date', 'amount', 
+                            'refund_id', 'refund',
+                            'pay_by', 'updated_by', 'ps'
                         // 'bank_branch', 'account_owner','account_number',
                           ];
 
     protected $filter =  ['date'];
 
                                 
-    public function signup()
-    {
-		   return $this->belongsTo('App\Signup');
-    }
     
-    public static function initialize($signup_id=0,$amount=0,$refund=false)
+    
+    public static function initialize(Bill $bill=null)
     {
         
         return [            
             
-            'signup_id' => $signup_id,
+            'bill_id' => $bill ? $bill->id : '',
+            
             'date' => '',
-            'refund' => $refund,
-            'amount' => $amount,
+          
+            'amount' => $bill ? $bill->amount : '',
             'pay_by' => 0,
             'ps' => ''
         ];
     }  
-    
 
-    // public static function initialize($signup,$refund=null)
-    // {
-    //     $amount=$signup->tuition;
-    //     $isRefund=0;
-    //     if($refund){
-    //         $amount=$refund->getTotal();
-    //         $isRefund=1;
-    //     }
-    //     return [            
+    public static function initializeRefund(Refund $refund)
+    {
+        
+        return [            
             
-    //         'signup_id' => $signup->id,
-    //         'date' => Carbon::now()->toDateString(),
-    //         'refund' => $isRefund,
-    //         'amount' => $amount,
-    //         'pay_by' => 0,
-    //          'bank_branch'=>'',
-    //          'account_owner'=>'',
-    //         'account_number'=>'',
-    //     ];
-    // }  
+            'refund_id' => $bill_id,
+            'date' => '',
+         
+            'amount' => 0,
+            'pay_by' => 0,
+            'ps' => ''
+        ];
+    } 
+    
+    public function isRefund()
+    {
+        if(!$this->refund_id) return false;
+
+        return (int)$this->refund_id > 0 ;
+    }
+
+    public function getBill()
+    {
+        if(!$this->bill_id) return null;
+
+        return Bill::find($this->bill_id);
+    }
+    public function getRefund()
+    {
+        if(!$this->refund_id) return null;
+
+        return Refund::find($this->refund_id);
+    }
+    
 
     public function canViewBy($user)
     {
-        return $this->signup->canViewBy($user);
+        if($this->isRefund()){
+            return $this->getRefund()->canViewBy($user);
+        }else{
+            return $this->getBill()->canViewBy($user);
+        }
+       
     }
 
     public function canEditBy($user)
 	{
-        return $this->signup->canEditBy($user);
+        if($this->isRefund()){
+            return $this->getRefund()->canEditBy($user);
+        }else{
+            return $this->getBill()->canEditBy($user);
+        }
           
   	}
     public function canDeleteBy($user)

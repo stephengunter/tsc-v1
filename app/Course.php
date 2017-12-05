@@ -65,6 +65,8 @@ class Course extends BaseCourse
         ];
     }
 
+    
+
     //是否額滿
     public function peopleFulled()
     {
@@ -77,7 +79,7 @@ class Course extends BaseCourse
         return !$this->active;
     }
 
-    public function canSignup($isNetSignup)
+    public function canSignup($isNetSignup=true)
     {
         return $this->status->canSignup($isNetSignup);
         

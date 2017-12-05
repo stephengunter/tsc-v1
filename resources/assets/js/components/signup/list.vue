@@ -5,7 +5,7 @@
         @refresh="init" :version="version"   @beginCreate="beginCreate"
         @dataLoaded="onDataLoaded">
      
-        <div v-if="course_id"  class="form-inline" slot="header">
+        <div  class="form-inline" slot="header">
             <span v-if="summary" >
                 總數：{{ summary.total }} 筆 &nbsp; 已繳費：{{ summary.success }} 筆 &nbsp; 待繳費：{{ summary.default }} 筆 &nbsp; 已取消：{{ summary.canceled }} 筆
                 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -15,6 +15,13 @@
             </select>
                
         </div>
+        
+        <button v-show="canPay" @click.prevent="onPayClicked" slot="btn" class="btn btn-warning btn-sm">
+            <span class="glyphicon glyphicon-credit-card" aria-hidden="true"></span>
+            <span>繳費</span>  
+        </button>
+               
+       
         <template scope="props">
             <tr>
                 <td v-if="can_select">
@@ -60,6 +67,10 @@
               type: Boolean,
               default: false
             },
+            can_pay: {
+              type: Boolean,
+              default: false
+            },
             version:{
                type: Number,
                default: 0
@@ -67,6 +78,10 @@
             can_select:{
                type: Boolean,
                default: true
+            },
+            default_status:{
+               type: Number,
+               default: 0
             },
             for_refund:{
                type: Boolean,
@@ -114,9 +129,14 @@
             }
         },
         computed: {
+            canPay(){
+                if(!this.can_pay) return false
+                if(!parseInt(this.user_id)) return false
+                return parseInt(this.searchParams.status) == 0
+            },
             createText(){
                 if(this.hide_create) return ''
-                // if(!this.searchParams.course) return ''
+                
                 return '新增報名'
             },
         },
@@ -148,7 +168,7 @@
                             this.statusOptions = data.options
                             let allStatuses={ text:'總數' , value:'-9' }
                             this.statusOptions.splice(0, 0, allStatuses);
-                            resolve(this.statusOptions[0].value);
+                            resolve(this.default_status);
                         })
                         .catch(error => {
                             console.log(error)
@@ -191,6 +211,10 @@
             beginCreate(){
                  this.$emit('begin-create')
             },
+            onPayClicked(){
+               
+                this.$emit('pay-clicked')
+            }
             
            
         },

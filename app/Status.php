@@ -13,7 +13,18 @@ class Status extends Model
         'class','signup','register',
 	   'ps', 'updated_by'
       
-	];
+    ];
+    
+    public function isFulled() 
+    {
+        //是否額滿
+		return $this->signup == -3;
+    }
+    public function isStopped() 
+    {
+        //是否額滿
+		return $this->signup == 0;
+    }
 
     public $signupStatusList=array(
         [
@@ -74,15 +85,20 @@ class Status extends Model
     {
 		return $this->belongsTo('App\Course');
     }
+
+   
+
+
     public function  canSignup($is_netSignup=true)
     {
-        $signupStatus= (int)$this->signup;
-        if($is_netSignup){
-           if($signupStatus > 0) return true;
-           return $signupStatus == -3 ;
-        }
+        //網路報名
+        if($is_netSignup) return $this->signup==1;
 
-        return $signupStatus!=0 ;
+        //現場報名
+        if($this->isStopped()) return false;
+        if($this->isFulled()) return false;
+
+        return true;
         
     }
     public static function initialize($course)

@@ -44,8 +44,9 @@ class UsersController extends BaseController
                     ->with(['menus' => $menus]);
         }  
 
-        $users=$this->users->getAll()->with('roles');
-        return response()->json([ 'model' => $users -> filterPaginateOrder() ]);
+        $users=$this->users->getAll()->with('roles')
+                                     ->filterPaginateOrder();
+        return response()->json([ 'model' => $users ]);
                 
                     
                

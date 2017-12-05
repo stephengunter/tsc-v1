@@ -196,6 +196,8 @@ class CoursesController extends BaseController
                         ]);
         }
 
+        
+
         $current_user=$this->currentUser();
         $with=['status','center','term','categories','teachers','classTimes'];
         $course = Course::with($with)->findOrFail($id);
@@ -206,6 +208,8 @@ class CoursesController extends BaseController
         $course->canDelete=$course->canDeleteBy($current_user);
         $course->canReview=$course->canReviewBy($current_user);
 
+        
+        $course->canSignup=$course->canSignup();
         
         
         return response()->json(['course' => $course]);

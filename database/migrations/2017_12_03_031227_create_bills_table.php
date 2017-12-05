@@ -23,6 +23,8 @@ class CreateBillsTable extends Migration
             $table->string('discount')->nullable();  
             $table->string('identity')->nullable();  
 
+            $table->string('signup_ids')->nullable(); 
+
             $table->integer('pay_way')->nullable();          
             $table->integer('status')->default(0);
 

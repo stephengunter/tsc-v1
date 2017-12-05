@@ -9,40 +9,9 @@
         </div>
         <div class="panel-body">
             <form  @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)" class="form">
-                <user-checker :version="userCheckerSettings.version"
-                   :status="userCheckerSettings.status" 
-                   @checked="onUserChecked"  @check-failed="onUserCheckFailed" >
-                  
-                </user-checker>
-                <div class="row" v-if="user_checked">
-                   <div  class="col-sm-3"> 
-                       <div class="form-group">                          
-                          <label>性別</label>
-                           <div>
-                              <toggle :items="genderOptions"   :default_val="form.user.profile.gender" @selected="setGender"></toggle>
-                            </div>
-                       </div>
-                   </div>  
-                   <div  class="col-sm-3"> 
-                       <div class="form-group">                          
-                          <label>身分證號</label>
-                          <input type="text" name="user.profile.SID" class="form-control" v-model="form.user.profile.SID" >
-                          
-                          <small v-if="form.errors.has('user.profile.SID')" v-text="form.errors.get('user.profile.SID')" class="text-danger" >身分證號</small>
-                             
-                        </div>
-                   </div>
-                   <div  class="col-sm-3"> 
-                       <div class="form-group">
-                            <label>生日</label>
-                            <div>
-                                <date-picker  :date="dob" :option="datePickerOption"></date-picker>
-                            </div>
-                            <input type="hidden" name="user.profile.dob" class="form-control" v-model="form.user.profile.dob"  >
-                            <small class="text-danger" v-if="form.errors.has('user.profile.dob')" v-text="form.errors.get('user.profile.dob')"></small>
-                        </div>
-                   </div>
-                </div>
+                <user-inputs ref="userinputs"  :form="form" @checked="onUserChecked" @check-failed="onUserCheckFailed">
+
+                </user-inputs>
                 <div class="row" v-if="user_checked">
                    <div  class="col-sm-3"> 
                        
@@ -55,52 +24,108 @@
                             <small class="text-danger" v-if="form.errors.has('signup.date')" v-text="form.errors.get('signup.date')"></small>
                         </div>
                    </div>  
-                   <div class="col-sm-7"> 
-                       <div class="form-group">                          
-                            <label>報名課程</label>
-
-                            <combination-select  :search_params="search_params"
-                               @ready="onCombinationReady">                           
-                            </combination-select>
-                            
-
-                            <input type="hidden" name="signup.course_id" class="form-control" v-model="form.signup.course_id"  >
-                            <small v-if="form.errors.has('signup.course_id')" v-text="form.errors.get('signup.course_id')" class="text-danger" >身分證號</small>
-                                
-                        </div>
-                   </div>
-                   <div v-if="hasCourse" class="col-sm-2">
+                   
+                   <div  class="col-sm-2">
                         <div class="form-group"> 
                             <label>是否繳費</label>
                             <div>
-                                <toggle :items="boolOptions"   :default_val="pay" @selected="setPay"></toggle>
+                                <toggle :items="boolOptions"   :default_val="form.pay" @selected="setPay"></toggle>
                             </div>
                         </div>  
                    </div>
                 </div>
-                <pay-inputs  v-if="isPay"  :form="form" :payways="payways"
+                <div class="row" v-if="user_checked" v-show="isPay">
+                    <div  class="col-sm-12"> 
+                        <div class="form-group">
+                            <label>報名課程</label>
+                            <button @click.prevent="selectCourseModal.show=true" type="button" class="btn btn-info btn-sm" >
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                            <table v-show="selectedCourses.length" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>課程編號</th>
+                                        <th>課程名稱</th>
+                                        <th>上課時間</th>
+                                        <th>課程期間</th>
+                                        <th>課程費用</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(course,index) in selectedCourses" :key="index" >
+                                        <td>{{ course.number }}</td>
+                                        <td>{{ course.fullname }}</td>
+                                        <td>{{ course.classTimesText }}</td>
+                                        <td>{{ course.period }}</td>
+                                        <td>{{ course.tuition | formatMoney}}</td>
+                                        <td>
+                                            <button @click.prevent="removeItem(course.id)" class="btn btn-danger btn-xs">
+                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3 v-show="total>0">合計：{{ total | formatMoney }}元</h3> 
+                        </div>
+                    </div>  
+                </div>
+                <bill-inputs  v-if="center_id" :form="form" :center_id="center_id" :payways="payways"
                    @discount-selected="onDiscountSelected" @clear-error="clearErrorMsg">
-                </pay-inputs>
+                </bill-inputs>
                
                 <div class="row" v-show="user_checked">
                     <div class="col-sm-6">
-                        <button type="submit"  class="btn btn-success" :disabled="!hasCourse">確認送出</button>
+                        <button type="submit"  class="btn btn-success" :disabled="!canSubmit">確認送出</button>
                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                       <button class="btn btn-default" @click.prevent="canceled">取消</button>
                     </div>
-
-
 
                 </div> 
             </form>
         </div>
     </div>
 
-
-    <modal :showbtn="false"  :show="showUserList" effect="fade" :width="modalSettings.width">
+    <modal  :show="selectCourseModal.show" effect="fade"  :width="selectCourseModal.width">
+        <div slot="modal-header" class="modal-header">
+            <button id="close-button" type="button" class="close" @click="selectingCourse=false">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+             </button>
+             <h3>
+                 請選擇課程
+             </h3>
+          </div>  
+        <div slot="modal-body" class="modal-body">
+            <combination-select v-if="selectingCourse"  :search_params="search_params"
+                @ready="onCombinationReady">                           
+            </combination-select>
+        </div>
+        <div slot="modal-footer" class="modal-footer" >
+            <button type="button" class="btn btn-success" @click.prevent="onCourseSelected">確定</button>
+        </div>
+    </modal>
+    <modal :showBtn="true"  :show="courseConfirmModal.show"  effect="fade" :width="courseConfirmModal.width">
+        
+        <div slot="modal-header" class="modal-header modal-header-danger">
+        
+        <button id="close-button" type="button" class="close" data-dismiss="modal" @click.prevent="courseConfirmModal.show=false">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        </button>
+            <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
+        </div>
+        <div slot="modal-body" class="modal-body">
+            <h3> {{  courseConfirmModal.msg }} </h3>
+        </div>
+        <div slot="modal-footer" class="modal-footer" >
+            <button type="button" class="btn btn-default" @click.prevent="courseConfirmModal.show=false">確定</button>
+        </div>
+        
+    </modal>
+    <modal :showbtn="false"  :show="userListModal.show" effect="fade" :width="userListModal.width">
         
           <div slot="modal-header" class="modal-header modal-header-danger">
-             <button id="close-button" type="button" class="close" data-dismiss="modal" @click="showUserList=false">
+             <button id="close-button" type="button" class="close" data-dismiss="modal" @click="userListModal.show=false">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
              </button>
              <h3>
@@ -109,22 +134,22 @@
              </h3>
           </div>
         <div slot="modal-body" class="modal-body">
-            <user-selector :users=userList @selected="onUserSelected"></user-selector>
+            <user-selector :users="userListModal.users" @selected="onUserSelected"></user-selector>
         </div>
     </modal>
- </div>       
+</div>       
 </template>
 
 <script>
-    import UserChecker from '../../components/user/checker.vue'
+    import UserInputs from '../../components/signup/user-inputs.vue'
     import UserSelector from '../../components/user/selector.vue'
-    import PayInputs from '../../components/signup/pay-inputs.vue'
+    import BillInputs from '../../components/bill/inputs.vue'
     export default {
         name: 'NewUserSignup',
         components: {
-            'user-checker':UserChecker,
+            'user-inputs':UserInputs,
             'user-selector':UserSelector,
-            'pay-inputs':PayInputs
+            'bill-inputs':BillInputs
         },
         props: {
             user_valid:{
@@ -145,7 +170,7 @@
                     },
                     signup:{},
                     tuition:{},
-                    pay:0
+                    pay:1
                 }),
                 formSubmitting:false,
                 user_checked: false,
@@ -159,46 +184,74 @@
                     reviewed:1
                 },
 
-                pay:0,
-                boolOptions:Helper.boolOptions(),
                 
-               
-                dob: {
-                    time: ''
-                },
-                dobError:false,
+                boolOptions:Helper.boolOptions(),
 
-               
-                genderOptions:Helper.genderOptions(),
                 datePickerOption: Helper.datetimePickerOption(),
                 
                
                 signupDate: {
                     time: Helper.todayString()
                 },
-                
 
-                userList:[],
-                showUserList:false,
+                userListModal:{
+                    show:false,
+                    width:1200,
+                   
+                    users:[]
+                },
 
-                userCheckerSettings:{
-                    version:0,
-                    status:0
+               
+                selectCourseModal:{
+                    show:false,
+                    width:600,
+                    course_id:0
                 },
-                modalSettings:{
-                   width:1200,
+
+                courseConfirmModal:{
+                    show:false,
+                    width:600,  
+                    course:null
                 },
+
+                course_ids:[],
+                selectedCourses:[],
+
+               
                 
 
             }
         },
         computed: {
+            
+            selectingCourse(){
+                return Helper.isTrue(this.selectCourseModal.show)
+            },
             hasCourse(){
                 if(!this.form.signup) return false
                 return Helper.isTrue(this.form.signup.course_id)
             },
+            center_id(){
+                if(!this.selectedCourses.length) return 0
+                return parseInt(this.selectedCourses[0].center_id)
+            },
+            total(){
+                if(!this.selectedCourses.length) return 0
+                let tuitions = this.selectedCourses.map((course) => {
+                    return Number(course.tuition)
+                })
+                return tuitions.reduce((prev, curr) => prev + curr)
+                
+            },
             isPay(){
-                return Helper.isTrue(this.pay)
+                return Helper.isTrue(this.form.pay)
+            },
+            canSubmit(){
+                if(this.isPay){
+                    return Number(this.total) > 0
+                }else{
+                    return true
+                }
             }
         },
         watch:{
@@ -209,13 +262,12 @@
               },
               deep: true
             },
-            dob: {
-              handler: function () {
-                  this.form.user.profile.dob=this.dob.time
-                  this.clearErrorMsg('user.profile.dob')
-              },
-              deep: true
-            },
+            total(){
+                
+                this.form.bill.total= this.total
+              
+            }
+            
         },
         beforeMount() {
            this.init()
@@ -223,29 +275,10 @@
         methods: {
             
             init() {
-                this.form = new Form({
-                    user:{
-                       email:'',
-                       phone:'',
-                       profile:{
-                          fullname:'',
-                       }
-                    },
-                    signup:{
-                       date:{}
-                    },
-
-                })
+               
                 this.formSubmitting=false
                 this.user_checked= false
                 this.loaded=false
-
-             
-                this.dob={
-                    time: ''
-                }
-                this.dobError=false
-
               
                 
                 this.discountOptions=[]
@@ -253,8 +286,7 @@
                     time: Helper.todayString()
                 }
 
-                this.userList=[]
-                this.showUserList=false
+               
 
                 this.fetchData()
                 
@@ -269,8 +301,9 @@
                     this.form=new Form({
                         user:data.user,
                         signup:signup,
+                        bill:data.bill,
                         tuition:data.tuition,
-                        pay:0
+                        pay:1
                     })
                     this.payways=data.payways
                     
@@ -283,6 +316,7 @@
             },
             onUserChecked(user){
                 this.user_checked=true
+
                 this.form.user.phone=user.phone
                 this.form.user.email=user.email
                 this.form.user.profile.fullname=user.profile.fullname
@@ -292,15 +326,16 @@
                 }
 
             },
-            onUserCheckFailed(userList){
+            onUserCheckFailed(users){
                 this.formSubmitting=false
-                this.userList=userList
-                if(userList.length){
-                   this.showUserList=true
+                this.userListModal.users= users
+                if(users.length){
+                   this.userListModal.show=true
                 }
             },           
             onUserSelected(selected){
                 let id=selected[0]
+                
                 let url=User.showUrl(id)
                 Helper.redirect(url)
             },
@@ -309,35 +344,81 @@
             },
 
             onCombinationReady(course_id){
-               alert(course_id)
-                this.setCourse(course_id)
-
+               this.selectCourseModal.course_id=course_id
             },
-            setGender(val) {
-                this.form.user.profile.gender = val;
+            courseExist(id){
+                if(this.selectedCourses.length < 1 ) return false
+                let item=this.selectedCourses.find((course)=>{
+                    return course.id==id
+                })
+
+                if(item) return true
+                return false
+            },
+            onCourseSelected(){
+                this.selectCourseModal.show=false
+
+                let id=this.selectCourseModal.course_id
+                if(this.courseExist(id)) return false
+
+                let getCourse=Course.show(id)
+                getCourse.then(data=>{
+                    
+                    let course=new Course(data.course)
+
+                    let canSignup=Helper.isTrue(course.canSignup)
+                    if(!canSignup){
+                        this.courseConfirmModal.msg=course.fullname +  ' 已停止報名'
+                        this.courseConfirmModal.show=true
+
+                        return false
+                    }
+
+                    this.selectedCourses.push(course)
+
+                   
+                    
+                }).catch(error =>{
+                     Helper.BusEmitError(error)
+                })
+            },
+            removeItem(id){
+                let index=this.selectedCourses.findIndex((course)=>{
+                    return course.id==id
+                })
+
+                this.selectedCourses.splice(index,1)
             },
             setPay(val){
-                this.pay=val
+                this.form.pay=val
             },
-            setCourse(val){
-              
-                this.form.signup.course_id=val
-                this.clearErrorMsg('signup.course_id')
-            },
+           
             onDiscountSelected(discount){
                 this.form.signup.discount_id=discount.id
                 this.form.signup.tuition=Helper.formatMoney(discount.tuition,true)                
             },
-           
+                      
             onSubmit() {
-                this.formSubmitting=true
-                this.userCheckerSettings.status+=1
+                
+                 this.formSubmitting=true
+                 this.$refs.userinputs.checkUser()
+                // this.userCheckerSettings.status+=1
             },
             submitForm() {
-                this.form.pay=this.pay
+               
                 let store=Signup.newUserStore(this.form)
                     .then(data => {
                        Helper.BusEmitOK()
+                       if(this.isPay){
+
+                       }else{
+                           Helper.redirect('/users/' + data.id)
+                       }
+
+
+                       
+
+
                        //this.$emit('saved',data)                            
                     })
                     .catch(error => {
@@ -349,6 +430,8 @@
                        
                     })
             },
+            
+            
          
 
 

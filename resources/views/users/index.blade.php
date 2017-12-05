@@ -3,12 +3,13 @@
 
 @section('content')
 
-       <user-index v-show="!selected" :hide_create="indexSettings.hide_create" :version="version"
-       @selected="onUserSelected" @add-to-role="addToRole" @begin-create="onBeginCreate">
-       </user-index> 
+    <user-index v-show="!selected" :hide_create="indexSettings.hide_create" :version="version"
+        @selected="onUserSelected" @add-to-role="addToRole" @begin-create="onBeginCreate">
+    </user-index> 
 
-       <user-details v-if="selected" :id="selected" :can_back="can_back" 
-         @btn-back-clicked="backToIndex" @user-deleted="onUserDeleted"></user-details>
+    <user-details v-if="selected" :id="selected" :can_back="can_back" 
+        @btn-back-clicked="backToIndex" @user-deleted="onUserDeleted">
+    </user-details>
 
            
 

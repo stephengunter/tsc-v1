@@ -1,54 +1,50 @@
 <template>
-<div>
 <data-viewer :source="source" :thead="thead" :filter="filter"  :title="title" 
     :default_order="defaultOrder" :default_search="defaultSearch" :version="version"
-     :create_text="createText" 
-      @beginCreate="beginCreate" >
+    :create_text="createText"   @beginCreate="beginCreate" >
+     
        
-        <template scope="props">
-            <tr>    
-               
-                <td><a herf="#" @click.prevent="userSelected(props.item.id)">{{props.item.name}}</a> </td>
-                
-                <td>{{props.item.email}}</td>
-                <td>{{props.item.phone}}</td>
-                <td>
-                      <button type="button" class="btn btn-default btn-xs" @click="addUserToRole(props.item.id)">
-                          <span class="glyphicon glyphicon-plus"></span>
-                      </button>
-                      
-                    <role-label v-for="role in props.item.roles" :labelstyle="role.style" :labeltext="role.display_name"></role-label>
-                </td>
-               
-                <td>{{ props.item.updated_at | tpeTime }}</td>    
-            </tr>
-        </template>
+    <template scope="props">
+        <tr>    
+            
+            <td><a href="#" @click.prevent="userSelected(props.item.id)">{{props.item.name}}</a> </td>
+            
+            <td>{{props.item.email}}</td>
+            <td>{{props.item.phone}}</td>
+            <td>
+                    
+                <role-label v-for="(role,index) in props.item.roles" :key="index" :role="role" ></role-label>
+            </td>
+            
+            <td>{{ props.item.updated_at | tpeTime }}</td>    
+        </tr>
+    </template>
 
 </data-viewer>
-
-
-<user-roles :user_id="userRoles.id" :showing="userRoles.show"
-     @canceled="onUserRolesCanceled" >
-        
-</user-roles>
-
-</div>
 </template>
 
 <script>
     import UserRoles from '../../components/user/user-roles.vue'
     export default {
         name: 'UserList',
+        props: {
+            hide_create: {
+              type: Boolean,
+              default: false
+            },
+            version: {
+              type: Number,
+              default: 0
+            }
+        },
         components: {
             'user-roles':UserRoles
         },
-        props: ['hide_create','version'],
-        
         data() {
             return {
                 title:Helper.getIcon('Users')  + '  使用者管理',
                 defaultOrder:'updated_at',
-                defaultSearch:'name',
+                defaultSearch:'profile.fullname',
                 
                 createText:'新增使用者',
                 
@@ -83,6 +79,9 @@
 
 
                 filter: [{
+                    title: '真實姓名',
+                    key: 'profile.fullname',
+                },{
                     title: '使用者名稱',
                     key: 'name',
                 }, {
@@ -120,15 +119,7 @@
             
             beginCreate(){
                  this.$emit('begin-create')
-            },
-            addUserToRole(id){
-                this.userRoles.show=true
-                this.userRoles.id=id
-            },
-           
-            onUserRolesCanceled() {
-               this.userRoles.show = false
-            },     
+            },   
         },
 
     }

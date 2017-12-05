@@ -22,13 +22,13 @@
               <div class="form-inline">
                   <input type="text" name="user.phone" class="form-control" v-model="form.user.phone" >
                   &nbsp;&nbsp;
-                  <button @click.prevent="onCheckUserClicked" v-show="!checkedTimes" :disabled="form.hasError()" class="btn btn-success btn-sm">
+                  <button @click.prevent="beginCheckUser" v-show="!checkedTimes" :disabled="form.hasError()" class="btn btn-success btn-sm">
                        {{ button_text }}
                   </button>
                   <small v-if="form.errors.has('user.data')" v-text="form.errors.get('user.data')" class="text-danger" ></small>
                 
               </div>
-              <small v-if="form.errors.has('user.phone')" v-text="form.errors.get('user.phone')" class="text-danger" >身分證號</small>
+              <small v-if="form.errors.has('user.phone')" v-text="form.errors.get('user.phone')" class="text-danger" ></small>
                  
             </div>
        </div>
@@ -75,11 +75,11 @@
             }
         },
         watch: {
-            version: function () {
+            version() {
                 this.init()
             },
-            status: function () {
-                this.onCheckUserClicked()
+            status() {
+                this.beginCheckUser()
             }
         },
         beforeMount() {
@@ -99,8 +99,7 @@
                 })
               
             },
-            onCheckUserClicked(){
-
+            beginCheckUser(){
                let check= this.checkUser()
                check.then(result=>{
                    if(result){

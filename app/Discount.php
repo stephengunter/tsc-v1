@@ -47,6 +47,29 @@ class Discount extends Model
 		if(!$user->isOwner()) return false;
 		return $user->admin->canAdminCenter($center);
 	} 
+	public function getName()
+	{
+		if($this->isBird()) return config('app.course.bird_discount_name') . ' ' . $this->name;
+		return $this->name;
+	}
+	public function isBird()
+	{
+		//是否早鳥優惠
+		$points_one=(int)$this->points_one;
+		$points_two=(int)$this->points_two;
+		return $points_one > $points_two;
+	}
+	public function populateViewData(bool $isStageOne)
+	{
+		$this->name=$this->getName();
+		if($isStageOne){
+			$this->points=$this->points_one;
+			
+		}else{
+			$this->points=$this->points_two;
+		}
+		
+	}
 
    public function canEditBy($user)
 	{

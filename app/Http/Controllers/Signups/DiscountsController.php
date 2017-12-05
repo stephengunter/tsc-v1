@@ -171,7 +171,7 @@ class DiscountsController extends BaseController
 
     public function options()
     {
-        $course_id=(int)request()->course;
+        
         $date=null;
         try {
             $date = Carbon::parse(request()->date);
@@ -180,11 +180,12 @@ class DiscountsController extends BaseController
             $date=Carbon::today();
         }
 
+        $activeDiscounts=null;
 
-
+        $course_id=(int)request()->course;
         $course=$this->courses->findOrFail($course_id);
-
         $activeDiscounts=$this->discounts->getValidDiscounts($course,$date);
+
         
         $options=$this->discounts->optionsConverting($activeDiscounts);
       

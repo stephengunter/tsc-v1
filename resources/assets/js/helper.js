@@ -89,6 +89,9 @@ class Helper {
             case 'signups':
                 html = '<i class="fa fa-file-text-o" aria-hidden="true"></i>'
                 break;
+            case 'bills':
+                html = '<span class="glyphicon glyphicon-credit-card" aria-hidden="true"></span>'
+            break;
             case 'tuitions':
                 html = '<i class="fa fa-money" aria-hidden="true"></i>'
                 break;

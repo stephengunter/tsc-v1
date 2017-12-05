@@ -15,6 +15,7 @@ use App\User;
 use App\Profile;
 use App\Course;
 use App\Tuition;
+use App\Bill;
 
 use App\Events\UserCreated;
 
@@ -45,6 +46,8 @@ class NewUserSignupsController extends BaseController
         $signup=Signup::initialize();
         $signup['net_signup'] = 0;
 
+        $bill=Bill::init();
+
         $tuition=Tuition::initialize();
         
         $payways=$this->signupService->getPayways();
@@ -54,6 +57,7 @@ class NewUserSignupsController extends BaseController
                 'user' => $user,
                 'signup' => $signup,
                 'tuition' => $tuition,
+                'bill' => $bill,
                 'payways' => $payways               
             ]);
          
@@ -66,13 +70,6 @@ class NewUserSignupsController extends BaseController
         $current_user=$this->currentUser();        
         $updated_by=$current_user->id;
 
-        $isPay=$request->isPay();
-
-        $values=$request->getValues($updated_by);
-
-        $course_id=$values['course_id'];
-        $course=Course::findOrFail($course_id);
-
         $userValues=$request->getUserValues($updated_by);
         $profileValues=$request->getProfileValues($updated_by);
         $userValues['name']=$profileValues['fullname'];
@@ -81,8 +78,21 @@ class NewUserSignupsController extends BaseController
         $profile=new Profile($profileValues);
 
         $user=$this->userService->store($user,$profile);
-
+        
         if(!$user) throw new Exception();
+
+        $isPay=$request->isPay();
+ 
+        if(!$isPay) return response()->json($user);
+            
+        
+
+        $values=$request->getValues($updated_by);
+
+        $course_id=$values['course_id'];
+        $course=Course::findOrFail($course_id);
+
+        
 
         try {
 

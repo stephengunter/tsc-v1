@@ -316,6 +316,7 @@
 
                     this.form=new Form({
                         signup:signup,
+                        bill:data.bill,
                         tuition:data.tuition,
                         pay:0
                     })

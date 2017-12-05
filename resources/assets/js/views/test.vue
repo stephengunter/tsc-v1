@@ -1,25 +1,25 @@
 <template>
     <div>
-        <new-user-signup>
+        <create-bill :user_id="user_id">
            
-        </new-user-signup>
+        </create-bill>
         
     </div>
 </template>
 
 <script>
-    import CreateSignup from '../components/signup/create.vue'
+    import CreateBill from '../components/bill/create.vue'
    
     export default {
         name:'Test',
         components: {
-           'create-signup':CreateSignup
+           'create-bill':CreateBill
         },
         data() {
             return {
                 ready:true,
                 course_id:31,
-                user_id:0,
+                user_id:1,
                 
                 
             }

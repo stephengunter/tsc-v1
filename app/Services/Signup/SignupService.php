@@ -23,6 +23,7 @@ use App\Events\SignupCreated;
 
 use Exception;
 use DB;
+use App\Support\Helper;
 
 use App\Exceptions\RequestError;
 
@@ -106,6 +107,23 @@ class SignupService
         }
     }
 
+    public function  initPayBill($signups)
+    {
+        $total = $signups->sum(function ($item) {
+            return $item->course->tuition;
+        });
+        
+        $bill=Bill::init();
+
+        $bill['total']=$total;
+
+        $signupIds=$signups->pluck('id')->toArray();
+
+        $bill['signup_ids']=Helper::strFromArray($signupIds);
+
+        return $bill;
+    }
+
     public function  initOnlinePayBill($signups)
     {
         $total = $signups->sum(function ($item) {
@@ -140,6 +158,20 @@ class SignupService
         return $bill;
         
     }
+
+    public function  getDiscountOptions(int $center_id )
+    {
+        
+        return $this->discounts->getDiscountOptions($center_id);
+        
+    } 
+
+    public function  getDiscountOptionsByCourse(Course $course,$date)
+    {
+        $validDiscounts=$this->discounts->getValidDiscounts($course,$date);
+        return $this->discounts->optionsConverting($validDiscounts);
+        
+    } 
 
     public function saveBill(Bill $bill , $signups)
     {
@@ -193,6 +225,17 @@ class SignupService
            return $this->printSignupSummary($info);
            
     }
+    public function getSummaryByUser($user_id)
+    {
+          $info = DB::table('signups')
+                       ->where('removed',false)
+                       ->where('user_id',$user_id)
+                       ->select('status', DB::raw('count(*) as total'))
+                       ->groupBy('status')->get();
+
+           return $this->printSignupSummary($info);
+           
+    }
     public function printSignupSummary($info)
     {
            $success=0;
@@ -236,7 +279,7 @@ class SignupService
      
     }
    
-
+    //單一課程報名
     public function store(Course $course, User $user, Signup $signup , Tuition $tuition=null)
     {
       
@@ -246,8 +289,8 @@ class SignupService
             $signup->discount_id=0;
             $signup->discount='';
             $signup->points=0;
-            $signup->tuition=$course->tuition;
-            //$signup->cost=$course->cost;
+            $signup->tuition=0;
+            $signup->cost=0;
         }
 
         $date =null;
@@ -266,8 +309,6 @@ class SignupService
             if($discount->tuition!=$signup->tuition){                    
                 
                 throw new RequestError('signup.tuition', '課程費用錯誤');
-               
-                
             }
              
             $signup->discount=$discount->name;
@@ -290,7 +331,7 @@ class SignupService
             $signup->save();
         }
 
-        $signup->updateStatus();
+        //$signup->updateStatus();
         $course->updateStatus();
       
         //event(new SignupCreated($signup));

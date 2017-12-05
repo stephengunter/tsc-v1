@@ -124,8 +124,8 @@ class User {
            
         })
     }
-    static update(form , id, role){
-         let url =this.updateUrl(id , role) 
+    static update(form , id){
+         let url =this.updateUrl(id) 
          let method='put'
         return new Promise((resolve, reject) => {
             form.submit(method,url)

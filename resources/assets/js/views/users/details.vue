@@ -27,15 +27,7 @@
                     </contact-info>
                 </div>
                 <div class="tab-pane fade" id="signupRecord">
-                      <!-- <signup-view v-if="activeIndex==1" :user_id="id" 
-                          :disable_edit="signupSettings.disable_edit"
-                          @selected="onSignupSelected">
-                          
-                      </signup-view>   -->
-                    <signup-list  v-if="activeIndex==1"  :user_id="id" 
-                       
-                        @selected="onSignupSelected" @begin-create="onBeginCreateSignup">
-                    </signup-list>
+                    <user-signups v-if="activeIndex==1" :user_id="id" ></user-signups>
                 </div>              
             </div>
         </div>
@@ -50,14 +42,14 @@
     
     import UserComponent from '../../components/user/user.vue'
     import contact_info from '../../components/contactInfo/contactInfo.vue'
-    import SignupList from '../../components/signup/list.vue'
+    import UserSignups from '../../components/user/signups.vue'
     
     export default {
         name: 'UserDetails',
         components: {
             'user':UserComponent,
             'contact-info':contact_info,
-            'signup-list':SignupList
+            'user-signups':UserSignups
            
         },
         props: {
@@ -160,14 +152,7 @@
             onContactInfoDeleted(){ 
                 this.setContactInfo(null)
             },
-            onSignupSelected(id){
-                let path=Signup.showUrl(id)
-                Helper.newWindow(path)
-            },
-            onBeginCreateSignup(){
-                let url='/signups/create?user=' + this.id
-                Helper.redirect(url)
-            },
+            
             onBtnBackClicked(){
                 this.$emit('btn-back-clicked')
             },

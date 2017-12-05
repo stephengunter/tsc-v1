@@ -194,6 +194,7 @@ import Leave from './models/leave.js'
 
 
 import Signup from './models/signup.js'
+import Bill from './models/bill.js'
 import Tuition from './models/tuition.js'
 import Refund from './models/refund.js'
 import Center from './models/center.js'
@@ -254,6 +255,7 @@ window.LessonParticipant = LessonParticipant
 window.Leave = Leave
 
 window.Signup = Signup
+window.Bill = Bill
 window.Tuition = Tuition
 window.Refund = Refund
 window.Teacher = Teacher

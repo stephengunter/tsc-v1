@@ -5,8 +5,8 @@
 		<div class="col-sm-12">
 			<div class="form-group"> 
 				<label>折扣優惠</label>
-				<discounts-selector :course_id="getCourseId()" :discount_id="getDiscountId()"
-				:date="form.signup.date" @selected="onDiscountSelected">
+				<discounts-selector :discount_id="getDiscountId()" :discounts="discounts"
+						@selected="onDiscountSelected">
 				</discounts-selector>
 			</div>  
 		</div>
@@ -16,24 +16,11 @@
 		<div  class="col-sm-3">
 			<div class="form-group"> 
 				<label>應繳學費</label>
-				<input  type="text" name="signup.tuition" class="form-control" v-model="form.signup.tuition" @keydown="clearErrorMsg('signup.tuition')"  >
-				<small class="text-danger" v-if="form.errors.has('signup.tuition')" v-text="form.errors.get('signup.tuition')"></small>
+				<input  type="text" name="bill.tuition" class="form-control" v-model="form.bill.tuition" @keydown="clearErrorMsg('bill.tuition')"  >
+				<small class="text-danger" v-if="form.errors.has('bill.tuition')" v-text="form.errors.get('bill.tuition')"></small>
 			</div>  
 		</div>
-		<div v-if="false" class="col-sm-3">    
-			<div class="form-group"> 
-				<label>材料費</label>
-				<input disabled type="text" name="signup.cost" class="form-control" v-model="form.signup.cost" @keydown="clearErrorMsg('signup.cost')"  >
-				<small class="text-danger" v-if="form.errors.has('signup.cost')" v-text="form.errors.get('signup.cost')"></small>
-			</div> 
-		</div>
-		<div v-if="false"  class="col-sm-3">    
-			<div class="form-group"> 
-				<label>合計應繳</label>
-				<input disabled type="text" :value="total" name="signup.cost" class="form-control"  >
-				
-			</div> 
-		</div>
+		
 	</div>   <!--  row   -->
 	<tuition-inputs  v-if="pay" :form="form" :payways="payways"
 			@clear-error="clearErrorMsg">
@@ -44,7 +31,7 @@
 
 
 <script>
-import DiscountSelector from "./discounts-selector.vue"
+import DiscountSelector from '../../components/bill/discounts-selector.vue'
 import TuitionInput from "../tuition/inputs.vue"
 
 export default {
@@ -65,11 +52,15 @@ export default {
 		
 	},
 	data() {
-		return {};
+		return {
+			discounts:[]
+		}
 	},
 	computed: {
-		total() {
-			return Number(this.form.signup.tuition) + Number(this.form.signup.cost);
+		loaded(){
+			if(!this.form) return false
+			if(this.discounts.length<1) return false 
+			return true
 		},
 		pay(){
 			if(!this.payways)  return false
@@ -80,17 +71,64 @@ export default {
 		this.init();
 	},
 	methods: {
-		init() {},
-		getCourseId(){
-			return Helper.tryParseInt(this.form.signup.course_id)
+		init() {
+			this.fetchData()
 		},
 		getDiscountId(){
-			return Helper.tryParseInt(this.form.signup.discount_id)
+			return parseInt(this.form.bill.discount_id)
 		},
-		onDiscountSelected(discount) {
+		getCourseId(){
+			return this.form.signup.course_id
+		},
+		getDate(){
+			return this.form.signup.date
+		},
+		fetchData(){
+			let getData=Discount.options(this.getCourseId(),this.getDate())
+                
+         getData.then(data => {
+            let discounts=data.discounts
+				
+				let default_discount=discounts.find((item)=>{
+					 return item.bird
+				})
+
+				if(default_discount) {
+					this.form.bill.discount_id=default_discount.value
+				}
+				else{
+					let noDiscount={ text:'無' , value:0 , points: 0 }
+					discounts.splice(0, 0, noDiscount)
+					this.form.bill.discount_id=0
+					
+				}
+
+				this.discounts=discounts
+        })
+        .catch(error=> {
+            Helper.BusEmitError(error)                        
+        })
+		},
+		onDiscountSelected(id){
 			
-			this.$emit("discount-selected", discount);
+			  let discount=this.discounts.find((item)=>{
+				  return item.value==id
+			  })
+
+			  this.$emit('discount-selected',discount)
+
+			//   let points=parseInt(discount.points)
+			  
+
+			//   if(points){
+			// 	  this.form.bill.amount=points * this.form.bill.total /100
+			//   }else{
+			// 	   this.form.bill.amount=this.form.bill.total
+			//   }
+
+			//   this.form.tuition.amount=this.form.bill.amount
 		},
+		
 		clearErrorMsg(name) {
 			this.$emit("clear-error", name);
 		}

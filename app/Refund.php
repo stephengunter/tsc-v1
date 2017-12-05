@@ -4,35 +4,22 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Support\FilterPaginateOrder;
-use App\Signup;
+use App\Bill;
 use App\Tuition;
 use Carbon\Carbon;
 
 class Refund extends Model
 {
-    public $statusList=[
-        '-1' => '待審核',
-        '0' => '審核中',
-        '1' => '已完成'
+    protected $fillable =  ['signup_id',  'date',  'number',
+        'courses_total' ,'courses_done' ,  'points' ,
+        'tuition' , 'cost', 'charge',
+        'pay_by', 'updated_by','status', 'removed',
+        'bank_branch', 'account_owner','account_number',
     ];
-    
-
-     use FilterPaginateOrder;
-     protected $filter =  ['date'];
-
-     protected $primaryKey = 'signup_id';
-
-     protected $fillable =  ['signup_id',  'date',  'number',
-                             'courses_total' ,'courses_done' ,  'points' ,
-                             'tuition' , 'cost', 'charge',
-                              'pay_by', 'updated_by','status', 'removed',
-                             'bank_branch', 'account_owner','account_number',
-                            ];
-
     public static function initialize(Signup $signup)
     {
         return [            
-            
+
             'signup_id' => $signup->id,
             'date' => Carbon::now()->toDateString(),
             'courses_done' => 0,
@@ -42,16 +29,16 @@ class Refund extends Model
             'cost' => 0,
             'charge' => 0,
             'status' => -1,
-             'pay_by' => 1,
-             'bank_branch'=>'',
-             'account_owner'=>'',
-             'account_number'=>'',
-            ];
+            'pay_by' => 1,
+            'bank_branch'=>'',
+            'account_owner'=>'',
+            'account_number'=>'',
+        ];
     } 
-
-    public function signup() {
-		return $this->belongsTo('App\Signup');
-	}
+    public function signup() 
+    {
+        return $this->belongsTo('App\Signup');
+    }
 
     public function hasTuitions()
     {

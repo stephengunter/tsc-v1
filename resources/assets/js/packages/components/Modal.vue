@@ -18,7 +18,7 @@
                 <slot name="modal-footer">
                     <div class="modal-footer" v-if="showbtn">
                         <button type="button" class="btn btn-primary" @click="ok">{{ ok_text }}</button>
-                        <button type="button" class="btn btn-default" @click="close">{{ cancel_text }}</button>
+                        <button type="button" v-show="cancel_text" class="btn btn-default" @click="close">{{ cancel_text }}</button>
                     </div>
                 </slot>                  
             </div>                           

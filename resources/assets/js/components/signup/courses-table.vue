@@ -1,0 +1,47 @@
+<template>
+   <table class="table table-striped">
+      <thead>
+         <tr>
+               <th>課程編號</th>
+               <th>課程名稱</th>
+               <th>上課時間</th>
+               <th>課程期間</th>
+               <th>課程費用</th>
+               <th></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr v-for="(course,index) in courses" :key="index" >
+               <td>{{ course.number }}</td>
+               <td>{{ course.fullname }}</td>
+               <td>{{ course.classTimesText }}</td>
+               <td>{{ course.period }}</td>
+               <td>{{ course.tuition | formatMoney}}</td>
+               <td>
+                  <button @click.prevent="removeItem(course.id)" class="btn btn-danger btn-xs">
+                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                  </button>
+               </td>
+         </tr>
+      </tbody>
+   </table>
+</template>
+
+<script>
+export default {
+   name: 'SignupCoursesTable',
+   props: {
+      courses:{
+         type: Array,
+         default: []
+      },
+   },
+   methods: {
+      removeItem(id){
+         
+         this.$emit('remove-course',id)
+      },
+   }
+}
+</script>
+

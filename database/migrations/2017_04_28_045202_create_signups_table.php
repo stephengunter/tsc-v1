@@ -29,10 +29,10 @@ class CreateSignupsTable extends Migration
             $table->decimal('tuition', 8, 2)->nullable();  
             $table->decimal('cost', 8, 2)->nullable();
 
-            $table->integer('discount_id')->unsigned()->nullable();
-            $table->integer('points')->unsigned()->nullable();
-            $table->string('discount')->nullable();  
-            $table->string('identity')->nullable();  
+            // $table->integer('discount_id')->unsigned()->nullable();
+            // $table->integer('points')->unsigned()->nullable();
+            // $table->string('discount')->nullable();  
+            // $table->string('identity')->nullable();  
 
             $table->boolean('net_signup')->default(false);           
             $table->integer('status')->default(0);

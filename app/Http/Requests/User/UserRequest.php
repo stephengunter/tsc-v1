@@ -20,20 +20,22 @@ class UserRequest extends FormRequest
         $email=$userValues['email'];   
 
         $user_id=$this->getUserId();
-        $role='';
-        if($user_id){
-           $user = User::findOrFail($user_id);
+        $role=$this->getRole();
 
-           if($user->isAdmin()) $role='Admin';
-           else if ($user->isTeacher()) $role=Role::teacherRoleName();
-           else if ($user->isStudent()) $role='Student';
-           else if ($user->isVolunteer()) $role=Role::volunteerRoleName();
+        if(!$role){
+            if($user_id){
+                $user = User::findOrFail($user_id);
+     
+                if($user->isAdmin()) $role='Admin';
+                else if ($user->isTeacher()) $role=Role::teacherRoleName();
+                else if ($user->isStudent()) $role='Student';
+                else if ($user->isVolunteer()) $role=Role::volunteerRoleName();
+     
+             }
 
-          
-
-        }else{
-            $role=$this->getRole();
         }
+        
+       
         
         
         return User::getRules($email,$user_id,$role);
@@ -58,7 +60,9 @@ class UserRequest extends FormRequest
     public function getRole()
     {
         $userValues = $this['user'];
-        $role='User';        
+
+        
+        $role='';        
         if(array_key_exists ( 'role' ,$userValues)){
             $role=$userValues['role'];
         }  

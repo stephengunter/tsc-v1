@@ -42,8 +42,8 @@
                                 <button type="button" class="btn btn-default btn-xs" @click="onAddRoleCilcked">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </button>
-                                <role-label v-for="(role,index) in user.roles" :key="index" :labelstyle="role.style" 
-                                    :labeltext="role.display_name">
+                                <role-label v-for="(role,index) in user.roles" :key="index" :role="role" >
+                                   
                                 </role-label>
                                 
                             </p>

@@ -15,6 +15,7 @@ use App\Signup;
 use App\User;
 use App\Course;
 use App\Tuition;
+use App\Bill;
 
 use App\Support\Helper;
 
@@ -94,50 +95,76 @@ class SignupsController extends BaseController
 
     }
 
+    private function checkValidStatus(int $status)
+    {
+        if( $status >= -1  && $status <=1 ) return $status;
+        return 0;
+    }
+
     public function index()
     {
         $request = request();
           
         if(!$request->ajax()){
-            $menus=$this->menus($this->key);            
+            $menus=$this->menus($this->key);   
             return view('signups.index')
                     ->with(['menus' => $menus]);
         }  
         
        
         $course_id=(int)$request->course; 
+        $user_id=(int)$request->user;
         $status=(int)$request->status;
+        $status=$this->checkValidStatus($status);
+
+        $signupList=null;
+        $summary=null;
+        $course=null;
 
         if($course_id){
             $course=Course::with('status')->findOrFail($course_id);
             $net_signup=false;
             $course->canSignup=$course->canSignup($net_signup);
 
-
             $signupList= $this->signupService->getByCourseId($course_id);
+
+            $summary=$this->signupService->getSummary($course_id);
             
-            if( $status >= -1  && $status <=1 ){
-                $signupList=$signupList->where('status',$status);
-            }
+        }else{
+            $signupList= $this->signupService->getByUserId($user_id);
 
-            $signupList=$signupList->with(['course','user.profile'])
-                                    ->filterPaginateOrder();
-
-            $summary=$this->signupService->getSummary($course_id);   
-
-            return response() ->json([ 'model' => $signupList,
-                                       'summary' => $summary,
-                                       'course' => $course
-                                     ]); 
+            $summary=$this->signupService->getSummaryByUser($user_id);
         }
 
+        $signupList=$signupList->where('status',$status)
+                                ->with(['course','user.profile'])
+                                ->filterPaginateOrder();
 
-        $user_id=(int)$request->user;
-        $signupList= $this->signupService->getByUserId($user_id)
-                                        ->with(['course','user.profile']);
+           
 
-        return response() ->json(['model' => $signupList->filterPaginateOrder()  ]); 
+        return response() ->json([ 'model' => $signupList,
+                                    'summary' => $summary,
+                                    'course' => $course
+                                ]);
        
+    }
+
+    private function createByUser(User $user)
+    {
+        $signups=[];
+        $bill=Bill::init();
+        $tuition=Tuition::initialize();
+
+        $payways=$this->signupService->getPayways();
+
+        return response()->json([
+                            
+                            'signups' => $signups,
+                            'bill' => $bill,
+                            'tuition' => $tuition,
+                            'payways' => $payways
+
+                        ]);
     }
 
     public function create()
@@ -155,6 +182,11 @@ class SignupsController extends BaseController
                         'course_id' => $course_id
                     ]);
         }  
+
+        if($user_id){
+            $user=User::findOrFail($user_id);
+            return $this->createByUser($user);
+        }
     
         
 
@@ -185,12 +217,12 @@ class SignupsController extends BaseController
 
         $signup=Signup::initialize($user_id,$course_id);
         $signup['net_signup'] = 0;
-     
-        // if($course){
-        //     $signup['cost'] = $course->cost;
-        // } 
 
-        //$defaultAmount=$course->defaultAmount();
+        $bill=Bill::init();
+        $bill['total']=$course->tuition;
+
+
+       
         $tuition=Tuition::initialize();
 
         $payways=$this->signupService->getPayways();
@@ -205,6 +237,7 @@ class SignupsController extends BaseController
             'user' => $user,
 
             'signup' => $signup,
+            'bill' => $bill,
             'tuition' => $tuition,
             'payways' => $payways
 

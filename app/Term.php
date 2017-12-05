@@ -22,6 +22,13 @@ class Term extends Model
 		return 	$user->admin->fromHeadCenter();
 	}
 
+	public static function defaultTerm()
+	{
+		return Term::where('removed',false)
+						->where('active',true)
+						->orderBy('number','desc')->first();
+	}
+
 	
 
 	public static function initialize()

@@ -40,6 +40,21 @@ class Signup {
     static deleteUrl(id){
          return this.source() + '/' + id
     }
+    static createByUser(userId){
+        let url = this.createUrl() 
+        url += '?user=' + userId
+       
+        return new Promise((resolve, reject) => {
+            axios.get(url)
+                .then(response => {
+                   resolve(response.data)
+                })
+                .catch(error=> {
+                     reject(error);
+                })
+           
+        })
+    }
     static create(courseId,userId){
         let url = this.createUrl() 
         url += '?course=' + courseId

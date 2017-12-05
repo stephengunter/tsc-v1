@@ -61,6 +61,7 @@ return [
 	'course' => [
 		
 		'close_before_days' => 1,  // 開始前??天截止報名
+		'bird_discount_name' => '早鳥優惠'
 		
 	],
 	

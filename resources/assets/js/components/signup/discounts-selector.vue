@@ -29,8 +29,8 @@ export default {
       return {
          
          discountOptions:[],
-			selected:0,
-			tuition:0,
+        selected:0,
+        tuition:0,
       }
 	},
 	watch: {

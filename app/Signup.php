@@ -49,19 +49,13 @@ class Signup extends Model
     {
 	  	  return $this->belongsTo('App\User');
     }
-    public function Bill()
+    public function bill()
     {
 		   return $this->belongsTo('App\Bill');
 	}  
 
-    public function tuitions() 
-	{
-		return $this->hasMany('App\Tuition');
-	}
-    public function refund() 
-	{
-		return $this->hasOne(Refund::class);
-    }
+    
+    
     
     public function isValid()
     {
@@ -85,18 +79,17 @@ class Signup extends Model
 		if(!$this->refund) return null;
         if($this->refund->removed) return null;
         return $this->refund;
+    }
+    
+    public function getRefund() 
+	{
+		if(!$this->refund) return null;
+        if($this->refund->removed) return null;
+        return $this->refund;
 	}
 
-    public function invoiceMoney()
-    {
-        $totalIncome=$this->incomeRecords()->sum('amount');
-                                        
-        return $totalIncome;
-    }
-    public function incomeRecords()
-    {
-        return $this->tuitions()->where('refund',false);
-    }
+    
+    
     public function refundRecords()
     {
         return $this->tuitions()->where('refund',true);
@@ -193,6 +186,7 @@ class Signup extends Model
     }
     public function populateViewData()
     {
+        $this->course->fullname();
         $this->statusText();
         $this->canRemove=$this->canRemove();
 
@@ -202,20 +196,20 @@ class Signup extends Model
         return $this->tuitions()->where('refund',false)->sum('amount');
     }
 
-    public function updateStatus()
-    {
+    // public function updateStatus()
+    // {
 
-        if($this->hasRefund()){
-            $this->status = -1; //'已取消'
-        }else{
-            $total = $this->totalIncome();
-            if($total>=$this->tuition)  $this->status=1;   //已繳費
-            else   $this->status=0;   //待繳費
-        }
-        $this->save();
+    //     if($this->hasRefund()){
+    //         $this->status = -1; //'已取消'
+    //     }else{
+    //         $total = $this->totalIncome();
+    //         if($total>=$this->tuition)  $this->status=1;   //已繳費
+    //         else   $this->status=0;   //待繳費
+    //     }
+    //     $this->save();
 
         
-    }    
+    // }    
     public function formattedPoints()
     {
         if(!$this->points) return '';
