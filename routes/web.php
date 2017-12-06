@@ -180,7 +180,7 @@ Route::group(['middleware' => 'admin'], function()
     Route::get('signups/index-options', '\App\Http\Controllers\Signups\SignupsController@indexOptions');
     Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsController@statusOptions');
     
-    Route::get('signups/{id}/print', '\App\Http\Controllers\Signups\SignupsController@print');
+    
     Route::post('signups/update-user', '\App\Http\Controllers\Signups\SignupsController@updateUser');
 
     Route::get('signups/new-user', '\App\Http\Controllers\Signups\NewUserSignupsController@create');
@@ -190,6 +190,7 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('signups', '\App\Http\Controllers\Signups\SignupsController');
 
     Route::get('bills/discount-options', '\App\Http\Controllers\Signups\BillsController@discountOptions');
+    Route::get('bills/{id}/print', '\App\Http\Controllers\Signups\BillsController@print');
     Route::resource('bills', '\App\Http\Controllers\Signups\BillsController');
 
 

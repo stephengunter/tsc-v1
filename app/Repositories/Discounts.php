@@ -78,12 +78,13 @@ class Discounts
         return $validDiscounts;
     }
 
-    public function getDiscountOptions(int $center_id )
+    public function getDiscountOptions(int $center_id, $date=null)
     {
-        $date=Carbon::today();
-        $term=Term::defaultTerm();
-
         $activeDiscounts=$this->activeDiscounts($center_id);
+
+        if(!$date)$date=Carbon::today();
+        
+        $term=Term::defaultTerm();
         
         //今天是哪個階段
         $isStageOne=Discount::isStageOne($term,$date);

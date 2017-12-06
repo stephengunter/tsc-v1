@@ -16,29 +16,36 @@ class Signup extends Model
     ];
 
     use FilterPaginateOrder;
-    protected $fillable =  ['course_id',  'user_id', 'date', 'parent', 'bill_id',
-                              'tuition','cost' ,'points' ,   'discount' ,
-                             'identity' , 'discount_id', 'net_signup',
-                             'status' ,  'removed' , 'updated_by'
+    protected $fillable =  ['course_id',  'user_id', 'date', 'parent', 
+                            'bill_id','tuition','cost' , 'net_signup',
+                             'status' ,'ps',  'removed' , 'updated_by'
                         	];
 
-    protected $filter =  ['date','status','tuition','discount'];
+    protected $filter =  ['date','status','tuition'];
 
-    public static function initialize($user_id=0,$course_id=0)
+    public static function initialize($user_id=0,Course $course=null)
     {
-        return [            
+        $values= [            
             'date' => Carbon::now()->toDateString(),
             'user_id' => $user_id,
-            'course_id' => $course_id,
+            'course_id' => 0,
             'parent' => 0,
-            'discount_id' => 0,
+           
             'tuition' => 0,
             'cost'=>0,
             'status' => 0,
+            'ps' => '',
             'net_signup' => 1,
             'sub_courses' => []
             
         ];
+
+        if($course){
+            $values['course_id'] =$course->id;
+            $values['tuition'] =$course->tuition;
+        }
+
+        return $values;
     }                         
 
     public function course()
@@ -161,6 +168,22 @@ class Signup extends Model
     }
 
     
+
+    public function getAmount()
+    {
+        $points=0;
+        if($this->bill){
+            $points=$this->bill->points;
+        }
+
+        if($points) $this->amount= round($this->tuition * $points);
+        else $this->amount= $this->tuition;
+
+        
+        return $this->amount;
+    }
+
+    
     public function canPay()
     {
         if($this->status==0){
@@ -188,28 +211,28 @@ class Signup extends Model
     {
         $this->course->fullname();
         $this->statusText();
+        
+        $this->getAmount();
+
         $this->canRemove=$this->canRemove();
 
     }
-    public function totalIncome()
+    
+
+    public function updateStatus()
     {
-        return $this->tuitions()->where('refund',false)->sum('amount');
-    }
 
-    // public function updateStatus()
-    // {
-
-    //     if($this->hasRefund()){
-    //         $this->status = -1; //'已取消'
-    //     }else{
-    //         $total = $this->totalIncome();
-    //         if($total>=$this->tuition)  $this->status=1;   //已繳費
-    //         else   $this->status=0;   //待繳費
-    //     }
-    //     $this->save();
+        if($this->hasRefund()){
+            $this->status = -1; //'已取消'
+        }else{
+           
+           if($this->bill->isPayOff())  $this->status = 1;  //已繳費
+           else $this->status = 0;  //待繳費
+        }
+        $this->save();
 
         
-    // }    
+    }    
     public function formattedPoints()
     {
         if(!$this->points) return '';

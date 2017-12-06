@@ -9,10 +9,8 @@
 					<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
 					返回
 				</button>
-				<button v-if="signup.payed()" @click="btnPrintClicked" class="btn btn-warning btn-sm" >
-					<span class="glyphicon glyphicon-print" aria-hidden="true"></span> 列印收據
-				</button>
-				<button  v-if="signup.canEdit" v-show="can_edit" @click="btnEditClicked" class="btn btn-primary btn-sm" >
+				
+				<button  v-if="false" v-show="can_edit" @click="btnEditClicked" class="btn btn-primary btn-sm" >
 					<span class="glyphicon glyphicon-pencil"></span> 編輯
 				</button>
 				<button v-if="signup.canDelete" v-show="can_edit" @click="btnDeleteClicked" class="btn btn-danger btn-sm" >
@@ -46,17 +44,16 @@
 					<p v-html="signup.statusLabel()"></p>   
 				</div>
 				<div class="col-sm-3">
-					<label class="label-title">課程費用</label>
+					<label class="label-title">應繳學費</label>
 					<p>
-						{{ signup.tuition | formatMoney }}
-						&nbsp;&nbsp;
-						{{ getDiscountText() }}
+						{{ signup.amount | formatMoney }}
+						
 					</p>                      
 				</div>
 				<div class="col-sm-3">
-					<label class="label-title">教材費</label>
+					<label class="label-title">折扣</label>
 					<p>
-						{{ signup.cost | formatMoney }}
+						{{ getDiscountText() }}
 					</p>   
 				</div>
 				<div class="col-sm-3">
@@ -123,7 +120,7 @@ export default {
 			.then(data => {
 				let signup = data.signup;
 				this.signup = new Signup(signup);
-				this.$emit("dataLoaded", signup);
+				this.$emit("loaded", signup);
 				this.loaded = true;
 			})
 			.catch(error => {
@@ -134,6 +131,7 @@ export default {
 			return Helper.tpeDate(date);
 		},
 		getDiscountText(){
+			 
 			if(!this.signup.discountText) return ''
 			return '( ' +  this.signup.discountText + ')'
 		},
@@ -150,9 +148,7 @@ export default {
 			};
 			this.$emit("btn-delete-clicked", values);
 		},
-		btnPrintClicked() {
-			this.$emit("print-invoice", this.id);
-		}
+		
 	}
 }
 </script>

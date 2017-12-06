@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Bill;
 use App\Refund;
 
+use App\Repositories\Payways;
+
 use App\Support\FilterPaginateOrder;
 use Carbon\Carbon;
 
@@ -73,6 +75,19 @@ class Tuition extends Model
         if(!$this->refund_id) return null;
 
         return Refund::find($this->refund_id);
+    }
+
+    public function paywayText()
+    {
+       
+       
+        $this->paywayText=Payways::textPayBy($this->pay_by);
+        return $this->paywayText;
+    }
+
+    public function populateViewData()
+    {
+        $this->paywayText();
     }
     
 

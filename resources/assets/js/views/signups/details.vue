@@ -1,17 +1,17 @@
 <template>
 <div>
-  <signup v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
+  <signup-view v-show="loaded" :id="id" :can_edit="can_edit" :can_back="can_back"  
      @saved="signupUpdated" @data-loaded="onDataLoaded" :version="current_version"
-     @btn-back-clicked="onBtnBackClicked" @signup-deleted="onSignupDeleted" 
-      @print-invoice="onPrintInvoice" > 
+     @btn-back-clicked="onBtnBackClicked" @signup-deleted="onSignupDeleted"   > 
+     
 
-  </signup>
+  </signup-view>
 
-  <div v-if="false" id="tabSignup" class="panel with-nav-tabs panel-default">
+  <div v-if="loaded" id="tabSignup" class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
             <ul class="nav nav-tabs">
                 <li class="active">
-                    <a @click="activeIndex=0" href="#tuitions" data-toggle="tab">繳費紀錄</a>
+                    <a @click="activeIndex=0" href="#tuitions" data-toggle="tab">繳費帳單</a>
                 </li>
                 <li class="">
                      <a @click="activeIndex=1" href="#refund" data-toggle="tab">退費申請</a>
@@ -27,10 +27,11 @@
         <div class="panel-body">
             <div class="tab-content">
                 <div class="tab-pane fade active in" id="tuitions">
-                    <tuition-view v-if="activeIndex==0" :signup_id="id"  
+                    <bill-view :id="parseInt(signup.bill_id)"></bill-view>
+                    <!-- <tuition-view v-if="activeIndex==0" :signup_id="id"  
                      @tuition-created="onTuitionChanged" @tuition-updated="onTuitionChanged"
                      @tuition-deleted="onTuitionChanged">
-                    </tuition-view>
+                    </tuition-view> -->
                 </div>
                 <div class="tab-pane fade" id="refund">
                     <refund-view v-if="activeIndex==1"  :id="id" :can_back="refundSettings.can_back"
@@ -65,14 +66,15 @@
 </template>
 
 <script>
-    import Signup from '../../components/signup/signup.vue'
-    import SubCourseSelector from '../../components/course/sub/selector.vue'
+    import SignupView from '../../components/signup/signup.vue'
+    import BillView from '../../components/bill/view.vue'
+    
     
     export default {
         name: 'SignupDetails',
         components: {
-            Signup,
-           'sub-course-selector':SubCourseSelector
+            'signup-view':SignupView,
+            'bill-view':BillView
         },
         props: {
             id: {
@@ -135,10 +137,7 @@
                return val=='true'
             },
             onDataLoaded(signup){
-                if(signup.subCourses.length){
-                   this.showSubCourses=true
-                }
-              
+               
                 this.loaded=true
                 this.signup=signup
             },
@@ -169,9 +168,7 @@
             onRefundChanged(){
                 this.current_version += 1               
             },
-            onPrintInvoice(){
-                this.$emit('print-invoice',this.id)
-            },
+            
             loadSubCourses(){
 
             }

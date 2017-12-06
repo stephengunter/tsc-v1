@@ -12,7 +12,7 @@
         
      </div>
      
-    <signup-list v-if="ready" :course_id="course_id" :hide_create="hide_create" 
+    <signup-list v-if="ready" :course_id="course_id" :hide_create="!canCreate" 
         :version="version" :can_select="can_select" :for_refund="for_refund"
         @loaded="onSignupListLoaded"
         @selected="onSelected" @begin-create="onBeginCreate">
@@ -50,10 +50,7 @@
               type: Number,
               default: 0
             },
-            hide_create:{
-               type: Boolean,
-               default: false
-            },
+            
             for_refund:{
                type: Boolean,
                default: false
@@ -80,7 +77,9 @@
                     show:false,
                     message:'此課程名額已滿，只能以備取身分報名。是否仍要繼續？',
                     ok_text:'繼續報名'
-                }
+                },
+
+                
              
             }
         },

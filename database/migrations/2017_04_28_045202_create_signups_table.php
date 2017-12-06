@@ -37,6 +37,7 @@ class CreateSignupsTable extends Migration
             $table->boolean('net_signup')->default(false);           
             $table->integer('status')->default(0);
 
+            $table->string('ps')->nullable();  
             $table->boolean('removed')->default(false);
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();

@@ -1,5 +1,5 @@
 class Signup {
-  constructor(data) {
+    constructor(data) {
        
         for (let property in data) {
             this[property] = data[property];
@@ -11,11 +11,16 @@ class Signup {
 
         this.statusText=Signup.getStatusText(data.status)
 
-      
+       if(data.bill){
+          this.discountText=Signup.formatDiscountText(data.bill.discount , data.bill.points)
         
-        this.discountText=Signup.formatDiscountText(data.discount , data.points)
-
-  }
+       }
+        
+        
+    }
+    static roleName(){
+        return 'Student'
+    }
     static title(){
        return 'Signups'
     }
@@ -190,32 +195,32 @@ class Signup {
                     })
                 })   //End Promise
     }
-    static newUserCreate(){
-        let url = this.source() + '/new-user'
-        return new Promise((resolve, reject) => {
-            axios.get(url)
-                .then(response => {
-                   resolve(response.data)
-                })
-                .catch(error=> {
-                     reject(error);
-                })
+    // static newUserCreate(){
+    //     let url = this.source() + '/new-user'
+    //     return new Promise((resolve, reject) => {
+    //         axios.get(url)
+    //             .then(response => {
+    //                resolve(response.data)
+    //             })
+    //             .catch(error=> {
+    //                  reject(error);
+    //             })
            
-        })
-    }
-    static newUserStore(form){
-        let url = this.source() + '/new-user'
-        let method='post'
-        return new Promise((resolve, reject) => {
-            form.submit(method,url)
-                .then(data => {
-                    resolve(data);
-                })
-                .catch(error => {
-                    reject(error);
-                })
-        })
-    }
+    //     })
+    // }
+    // static newUserStore(form){
+    //     let url = this.source() + '/new-user'
+    //     let method='post'
+    //     return new Promise((resolve, reject) => {
+    //         form.submit(method,url)
+    //             .then(data => {
+    //                 resolve(data);
+    //             })
+    //             .catch(error => {
+    //                 reject(error);
+    //             })
+    //     })
+    // }
 
   static getThead(canSelect){
     let thead= [
@@ -255,16 +260,17 @@ class Signup {
                     default:true
 
                 }, {
-                    title: '課程費用',
+                    title: '應繳學費',
                     key: 'tuition',
                     sort: true,
                     default:true
-                }, {
-                    title: '折扣',
-                    key: 'discount',
-                    sort: true,
-                    default:true
-                 }
+                }
+                // , {
+                //     title: '折扣',
+                //     key: 'discount',
+                //     sort: true,
+                //     default:true
+                //  }
                 ]
 
                 if(canSelect){

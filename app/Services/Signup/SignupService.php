@@ -158,16 +158,20 @@ class SignupService
         return $bill;
         
     }
-
-    public function  getDiscountOptions(int $center_id )
+    
+    public function  getDiscountOptions(int $center_id ,$date=null)
     {
         
-        return $this->discounts->getDiscountOptions($center_id);
+        return $this->discounts->getDiscountOptions($center_id,$date);
         
     } 
 
-    public function  getDiscountOptionsByCourse(Course $course,$date)
+
+
+    public function  getDiscountOptionsByCourse(Course $course)
     {
+        
+
         $validDiscounts=$this->discounts->getValidDiscounts($course,$date);
         return $this->discounts->optionsConverting($validDiscounts);
         
@@ -277,6 +281,31 @@ class SignupService
       
         return $this->signups->getByUserId($user_id);
      
+    }
+
+    public function storeBillAndSignups(Bill $bill, Tuition  $tuition,  $signups)
+    {
+        $bill= DB::transaction(function() use($bill,$tuition,$signups) {
+            
+             //$date=Carbon::today();
+ 
+             $bill->save();
+
+             if(!$tuition->date)  $tuition->date=Carbon::today();
+             
+             $bill->tuitions()->save($tuition);
+ 
+             foreach($signups as $signup){
+                   
+                if(!$signup->date)  $signup->date=Carbon::today();
+                $bill->signups()->save($signup);
+             }
+ 
+             $bill->updateStatus();
+ 
+             return $bill;
+             
+        });
     }
    
     //單一課程報名

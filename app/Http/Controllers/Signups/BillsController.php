@@ -21,6 +21,7 @@ use App\Support\Helper;
 use App\Events\SignupChanged;
 use Carbon\Carbon;
 use PDF;
+use DB;
 use Exception;
 
 use App\Exceptions\RequestError;
@@ -108,27 +109,34 @@ class BillsController extends BaseController
       $user=$this->currentUser();
       $updated_by=$user->id;
 
-      $date=Carbon::today();
-
-      $bill=new Bill($request->getBillValues($updated_by));
-      $bill->save();
-      
-
+      $billValues=$request->getBillValues($updated_by);
       $tuitionValues=$request->getTuitionValues($updated_by); 
-      $tuitionValues['date']=$date;
-      $tuition=new Tuition($tuitionValues);  
-      $bill->tuitions()->save($tuition);
-
-   
       $signups=$request->getSignups();
-      foreach($signups as $signup){
-            $signup['bill_id']=$bill->id;
-            $signup['date']=$date;
-            Signup::create($signup);
-      }
       
 
+      $bill= DB::transaction(function() use($billValues,$tuitionValues,$signups) {
+           
+            $date=Carbon::today();
+
+            $bill=Bill::create($billValues);
+
+            $tuitionValues['date']=$date;
+            $tuition=new Tuition($tuitionValues);  
+            
+            $bill->tuitions()->save($tuition);
+
+            foreach($signups as $signup){
+                  $signup['bill_id']=$bill->id;
+                  $signup['date']=$date;
       
+                  $bill->signups()->save(new Signup($signup));
+            }
+
+            $bill->updateStatus();
+
+            return $bill;
+            
+      });
 
       
 
@@ -136,13 +144,38 @@ class BillsController extends BaseController
          
    }
 
+   public function show($id)
+   {
+       $current_user=$this->currentUser();
+      
+       $bill=Bill::with(['signups','tuitions'])->findOrFail($id);
+
+       foreach($bill->signups as $signup){
+            $signup->course->fullName();
+       }
+
+       foreach($bill->tuitions as $tuition){
+          $tuition->populateViewData();
+       }
+
+       return response()->json([ 'bill' => $bill ]);
+
+   }
+
    public function discountOptions()
    {
       $center_id=(int)request()->center;
+      $date=null;
+      try {
+          $date = Carbon::parse(request()->date);
+      }
+      catch (Exception $err) {
+          $date=Carbon::today();
+      }
       
       Center::findOrFail($center_id);
       
-      $discounts= $this->signupService->getDiscountOptions($center_id);
+      $discounts= $this->signupService->getDiscountOptions($center_id,$date);
 
       return response()->json([ 'discounts' => $discounts ]); 
       
@@ -171,6 +204,48 @@ class BillsController extends BaseController
 
 //        return response()->json([ 'options' => $options ]);  
 //    }
+    public function print($id)    
+    {
+       
+        $current_user=$this->currentUser();
+    
+        $bill=Bill::with(['signups'])->findOrFail($id);
+
+        dd($bill);
+        //$signup->course->center->contactInfo=$signup->course->center->contactInfo();
+        
+        $invoiceMoney=$bill->invoiceMoney();
+        $date='';
+        $payBy='';
+
+        if($invoiceMoney > 0){
+            $incomeRecord=$signup->incomeRecords()
+                                ->orderBy('date','desc')
+                                ->first();
+            $date=$incomeRecord->date;
+            $payBy=$this->payways->textPayBy($incomeRecord->pay_by);
+        
+
+        }
+
+        $invoice=[
+            'money'=> Helper::formatMoney($invoiceMoney),
+            'date' => $date,
+            'payBy' => $payBy
+        ];
+
+        $signup->tuition=Helper::formatMoney($signup->tuition);
+    
+        $title=$signup->course->name . ' 課程費用收據'; 
+        $pdf = PDF::loadView('signups.invoice', [
+                                'title' => $title,
+                                'signup' => $signup,
+                                'invoice' => $invoice
+                            ]);
+
+                        
+        return $pdf->stream();
+    }
    
    private function creditCardPay(Bill $bill)
    {

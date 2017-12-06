@@ -11,16 +11,34 @@
          </div>
             
       </div> 
-      <div class="row">
+		<div v-if="can_edit"  class="row">
+			<div  class="col-sm-3">
+				<label>應繳金額</label>
+				<input type="text" name="bill.amount" class="form-control" v-model="form.bill.amount">
+            <small class="text-danger" v-if="form.errors.has('bill.amount')" v-text="form.errors.get('bill.amount')"></small>
+              
+			</div>
+			<div  class="col-sm-9">
+				<div class="form-group">
+                <label>備註</label>
+                <input type="text" name="tuition.ps" class="form-control" v-model="form.signup.ps"   >
+            
+            </div>
+			</div>
+		</div>
+      <div v-else class="row">
+			
          <div class="col-sm-12">
-            <div class="form-group"> 
-               <h3>應繳金額： <span style="color:red"> {{ form.bill.amount | formatMoney }}  </span> 
+            
+				<div class="form-group">
+					 <h3>應繳金額： <span style="color:red"> {{ form.bill.amount | formatMoney }}  </span> 
             
                </h3>
-            </div>  
+				</div> 
          </div>
+			
       </div>
-      <tuition-inputs :form="form" :payways="payways"></tuition-inputs>
+      <tuition-inputs :form="form" :payways="payways" :edit_date="can_edit"></tuition-inputs>
    </div>
 </template>
 
@@ -37,15 +55,24 @@ export default {
 		form: {
 			type: Object,
 			default: null
-      },
-      center_id: {
+		},
+		center_id: {
 			type: Number,
 			default: 0
+      },
+      date: {
+			type: String,
+			default: ''
       },
       payways:{
          type: Array,
 			default: null
-      }
+		},
+		can_edit: {
+			type: Boolean,
+			default: false
+      },
+		
 		
 	},
    data() {
@@ -53,6 +80,7 @@ export default {
 			discounts:[]
 		}
 	},
+	
 	computed: {
 		discount_id(){
 			if(!this.form.bill) return 0
@@ -67,6 +95,9 @@ export default {
 		
 		total(){
 			 this.countAmount()
+		},
+		date(){
+			this.init()
 		}
             
    },
@@ -75,10 +106,11 @@ export default {
    },
    methods: {
       init(){
-         this.fetchData()
+			this.fetchData()
       },
       fetchData(){
-         let discounts=Bill.discountOptions(this.center_id)
+			
+         let discounts=Bill.discountOptions(this.center_id,this.date)
         
          discounts.then(data => {
 				let discounts= data.discounts
@@ -126,14 +158,14 @@ export default {
 			let points=parseInt(discount.points)
 			this.form.bill.points=points
 			
-
+			let amount=0
 			if(points){
-				  this.form.bill.amount=points * this.form.bill.total /100
+				  amount=points * this.form.bill.total /100
 			}else{
-				this.form.bill.amount=this.form.bill.total
+				 amount=this.form.bill.total
 			}
-
-			this.form.tuition.amount=this.form.bill.amount
+			this.form.bill.amount=Helper.formatMoney(amount)
+			this.form.tuition.amount=Helper.formatMoney(amount)
 		}
 		
    }

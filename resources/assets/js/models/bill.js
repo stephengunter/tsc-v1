@@ -111,10 +111,11 @@ class Bill {
          })
      }
 
-     static discountOptions(centerId){
+     static discountOptions(centerId,date=''){
         return new Promise((resolve, reject) => {
             let url = this.source() + '/discount-options' 
             url+='?center=' + centerId
+            if(date) url += '&date=' + date
             axios.get(url)
                 .then(response => {
                    resolve(response.data)
@@ -128,7 +129,20 @@ class Bill {
  
     
  
- 
+    
+
+     statusLabel(){
+        
+        let text=this.statusText
+        let style='label label-default'
+        if(this.status) style='label label-success'
+        
+        return `<span class="${style}" > ${text} </span>`
+    }
+
+    payed(){
+        return parseInt(this.status)==1
+    }
  
      
  

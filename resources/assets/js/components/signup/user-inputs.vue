@@ -58,9 +58,6 @@
       },
       data() {
          return {
-               title:Helper.getIcon('Signups')  + '  新學員報名',
-            
-            
                user_checked: false,
                loaded:false,
 
@@ -116,13 +113,15 @@
          this.init()
       },
       methods: {
-         
          init() {
             
                
-			},
+         },
 			checkUser(){
-				this.userCheckerSettings.status +=1
+					this.userCheckerSettings.status +=1
+			},       
+			checkUser(){
+					this.userCheckerSettings.status +=1
 			},
          onUserChecked(user){
             this.user_checked=true

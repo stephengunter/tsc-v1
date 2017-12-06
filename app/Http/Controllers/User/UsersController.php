@@ -4,8 +4,6 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\BaseController;
 
-use App\Http\Middleware\CheckAdmin;
-
 use Illuminate\Http\Request;
 use App\Http\Requests\User\UserRequest; 
 use App\Http\Requests\User\FindUserRequest;
@@ -14,9 +12,7 @@ use App\Http\Requests\User\FindUserRequest;
 use App\User;
 use App\Profile;
 
-use App\Repositories\Users;
-use App\Repositories\Titles;
-use App\Repositories\Registrations;
+use App\Services\User\UserService;
 use DB;
 
 use App\Support\Helper;
@@ -27,12 +23,9 @@ class UsersController extends BaseController
  {
     protected $key='users';
     
-    public function __construct(Users $users, Titles $titles,Registrations $registrations)                               
+    public function __construct(UserService $userService)                               
     {
-          $this->users=$users;
-          $this->titles=$titles;
-         
-          $this->registrations=$registrations;
+          $this->userService=$userService;
           
 	}
 
@@ -44,7 +37,7 @@ class UsersController extends BaseController
                     ->with(['menus' => $menus]);
         }  
 
-        $users=$this->users->getAll()->with('roles')
+        $users=$this->userService->getAll()->with('roles')
                                      ->filterPaginateOrder();
         return response()->json([ 'model' => $users ]);
                 
@@ -60,14 +53,18 @@ class UsersController extends BaseController
                     ->with(['menus' => $menus]);
         }  
 
-        $with_password=true;
-        $user= $this->users->initialize($with_password);
+        $role=request()->get('role');
+
+        if($role) $with_password=false;
+        else $with_password=true;
         
-        return response()
-            ->json([
-                'user' => $user,
-                'option' => []
-            ]);
+        $user= User::initialize($with_password,$role);
+        
+        return response()->json(['user' => $user ]);
+            
+                
+                
+           
     }
 
     
@@ -75,32 +72,21 @@ class UsersController extends BaseController
     public function store(UserRequest $request)
     {
         
-        $admin_id=$this->checkAdmin->getAdminId();
+        $current_user=$this->currentUser();
+        $updated_by=$current_user->id;
 
-        $removed=false;
-        $updated_by=$admin_id;
-
-        $userValues=$request->getUserValues($updated_by,$removed);
+        $userValues=$request->getUserValues($updated_by);
+        $user=new User($userValues);
         
-        if(!$userValues['email'] && !$userValues['phone'] ){
-            abort(404);
-        }
 
-        $profileValues=$request->getProfileValues($updated_by);        
+        $profileValues=$request->getProfileValues($updated_by);
+        $profile=new Profile($profileValues);   
         
-        $user= DB::transaction(function() 
-        use($userValues,$profileValues){
-              $user=User::create($userValues);
-              $profile=new Profile($profileValues);
-              $user->profile()->save($profile);
-
-              return $user;
-              
-        });
-      
-        event(new UserRegistered($user));
+        $user=$this->userService->store($user, $profile);
+        
 
         return response()->json($user);
+        
             
     }
 
@@ -141,12 +127,12 @@ class UsersController extends BaseController
         if(!$user->canEditBy($current_user)){
             return  $this->unauthorized();       
         }
-        $user->defaultRole=$user->defaultRole();
-        $titleOptions=$this->titles->options();
+        // $user->defaultRole=$user->defaultRole();
+        // $titleOptions=$this->titles->options();
         return response()
                 ->json([
                     'user' => $user,
-                    'titleOptions' => $titleOptions
+                    // 'titleOptions' => $titleOptions
                 ]);
         
     }
@@ -165,7 +151,7 @@ class UsersController extends BaseController
         $userValues=$request->getUserValues($updated_by,$removed);       
         $profileValues=$request->getProfileValues($updated_by);
        
-        $user= $this->users->updateUserAndProfile($userValues,$profileValues, $user);
+        $user= $this->userService->update($userValues,$profileValues, $user);
         
         return response()->json($user);
     }
@@ -174,7 +160,7 @@ class UsersController extends BaseController
     {
         $current_user=$this->currentUser();
         
-        $deleted=$this->users->delete($id ,$current_user);
+        $deleted=$this->userService->delete($id ,$current_user);
         if(!$deleted){
             return  $this->unauthorized();  
         }
@@ -185,26 +171,25 @@ class UsersController extends BaseController
    
     public function rolesCanAdd($id)
     {
-        $user =$this->users->findOrFail($id);
-        
-        $with_admin=$this->checkAdmin->isOwner();
+        $user =User::findOrFail($id);
+
+        $current_user=$this->currentUser();
+        $with_admin=$current_user->isOwner();
         $roles=$user->rolesCanAdd($with_admin);
 
         return response()->json([ 'roles' => $roles ]);
     }
     public function roles($id)
     {
-        $user =$this->users->findOrFail($id);
+        $user =User::findOrFail($id);
         
         return response()->json([ 'roles' => $user->roles ]);
-            
-               
            
     }
 
     public function updateContactInfo(Request $request, $userId)
     {
-        $user =$this->users->findOrFail($userId);
+        $user =User::findOrFail($id);
         $current_user=$this->currentUser();
         if(!$user->canEditBy($current_user)){
               return  $this->unauthorized();
@@ -219,7 +204,7 @@ class UsersController extends BaseController
     }
     public function updatePhoto(Request $request, $userId)
     {
-        $user =$this->users->findOrFail($userId);
+        $user =User::findOrFail($id);
 
         $current_user=$this->currentUser();
 
@@ -242,7 +227,7 @@ class UsersController extends BaseController
         $email=$values['email'];
         $phone=$values['phone'];
 
-        $userList=$this->users->findUsers($email, $phone);
+        $userList=$this->userService->findUsers($email, $phone);
         
         
         return response()->json(['userList' => $userList  ]);  

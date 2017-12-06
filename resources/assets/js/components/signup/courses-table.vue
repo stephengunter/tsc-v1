@@ -7,7 +7,7 @@
                <th>上課時間</th>
                <th>課程期間</th>
                <th>課程費用</th>
-               <th></th>
+               <th v-if="can_remove"></th>
          </tr>
       </thead>
       <tbody>
@@ -18,7 +18,7 @@
                <td>{{ course.period }}</td>
                <td>{{ course.tuition | formatMoney}}</td>
                <td>
-                  <button @click.prevent="removeItem(course.id)" class="btn btn-danger btn-xs">
+                  <button @click.prevent="removeItem(course.id)" v-if="can_remove" class="btn btn-danger btn-xs">
                      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                   </button>
                </td>
@@ -34,6 +34,10 @@ export default {
       courses:{
          type: Array,
          default: []
+      },
+      can_remove:{
+         type: Boolean,
+         default: true
       },
    },
    methods: {

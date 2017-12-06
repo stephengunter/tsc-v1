@@ -18,7 +18,7 @@ class SignupRequest extends FormRequest
             'signup.course_id' => 'required',
             'signup.user_id'=> 'required',
             'signup.tuition'=> 'numeric',
-            'signup.cost'=> 'numeric',
+            
         ];
 
         if(!$this->isPay()) return $rules;
@@ -27,6 +27,7 @@ class SignupRequest extends FormRequest
 
         $payRules=[
             'tuition.amount' => 'required|numeric|min:1',
+            'bill.amount' => 'required|numeric|min:1',
         ];
 
         
@@ -45,12 +46,15 @@ class SignupRequest extends FormRequest
             'tuition.amount.numeric' => '必須是數字',
             'tuition.amount.min' => '必須大於0',
             'tuition.amount.required' => '必須填寫金額',
+
+            'bill.amount.required' => '必須填寫金額',
+            'bill.amount.numeric' => '必須是數字',
         ];
     }
 
     public function isPay()
     {
-        if($this->pay) return true;
+        if($this->getBillValues()) return true;
         return false;
     }
     public function getValues($updated_by)
@@ -59,10 +63,18 @@ class SignupRequest extends FormRequest
         
         return Helper::setUpdatedBy($values,$updated_by);
     }
+    public function getBillValues($updated_by='')
+    {
+        $values=$this->get('bill');
+        if(!$values) return null;
 
+        return Helper::setUpdatedBy($values,$updated_by);
+    }
     public function getTuitionValues($updated_by)
     {
         $values=$this->get('tuition');
+        if(!$values) return null;
+
         return Helper::setUpdatedBy($values,$updated_by);
     }
 }

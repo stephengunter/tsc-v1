@@ -5,7 +5,7 @@ namespace App\Repositories;
 
 class Payways 
 {
-    public function getAll()
+    public static function getAll()
     {
 
         return config('app.payways');
@@ -21,13 +21,15 @@ class Payways
         return (int)$payway_id == 1;
     }
     
-    public function textPayBy($pay_id)
+    public static function textPayBy($pay_id)
     {
-        $payways=$this->getAll();
+        $payways=static::getAll();
 
-        return collect($payways)->first(function ($item) use($pay_id) {
+        $payway = collect($payways)->first(function ($item) use($pay_id) {
             return $item['value'] ==$pay_id ;
         });
+
+        return $payway['text'];
         
     }
 

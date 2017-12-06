@@ -71,8 +71,9 @@ class User {
     static deleteUrl(id){
          return this.source() + '/' + id
     }
-    static create(){
+    static create(role=''){
         let url = this.createUrl() 
+        if(role) url += '?role=' + role
         return new Promise((resolve, reject) => {
             axios.get(url)
                 .then(response => {

@@ -23,6 +23,7 @@ use App\Events\SignupChanged;
 use Carbon\Carbon;
 use PDF;
 use Exception;
+use DB;
 
 use App\Exceptions\RequestError;
 
@@ -140,6 +141,10 @@ class SignupsController extends BaseController
                                 ->with(['course','user.profile'])
                                 ->filterPaginateOrder();
 
+        foreach($signupList as $signup){
+            $signup->populateViewData();
+        }
+
            
 
         return response() ->json([ 'model' => $signupList,
@@ -167,82 +172,64 @@ class SignupsController extends BaseController
                         ]);
     }
 
+    private function createByCourse(Course $course)
+    {
+        if($course->removed) abort(404);
+        if(!$course->active) abort(404);
+
+        
+        $course->populateViewData();
+
+        $userOptions=$this->signupService->userOptions();
+        $user_id=0;
+        $signup=Signup::initialize($user_id,$course);
+        $signup['net_signup'] = 0;
+
+        $bill=Bill::init();
+        $bill['total']=$course->tuition;
+       
+        $tuition=Tuition::initialize();
+
+       
+        $payways=$this->signupService->getPayways();
+
+        return response()
+        ->json([
+            
+            'course' => $course,
+            'signup' => $signup,
+            'bill' => $bill,
+            'tuition' => $tuition,
+            'userOptions' => $userOptions,
+            'payways' => $payways
+
+        ]);
+    }
+
     public function create()
     {
         $request = request();
         $course_id=(int)$request->course; 
         $user_id=(int)$request->user; 
 
-        if(!$request->ajax()){
-            $menus=$this->menus($this->key);            
-            return view('signups.create')
-                    ->with([
-                        'menus' => $menus,
-                        'user_id' => $user_id,
-                        'course_id' => $course_id
-                    ]);
-        }  
+        // if(!$request->ajax()){
+        //     $menus=$this->menus($this->key);            
+        //     return view('signups.create')
+        //             ->with([
+        //                 'menus' => $menus,
+        //                 'user_id' => $user_id,
+        //                 'course_id' => $course_id
+        //             ]);
+        // }  
 
         if($user_id){
             $user=User::findOrFail($user_id);
             return $this->createByUser($user);
         }
-    
         
-
-        $course=null;
-        if($course_id){
-            $course= Course::findOrFail($course_id);
-            $net_signup=false;
-            $course->canPay=$course->canSignup($net_signup);
-        }
-
-        $courseOptions=[];
-        if($course){
-            array_push($courseOptions,  $course->toOption());
-        }
+        $course= Course::findOrFail($course_id);
+        return $this->createByCourse($course);
         
-        
-        $userOptions =[];
-        $user=null;
-        if($user_id > 0){
-            $user= User::with('profile')->findOrFail($user_id);
-          
-        }else{
-            $userOptions = $this->getUserOptions($user);
-        }       
-
-       
-        
-
-        $signup=Signup::initialize($user_id,$course_id);
-        $signup['net_signup'] = 0;
-
-        $bill=Bill::init();
-        $bill['total']=$course->tuition;
-
-
-       
-        $tuition=Tuition::initialize();
-
-        $payways=$this->signupService->getPayways();
-
-        return response()
-        ->json([
-            'courseOptions' => $courseOptions,
-           
-            'userOptions' => $userOptions,
-            
-            'course' => $course,
-            'user' => $user,
-
-            'signup' => $signup,
-            'bill' => $bill,
-            'tuition' => $tuition,
-            'payways' => $payways
-
-
-        ]);
          
     }
     
@@ -273,47 +260,40 @@ class SignupsController extends BaseController
         $current_user=$this->currentUser();        
         $updated_by=$current_user->id;
 
-        $isPay=$request->isPay();
+        
+        
 
         $values=$request->getValues($updated_by);
 
         $net_signup=0;
+        $course=Course::findOrFail($values['course_id']);
+        $user=User::findOrFail($values['user_id']);
+
+        $this->signupService->canSignup($course, $user, $net_signup);
+
         $values['net_signup']=$net_signup;
-
         $values['cost']=0;  //不代收材料費
-
-        $course_id=$values['course_id'];
-        $course=Course::findOrFail($course_id);
-
-        // if(!$course->canSignup($net_signup))
-        // {
-        //    return $this->storeBackUpSignup($values);
-        // }
-
-        $user_id=$values['user_id'];
-        $user=User::findOrFail($user_id);
-        
-        $canSignup=$this->signupService->canSignup($course, $user, $net_signup);
-
-        $tuition=null;
-      
-        if($isPay){
-            $tuitionValues=$request->getTuitionValues($updated_by); 
-            $tuitionValues['date']=$values['date'];
-            $tuition=new Tuition($tuitionValues);          
-        }else{
-            $values['discount_id'] = 0;
-        } 
-
         $signup=new Signup($values);
 
-        $signup=$this->signupService->store($course,$user,$signup,$tuition);
+        if(!$request->isPay()) {
+            $signup->save();
+            return response()->json($signup);
+        } 
+
 
         
 
-        
+        $billValues=$request->getBillValues($updated_by);
+        $bill=new Bill($billValues);
 
-        return response()->json($signup);
+        $tuitionValues=$request->getTuitionValues($updated_by); 
+        $tuition=new Tuition($tuitionValues);
+
+        $signups=[$signup];
+        
+        $bill= $this->signupService->storeBillAndSignups($bill,$tuition,$signups);
+
+        return response()->json($bill);
 
             
     }
@@ -395,13 +375,9 @@ class SignupsController extends BaseController
         }  
 
         $current_user=$this->currentUser();
-        $signup=Signup::with('course','user.profile')->findOrFail($id);
-        if($signup->parent){
-            $signup=Signup::with('course','user.profile')->findOrFail($signup->parent);
-           
-        }
-
-        $signup->subCourses=$signup->subSignupCourses();
+        $with=['course','user.profile','bill'];
+        $signup=Signup::with($with)->findOrFail($id);
+        
         
         
         if(!$signup->canViewBy($current_user)){
@@ -413,8 +389,7 @@ class SignupsController extends BaseController
         $signup->canDelete=$signup->canDeleteBy($current_user);        
         $signup->hasRefund=$signup->hasRefund();
 
-        $invoiceMoney=$signup->invoiceMoney();
-        $signup->hasInvoice=$invoiceMoney > 0;
+        $signup->populateViewData();
 
         return response()->json([ 'signup' => $signup ]);
 
@@ -452,45 +427,7 @@ class SignupsController extends BaseController
         
     }
 
-    public function print($id)
-    {
-        $current_user=$this->currentUser();
-     
-        $signup=Signup::with('course.center','user.profile')->findOrFail($id);
-        $signup->course->center->contactInfo=$signup->course->center->contactInfo();
-        
-        $invoiceMoney=$signup->invoiceMoney();
-        $date='';
-        $payBy='';
-
-        if($invoiceMoney > 0){
-            $incomeRecord=$signup->incomeRecords()
-                                  ->orderBy('date','desc')
-                                  ->first();
-            $date=$incomeRecord->date;
-            $payBy=$this->payways->textPayBy($incomeRecord->pay_by);
-           
-
-        }
-
-        $invoice=[
-            'money'=> Helper::formatMoney($invoiceMoney),
-            'date' => $date,
-            'payBy' => $payBy
-        ];
-
-        $signup->tuition=Helper::formatMoney($signup->tuition);
-       
-        $title=$signup->course->name . ' 課程費用收據'; 
-        $pdf = PDF::loadView('signups.invoice', [
-                                 'title' => $title,
-                                 'signup' => $signup,
-                                 'invoice' => $invoice
-                            ]);
-
-                           
-        return $pdf->stream();
-    }
+    
     public function getByUser($user)
     {
         $signupList=$this->signups->getByUser($user);
@@ -536,22 +473,7 @@ class SignupsController extends BaseController
         return $courseOptions;
     }
 
-    private function  getUserOptions($user)
-    {
-        $userOptions=[];
-    
-        if($user){           
-            $item=$user->profile->toOption();             
-            array_push($userOptions,  $item);
-        }else
-        {
-          
-            $userOptions=$this->signupService->userOptions();
-            
-        }
-
-        return $userOptions;
-    }
+   
 
    
     

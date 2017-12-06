@@ -44,16 +44,16 @@
         
          <div slot="modal-header" class="modal-header modal-header-danger">
          
-         <button id="close-button" type="button" class="close" data-dismiss="modal" @click.prevent="courseConfirmModal.show=false">
-               <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-         </button>
-               <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
+				<button id="close-button" type="button" class="close" data-dismiss="modal" @click.prevent="courseConfirmModal.show=false">
+					<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+				</button>
+				<h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 警告</h3>
          </div>
          <div slot="modal-body" class="modal-body">
-               <h3> {{  courseConfirmModal.msg }} </h3>
+            <h3> {{  courseConfirmModal.msg }} </h3>
          </div>
          <div slot="modal-footer" class="modal-footer" >
-               <button type="button" class="btn btn-default" @click.prevent="courseConfirmModal.show=false">確定</button>
+            <button type="button" class="btn btn-default" @click.prevent="courseConfirmModal.show=false">確定</button>
          </div>
         
       </modal>
@@ -142,7 +142,7 @@
       },
       methods: {
          init() {
-
+				
          },
          fetchData(){
             let create=Signup.createByUser(this.user_id)
@@ -154,7 +154,9 @@
                   tuition:data.tuition,
                   
                })
-               this.payways=data.payways
+			   this.payways=data.payways
+					
+					
                
             }).catch(error =>{
                Helper.BusEmitError(error)
@@ -220,7 +222,9 @@
                
             let store=Bill.store(this.form)
             store.then(data => {
-                 alert('then')
+					  Helper.BusEmitOK()
+					  let url='/users/' + this.user_id
+					  Helper.redirect(url)
             })
             .catch(error => {
                Helper.BusEmitError(error)

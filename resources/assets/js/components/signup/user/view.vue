@@ -6,6 +6,10 @@
          </span> 
               
          <div>
+            <button v-if="can_back" v-show="readonly" @click.prevent="canceled" class="btn btn-default btn-sm" >
+                 <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                     返回
+             </button>
             <button v-if="readonly" @click.prevent="edit" class="btn btn-primary btn-sm" >
                <span class="glyphicon glyphicon-pencil"></span> 編輯
             </button>
@@ -44,7 +48,11 @@
          user_id:{
             type:Number,
             default:0
-         }
+         },
+         can_back:{
+            type:Boolean,
+            default:false
+         },
       },
       data() {
          return {
@@ -78,6 +86,9 @@
 			},
 			isBusy(){
 				return !this.readonly
+			},
+			canceled(){
+				this.$emit('canceled')
 			},
          edit(){
             let getUser=User.edit(this.user_id)

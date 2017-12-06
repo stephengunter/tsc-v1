@@ -2,7 +2,7 @@
 
 @section('content')
   
-   <signup-index v-show="indexMode"  :hide_create="indexSettings.hide_create" :version="version"
+   <signup-index v-show="indexMode"   :version="version"
     @selected="onSignupSelected" @begin-create="beginCreate">
    </signup-index> 
 
@@ -34,9 +34,7 @@
 
                course_id:0,
 
-               indexSettings:{
-                  hide_create:false
-               },
+              
                detailsSettings:{
                   can_back:true
                },

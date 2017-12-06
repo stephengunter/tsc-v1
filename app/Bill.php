@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use App\SupportHelper;
+use App\Support\Helper;
 
 class Bill extends Model
 {
@@ -22,6 +22,11 @@ class Bill extends Model
     public function tuitions() 
 	{
 		return $this->hasMany('App\Tuition');
+    }
+
+    public function discount() 
+	{
+		return $this->hasOne('App\Discount');
     }
 
     public function refund() 
@@ -50,28 +55,49 @@ class Bill extends Model
 
     public function invoiceMoney()
     {
-        $totalIncome=$this->incomeRecords()->sum('amount');
-                                        
-        return $totalIncome;
+        $this->invoiceMoney=$this->tuitions()->sum('amount');
+        return  $this->invoiceMoney;
+    }
+    public function statusText()
+    {
+        $text='待繳費';
+        if($this->isPayOff()) $text='已繳費';
+
+        $this->statusText=$text;
+
+        return $this->statusText;
+    }
+    public function populateViewData()
+    {
+        $this->invoiceMoney();
+        $this->statusText();
+        
+        $this->getAmount();
+
+        $this->canRemove=$this->canRemove();
+
     }
 
-    public function incomeRecords()
+    public function isPayOff()
     {
-        return $this->tuitions()->where('refund',false);
+        return $this->status == 1;
     }
 
     public function updateStatus()
     {
-        // foreach($this->signups as $signup){
-        //     $signup->points=$this->points;
-        //     $signup->discount=$this->discount;
-        //     $signup->discount_id=$this->discount_id;
-        // }
+        $totalIncome=$this->invoiceMoney();
+
+        if($totalIncome>=$this->amount)$this->status=1;
+        else  $this->status=0;
 
         $signup_ids=$this->signups->pluck('id')->toArray();
         $this->signup_ids=Helper::strFromArray($signup_ids);
 
+        $this->save();
 
+        foreach($this->signups as $signup){
+            $signup->updateStatus();
+        } 
 
     }
 }

@@ -42,7 +42,7 @@
                 </td>
                 <td v-html="getFormatedCourseName(props.item.course)"></td>    
                 <td>{{ props.item.tuition | formatMoney }}</td>  
-                <td v-html="discountText(props.item)"></td>
+                <!-- <td v-html="discountText(props.item)"></td> -->
             </tr>
         </template>
 
@@ -135,6 +135,7 @@
                 return parseInt(this.searchParams.status) == 0
             },
             createText(){
+                
                 if(this.hide_create) return ''
                 
                 return '新增報名'
@@ -166,12 +167,10 @@
                         let options=Signup.statusOptions()
                         options.then(data => {
                             this.statusOptions = data.options
-                            let allStatuses={ text:'總數' , value:'-9' }
-                            this.statusOptions.splice(0, 0, allStatuses);
-                            resolve(this.default_status);
+                            resolve(data.options[0].value);
                         })
                         .catch(error => {
-                            console.log(error)
+                            Helper.BusEmitError(error)  
                             reject(error.response);
                         })
                    }
@@ -183,6 +182,8 @@
             onDataLoaded(data){
                 if(data.summary)  this.summary=data.summary
                 else this.summary=null
+
+             
 
                 this.$emit('loaded',data)
             }, 

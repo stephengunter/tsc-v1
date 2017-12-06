@@ -2,7 +2,7 @@
 <div>
     
     <show v-if="readOnly"  :id="id" can_edit="can_edit"  :can_back="can_back"  
-       :version="version"  @begin-edit="beginEdit" @dataLoaded="onDataLoaded"
+       :version="version"  @begin-edit="beginEdit" @loaded="onDataLoaded"
        @btn-back-clicked="onBtnBackClicked"   @btn-delete-clicked="beginDelete" 
        @print-invoice="onPrintInvoice">                 
     </show>
@@ -70,7 +70,8 @@
                this.showConfirm=false
             },      
             onDataLoaded(signup){
-                this.$emit('data-loaded',signup)
+               
+               this.$emit('data-loaded',signup)
             },        
             beginEdit() {
                 this.readOnly=false

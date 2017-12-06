@@ -120,6 +120,8 @@ class Course extends BaseCourse
         $withNumber=false;
         $this->fullName($withNumber);
 
+        $this->fulled=$this->peopleFulled();
+
         // if($this->groupAndParent()){
         //     $this->weeks=null;
         //     $this->hours=null;

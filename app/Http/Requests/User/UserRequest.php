@@ -69,7 +69,7 @@ class UserRequest extends FormRequest
         return $role;
     }
 
-    public function getUserValues($updated_by,$removed)
+    public function getUserValues($updated_by,$removed=false)
     {
         $request=$this->get('user');
         $values=array_except($request, ['profile','contact_info','role']);
