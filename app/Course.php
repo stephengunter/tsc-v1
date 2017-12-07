@@ -118,7 +118,7 @@ class Course extends BaseCourse
 
     public function populateViewData($editNumber=false,$photo=false){
         $withNumber=false;
-        $this->fullName($withNumber);
+        $this->fullName=$this->fullName($withNumber);
 
         $this->fulled=$this->peopleFulled();
 
@@ -183,7 +183,7 @@ class Course extends BaseCourse
 
     public function updateStatus()
     {
-       
+        
         $this->status->updateStatus();
     }
 
@@ -306,8 +306,8 @@ class Course extends BaseCourse
         
         if($withNumber) $fullname=$this->number . ' ' . $fullname;
 
-        $this->fullname=$fullname;
-        return $this->fullname;
+        
+        return $fullname;
     }
     public function sortClassTimes()
     {

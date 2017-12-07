@@ -15,7 +15,7 @@ class Center extends Model
 	use FilterPaginateOrder;
 	
 	protected $fillable = ['name', 'code' , 'course_tel', 'area_id' ,
-							'oversea','active',  'display_order',
+							'rule','oversea','active',  'display_order',
 						   'contact_info','removed','updated_by'];
 	
     protected $filter = [

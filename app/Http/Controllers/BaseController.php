@@ -101,12 +101,7 @@ class BaseController extends Controller
                     'path' => '/signups/new-user',
                     'active' => $current=='signups/new-user'
                 ],
-                [
-                    'id' => 3,
-                    'text' => '折扣設定',
-                    'path' => '/discounts',
-                    'active' => $current=='discounts'
-                ]
+               
                 
             );
         } 
@@ -333,31 +328,42 @@ class BaseController extends Controller
                     'path' => '/centers',
                     'active' => $current=='centers' ,  
                      
-                ],[
+                ],
+                [
                     'id' => 2,
                     'text' => '匯入開課中心',
                     'path' => '/centers-import',
                     'hide' => !\App\Center::canImport($current_user),
                     'active' => $current=='centers-import',  
                      
-                ],[
-                    'id' => 3,
+                ],
+                [
+                    'id' => 2,
                     'text' => '課程分類',
                     'path' => '/categories',
                     'active' => $current=='categories' ,                
-                ],[
+                ],
+                [
                     'id' => 4,
                     'text' => '匯入課程分類',
                     'path' => '/categories-import',
                     'hide' => !\App\Category::canImport($current_user),
                     'active' =>$current=='categories-import',                
-                ],[
-                    'id' => 5,
+                ],
+                [
+                    'id' => 3,
                     'text' => '學期設定',
                     'path' => '/terms',
                     'active' => $current=='terms'
-                ],[
-                    'id' => 6,
+                ],
+                [
+                    'id' => 4,
+                    'text' => '折扣設定',
+                    'path' => '/discounts',
+                    'active' => $current=='discounts'
+                ],
+                [
+                    'id' => 5,
                     'text' => '文件下載管理',
                     'path' => '/downloads',
                     'active' => $current=='downloads'
@@ -454,6 +460,12 @@ class BaseController extends Controller
                     'text' => '課程清單',
                     'path' => '/courses-report',
                     'active' => $current=='courses-report'
+                ],
+                [
+                    'id' => 2,
+                    'text' => '報名統計',
+                    'path' => '/signups-report',
+                    'active' => $current=='signups-report'
                 ],
                
                 

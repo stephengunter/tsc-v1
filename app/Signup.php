@@ -176,11 +176,10 @@ class Signup extends Model
             $points=$this->bill->points;
         }
 
-        if($points) $this->amount= round($this->tuition * $points);
-        else $this->amount= $this->tuition;
-
+        if($points) return round($this->tuition * $points);
         
-        return $this->amount;
+        
+        return $this->tuition;
     }
 
     
@@ -203,16 +202,16 @@ class Signup extends Model
         $text='待繳費';
         if($this->status==1) $text='已繳費';
         else if($this->status==-1) $text='已取消';
-        $this->statusText=$text;
 
-        return $this->statusText;
+
+        return $text;
     }
     public function populateViewData()
     {
         $this->course->fullname();
-        $this->statusText();
+        $this->statusText=$this->statusText();
         
-        $this->getAmount();
+        $this->amount =$this->getAmount();
 
         $this->canRemove=$this->canRemove();
 

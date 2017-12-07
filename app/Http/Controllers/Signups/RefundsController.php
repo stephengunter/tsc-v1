@@ -19,7 +19,6 @@ use App\Signup;
 use App\Refund;
 
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 use App\Events\RefundChanged;
 
@@ -30,11 +29,9 @@ class RefundsController extends BaseController
     protected $key='refunds';
     public function __construct(Refunds $refunds,Signups $signups, Courses $courses, 
                                  Terms $terms , Centers $centers,
-                                Payways $payways,Users $users, CheckAdmin $checkAdmin)                      
+                                Payways $payways,Users $users)                      
     {
-         $exceptAdmin=[];
-         $allowVisitors=[];
-		 $this->setMiddleware( $exceptAdmin, $allowVisitors);
+        
 
          $this->refunds=$refunds;
 		 $this->courses=$courses;
@@ -43,8 +40,6 @@ class RefundsController extends BaseController
          $this->users=$users;
          $this->terms=$terms;
          $this->centers=$centers;
-
-         $this->setCheckAdmin($checkAdmin);
 
 	}
     public function indexOptions()
@@ -95,7 +90,7 @@ class RefundsController extends BaseController
          $summary=$this->refunds->getSummary($signup_ids);    
 
          $refundList=$refundList->where('status',$status);
-         $refundList=$refundList->with('signup.course','signup.user.profile')->filterPaginateOrder();
+         $refundList=$refundList->with('signup.course','signup.user.profile');//->filterPaginateOrder();
        
 
           
@@ -118,19 +113,24 @@ class RefundsController extends BaseController
 
     public function create()
     {
+        
         $request = request();
+        $signup_id=(int)$request->signup; 
+        
         if(!$request->ajax()){
             $menus=$this->menus($this->key);            
             return view('refunds.create')
-                    ->with(['menus' => $menus]);
-         }  
+                    ->with(['menus' => $menus,
+                            'signup_id' => $signup_id
+                          ]);
+        }  
 
         $signup_id=(int)$request->signup; 
 
         $signup=Signup::with('course','user.profile')->findOrFail($signup_id);
         $refund=Refund::initialize($signup);
 
-        $payOptions=$this->payways->bankOnly();
+        $payOptions=$this->payways->getAll();
         
         return response()
             ->json([

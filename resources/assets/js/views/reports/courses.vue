@@ -6,12 +6,12 @@
                 
                 <div class="form-group">
                     <select  v-model="params.term"  @change="onParamChanged"  style="width:auto;" class="form-control selectWidth">
-                        <option v-for="item in termOptions" :value="item.value" v-text="item.text"></option>
+                        <option v-for="(item,index) in termOptions" :key="index" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 <div class="form-group">
                     <select  v-model="params.center" @change="onParamChanged" style="width:auto;" class="form-control selectWidth">
-                         <option v-for="item in centerOptions" :value="item.value" v-text="item.text"></option>
+                         <option v-for="(item,index) in centerOptions" :key="index" :value="item.value" v-text="item.text"></option>
                     </select>
                 </div>
                 
@@ -33,25 +33,20 @@
                  </h4>
              </div>
            
-             <div  class="form-inline" slot="header">               
-                <button v-show="hasData" class="btn btn-default btn-xs" @click.prevent="onBtnViewMoreClicked">
-                    <span v-if="courseRowSettings.viewMore" class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-                    <span v-if="!courseRowSettings.viewMore" class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
-                </button>
-             </div>
+             
         </div>
         <div class="panel-body">
            
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th v-for="item in thead" v-if="item.default" v-bind:style="{ width: item.width }" v-text="item.title">
+                        <th v-for="(item,index) in thead" :key="index" v-if="item.default" v-bind:style="{ width: item.width }" v-text="item.title">
                         </th>
                     </tr>
                     
                 </thead>
                 <tbody>
-                    <row v-for="course in courses" :course="course" :more="courseRowSettings.viewMore" 
+                    <row v-for="(course,index) in courses" :key="index" :course="course" :more="courseRowSettings.viewMore" 
                        :select="courseRowSettings.can_select" >
                       
                         

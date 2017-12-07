@@ -157,6 +157,28 @@ class CourseService
         return $course;
 
    }
+
+   public function stopCourse(Course $course, User $current_user,$ps)
+   {
+        if(!$course->canReviewBy($current_user)){
+            throw new RequestError('course.number','您沒有停開此課程的權限');
+        }
+
+        if($course->status->ps){
+            $course->status->ps .= '<br>';
+            $course->status->ps .= $ps;
+        }else{
+            $course->status->ps = $ps;
+        }
+
+        $course->active=0;
+        $course->reviewed=0;
+
+        $course->save();
+
+        $course->updateStatus();
+
+   }
    
 
    private function storeGroupParentCourse(array $values, array $category_ids)

@@ -94,9 +94,15 @@ class SignupService
         return $this->payways->getAll();
     }
 
+    public function  getReviewedCourses($term_id,$center_id)
+    {
+        
+        return $this->courses->getReviewedCourses($term_id,$center_id);
+    }
+
     public function  getCanSignupCourses($term_id,$center_id)
     {
-
+        return $this->getReviewedCourses($term_id,$center_id);
     }
 
     public function  getCourseOptions()

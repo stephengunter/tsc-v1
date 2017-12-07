@@ -79,7 +79,7 @@ Route::get('errors', function(){
      return view('errors');
 });
 
-
+//Auth
 Route::get('login', '\App\Http\Controllers\Auth\SessionsController@create')->name('login');
 Route::post('login', '\App\Http\Controllers\Auth\SessionsController@store');
 Route::post('logout', '\App\Http\Controllers\Auth\SessionsController@destroy');
@@ -100,6 +100,12 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('downloads', 'DownloadsController',['except'=>['update']]);
 
     Route::resource('photoes', 'PhotoesController',['only'=>['show','store']]);
+
+    //User
+    
+    Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
+    Route::put('users/{user}/update-photo',['uses'=>'\App\Http\Controllers\User\UsersController@updatePhoto']);
+    Route::post('users/find-users', ['uses' => '\App\Http\Controllers\User\UsersController@findUsers']);
 
     //Center
     Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
@@ -149,9 +155,6 @@ Route::group(['middleware' => 'admin'], function()
 
     Route::resource('credit-courses-import', '\App\Http\Controllers\Course\Credit\ImportsController',
     ['only' => ['index','store']]);
-
-
-
    
     Route::resource('course-signup-infoes', '\App\Http\Controllers\Course\SignupInfoesController',
     ['only' => ['show','edit','update']]);
@@ -169,13 +172,14 @@ Route::group(['middleware' => 'admin'], function()
     Route::post('schedules-import/excel', '\App\Http\Controllers\Course\SchedulesImportController@excelImport');
     Route::resource('schedules-import', '\App\Http\Controllers\Course\SchedulesImportController', 
     ['only' => ['create','store']]);
+
+
+    //Signups
     
     Route::post('discounts/display-order',['uses'=>'\App\Http\Controllers\Signups\DiscountsController@updateDisplayOrder']);
     Route::get('discounts/options', '\App\Http\Controllers\Signups\DiscountsController@options');
     Route::get('discounts/count-tuition', '\App\Http\Controllers\Signups\DiscountsController@countTuition');
     Route::resource('discounts', '\App\Http\Controllers\Signups\DiscountsController');
-
-
 
     Route::get('signups/index-options', '\App\Http\Controllers\Signups\SignupsController@indexOptions');
     Route::get('signups/status-options', '\App\Http\Controllers\Signups\SignupsController@statusOptions');
@@ -196,10 +200,6 @@ Route::group(['middleware' => 'admin'], function()
 
     
     
-    
-    Route::put('users/{user}/update-contactinfo',['uses'=>'\App\Http\Controllers\User\UsersController@updateContactInfo']);
-    Route::put('users/{user}/update-photo',['uses'=>'\App\Http\Controllers\User\UsersController@updatePhoto']);
-    Route::post('users/find-users', ['uses' => '\App\Http\Controllers\User\UsersController@findUsers']);
 
     
     
@@ -293,8 +293,14 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController');
     Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
 
+
+    //Reports
     Route::resource('courses-report', '\App\Http\Controllers\Reports\CourseListController',
-                                        ['only' => ['index','store']]);  
+    ['only' => ['index','store']]); 
+
+    Route::post('signups-report/import-stops', '\App\Http\Controllers\Reports\SignupsController@importStopCourses');
+    Route::resource('signups-report', '\App\Http\Controllers\Reports\SignupsController',
+    ['only' => ['index','store']]); 
 
 
     

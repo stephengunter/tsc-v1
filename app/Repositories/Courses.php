@@ -105,6 +105,16 @@ class Courses
         $courseList=$this->getAll();
         return $courseList->where('active',true);
     }
+    public function getReviewedCourses(int $termId,int $centerId)
+    {
+        
+       return $this->getAll()->where('term_id',$termId)
+                           ->where('center_id',$centerId)
+                           ->where('reviewed',true); 
+
+                            //   dd($courseList->get());
+       
+    }
     public function getActiveCourses(int $categoryId=0,int $centerId=0,array $with=[])
     {
         if(!count($with)) $with=['center','categories','teachers','classTimes'];

@@ -55,24 +55,21 @@ class Bill extends Model
 
     public function invoiceMoney()
     {
-        $this->invoiceMoney=$this->tuitions()->sum('amount');
-        return  $this->invoiceMoney;
+        return   $this->tuitions()->sum('amount');
     }
     public function statusText()
     {
         $text='待繳費';
         if($this->isPayOff()) $text='已繳費';
 
-        $this->statusText=$text;
-
-        return $this->statusText;
+        return $text;
     }
     public function populateViewData()
     {
-        $this->invoiceMoney();
-        $this->statusText();
+        $this->invoiceMoney=$this->invoiceMoney();
+        $this->statusText=$this->statusText();
         
-        $this->getAmount();
+        
 
         $this->canRemove=$this->canRemove();
 

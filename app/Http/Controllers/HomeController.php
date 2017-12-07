@@ -39,7 +39,7 @@ class HomeController extends BaseController
                     'credit_courses',
                     'teachers',
                     'main_settings',
-                  
+                    'reports'
                    ];        
                 
         if($current_user->isOwner() ||  $current_user->isDev()){

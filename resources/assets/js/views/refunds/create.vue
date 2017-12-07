@@ -35,6 +35,13 @@
         components: {
           'edit-refund':EditRefund
         },
+        props: {
+            signup_id: {
+              type: Number,
+              default: 0
+            }
+           
+        },
         data() {
             return {
                 title: Helper.getIcon('Refunds') + '  新增退費申請 - 請先找出對應的報名紀錄',
@@ -51,7 +58,7 @@
             }
         },
         beforeMount() {
-             this.init()
+             if(this.signup_id) this.signupId=this.signup_id
         },
         methods: {
             init(){

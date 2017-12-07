@@ -11,7 +11,6 @@ use App\Term;
 use App\Center;
 use App\Repositories\Courses;
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 use Excel;
 use DB;
@@ -20,20 +19,14 @@ class CourseListController extends BaseController
 {
     protected $key='reports';
     private $cols=[
-                    'A','B','C','D','E','F','G','H','I'
+                    'A','B','C','D','E','F','G','H'
                 ];
     private $width=[
-       12,28,33,33,12,23,12,12,12
+       12,28,33,33,12,23,12,12
     ];
-    public function __construct(Courses $courses,CheckAdmin $checkAdmin)                                          
+    public function __construct(Courses $courses)                                          
     {
-         $exceptAdmin=[];
-         $allowVisitors=[];
-		 $this->setMiddleware( $exceptAdmin, $allowVisitors);
-		
          $this->courses=$courses;
-
-         $this->setCheckAdmin($checkAdmin);
 
 	}
 
@@ -110,7 +103,7 @@ class CourseListController extends BaseController
     {
         $sheet->row($current_row, array(
                     '編號','課程名稱','授課教師','課程簡介','課程日期','上課時間',
-                    '總時數','課程費用','報名日期'
+                    '總時數','課程費用'
                 ));
         $sheet->setHeight($current_row, 20);
         $range=$this->rowRange($current_row);
@@ -141,7 +134,9 @@ class CourseListController extends BaseController
             $text .=  $teacher->getName() .Chr(10); 
             $experiences=$teacher->experiencesArray();
             for($i = 0; $i < count($experiences); ++$i) {
-                $text .= ' ● ' .$experiences[$i] .Chr(10);
+                if($experiences[$i]){
+                    $text .= ' ● ' .$experiences[$i] .Chr(10);
+                }
             }
           
             $text .= Chr(10) . $teacher->description;
@@ -160,7 +155,7 @@ class CourseListController extends BaseController
             $this->classTimes($course),
             $course->hours,
             $course->tuition,
-            $course->open_date  .  Chr(10) . '至'.  Chr(10) . $course->close_date ,
+            // $course->open_date  .  Chr(10) . '至'.  Chr(10) . $course->close_date ,
         );
 
         $sheet->setHeight($current_row, 360);
@@ -208,19 +203,12 @@ class CourseListController extends BaseController
         $termId=(int)$request->term; 
         $centerId=(int)$request->center;
 
-        $courseList=$this->getCourseList($termId,$centerId);
-        
-        if(count($courseList)){
-            $courseList=$courseList->with(['center','categories','teachers','classTimes'])
-                                    ->get();
-            foreach ($courseList as $course) {
-                foreach ($course->classTimes as $classTime) {
-                  $classTime->weekday;
-                }
-                foreach ($course->teachers as $teacher) {
-                  $teacher->name=$teacher->getName();
-                }
-            }
+        $courseList=$this->getCourseList($termId,$centerId)
+                         ->with(['center','categories','teachers','classTimes'])
+                         ->get();
+        foreach ($courseList as $course) {
+            $course->populateViewData();
+            
         }
 
         return response() ->json(['courseList' => $courseList  ]);

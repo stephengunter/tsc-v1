@@ -139,6 +139,7 @@ Vue.component('classroom-index', require('./views/classrooms/index'))
 Vue.component('title-index', require('./views/titles/index'))
 
 Vue.component('courses-report', require('./views/reports/courses'))
+Vue.component('signups-report', require('./views/reports/signups'))
 
 
 
