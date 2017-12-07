@@ -21,6 +21,8 @@ class Teacher extends Model
     protected $primaryKey = 'user_id';
     protected $guarded = [];
 
+    
+
 	
     protected $filter = [
          'user.profile.fullname','specialty', 'active','reviewed', 'education','updated_at'
@@ -37,8 +39,7 @@ class Teacher extends Model
             'active' => 0,
 			'reviewed' => 0,
 			'education' => '',
-            'job' => '',
-			'jobtitle' => '',
+            
         ];
     }
     
@@ -70,6 +71,16 @@ class Teacher extends Model
     {
         return $this->user->profile->photo();
     }
+
+    public function getAccount() 
+	{
+		return $this->user->getAccount();
+	}
+
+    public function setAccount($number,$updated_by) 
+	{
+		return $this->user->setAccount($number,$updated_by);
+	}
 
     public function addToRole()
     {
@@ -195,6 +206,11 @@ class Teacher extends Model
         return false;
        
           
+    }
+    public function populateViewData()
+    {
+        $this->name=$this->getName();
+        $this->centerNames=$this->centerNames();
     }
     public function canReviewBy($user)
 	{

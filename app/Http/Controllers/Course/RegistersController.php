@@ -14,7 +14,6 @@ use App\Signup;
 use App\Student;
 
 use App\Support\Helper;
-use App\Http\Middleware\CheckAdmin;
 
 use DB;
 
@@ -22,18 +21,10 @@ use DB;
 class RegistersController extends BaseController
 {
     protected $key='registers';
-    public function __construct(Courses $courses,Signups $signups,CheckAdmin $checkAdmin) 
+    public function __construct(Courses $courses,Signups $signups) 
     {
-       
-		$exceptAdmin=[];
-        $allowVisitors=[];
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
-        
         $this->courses=$courses;
         $this->signups=$signups;
-
-        $this->setCheckAdmin($checkAdmin);
-		
 	}
 
     public function index()

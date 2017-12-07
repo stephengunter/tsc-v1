@@ -67,22 +67,23 @@
                 <input type="text" name="teacher.name" class="form-control" v-model="form.teacher.name" disabled >
             </div>
       </div>
-      <div v-show="false" class="col-sm-4">
+      <div  class="col-sm-4">
           <div class="form-group">
-                <label>狀態</label>
-                <div>
-                    <toggle :items="activeOptions"   :default_val="form.teacher.active" @selected="onActiveSelected"></toggle>
-                </div>
+                <label>鐘點費</label>
+               
+                <input type="text" name="teacher.wage" class="form-control" v-model="form.teacher.wage"  >
+                <small class="text-danger" v-if="form.errors.has('teacher.wage')" v-text="form.errors.get('teacher.wage')"></small>
           </div>
+          
       </div>
-      <div v-show="false" class="col-sm-4">
+      <div  class="col-sm-4">
           <div class="form-group">
-                <label>資料審核</label>
-                <div>
-                    <input type="hidden" v-model="form.teacher.reviewed"  >
-                    <toggle :items="reviewedOptions"   :default_val="form.teacher.reviewed" @selected="onReviewedSelected"></toggle>
-                </div>
+                <label>銀行帳號</label>
+               
+                <input type="text" name="teacher.account.number" class="form-control" v-model="form.teacher.account.number"  >
+                <small class="text-danger" v-if="form.errors.has('teacher.account.number')" v-text="form.errors.get('teacher.account.number')"></small>
           </div>
+          
       </div>
    </div>   <!--  row   -->
    <div class="row">

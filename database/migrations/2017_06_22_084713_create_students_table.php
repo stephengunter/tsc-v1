@@ -16,10 +16,8 @@ class CreateStudentsTable extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('course_id')->unsigned();
-			$table->foreign('course_id')->references('course_id')->on('registers')->onDelete('cascade');
 
             $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->string('number')->nullable();
             $table->date('join_date');

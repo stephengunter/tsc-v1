@@ -8,6 +8,7 @@ use App\Profile;
 use App\Tuition;
 use App\Discount;
 use App\Bill;
+use App\Student;
 
 use Carbon\Carbon;
 
@@ -298,7 +299,7 @@ class SignupService
              $bill->save();
 
              if(!$tuition->date)  $tuition->date=Carbon::today();
-             
+           
              $bill->tuitions()->save($tuition);
  
              foreach($signups as $signup){
@@ -315,66 +316,67 @@ class SignupService
     }
    
     //單一課程報名
-    public function store(Course $course, User $user, Signup $signup , Tuition $tuition=null)
-    {
-      
-        $this->canSignup($course, $user, $signup->net_signup);
+    // public function store(Course $course, User $user, Signup $signup , Tuition $tuition=null)
+    // {
+    //     throw new RequestError('','');
+
+    //     $this->canSignup($course, $user, $signup->net_signup);
         
-        if(!$tuition){
-            $signup->discount_id=0;
-            $signup->discount='';
-            $signup->points=0;
-            $signup->tuition=0;
-            $signup->cost=0;
-        }
+    //     if(!$tuition){
+    //         $signup->discount_id=0;
+    //         $signup->discount='';
+    //         $signup->points=0;
+    //         $signup->tuition=0;
+    //         $signup->cost=0;
+    //     }
 
-        $date =null;
-        try {
-            $date = Carbon::parse($signup->date);
-        }
-        catch (Exception $err) {
+    //     $date =null;
+    //     try {
+    //         $date = Carbon::parse($signup->date);
+    //     }
+    //     catch (Exception $err) {
            
-            throw new RequestError('signup.date','日期錯誤');
-        }
+    //         throw new RequestError('signup.date','日期錯誤');
+    //     }
 
       
 
-        if($signup->discount_id){
-            $discount=$this->countTuition($course,$signup->discount_id,$date);
-            if($discount->tuition!=$signup->tuition){                    
+    //     if($signup->discount_id){
+    //         $discount=$this->countTuition($course,$signup->discount_id,$date);
+    //         if($discount->tuition!=$signup->tuition){                    
                 
-                throw new RequestError('signup.tuition', '課程費用錯誤');
-            }
+    //             throw new RequestError('signup.tuition', '課程費用錯誤');
+    //         }
              
-            $signup->discount=$discount->name;
-            $signup->points=$discount->points; 
-        }
+    //         $signup->discount=$discount->name;
+    //         $signup->points=$discount->points; 
+    //     }
 
-        if($tuition){
-            $signup= DB::transaction(function() use($signup,$tuition) {
-                $signup->save();
+    //     if($tuition){
+    //         $signup= DB::transaction(function() use($signup,$tuition) {
+    //             $signup->save();
                
-                $signup->tuitions()->save($tuition);
+    //             $signup->tuitions()->save($tuition);
 
                 
-                return $signup;
+    //             return $signup;
                  
-            });
+    //         });
 
            
-        }else{
-            $signup->save();
-        }
+    //     }else{
+    //         $signup->save();
+    //     }
 
-        //$signup->updateStatus();
-        $course->updateStatus();
+    //     //$signup->updateStatus();
+    //     $course->updateStatus();
       
-        //event(new SignupCreated($signup));
+    //     //event(new SignupCreated($signup));
 
-        return $signup;
+    //     return $signup;
 
 
-    }
+    // }
 
     public function delete(Signup $signup, User $current_user)
     {

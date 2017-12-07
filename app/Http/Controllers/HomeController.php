@@ -34,7 +34,7 @@ class HomeController extends BaseController
         //         'notices','reports'];
                 $keys=[ 
                     'signups',
-                  
+                    'students',
                     'courses',
                     'credit_courses',
                     'teachers',

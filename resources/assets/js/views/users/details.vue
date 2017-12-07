@@ -95,6 +95,7 @@
             }
         },
         beforeMount(){
+          
            this.init()
         },
         watch: {
@@ -102,12 +103,13 @@
         },
         methods:{
             init(){
+                
+                this.activeIndex=0
                 this.user={
                    contact_info:0
                 }
                 this.userLoaded=false
-                this.activeIndex=0
-
+               
                 
                 this.userSettings={
                     can_edit:true,
@@ -124,6 +126,7 @@
                
                
             },
+            
             onUserLoaded(user){
                  this.user=user
                  this.setContactInfo(user.contact_info)

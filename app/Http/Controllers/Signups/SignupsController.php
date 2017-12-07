@@ -40,14 +40,12 @@ class SignupsController extends BaseController
     private function seed()
     {
         $course_id=2;
-       
-        
 
         $users=User::all();
         foreach($users as $user){
             $course=Course::findOrFail($course_id);
             $signup=new Signup([
-                'course_id' => 2,
+                'course_id' => $course_id,
                 'user_id' => $user->id,
                 'net_signup' =>  0,
                 'parent' => 0,
@@ -208,19 +206,20 @@ class SignupsController extends BaseController
 
     public function create()
     {
+        
         $request = request();
         $course_id=(int)$request->course; 
         $user_id=(int)$request->user; 
 
-        // if(!$request->ajax()){
-        //     $menus=$this->menus($this->key);            
-        //     return view('signups.create')
-        //             ->with([
-        //                 'menus' => $menus,
-        //                 'user_id' => $user_id,
-        //                 'course_id' => $course_id
-        //             ]);
-        // }  
+        if(!$request->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('signups.create')
+                    ->with([
+                        'menus' => $menus,
+                        'user_id' => $user_id,
+                        'course_id' => $course_id
+                    ]);
+        }  
 
         if($user_id){
             $user=User::findOrFail($user_id);

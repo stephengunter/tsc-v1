@@ -90,6 +90,7 @@ class CoursesController extends BaseController
     }
     public function create()
     {   
+        abort(404);
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('courses.create')

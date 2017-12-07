@@ -7,6 +7,7 @@ use App\Teacher;
 use App\Volunteer;
 use App\Photo;
 use App\Role;
+use App\Account;
 use App\ContactInfo;
 
 use App\Support\FilterPaginateOrder;
@@ -184,6 +185,32 @@ class User extends Authenticatable {
 	public function students() 
 	{
 		return $this->hasMany('App\Student');
+	}
+
+	public function accounts() 
+	{
+		return $this->hasMany('App\Account');
+	}
+
+	public function getAccount() 
+	{
+		return $this->accounts->first();
+	}
+
+	public function setAccount($number,$updated_by) 
+	{
+		$account=$this->accounts->first();
+		if($account){
+			$account->number=$number;
+			$account->updated_by=$updated_by;
+			$account->save();
+		}else{
+			$account=new Account([
+				'number' => $number,
+				'updated_by' => $updated_by
+			]);
+			$this->accounts()->save($account);
+		}
 	}
 
 	public function getPhoto() 

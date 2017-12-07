@@ -94,10 +94,13 @@ class UsersController extends BaseController
     {
         
         if(!request()->ajax()){
+            $active=request()->get('active'); 
+
             $menus=$this->menus($this->key);            
             return view('users.details')
                     ->with([ 'menus' => $menus,
-                              'id' => $id     
+                              'id' => $id  ,
+                              'active' => $active   
                         ]);
         }  
 

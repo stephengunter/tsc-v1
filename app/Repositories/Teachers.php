@@ -361,7 +361,7 @@ class Teachers
         
         
         $excel=Excel::load($file, function($reader) {             
-            $reader->limitColumns(16);
+            $reader->limitColumns(20);
             $reader->limitRows(100);
         })->get();
 
@@ -415,7 +415,7 @@ class Teachers
 
             $education=trim($row['education']);
             $specialty=trim($row['specialty']);
-            // $job=trim($row['job']);
+            
             $description=trim($row['description']);
             
             $experiences='';               
@@ -425,12 +425,16 @@ class Teachers
             }
 
 
+            $wage=trim($row['wage']);
+            $account_number=trim($row['account_number']);
+
+
             $updated_by=$current_user->id;
     
             $teacherValues=[
                 'education' => $education,
                 'specialty' => $specialty,
-                // 'job' => $job,
+                'wage' => $wage,
                 
                 'description' => $description,
                 'experiences' => $experiences,
@@ -464,6 +468,10 @@ class Teachers
 
             $teacher=$this->storeTeacher($userValues,$profileValues,$teacherValues,
             $user_id,$teacher_id,$current_user,$center->id);
+
+            if($account_number){
+                $teacher->setAccount($account_number,$updated_by);
+            }
 
             
             if(!$teacher) continue;

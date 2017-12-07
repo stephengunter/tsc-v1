@@ -29,6 +29,7 @@ class TeacherRequest extends FormRequest
              'teacher.specialty'=> 'required',
              'teacher.experiences'=> 'required',
              'teacher.education'=> 'required',
+             'teacher.wage'=> 'required|numeric',
         ];
 
         $id=$this->getTeacherId();
@@ -65,6 +66,8 @@ class TeacherRequest extends FormRequest
             'teacher.specialty.required' => '必須填寫專長',
             'teacher.education.required' => '必須填寫最高學歷',
             'teacher.experiences.required' => '必須填寫學經歷',
+            'teacher.wage.required' => '必須填寫鐘點費',
+            'teacher.wage.numeric' => '必須是數字',
         ];
 
         
@@ -112,7 +115,15 @@ class TeacherRequest extends FormRequest
     public function getTeacherValues($updated_by,$removed)
     {
         $values=$this->get('teacher');   
-        $values=array_except($values, ['user','name']);  
+        $values=array_except($values, ['user','name','account']);  
+        $values= Helper::setUpdatedBy($values,$updated_by);
+        return Helper::setRemoved($values,$removed);
+        
+    }
+    public function getAccountValues($updated_by,$removed=false)
+    {
+        $values=$this->get('teacher')['account'];   
+       
         $values= Helper::setUpdatedBy($values,$updated_by);
         return Helper::setRemoved($values,$removed);
         

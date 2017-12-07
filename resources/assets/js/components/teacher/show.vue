@@ -81,8 +81,12 @@
             </div>   <!-- End row-->
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="label-title">建檔日期</label>
-                    <p>{{ teacher.created_at | tpeTime  }}</p>           
+                    <label class="label-title">鐘點費</label>
+                    <p>{{ teacher.wage | formatMoney  }}</p>           
+                </div>
+                <div class="col-sm-4">
+                    <label class="label-title">銀行帳號</label>
+                    <p v-show="teacher.account">{{ teacher.account.number  }}</p>           
                 </div>
                 <div class="col-sm-4">
                     <label class="label-title">最後更新</label>

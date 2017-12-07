@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\FilterPaginateOrder;
 use App\Course;
+use App\Student;
 use Carbon\Carbon;
 
 class Signup extends Model
@@ -225,13 +226,44 @@ class Signup extends Model
             $this->status = -1; //'已取消'
         }else{
            
-           if($this->bill->isPayOff())  $this->status = 1;  //已繳費
+           if($this->bill->isPayOff()){
+                $this->status = 1;  //已繳費
+                $this->createStudent();
+           } 
            else $this->status = 0;  //待繳費
         }
         $this->save();
-
         
     }    
+
+    public function createStudent($join_date='')
+    {
+        
+        $student=$this->getStudent();
+        if($student) return;
+
+        if(!$join_date) $join_date=$this->course->begin_date;
+        $values=[
+           'course_id' => $this->course_id,
+           'user_id' => $this->user_id,
+           'join_date' => $join_date
+        ];
+
+       
+  
+        Student::create($values);
+
+
+    }
+
+    public function getStudent()
+    {
+        return Student::where('course_id',$this->course_id)
+                       ->where('user_id',$this->user_id)
+                       ->first();
+    }
+
+
     public function formattedPoints()
     {
         if(!$this->points) return '';

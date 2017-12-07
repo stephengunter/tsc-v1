@@ -88,7 +88,7 @@ class TeachersController extends BaseController
 
         $teacherList=$teacherList->filterPaginateOrder();   
         foreach($teacherList as $teacher){
-            $teacher->centerNames=$teacher->centerNames();
+            $teacher->populateViewData();
         }                         
         return response()->json([ 'model' => $teacherList ]);
 
@@ -98,6 +98,7 @@ class TeachersController extends BaseController
 
     public function create()
     {
+        abort(404);
          $request = request();
          $user_id=(int)$request->user;
          
@@ -154,8 +155,8 @@ class TeachersController extends BaseController
         }
 
         
-        $teacher->name=$teacher->getName();
-        $teacher->centerNames=$teacher->centerNames();
+        $teacher->populateViewData();
+        $teacher->account=$teacher->getAccount();
 
         $teacher->canEdit=$teacher->canEditBy($current_user);
         $teacher->canReview=$teacher->canReviewBy($current_user);
@@ -177,6 +178,8 @@ class TeachersController extends BaseController
         }
 
         $teacher->name=$teacher->getName();
+        $teacher->account=$teacher->getAccount();
+
         return response()->json([
             'teacher' => $teacher
         ]);
@@ -235,6 +238,8 @@ class TeachersController extends BaseController
             return  $this->unauthorized();    
         }
 
+       
+
         $updated_by=$current_user->id;
         $removed=false;
         $teacherValues=$request->getTeacherValues($updated_by,$removed);
@@ -243,9 +248,15 @@ class TeachersController extends BaseController
             $teacherValues['reviewed'] = 0;
             $teacherValues['reviewed_by'] = '';
         }
+
+        $accountValues=$request->getAccountValues($updated_by);
+        
         
         $teacher->update($teacherValues);
-        
+
+        if($accountValues){
+            $teacher->setAccount($accountValues['number'],$updated_by);
+        }
        
         return response()->json($teacher); 
          

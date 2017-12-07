@@ -22,7 +22,7 @@ class CreateTeachersTable extends Migration {
 			$table->string('certificate')->nullable();;
 			$table->string('specialty')->nullable();
 			$table->string('job')->nullable();
-            $table->string('jobtitle')->nullable();
+         $table->string('jobtitle')->nullable();
 			$table->text('description')->nullable();
 			$table->boolean('active')->default(false);
 			$table->boolean('reviewed')->default(false);
@@ -32,6 +32,8 @@ class CreateTeachersTable extends Migration {
 
 			$table->boolean('removed')->default(false);
 			$table->date('join_date')->nullable();
+
+			$table->decimal('wage', 8, 2)->nullable(); //鐘點費
 
 			$table->integer('updated_by')->unsigned()->nullable();
 			$table->integer('reviewed_by')->unsigned()->nullable();

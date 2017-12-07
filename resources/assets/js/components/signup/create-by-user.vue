@@ -222,9 +222,9 @@
                
             let store=Bill.store(this.form)
             store.then(data => {
-					  Helper.BusEmitOK()
-					  let url='/users/' + this.user_id
-					  Helper.redirect(url)
+					//   Helper.BusEmitOK()
+					//   let url='/users/' + this.user_id
+					//   Helper.redirect(url)
             })
             .catch(error => {
                Helper.BusEmitError(error)

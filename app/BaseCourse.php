@@ -100,10 +100,10 @@ class BaseCourse extends Model
 	{
 		return $this->hasOne('App\Admission');
 	}
-    public function register() 
-	{
-		return $this->hasOne('App\Register');
-	}
+    // public function register() 
+	// {
+	// 	return $this->hasOne('App\Register');
+	// }
 
 	public function categories()
     {

@@ -89,7 +89,8 @@
                     getData.then(data=>{
                         let teacher=data.teacher
                         teacher.experiences=Helper.replaceAll(teacher.experiences,'<br>' , '\n')
-
+                        teacher.wage=Helper.formatMoney(teacher.wage)
+                        
                         this.form.teacher=data.teacher
                         this.loaded=true 
                     }).catch(error=>{

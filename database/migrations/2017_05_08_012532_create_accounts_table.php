@@ -18,9 +18,9 @@ class CreateAccountsTable extends Migration
             $table->boolean('public')->default(false);
             $table->integer('user_id')->unsigned()->nullable();
 
-            $table->string('owner');
-            $table->string('bank');
-            $table->string('branch');
+            $table->string('owner')->nullable();
+            $table->string('bank')->nullable();
+            $table->string('branch')->nullable();
             $table->string('number');
 
             $table->boolean('removed')->default(false);
