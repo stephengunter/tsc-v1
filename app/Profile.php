@@ -38,15 +38,10 @@ class Profile extends Model {
 		return $this->belongsTo('App\User');
 	}
 
-    public function title() {
-		return $this->belongsTo('App\Title');
-	}
+   
     public function titleText() {
-		if($this->title){
-            return $this->title->name;
-        }else{
-            return '';
-        }
+        if(!$this->title) return '';
+		return $this->title;
 	}
 
     public function photo()

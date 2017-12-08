@@ -8,7 +8,7 @@ use App\Support\FilterPaginateOrder;
 class Student extends Model
 {
     use FilterPaginateOrder;
-	protected $filter =  ['id'];
+	protected $filter =  ['user.profile.fullname'];
 	protected $fillable = ['course_id', 'user_id', 'number',
 							'join_date' , 'out_date', 'active', 'ps',
 							'updated_by'
@@ -20,6 +20,10 @@ class Student extends Model
 	// {
 	// 	 return $this->belongsTo('App\Register','course_id');
 	// }
+	public function course()
+	{
+		 return $this->belongsTo('App\Course');
+	}
     public function user()
 	{
 		 return $this->belongsTo('App\User');

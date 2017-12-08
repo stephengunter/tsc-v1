@@ -6,6 +6,9 @@ class Errors {
         this.errors = {};
     }
 
+    
+
+
 
     /**
      * Determine if an errors exists for the given field.
@@ -63,6 +66,12 @@ class Errors {
 
         this.errors = {};
     }
+
+
+
+
+
+
 }
 
 export default Errors;

@@ -16,12 +16,12 @@ class CreateProfilesTable extends Migration {
 			$table->primary('user_id');
 			$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-			$table->string('fullname')->nullable();;
+			$table->string('fullname')->nullable();
 			$table->string('SID')->nullable();
 			$table->boolean('gender')->default(true);
 			$table->date('dob')->nullable();
 			$table->integer('photo_id')->unsigned()->nullable(); 
-			$table->integer('title_id')->unsigned()->nullable(); 
+			$table->string('title')->nullable(); 
 
 			$table->integer('updated_by')->unsigned()->nullable();
 			$table->timestamps();

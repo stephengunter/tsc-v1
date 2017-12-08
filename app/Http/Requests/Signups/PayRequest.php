@@ -46,6 +46,8 @@ class PayRequest extends FormRequest
     }
     public function getSignups()
     {
-        return $this->get('signups');
+        return array_map(function($item){
+            return new \App\Signup($item);
+        }, $this->get('signups'));
     }
 }

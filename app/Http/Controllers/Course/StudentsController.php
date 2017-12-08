@@ -29,7 +29,37 @@ class StudentsController extends BaseController
 		
 	}
 
+    public function index()
+    {
+        
+        $request = request();
+        if(!$request->ajax()){
+            $menus=$this->menus($this->key);            
+            return view('students.index')
+                    ->with(['menus' => $menus]);
+        }  
+
+        $course_id=(int)$request->course; 
+        $course=Course::findOrFail($course_id);
+
+        $summary=[
+            'total' => $course->students()->count(),
+            'canceled' => $course->students()->where('active',0)->count()
+        ];
+
+        $count=$course->students()->count();
+
+        $students=$course->students()
+        ->with(['user.profile'])->orderBy('active','desc')
+        ->filterPaginateOrder();
+
+        return response() ->json([ 'model' => $students,
+                                   'summary' => $summary
+                                ]);
+        
    
+       
+    }
     
     public function show($id)
     {

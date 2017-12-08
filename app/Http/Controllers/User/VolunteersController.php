@@ -27,22 +27,15 @@ class VolunteersController extends BaseController
 {
     protected $key='volunteers';
 
-    public function __construct(Volunteers $volunteers, Titles $titles, 
-                        Centers $centers, Users $users, CheckAdmin $checkAdmin)
+    public function __construct(Volunteers $volunteers,Centers $centers, Users $users)                 
     {
-        $exceptAdmin=[];
-        $allowVisitors=[];
-        $this->setMiddleware( $exceptAdmin, $allowVisitors);
+        
 
 		$this->volunteers=$volunteers;
-        $this->titles=$titles;
         $this->centers=$centers;
         $this->users=$users;
-
-        $this->setCheckAdmin($checkAdmin);
          
 	}
-
     
     public function index()
     {

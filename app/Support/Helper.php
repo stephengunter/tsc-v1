@@ -8,6 +8,18 @@ use Carbon\Carbon;
 
 class Helper 
 {
+    public static function getDateFromString($strVal,$ROC=false)
+    {
+        $pieces=explode('/', $strVal);
+        
+         $year = (int)$pieces[0];
+         $month=(int)$pieces[1];
+         $day=(int)$pieces[2];
+
+         if($ROC)  $year+=1911;
+
+         return Carbon::createFromDate($year, $month, $day);
+    }
     public static function getAppSettings($frontend=false)
     {
         if($frontend){

@@ -152,8 +152,24 @@ class SignupsController extends BaseController
        
     }
 
-    private function createByUser(User $user)
+    private function createByUser(User $user,int $course_id=0)
     {
+        if($course_id){
+            $course= Course::findOrFail($course_id);
+            $isNetSignup=true;
+
+            $errMsg=$course->canSignupBy($user,$isNetSignup);
+
+            if($errMsg) $course->error=$errMsg;
+
+           
+
+            $course->populateViewData();
+
+            return response()->json([
+                'course' => $course
+            ]);
+        }
         $signups=[];
         $bill=Bill::init();
         $tuition=Tuition::initialize();
@@ -212,6 +228,8 @@ class SignupsController extends BaseController
         $user_id=(int)$request->user; 
 
         if(!$request->ajax()){
+           
+
             $menus=$this->menus($this->key);            
             return view('signups.create')
                     ->with([
@@ -223,7 +241,7 @@ class SignupsController extends BaseController
 
         if($user_id){
             $user=User::findOrFail($user_id);
-            return $this->createByUser($user);
+            return $this->createByUser($user,$course_id);
         }
         
         $course= Course::findOrFail($course_id);
@@ -256,10 +274,9 @@ class SignupsController extends BaseController
     
     public function store(SignupRequest $request)
     {  
+        //必須繳費,單一課程
         $current_user=$this->currentUser();        
         $updated_by=$current_user->id;
-
-        
         
 
         $values=$request->getValues($updated_by);

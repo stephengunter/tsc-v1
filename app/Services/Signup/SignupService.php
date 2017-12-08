@@ -293,8 +293,6 @@ class SignupService
     public function storeBillAndSignups(Bill $bill, Tuition  $tuition,  $signups)
     {
         $bill= DB::transaction(function() use($bill,$tuition,$signups) {
-            
-             //$date=Carbon::today();
  
              $bill->save();
 
@@ -313,6 +311,8 @@ class SignupService
              return $bill;
              
         });
+
+        return $bill;
     }
    
     //單一課程報名
@@ -443,11 +443,16 @@ class SignupService
             throw new RequestError('signup.course_id','此課程目前無法報名');
         }
         if($user->id){
-            $validSignups=$this->getValidSignups($course->id)->where('user_id',$user->id)->get();
-            if(count($validSignups) ) {
+
+            
+            if($course->hasSignupBy($user->id)) throw new RequestError('signup.user_id','此學員已報名過此課程了');
+
+
+            // $validSignups=$this->getValidSignups($course->id)->where('user_id',$user->id)->get();
+            // if(count($validSignups) ) {
                 
-                throw new RequestError('signup.user_id','此學員已報名過此課程了');
-            }
+            //     throw new RequestError('signup.user_id','此學員已報名過此課程了');
+            // }
         }
       
 

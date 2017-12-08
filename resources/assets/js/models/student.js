@@ -151,6 +151,60 @@ class Student {
                     value: '0'
                 }]
     }
+
+    static getThead(){
+        let thead= [
+            //    {
+            //        title: '編號',
+            //        key: 'number',
+            //        sort: false,
+            //        static:true,
+            //        default:true
+
+            //    },
+                {
+                    title: '姓名',
+                    key: 'user.profile.fullname',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
+                    title: '加入日期',
+                    key: 'join_date',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
+                    title: '手機',
+                    key: 'user.phone',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
+                    title: 'Email',
+                    key: 'user.email',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
+                    title: '',
+                    key: 'active',
+                    sort: false,
+                    static:true,
+                    default:true
+                },]
+               
+
+              
+
+         
+           return thead
+   }
+   
    
 }
 

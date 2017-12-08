@@ -3,7 +3,7 @@
 namespace App;
 
 use App\BaseCourse;
-
+use App\User;
 use App\Category;
 use App\Photo;
 use App\Support\FilterPaginateOrder;
@@ -84,6 +84,15 @@ class Course extends BaseCourse
         return $this->status->canSignup($isNetSignup);
         
     }
+    public function canSignupBy(User $user,$isNetSignup=true)
+    {
+        if(!$this->canSignup($isNetSignup)) return '此課程目前無法報名';
+
+        if($this->hasSignupBy($user->id)) return '此學員已報名過此課程了';
+
+        return '';
+        
+    }
     public function signupStatus()
     {
          $today=Carbon::today();
@@ -100,15 +109,12 @@ class Course extends BaseCourse
     {
         
         $validSignups=$this->validSignups();
-       
-        if(!count($validSignups)) return false;
 
 
         $filtered = $validSignups->filter(function ($signup) use($user_id) {
             return $signup->user_id==$user_id;
         })->all();
-        
-      
+       
 
         if(count($filtered)) return true;
             
@@ -230,14 +236,14 @@ class Course extends BaseCourse
     {
         return $this->signups->filter(function ($item) {
             return $item->isValid();
-        })->all();
+        });
 
     }
     public function confirmedSignups()
     {
         return $this->signups->filter(function ($item) {
             return $item->isConfirmed();
-        })->all();
+        });
     }
    
     public function canCreateAdmit()

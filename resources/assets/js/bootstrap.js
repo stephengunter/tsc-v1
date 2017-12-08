@@ -65,6 +65,8 @@ Vue.component('signup-details', require('./views/signups/details'))
 Vue.component('signup-create', require('./views/signups/create'))
 Vue.component('new-user-signup', require('./views/signups/new-user-signup'))
 
+Vue.component('students-index', require('./views/students/index'))
+
 Vue.component('tuition-view', require('./views/tuitions/view'))
 
 Vue.component('refund-index', require('./views/refunds/index'))
@@ -80,6 +82,7 @@ Vue.component('user-details', require('./views/users/details'))
 Vue.component('volunteer-index', require('./views/volunteers/index'))
 Vue.component('volunteer-create', require('./views/volunteers/create'))
 Vue.component('volunteer-details', require('./views/volunteers/details'))
+Vue.component('volunteer-import', require('./views/volunteers/import'))
 
 
 Vue.component('admin-index', require('./views/admins/index'))

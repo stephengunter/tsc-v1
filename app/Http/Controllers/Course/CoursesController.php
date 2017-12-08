@@ -188,7 +188,8 @@ class CoursesController extends BaseController
     }
     public function show($id)
     {
-        
+        $course = Course::findOrFail($id);
+        dd($course->canSignup());
         if(!request()->ajax()){
             $menus=$this->menus($this->key);            
             return view('courses.details')

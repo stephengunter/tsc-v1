@@ -106,18 +106,18 @@ class Volunteer extends Model
     }
 	public function attachCenter($center_id)
     {
-            if(!$this->centers->contains($center_id)) 
-            {
-                $this->centers()->attach($center_id);
-            }
+        if(!$this->centers->contains($center_id)) 
+        {
+            $this->centers()->attach($center_id);
+        }
            
     }
     public function detachCenter($center_id)
     {
-            if($this->centers->contains($center_id)) 
-            {
-                $this->centers()->detach($center_id);
-            }
+        if($this->centers->contains($center_id)) 
+        {
+            $this->centers()->detach($center_id);
+        }
     }
     public function syncCenters($centerIds)
     {

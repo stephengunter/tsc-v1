@@ -35,6 +35,8 @@ new Vue({
     created() {
         document.getElementsByTagName("body")[0].removeAttribute("style");
         Bus.$on('login',this.beginLogin)
+
+       
         Bus.$on('errors',this.showErrorMsg)
         Bus.$on('okmsg',this.showSuccessMsg)       
          

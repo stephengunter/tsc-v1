@@ -106,41 +106,34 @@ class BillsController extends BaseController
     
    public function store(PayRequest $request)
    {
-      $user=$this->currentUser();
-      $updated_by=$user->id;
+       
+        $user=$this->currentUser();
+        $updated_by=$user->id;
 
-      $billValues=$request->getBillValues($updated_by);
-      $tuitionValues=$request->getTuitionValues($updated_by); 
-      $signups=$request->getSignups();
-      
+        $signups=$request->getSignups();
 
-      $bill= DB::transaction(function() use($billValues,$tuitionValues,$signups) {
-           
-            $date=Carbon::today();
+        //網路報名的標準
+        $isNetSignup=true;
 
-            $bill=Bill::create($billValues);
+        foreach($signups as $signup){
+            $course=Course::findOrFail($signup->course_id);
+            $user=User::findOrFail($signup->user_id);
+            $this->signupService->canSignup($course, $user, $isNetSignup);
+        }
 
-            $tuitionValues['date']=$date;
-            $tuition=new Tuition($tuitionValues);  
-            
-            $bill->tuitions()->save($tuition);
 
-            foreach($signups as $signup){
-                  $signup['bill_id']=$bill->id;
-                  $signup['date']=$date;
-      
-                  $bill->signups()->save(new Signup($signup));
-            }
+        $billValues=$request->getBillValues($updated_by);
+        $bill=new Bill($billValues);
 
-            $bill->updateStatus();
+        $tuitionValues=$request->getTuitionValues($updated_by);
+        $tuition=new Tuition($tuitionValues);
 
-            return $bill;
-            
-      });
 
-      
+        
 
-      return response() ->json($bill);
+        $bill= $this->signupService->storeBillAndSignups($bill,$tuition,$signups);
+        
+        return response()->json($bill);
          
    }
 
@@ -161,6 +154,8 @@ class BillsController extends BaseController
        return response()->json([ 'bill' => $bill ]);
 
    }
+
+   
 
    public function discountOptions()
    {

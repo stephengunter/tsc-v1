@@ -107,6 +107,10 @@ Route::group(['middleware' => 'admin'], function()
     Route::put('users/{user}/update-photo',['uses'=>'\App\Http\Controllers\User\UsersController@updatePhoto']);
     Route::post('users/find-users', ['uses' => '\App\Http\Controllers\User\UsersController@findUsers']);
 
+    Route::resource('volunteers', '\App\Http\Controllers\User\VolunteersController');
+    Route::resource('volunteers-import', '\App\Http\Controllers\User\VolunteersImportController',
+    ['only' => ['index','store']]);
+
     //Center
     Route::get('centers/options', '\App\Http\Controllers\Settings\CentersController@options');
     Route::post('centers/display-order','\App\Http\Controllers\Settings\CentersController@updateDisplayOrder');
@@ -241,7 +245,7 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('titles', '\App\Http\Controllers\User\TitlesController');
     
 
-    Route::resource('volunteers', '\App\Http\Controllers\User\VolunteersController');
+   
 
    
 

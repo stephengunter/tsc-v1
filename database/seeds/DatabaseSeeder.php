@@ -39,8 +39,9 @@ class DatabaseSeeder extends Seeder {
 		
 		$this->addDev();
 
+		$this->call(IdentitiesSeeder::class);
+
 		
-		$this->call(TitleTableSeeder::class);
 		$this->call(TermTableSeeder::class);		
 		$this->call(CenterTableSeeder::class);
 
@@ -61,7 +62,7 @@ class DatabaseSeeder extends Seeder {
 		//$this->call(AccountSeeder::class);
 		 
 		
-		// $this->call(IdentitiesSeeder::class);
+		
 
 		 
 

@@ -20,7 +20,7 @@ class CreateVolunteersTable extends Migration
             
             $table->date('join_date')->nullable();
             
-            $table->boolean('active')->default(false);
+            $table->boolean('active')->default(true);
             $table->boolean('removed')->default(false);
             
             $table->integer('updated_by')->unsigned()->nullable();

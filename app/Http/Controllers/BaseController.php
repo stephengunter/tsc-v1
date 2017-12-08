@@ -143,10 +143,11 @@ class BaseController extends Controller
                 ],
                 [
                     'id' => 4,
-                    'text' => '稱謂設定',
-                    'path' => '/titles',
-                    'active' => $current=='titles'
+                    'text' => '匯入志工',
+                    'path' => '/volunteers-import',
+                    'active' => $current=='volunteers-import'
                 ],
+               
                
             );
         }
@@ -291,31 +292,37 @@ class BaseController extends Controller
         if($key =='students'|| $key =='admissions'|| $key =='registers' 
             || $key =='lessons' || $key =='scores'){
             return array(
-            
-                [
+                  [
                     'id' => 1,
-                    'text' => '錄取名單',
-                    'path' => '/admissions',
-                    'active' => $current=='admissions'
-                ],
-                [
-                    'id' => 2,
-                    'text' => '註冊學員名單',
-                    'path' => '/course-registers',
-                    'active' => $current=='course-registers'
-                ],
-                [
-                    'id' => 3,
-                    'text' => '課堂紀錄表',
-                    'path' => '/lessons',
-                    'active' => $current=='lessons'
-                ],
-                [
-                    'id' => 4,
-                    'text' => '學員成績',
-                    'path' => '/scores',
-                    'active' => $current=='scores'
-                ],
+                    'text' => '學員管理',
+                    'path' => '/students',
+                    'active' => $current=='students'
+                  ],
+            
+                // [
+                //     'id' => 1,
+                //     'text' => '錄取名單',
+                //     'path' => '/admissions',
+                //     'active' => $current=='admissions'
+                // ],
+                // [
+                //     'id' => 2,
+                //     'text' => '註冊學員名單',
+                //     'path' => '/course-registers',
+                //     'active' => $current=='course-registers'
+                // ],
+                // [
+                //     'id' => 3,
+                //     'text' => '課堂紀錄表',
+                //     'path' => '/lessons',
+                //     'active' => $current=='lessons'
+                // ],
+                // [
+                //     'id' => 4,
+                //     'text' => '學員成績',
+                //     'path' => '/scores',
+                //     'active' => $current=='scores'
+                // ],
                 
             );
         }

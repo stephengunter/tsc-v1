@@ -104,7 +104,7 @@
 
              form:{},
 
-             payways:[]
+             payways:[],
          }
       },
       computed: {
@@ -156,10 +156,9 @@
                })
 			   this.payways=data.payways
 					
-					
                
             }).catch(error =>{
-               Helper.BusEmitError(error)
+                Helper.BusEmitError(error)
             })
          },
          onCourseSelected(id){
@@ -169,18 +168,18 @@
            
             if(this.courseExist(id)) return false
 
-            let getCourse=Course.show(id)
-            getCourse.then(data=>{
+            let getData=Signup.create(id,this.user_id)
+            getData.then(data=>{
+               let course=  data.course  
                
-               let course=new Course(data.course)
-
-               let canSignup=Helper.isTrue(course.canSignup)
-               if(!canSignup){
-                  this.courseConfirmModal.msg=course.fullname +  ' 已停止報名'
+               if(course.error){
+                  this.courseConfirmModal.msg=course.fullName +  '  ' +  course.error
                   this.courseConfirmModal.show=true
 
                   return false
                }
+
+                course=new Course(data.course)
 
                this.selectedCourses.push(course)
               
@@ -190,6 +189,29 @@
             }).catch(error =>{
                Helper.BusEmitError(error)
             })
+
+            // let getCourse=Course.show(id)
+            // getCourse.then(data=>{
+               
+            //    let course=new Course(data.course)
+
+            //    let canSignup=Helper.isTrue(course.canSignup)
+            //    alert('canSignup')
+            //    if(!canSignup){
+            //       this.courseConfirmModal.msg=course.fullname +  ' 已停止報名'
+            //       this.courseConfirmModal.show=true
+
+            //       return false
+            //    }
+
+            //    this.selectedCourses.push(course)
+              
+
+               
+               
+            // }).catch(error =>{
+            //    Helper.BusEmitError(error)
+            // })
          },
          courseExist(id){
             if(this.selectedCourses.length < 1 ) return false
@@ -222,9 +244,9 @@
                
             let store=Bill.store(this.form)
             store.then(data => {
-					//   Helper.BusEmitOK()
-					//   let url='/users/' + this.user_id
-					//   Helper.redirect(url)
+                Helper.BusEmitOK()
+                let url='/users/' + this.user_id
+                Helper.redirect(url)
             })
             .catch(error => {
                Helper.BusEmitError(error)

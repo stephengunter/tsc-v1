@@ -31,15 +31,15 @@
 
     <modal :showbtn="false"  :show="userListModal.show" effect="fade" :width="userListModal.width">
         
-          <div slot="modal-header" class="modal-header modal-header-danger">
-             <button id="close-button" type="button" class="close" data-dismiss="modal" @click="userListModal.show=false">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-             </button>
-             <h3>
-                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                 相同資料的使用者已經存在
-             </h3>
-          </div>
+		<div slot="modal-header" class="modal-header modal-header-danger">
+			<button id="close-button" type="button" class="close" data-dismiss="modal" @click="userListModal.show=false">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+			</button>
+			<h3>
+				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+				相同資料的使用者已經存在
+			</h3>
+		</div>
         <div slot="modal-body" class="modal-body">
             <user-selector :users="userListModal.users" @selected="onUserSelected"></user-selector>
         </div>
@@ -175,7 +175,7 @@
 						Helper.BusEmitOK()
 						this.formSubmitting=false
 
-						this.redirectToUser(user.id)
+						this.redirectToSignup(user.id)
 													
 					})
 					.catch(error => {
@@ -187,6 +187,9 @@
 			},
 			redirectToUser(id){
 				Helper.redirect('/users/' + id)
+			},
+			redirectToSignup(user_id){
+				Helper.redirect('/signups/create?user=' + user_id )
 			}
 			
 			

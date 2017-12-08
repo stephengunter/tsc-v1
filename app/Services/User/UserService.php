@@ -5,7 +5,6 @@ use App\User;
 use App\Profile;
 
 use App\Repositories\Users;
-use App\Repositories\Titles;
 use App\Repositories\Registrations;
 
 
@@ -18,10 +17,9 @@ use Exception;
 
 class UserService
 {
-    public function __construct(Users $users, Titles $titles,Registrations $registrations)                               
+    public function __construct(Users $users, Registrations $registrations)                               
     {
           $this->users=$users;
-          $this->titles=$titles;
          
           $this->registrations=$registrations;
           
