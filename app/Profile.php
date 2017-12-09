@@ -10,7 +10,7 @@ class Profile extends Model {
     protected $primaryKey = 'user_id';
     
 	protected $fillable = [
-	   'fullname', 'SID', 'gender', 
+	   'fullname', 'SID', 'gender', 'title', 
        'dob' , 'title_id', 'updated_by'
 	];
 

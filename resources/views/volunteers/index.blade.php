@@ -3,12 +3,12 @@
 
 @section('content')
 
-       <volunteer-index v-show="!selected" :hide_create="indexSettings.hide_create" :version="version"
+       <volunteer-index v-show="!selected"  :version="version"
            @selected="onSelected"  @begin-create="onBeginCreate">
        </volunteer-index> 
-       <volunteer-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
+       <!-- <volunteer-details v-if="selected"  :id="selected" :can_back="detailsSettings.can_back" 
         @btn-back-clicked="backToIndex" @volunteer-deleted="onVolunteerDeleted">
-       </volunteer-details>
+       </volunteer-details> -->
        
 @endsection
 
@@ -51,19 +51,20 @@
             },
             
             onSelected(id){
-               this.selected=id
+               Helper.redirect('/users/' + id) 
+               //this.selected=id
             },
-            onVolunteerDeleted(){
-                this.backToIndex()
-            },
+            // onVolunteerDeleted(){
+            //     this.backToIndex()
+            // },
             onBeginCreate(){
                  Helper.redirect('/volunteers/create') 
             },
-            backToIndex(){
-                this.version+=1
-                this.selected=0
+            // backToIndex(){
+            //     this.version+=1
+            //     this.selected=0
                  
-            }
+            // }
             
 
         },

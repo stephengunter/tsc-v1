@@ -161,54 +161,7 @@ class Volunteer {
         })
     }
 
-    static getThead(canSelect) {
-        let thead = [{
-            title: '姓名',
-            key: 'name',
-            sort: false,
-            default: true
-        }, {
-            title: '稱謂',
-            key: 'user.profile.titleText',
-            sort: false,
-            default: true
-        }, {
-            title: '手機',
-            key: 'user.phone',
-            sort: false,
-            default: true
-        }, {
-            title: '所屬中心',
-            key: 'centers',
-            sort: false,
-            default: true
-
-        }, {
-            title: '狀態',
-            key: 'active',
-            sort: true,
-            default: true
-        },  {
-            title: '加入日期',
-            key: 'join_date',
-            sort: true,
-            default: true
-        }]
-
-        if (canSelect) {
-            let selectColumn = {
-                title: '',
-                key: '',
-                sort: false,
-                static: true,
-                default: true
-            }
-            thead.splice(0, 0, selectColumn);
-        }
-
-
-        return thead
-    }
+    
 
 
 }

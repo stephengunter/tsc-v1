@@ -47,31 +47,18 @@ class VolunteersController extends BaseController
 
         $request = request();
         
-        $centerId=(int)$request->center;
-        $volunteerList=[];
-        if($centerId){
-          
-            $volunteerList=$this->volunteers->getByCenter($centerId)
-                                        ->with('user')->with('user.profile');
-                                       
-        }else{
-            $volunteerList=$this->volunteers->getAll()
-                                        ->with('user')->with('user.profile');
-        }
+        
+        $volunteers=$this->volunteers->getAll()
+                                    ->with('user')
+                                    ->with('user.profile')
+                                    ->filterPaginateOrder();
 
-      
-        $volunteerList=$volunteerList->filterPaginateOrder();   
-
-        foreach($volunteerList as $volunteer){
-            $volunteer->centerNames=$volunteer->centerNames();
-            $user=$volunteer->user;
-            $user->profile->titleText=$user->profile->titleText();
-        }
+        
                                     
-        return response()
-            ->json([
-               'model' => $volunteerList                
-            ]); 
+        return response()->json([ 'model' => $volunteers    ]); 
+            
+                              
+          
 
     }
 
@@ -92,12 +79,9 @@ class VolunteersController extends BaseController
         $volunteer=null;
 
         if($user_id){
-            $current_user=$this->currentUser();
-            $user=$this->users->findOrFail($user_id);
-            if(!$user->canViewBy($current_user)){
-                return  $this->unauthorized();     
-            }
-
+           
+            $user=User::findOrFail($user_id);
+           
             
             $user->profile;
             $volunteer=$user->volunteer;
@@ -110,14 +94,10 @@ class VolunteersController extends BaseController
              $volunteer=Volunteer::initialize();
         }
 
-
-        $titleOptions=$this->titles->options();
-
         return response()
             ->json([
                 'user' => $user,
-                'volunteer' => $volunteer,
-                'titleOptions' => $titleOptions,               
+                'volunteer' => $volunteer           
             ]);
        
        
@@ -126,52 +106,16 @@ class VolunteersController extends BaseController
     {
          $current_user=$this->currentUser();
          $updated_by=$current_user->id;
-         $removed=false;
 
-         $volunteerValues=$request->getVolunteerValues($updated_by,$removed);
-         $userValues=$request->getUserValues($updated_by,$removed);
-         $profileValues=$request->getProfileValues($updated_by,$removed);
+         $volunteerValues=$request->getVolunteerValues($updated_by);
+         $userValues=$request->getUserValues($updated_by);
+         $profileValues=$request->getProfileValues($updated_by);
 
          $user_id=$request->getUserId();
          $volunteerId=$request->getVolunteerId();
 
-         $user= DB::transaction(function() 
-                use($userValues,$profileValues,$volunteerValues,$user_id,$volunteerId)
-                {
-                    $user=null;
-                    if($user_id){
-                        $user=User::findOrFail($user_id);
-                        $user->update($userValues);
-                        $user->profile->update($profileValues);
-                    }else{
-                        $user=new User($userValues);
-                        $user->password= config('app.default_password');
-                        $user->save();
-                        $profile=new Profile($profileValues);
-                        $user->profile()->save($profile);
-                    }
+         $volunteer=$this->volunteers->storeVolunteer($userValues,$profileValues,$volunteerValues,$user_id,$volunteerId);
 
-                    
-                    if($volunteerId){
-                        $volunteer = Volunteer::findOrFail($id);
-                        $volunteer->update($volunteerValues);
-                    }else{
-                        $volunteer=$user->volunteer;
-                        if(!$volunteer){
-                            $volunteer=new Volunteer($volunteerValues);  
-                            $user->volunteer()->save($volunteer);
-                        }else{
-                            $user->volunteer->update($volunteerValues);
-                        }
-                    }
-                 
-                    return $user;
-                });
-
-         $volunteer= Volunteer::findOrFail($user->id);
-         event(new VolunteerCreated($volunteer, $current_user));
-        
-       
        
          return response()->json($volunteer); 
     }

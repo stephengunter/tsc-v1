@@ -111,13 +111,6 @@ class Center extends Model
 	{
 		return $this->hasMany('App\Classroom');
 	}
-
-	
-
-	public function volunteers() 
-	{
-		return $this->belongsToMany('App\Volunteer','center_volunteer','center_id','user_id');
-	}
 	public function teachers() 
 	{
 		 return $this->belongsToMany('App\Teacher','center_teacher','center_id','teacher_id');

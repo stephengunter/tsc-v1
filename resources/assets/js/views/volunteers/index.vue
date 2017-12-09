@@ -52,7 +52,7 @@
                 this.$emit('selected',id)
             },
             onBeginCreate(){
-                this.$emit('begin-create',this.course_id)
+                this.$emit('begin-create')
             }
             
             

@@ -33,10 +33,7 @@ class VolunteerRequest extends FormRequest
       
         $userRules=User::getRules($email, $user_id,$role);
         
-        $SID=$this->getSID();
-        if($SID){
-            $userRules['user.profile.SID']='required|unique:profiles,SID,'.$user_id .',user_id';
-        }
+        
 
         return array_merge($rules,$userRules);
     }
@@ -66,16 +63,13 @@ class VolunteerRequest extends FormRequest
         }  
         return $user_id;
     }
+
     public function getSID()
     {
-        $profileValues = $this->getProfileValues();
-        $SID='';        
-        if(array_key_exists ( 'SID' ,$profileValues)){
-            $SID=$profileValues['SID'];
-        }  
-        return $SID;
-    }
-    public function getUserValues($updated_by,$removed)
+        return $this->getProfileValues()['SID'];
+    } 
+   
+    public function getUserValues($updated_by,$removed=false)
     {
         $request=$this->get('user');
         $values=array_except($request, ['profile']);
@@ -91,7 +85,7 @@ class VolunteerRequest extends FormRequest
         return Helper::setUpdatedBy($values,$updated_by);
         
     }
-    public function getVolunteerValues($updated_by,$removed)
+    public function getVolunteerValues($updated_by,$removed=false)
     {
         $values=$this->get('volunteer');   
         $values=array_except($values, ['user','name']);  

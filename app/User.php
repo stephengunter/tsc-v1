@@ -86,6 +86,7 @@ class User extends Authenticatable {
 			$extraRules=[
 			  'user.profile.fullname' => 'required|max:255',
 			  'user.phone' =>'required|min:6|unique:users,phone,'.$id,
+			  'user.profile.SID' =>'required|unique:profiles,SID,'.$id .',user_id',
 		    ];
 		}
 
@@ -362,6 +363,8 @@ class User extends Authenticatable {
 		return true;
 	}
 
+	
+
 	public function defaultRole()
 	{
 		if(!$this->roles()->count()) return null;
@@ -370,12 +373,12 @@ class User extends Authenticatable {
 	}
 
 	public function addRole($roleName)
-    {
+   {
         if(!$this->hasRole($roleName)){
             $role=Role::where('name',$roleName)->first();
             $this->attachRole($role);       
         } 
-    }
+   }
 
 	public function removeRole($roleName)
 	{		

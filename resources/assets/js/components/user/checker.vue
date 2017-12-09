@@ -88,15 +88,16 @@
         methods:{
             init(){
                 this.colStyle='col-sm-' + this.col_width
-                this.form = new Form({
-                    user:{
-                       email:'',
-                       phone:'',
-                       profile:{
-                          fullname:'',
-                       }
-                    }
-                })
+                this.form=new Form({
+                        user:{
+                            email:'',
+                            phone:'',
+                            profile:{
+                              fullname:'',
+                            }
+                        }
+                    })
+                
               
             },
             beginCheckUser(){

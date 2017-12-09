@@ -33,6 +33,13 @@ class Discount extends Model
 		];
 	}
 
+	public function center() {
+		return $this->belongsTo('App\Center');
+	}
+	public function identity() {
+		return $this->belongsTo('App\Identity');
+	}
+
 	public static function isStageOne(Term $term,$date=null)
 	{
 		if(!$date) $date=Carbon::today();

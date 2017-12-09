@@ -26,10 +26,7 @@ class Volunteer extends Model
                ];      
        
     }
-    public function centers()
-    {
-        return $this->belongsToMany('App\Center','center_volunteer','user_id','center_id');
-    }
+   
 	public function user() {
 		return $this->belongsTo('App\User');
 	}

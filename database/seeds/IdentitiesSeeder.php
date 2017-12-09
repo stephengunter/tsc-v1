@@ -17,6 +17,9 @@ class IdentitiesSeeder extends Seeder
 			[
 				'name' => '舊生',
 			],
+			[
+				'name' => '原住民',
+			],
             [
 				'name' => '65歲以上銀髮族',
 			],

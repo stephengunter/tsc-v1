@@ -73,7 +73,7 @@ class Volunteers
         return $user;
     }
 
-    public function storeVolunteer($userValues,$profileValues,$volunteerValues,$user_id,$volunteerId,$current_user,$center_id)
+    public function storeVolunteer($userValues,$profileValues,$volunteerValues,$user_id,$volunteerId)
     {
         $user= DB::transaction(function() 
             use($userValues,$profileValues,$volunteerValues,$user_id,$volunteerId)
@@ -104,14 +104,12 @@ class Volunteers
                         $user->volunteer->update($volunteerValues);
                     }
                 }
+
+                $user->addRole(Volunteer::roleName());
             
                 return $user;
         });
-
-
-
-        $volunteer= Volunteer::findOrFail($user->id);
-        $volunteer->attachCenter($center_id);
+        
 
         $is_new_user=true;
         if($user_id)  $is_new_user=false;
@@ -119,6 +117,9 @@ class Volunteers
         if($is_new_user){
             event(new UserRegistered($user));            
         }
+
+
+        $volunteer= Volunteer::findOrFail($user->id);
 
         return $volunteer;
     }
@@ -208,17 +209,7 @@ class Volunteers
               continue;
            }
 
-           $center_code=trim($row['center']);
            
-           if(!$center_code){
-               $err_msg .= '中心代碼不可空白' . ',';
-               continue;
-           }
-           $center=$this->centers->getByCode($center_code);
-           if(!$center) {
-               $err_msg .= '中心代碼' .$center_code . '錯誤'. ',';
-               continue;
-           }
 
            $exist_user=null;
            $sid=trim($row['id']);
@@ -280,7 +271,7 @@ class Volunteers
            $volunteerValues=[];
 
            $volunteer=$this->storeVolunteer($userValues,$profileValues,$volunteerValues,
-           $user_id,$volunteer_id,$current_user,$center->id);
+           $user_id,$volunteer_id);
            
            if(!$volunteer) continue;
 

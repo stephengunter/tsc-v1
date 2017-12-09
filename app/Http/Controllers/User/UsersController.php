@@ -106,7 +106,7 @@ class UsersController extends BaseController
 
         $current_user=$this->currentUser();
         
-        $user = User::with('profile.title','roles')->findOrFail($id);
+        $user = User::with('profile','roles')->findOrFail($id);
         if(!$user->canViewBy($current_user)){
             return  $this->unauthorized();   
         }
