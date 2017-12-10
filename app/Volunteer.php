@@ -27,9 +27,16 @@ class Volunteer extends Model
        
     }
    
-	public function user() {
+    public function user()
+    {
 		return $this->belongsTo('App\User');
-	}
+    }
+    public function courses()
+    {
+        return $this->belongsToMany('App\Course','course_volunteer','course_id','volunteer_id');
+    }
+   
+
 	public static function roleName()
     {
         return Role::volunteerRoleName();
@@ -56,28 +63,7 @@ class Volunteer extends Model
         } 
 		
 	}
-	public function validCenters()
-	{
-		 return Helper::validCenters($this);
-	}
-
-    public function centersCanAdd()
-	{
-        return Helper::centersCanAdd($this);
-	}
-	public function centersCanAddByAdmin($admin)
-	{
-         return Helper::centersCanAddByAdmin($this,$admin);
-    }
-	public function centerNames()
-    {
-        if(count($this->validCenters())){
-            return $this->validCenters()->pluck('name')->toArray();
-        }else{
-            return '';
-        }
-        
-    }
+	
     public function canViewBy($user)
 	{
 		if($user->id==$this->user_id) return true;

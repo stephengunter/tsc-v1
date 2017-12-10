@@ -18,6 +18,9 @@ class IdentitiesSeeder extends Seeder
 				'name' => '舊生',
 			],
 			[
+				'name' => '各級學校在校生',
+			],
+			[
 				'name' => '原住民',
 			],
             [
@@ -28,6 +31,14 @@ class IdentitiesSeeder extends Seeder
 			],
             [
 				'name' => '低收入戶',
+			],
+			[
+				'name' => '宗教師',
+			],
+			
+			[
+				'name' => '慈濟志業體同仁',
+                'member' => true
 			],
             [
 				'name' => '慈誠委員',

@@ -3,10 +3,17 @@
 namespace App;
 
 use App\BaseCourse;
+use App\Support\Validator\Course as CourseValidator;
+use App\Support\Formatter\Course as CourseFormatter;
+use App\Support\FilterPaginateOrder;
+
+
+
 use App\User;
 use App\Category;
 use App\Photo;
-use App\Support\FilterPaginateOrder;
+use App\Volunteer;
+
 use Carbon\Carbon;
 
 
@@ -14,21 +21,37 @@ use App\Support\Helper;
 
 class Course extends BaseCourse
 {
-    
-    protected $fillable = [ 'term_id', 'center_id', 'name', 'level', 
-                            'number', 'caution', 'limit','min',
-                            'begin_date' ,  'end_date' , 'weeks', 'hours',
-                            'description','target',
-                            'tuition', 'cost' , 'materials','discount',
+    use FilterPaginateOrder;
+    use CourseValidator;
+    use CourseFormatter;
 
-                            'net_signup' , 'open_date' , 'close_date',
+   
+    protected $fillable = [ 
+        'term_id', 'center_id', 'name', 'level', 
+        'number', 'caution', 'limit','min',
+        'begin_date' ,  'end_date' , 'weeks', 'hours',
+        'description','target',
+        'tuition', 'cost' , 'materials','discount',
+
+        'net_signup' , 'open_date' , 'close_date',
+        
+        'reviewed', 'active',       
+        'removed' , 'updated_by'  
                             
-                            'reviewed', 'active',       
-                            'removed' , 'updated_by'  
-                            
-                            ];
+    ];
+    public  function getFillables()
+    {
+        return $this->fillable;
+    }
+    public function teachers()
+    {
+        return $this->belongsToMany('App\Teacher','course_teacher','course_id','teacher_id');
+    }
 	
-    
+    public function volunteers()
+    {
+        return $this->belongsToMany('App\Volunteer','course_volunteer','course_id','volunteer_id');
+    }
 
     public static function initialize($term_id,$center_id)
     {   
@@ -65,8 +88,6 @@ class Course extends BaseCourse
         ];
     }
 
-    
-
     //是否額滿
     public function peopleFulled()
     {
@@ -78,138 +99,21 @@ class Course extends BaseCourse
     {
         return !$this->active;
     }
-
-    public function canSignup($isNetSignup=true)
+    //是否停止開課
+    public function classStopped()
     {
-        return $this->status->canSignup($isNetSignup);
-        
-    }
-    public function canSignupBy(User $user,$isNetSignup=true)
-    {
-        if(!$this->canSignup($isNetSignup)) return '此課程目前無法報名';
-
-        if($this->hasSignupBy($user->id)) return '此學員已報名過此課程了';
-
-        return '';
-        
-    }
-    public function signupStatus()
-    {
-         $today=Carbon::today();
-         $open = Carbon::parse($this->open_date);
-         $close = Carbon::parse($this->close_date);
-
-         if($today->lt($open)) return 0;
-         if($today->gt($close)) return 2;
-         return 1;
-
-    }
-
-    public function hasSignupBy($user_id)
-    {
-        
-        $validSignups=$this->validSignups();
-
-
-        $filtered = $validSignups->filter(function ($signup) use($user_id) {
-            return $signup->user_id==$user_id;
-        })->all();
-       
-
-        if(count($filtered)) return true;
-            
-        return false;
-    }
-   
-
-    public function populateViewData($editNumber=false,$photo=false){
-        $withNumber=false;
-        $this->fullName=$this->fullName($withNumber);
-
-        $this->fulled=$this->peopleFulled();
-
-        // if($this->groupAndParent()){
-        //     $this->weeks=null;
-        //     $this->hours=null;
-
-        //     $this->tuition=$this->getTuition();
-        //     $this->cost=$this->getCost();
-        //     $this->credit_count=$this->getCreditCounts();
-        // }
-
-        //$this->getParentCourse();
-
-        $this->sortClassTimes();
-        foreach ($this->classTimes as $classTime) {
-            $classTime->weekday;
-        }
-        foreach ($this->teachers as $teacher) {
-            $teacher->name=$teacher->getName();
-        }
-
-        if($editNumber){
-            $this->numberError='';
-            if($this->number){
-                $parts=explode('-', $this->number);
-                $this->default_number=$parts[0] . '-';
-                $this->custom_number=$parts[1];
-            }else{
-                $this->default_number=$this->generateNumber();
-                $this->custom_number='';
-            }
-
-        }
-
-        if($photo) $this->photo= $this->photo();
-
-        
-    }
-    public function countTuition()
-    {
-        $credit_count=(int)$this->credit_count;  //學分數
-        if(!$credit_count) return;
-
-        $credit_price=$this->credit_price;
-        if(!$credit_price) return;
-
-        $this->tuition=$credit_count * $credit_price;
-        
-    }
-
-    public function validLessons()
-    {
-        return $this->lessons()->where('removed',false)->get();
+        return $this->status->classStopped();
     }
     public function canInitLessons()
     {
-        if( $this->groupAndParent() ) return false;
+      
         if(  count($this->validLessons()) ) return false;
         return true;
     }
 
-    public function updateStatus()
-    {
-        
-        $this->status->updateStatus();
-    }
 
-    public function attachCategory($category_id)
-    {
-        if(!$this->categories->contains($category_id)) 
-        {
-            $this->categories()->attach($category_id);
-        }
-           
-    }
 
-    public function detachCategory($category_id)
-    {
-        if($this->categories->contains($category_id)) 
-        {
-            $this->categories()->detach($category_id);
-        }
-    }
-
+    //Getters
     public function validCategories()
     {
         if(!$this->categories()->count()) return null;
@@ -232,8 +136,20 @@ class Course extends BaseCourse
             return null;
         }
     }
+    public function getClasstimes()
+    {
+        return $this->classTimes()->orderBy('weekday_id')
+                                         ->orderBy('on')->get();
+    }
+    
+    public function sortClassTimes()
+    {
+         $this->classTimes= $this->classTimes->sortBy('weekday_id')
+                                             ->sortBy('on')->values()->all();
+    }
     public function validSignups()
     {
+        //有效的報名
         return $this->signups->filter(function ($item) {
             return $item->isValid();
         });
@@ -245,123 +161,23 @@ class Course extends BaseCourse
             return $item->isConfirmed();
         });
     }
-   
-    public function canCreateAdmit()
+    public function validLessons()
     {
-        if($this->admission) return false;
-        if($this->classStopped()) return false;
-        return true;
-    }
-    public function canCreateRegister()
-    {
-        if(!$this->admission) return false;
-        if($this->register) return false;
-        if($this->classStopped()) return false;
-        return true;
-    }
-    public function getClasstimes()
-    {
-        return $this->classTimes()->orderBy('weekday_id')
-                                         ->orderBy('on')->get();
-    }
-    public function classStopped()
-    {
-        return $this->status->classStopped();
+        return $this->lessons()->where('removed',false)->get();
     }
 
-    public function canViewBy($user)
+    public function getTuition()
     {
-       return true;
+        return $this->tuition;
     }
 
-    public function canEditBy($user)
-	{
-        if($user->isDev()) return true;
-        
-        if($user->isAdmin()){
-            return $user->admin->canAdminCenter($this->center);           
-        } 
-
-        if($user->isTeacher()){
-            return $this->teachers->contains($user->teacher);
-        }
-		
-		return false;
-          
-    } 
-    public function canReviewBy($user)
-	{
-        if($user->isDev()) return true;
-        if(!$user->isOwner()) return false;
-
-        return $user->admin->canAdminCenter($this->center);
-	}
-	public function canDeleteBy($user)
-	{
-        if(count($this->validLessons())) return false;
-		return $this->canEditBy($user);
-        
-	}
-
-    
-    public function fullName($withNumber=true)
+    public function getCost()
     {
-        $fullname=$this->name;
-        if($this->level) $fullname .= ' - ' . $this->level;
-        
-        
-        if($withNumber) $fullname=$this->number . ' ' . $fullname;
-
-        
-        return $fullname;
-    }
-    public function sortClassTimes()
-    {
-         $this->classTimes= $this->classTimes->sortBy('weekday_id')
-                                             ->sortBy('on')->values()->all();
-    }
-    public function nameWithNumber()
-    {
-        return $this->name . ' (' . $this->number . ')';
-    }
-    public function toOption()
-    {
-        $item=[ 
-                 'text' => $this->nameWithNumber() , 
-                  'value' => $this->id , 
-             ];
-
-         return $item;
-    }
-    public function getParentCourse()
-    {
-        $parent_id=(int)$this->parent;
-        $this->parentCourse=static::find($parent_id);
-       
-
-        return $this->parentCourse;
+        return $this->cost;
     }
 
-    public function subCourses()
-    {
-        if(!$this->groupAndParent()) return null;
 
-        return static::where('removed',false)->where('parent',$this->id)->get();
-    }
-
-    
-    public function attachGroupCategory()
-    {
-        $groupCategory=Category::groupCategory();
-        if($groupCategory) $this->attachCategory($groupCategory->id);
-        
-    }
-    public function groupAndParent()
-    {
-         if(!$this->isGroup()) return false;
-         return (int)$this->parent < 1;
-    }
-
+    //Voids
     public function generateNumber()
     {
         $term = $this->term;
@@ -373,38 +189,45 @@ class Course extends BaseCourse
         return $term->number . $center->code . $category->code . '-';
         
     }
-    public function getTuition()
+    public function toOption()
     {
-        if($this->groupAndParent())
-        {
-            $subCourses=$this->subCourses();
-            if(!$subCourses) return 0;
-            return $subCourses->sum('tuition');
-        }
+        $item=[ 
+                 'text' => $this->nameWithNumber() , 
+                  'value' => $this->id , 
+             ];
 
-        return $this->tuition;
+         return $item;
     }
-    public function getCreditCounts()
+    public function addVolunteer(Volunteer $volunteer)
     {
-        if($this->groupAndParent())
+        if(!$this->volunteers->contains($volunteer)) 
         {
-            $subCourses=$this->subCourses();
-            if(!$subCourses) return 0;
-            return $subCourses->sum('credit_count');
+            $this->volunteers()->attach($volunteer);
         }
-
-        return $this->credit_count;
+           
     }
-    public function getCost()
+
+    public function updateStatus()
     {
-        if($this->groupAndParent())
-        {
-            $subCourses=$this->subCourses();
-            if(!$subCourses) return 0;
-            return $subCourses->sum('cost');
-        }
-
-        return $this->cost;
+        $this->status->updateStatus();
     }
+    
+    public function countTuition()
+    {
+        $credit_count=(int)$this->credit_count;  //學分數
+        if(!$credit_count) return;
+
+        $credit_price=$this->credit_price;
+        if(!$credit_price) return;
+
+        $this->tuition=$credit_count * $credit_price;
+        
+    }
+    
+
+    
+    
+    
+    
 
 }

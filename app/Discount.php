@@ -12,9 +12,9 @@ use Exception;
 class Discount extends Model
 {
    protected $fillable = [ 'name', 'center_id', 'all_courses',
-							'points_one', 'points_two' ,'ps', 
+								'points_one', 'points_two' ,'ps', 
    						    'removed','active','updated_by'
-						  ];
+						  	];
 	
 
     
@@ -36,12 +36,15 @@ class Discount extends Model
 	public function center() {
 		return $this->belongsTo('App\Center');
 	}
-	public function identity() {
-		return $this->belongsTo('App\Identity');
-	}
+	public function identities()
+   {
+        return $this->belongsToMany('App\Identity','discount_identity');
+   }
+	
 
-	public static function isStageOne(Term $term,$date=null)
+	public static function isStageOne(Term $term=null,$date=null)
 	{
+		if(!$term)  $term=Term::defaultTerm();
 		if(!$date) $date=Carbon::today();
 	
 		$bird = Carbon::parse($term->bird_date);
@@ -111,6 +114,8 @@ class Discount extends Model
 		return $name . ' ' .$this->getFormattedPoints($this->points);
           
 	}
+
+	
 	
 
 

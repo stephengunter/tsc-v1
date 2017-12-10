@@ -19,10 +19,10 @@ class ContactInfo extends Model {
     {
         return [
              'tel' => '', 
-			 'fax' => '',
-			 'residenceAddress' => 0,
-			 'contactAddress' =>  0,
-			 'addressText' => '',
+				'fax' => '',
+				'residenceAddress' => 0,
+				'contactAddress' =>  0,
+				'addressText' => '',
         ];
     }
 
@@ -68,7 +68,7 @@ class ContactInfo extends Model {
 		
 		$address=Address::createByZipcode($zipcode,$street,$updated_by);
 		if($address){
-			$values=static::initialize();
+			$values=[];
 			$values['contactAddress']=$address->id;
 			$values['tel']=$tel;
 			$values['fax']=$fax;

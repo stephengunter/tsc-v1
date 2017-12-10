@@ -25,8 +25,10 @@ class Classtimes
             $reader->limitRows(500);
         })->get();
         
+        $classtimes=[];
 
         $classtimeList=$excel->toArray()[0];
+       
         for($i = 1; $i < count($classtimeList); ++$i) {
             $row=$classtimeList[$i];
 
@@ -40,20 +42,25 @@ class Classtimes
                 $err_msg .= '代碼  ' .$number . ' 錯誤'. ',';
                 continue;
             }
+            if($course->reviewed){
+                $err_msg .= '代碼  ' .$number . ' 已審核,無法更改'. ',';
+                continue;
+            }
 
             if(!$course->canEditBy($current_user)){
                 $err_msg .= '您沒有編輯課程  ' .$number . ' 的權限'. ',';
                 continue;        
             }
+
+          
             
-            $weekday=trim($row['weekday']);
-            if(!$weekday)continue;
+            $weekday=(int)trim($row['weekday']);
 
-            $on=trim($row['on']);
-            if(!$on)continue;
+            $on=(int)trim($row['on']);
 
-            $off=trim($row['off']);
-            if(!$off)continue;
+            $off=(int)trim($row['off']);
+            $classroom=trim($row['classroom']);
+           
 
             $weekday=(int)$weekday;
             $weekdayEntity=Weekday::where('val',$weekday)->first();
@@ -61,11 +68,11 @@ class Classtimes
                 $err_msg .= '星期代碼  ' .$number . ' 錯誤'. ',';
                 continue;
             }
-
-
+            
 
             $on=(int)$on;
             $off=(int)$off;
+            
             
 
             $values=[
@@ -73,14 +80,29 @@ class Classtimes
                 'weekday_id' => $weekdayEntity->id ,
                 'on' => $on , 
                 'off' => $off,
-
+                'classroom' => $classroom,
                 'updated_by' => $current_user->id
             ];
 
-            
-            $classtime = ClassTime::create($values);
+            $classtime =new ClassTime($values);
+
+            array_push($classtimes, $classtime);
             
         }
+
+        $course_ids = array_column($classtimes, 'course_id');
+        $courses=Course::whereIn('id',$course_ids)->get();
+       
+        foreach($courses as $course){
+            $course->classTimes()->delete();
+        }
+
+        foreach($classtimes as $classtime){
+            $classtime->save();
+        }
+
+
+
 
         return $err_msg;
     }

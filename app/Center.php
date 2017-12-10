@@ -105,12 +105,7 @@ class Center extends Model
 
 	}
 
-
-
-	public function classrooms() 
-	{
-		return $this->hasMany('App\Classroom');
-	}
+	
 	public function teachers() 
 	{
 		 return $this->belongsToMany('App\Teacher','center_teacher','center_id','teacher_id');

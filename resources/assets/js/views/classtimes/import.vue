@@ -1,6 +1,6 @@
 <template>
 
-    <div class="panel panel-default">
+    <div v-if="center_options" class="panel panel-default">
         <div class="panel-heading ">           
        
 
@@ -15,8 +15,14 @@
         <div  class="panel-body">
          
             <div class="row">
-                    
-                <div class="col-sm-4">
+                <div class="col-sm-3"> 
+                    <div class="form-group">
+                        <select  v-model="center" class="form-control">
+                            <option v-for="(item,index) in center_options" :key="index" :value="item.value" v-text="item.text"></option>
+                        </select>
+                    </div>
+                </div>       
+                <div class="col-sm-9">
                     <button v-if="loading" class="btn btn-default">
                          <i class="fa fa-spinner fa-spin"></i> 
                          處理中
@@ -27,6 +33,7 @@
                        <input type="file"  ref="fileinput"  name="categorys_file" style="display: none;"  
                        @change="onFileChange" >
                     </label>
+                     <small class="text-danger" v-if="hasError" v-text="err_msg"></small>
                 </div>
             </div>
             
@@ -42,7 +49,12 @@
     
     export default {
         name: 'ClassTimeImport',
-        
+        props: {
+            center_options:{
+                type: Array,
+                default: null
+            },
+        },
         data() {
             return {
                 title:Helper.getIcon('classtimes')  + '  Excel 匯入上課時間',
@@ -51,12 +63,20 @@
 
                 files: [],
 
+                center:0,
+
                 err_msg:''
                
             }
-        },        
-        beforeMount() {
-             
+        }, 
+        computed:{
+            hasError(){
+                if(this.err_msg) return true
+                    return false
+            },
+        },       
+        mounted() {
+             this.center=this.center_options[0].value
         },
         methods: {
             init(){
@@ -79,7 +99,7 @@
                 let form = new FormData()
                 for (let i = 0; i < this.files.length; i++) {
                     form.append('classtimes_file', this.files[i])
-                    
+                     form.append('center', this.center)
                 }
 
                 let store=Classtime.import(form)
@@ -87,7 +107,7 @@
                    
                         Helper.BusEmitOK()
                         this.loading=false
-                        this.$emit('imported')  
+                        // this.$emit('imported')  
                     })
                     .catch(error => {
                         if(error.response.data.code==422){

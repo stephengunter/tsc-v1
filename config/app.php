@@ -17,6 +17,12 @@ return [
 
 	'name' => '慈大社推中心',
 
+	'dev'=>array(
+		'name' => 'stephen',
+		'email' =>'traders.com.tw@gmail.com',
+		'phone' => '0936060049',
+	 ),
+
 	'areas' => [
 		[
 			'value' => 1,

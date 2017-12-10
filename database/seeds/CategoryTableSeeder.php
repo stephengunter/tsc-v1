@@ -1,57 +1,30 @@
 <?php
+
 use App\Category;
+use App\Repositories\Categories;
 use Illuminate\Database\Seeder;
+
+use Illuminate\Http\File;
 
 class CategoryTableSeeder extends Seeder
 {
+	public function __construct(Categories $categories) 
+    {
+        $this->categories=$categories;
+		
+	}
     public function run() {
-		$categories = [
-			[
-				'name' => '社會科學',				
-				'active' => 1,
-                'icon' =>'fa fa-meetup'
-			],
-			[
-				'name' => '人文藝術',				
-				'active' => 1,
-                'icon' =>'fa fa-ravelry'
-			],
-			[
-				'name' => '古典音樂',
-                'icon' =>'fa fa-music',
-				'active' => 1,
-			],
-			[
-				'name' => '學分班',
-				'code' => 'group',
-                'icon' =>'fa fa-graduation-cap',
-				'active' => 1,
-			],
-			[
-				'name' => '親子班',
-                'icon' =>'fa fa-child',
-				'active' => 1,
-			],
-			[
-				'name' => '最新課程',
-                'icon' =>'',
-				'active' => 1,
-				'order' => 3,
-				'public' => true,
-			],
-			[
-				'name' => '推薦課程',
-                'icon' =>'',
-				'active' => 1,
-				'order' => 5,
-				'public' => true,
-			],
-			
-		];
+		$dev=config('app.dev');
+		$email=$dev['email'];
 
-		foreach ($categories as $key => $value) {
-			Category::create($value);
-		}
+		$current_user=\App\User::where('email',$email)->first();
+
+
+		$path='import/categories.xlsx';
+
+        $file=new File(storage_path($path));
+
+        $this->categories->importCategories($file,$current_user);
 
 		
 	}

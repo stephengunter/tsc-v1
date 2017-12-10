@@ -6,6 +6,7 @@ use App\Status;
 use App\Category;
 use App\User;
 use App\Profile;
+use App\Volunteer;
 
 use App\Repositories\Courses;
 use App\Repositories\Centers;
@@ -13,6 +14,7 @@ use App\Repositories\Terms;
 use App\Repositories\Weekdays;
 use App\Repositories\Teachers;
 use App\Repositories\Categories;
+use App\Repositories\Volunteers;
 
 use App\Exceptions\RequestError;
 use App\Support\Helper;
@@ -28,7 +30,7 @@ use Carbon\Carbon;
 class CourseService
 {
    public function __construct(Courses $courses, Categories $categories, Teachers $teachers,
-                                 Terms $terms , Centers $centers, Weekdays $weekdays)
+                                 Terms $terms , Centers $centers, Weekdays $weekdays,Volunteers $volunteers)
                                
     {
        
@@ -38,6 +40,7 @@ class CourseService
         $this->terms=$terms;
         $this->centers=$centers;
         $this->weekdays=$weekdays;
+        $this->volunteers=$volunteers;
 
     }
    public function termOptions()
@@ -136,6 +139,10 @@ class CourseService
 
    public function store(array $values, array $category_ids=[], array $teacher_ids=[] )
    {
+        $course=new Course();
+        $fillable=$course->getFillables();
+        $values=array_only($values, $fillable);
+
         $values['active'] =1;
         $values['reviewed'] =0;
         $values['credit'] =0;
@@ -148,6 +155,9 @@ class CourseService
    }
    public function update(Course $course,array $values, array $category_ids=[], array $teacher_ids=[] )
    {
+        $course=new Course();
+        $fillable=$course->getFillables();
+        $values=array_only($values, $fillable);
         
         $values['credit'] =false;
         $values['group'] =0;
@@ -450,58 +460,77 @@ class CourseService
 
    public function importCourseInfoes($file,$current_user)
    {
-      $err_msg='';
-      $excel=$this->getExcelObject($file);     
+        $err_msg='';
+        $excel=$this->getExcelObject($file);     
        
 
-      $courseList=$excel->toArray()[0];
-      for($i = 1; $i < count($courseList); ++$i) {
-         $row=$courseList[$i];
-         
-         $number=trim($row['number']);
-         if(!$number)continue;
+        $courseList=$excel->toArray()[0];
+        for($i = 1; $i < count($courseList); ++$i) {
+            $row=$courseList[$i];
+            
+            $number=trim($row['number']);
+            if(!$number)continue;
 
-         $course=$this->findByNumber($number);
-         if(!$course) {
-            $err_msg .= '找不到代碼 = ' .$number . '的課程'. ',';
-            continue;
-         }
+            $course=$this->findByNumber($number);
+            if(!$course) {
+                $err_msg .= '找不到代碼 = ' .$number . '的課程'. ',';
+                continue;
+            }
 
-         $caution=trim($row['caution']);
-         if($caution){
-            $caution= str_replace(';', '<br>',$caution);
-         }
+            $caution=trim($row['caution']);
+            if($caution){
+                $caution= str_replace(';', '<br>',$caution);
+            }
 
-         $materials=trim($row['materials']);
-         if($materials){
-            $materials= str_replace(';', '<br>',$materials);
-         }
+            $materials=trim($row['materials']);
+            if($materials){
+                $materials= str_replace(';', '<br>',$materials);
+            }
 
-         $target=trim($row['target']);
+            $target=trim($row['target']);
 
-         $limit=trim($row['limit']);
-         $min=trim($row['min']);
+            $limit=trim($row['limit']);
+            $min=trim($row['min']);
 
-         $tuition=(float)trim($row['tuition']);
-         $cost=(float)trim($row['cost']);
+            $tuition=(float)trim($row['tuition']);
+            $cost=(float)trim($row['cost']);
 
-         $courseValues=[
-            'caution' => $caution,
-          
-            'tuition' => $tuition,
-            'materials' => $materials,
-            'cost' => $cost,
-            'target' => $target,
-            'limit' => $limit,
-            'min' => $min,
-           
-           
-            'updated_by' => $current_user->id
-         ];
+            $courseValues=[
+                'caution' => $caution,
+            
+                'tuition' => $tuition,
+                'materials' => $materials,
+                'cost' => $cost,
+                'target' => $target,
+                'limit' => $limit,
+                'min' => $min,
+            
+            
+                'updated_by' => $current_user->id
+            ];
 
 
-         $course->update($courseValues);
-         $course->updateStatus();
+            $course->update($courseValues);
+            $course->updateStatus();
+
+            $volunteers=[];
+            $volunteers_ids=trim($row['volunteers_ids']);
+            if($volunteers_ids){
+                
+                $volunteer_SIDs=explode(',', $volunteers_ids);
+                foreach($volunteer_SIDs as $SID){
+                    $volunteer= $this->volunteers->getBySID($SID);
+                    if($volunteer) array_push($volunteers, $volunteer); 
+                }
+
+            }
+
+            if(count($volunteers)){
+                foreach($volunteers as $volunteer){
+                    $course->addVolunteer($volunteer);
+                }
+                
+            }
 
 
       //    if($course->groupAndParent())

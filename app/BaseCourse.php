@@ -135,10 +135,7 @@ class BaseCourse extends Model
 		return $this->hasMany('App\Student');
 	}
 
-    public function classroom()
-    {
-          return $this->belongsTo('App\Classroom');
-    }
+    
     public function photo($default=true)
 	{
         if($this->photo_id) return Photo::find($this->photo_id);
@@ -280,45 +277,9 @@ class BaseCourse extends Model
         $this->status->updateStatus();
     }
 
-    public function attachCategory($category_id)
-    {
-        if(!$this->categories->contains($category_id)) 
-        {
-            $this->categories()->attach($category_id);
-        }
-           
-    }
+    
 
-    public function detachCategory($category_id)
-    {
-        if($this->categories->contains($category_id)) 
-        {
-            $this->categories()->detach($category_id);
-        }
-    }
-
-    public function validCategories()
-    {
-        if(!$this->categories()->count()) return null;
-        return $this->categories()->where('removed',false)
-                    ->where('active',true)->get();
-    }
-    public function privateCategories()
-    {
-        if(!$this->categories()->count()) return null;
-        return $this->categories()->where('removed',false)
-                    ->where('active',true)
-                    ->where('public',false)->get();
-    }
-    public function defaultCategory()
-    {
-        $privateCategories=$this->privateCategories();
-        if($privateCategories){
-            return $privateCategories[0];
-        }else{
-            return null;
-        }
-    }
+    
     public function validSignups()
     {
         return $this->signups()->where('removed',false)

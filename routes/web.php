@@ -295,7 +295,6 @@ Route::group(['middleware' => 'admin'], function()
     Route::resource('terms', '\App\Http\Controllers\Settings\TermsController');
     
     Route::resource('holidays', '\App\Http\Controllers\Settings\HolidaysController');
-    Route::resource('classrooms', '\App\Http\Controllers\Settings\ClassroomsController');
 
 
     //Reports

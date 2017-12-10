@@ -17,9 +17,6 @@ use App\Http\Requests\Course\CourseRequest;
 use App\Support\Helper;
 use Carbon\Carbon;
 
-
-
-
 class CoursesController extends BaseController
 {
     protected $key='courses';
@@ -46,6 +43,8 @@ class CoursesController extends BaseController
             ]);
 
     }
+
+    
     public function index()
     {
         

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Course;
 
 use App\Repositories\Classtimes;
+use App\Repositories\Centers;
 
 use Illuminate\Support\Facades\Input;
 
@@ -16,21 +17,21 @@ class ClasstimesImportController extends BaseController
  {
     protected $key='courses';
 
-    public function __construct(Classtimes $classtimes)                               
+    public function __construct(Centers $centers,Classtimes $classtimes)                               
     {
-        
+        $this->centers=$centers;
         $this->classtimes=$classtimes;
     }
     
 	public function index()
     {
-
-        if(request()->ajax()) abort(404);
-        $current_user=$this->currentUser();
-       
+        
+        $centerOptions=$this->centers->optionsConverting($this->canAdminCenters());
        
         $menus=$this->menus($this->key);            
-        return view('classtimes.import')->with([ 'menus' => $menus ]); 
+        return view('classtimes.import')->with([ 'menus' => $menus ,
+                                                 'centerOptions' => $centerOptions
+                                                ]); 
     }
 
     public function store(Request $form)

@@ -10,8 +10,6 @@ use App\Discount;
 use App\Bill;
 use App\Student;
 
-use Carbon\Carbon;
-
 use App\Repositories\Courses;
 use App\Repositories\Discounts;
 use App\Repositories\Payways;
@@ -20,13 +18,14 @@ use App\Repositories\Users;
 use App\Repositories\Terms;
 use App\Repositories\Centers;
 
-use App\Events\SignupCreated;
 
+use Carbon\Carbon;
 use Exception;
 use DB;
 use App\Support\Helper;
-
 use App\Exceptions\RequestError;
+
+use App\Events\SignupCreated;
 
 class SignupService
 {
@@ -114,6 +113,8 @@ class SignupService
         }
     }
 
+    
+
     public function  initPayBill($signups)
     {
         $total = $signups->sum(function ($item) {
@@ -168,7 +169,6 @@ class SignupService
     
     public function  getDiscountOptions(int $center_id ,$date=null)
     {
-        
         return $this->discounts->getDiscountOptions($center_id,$date);
         
     } 
@@ -177,8 +177,6 @@ class SignupService
 
     public function  getDiscountOptionsByCourse(Course $course)
     {
-        
-
         $validDiscounts=$this->discounts->getValidDiscounts($course,$date);
         return $this->discounts->optionsConverting($validDiscounts);
         

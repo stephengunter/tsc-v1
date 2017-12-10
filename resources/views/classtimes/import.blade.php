@@ -4,7 +4,7 @@
 @section('content')
      
     
-    <classtimes-import  @imported="onImported">
+    <classtimes-import  :center_options="{{ json_encode($centerOptions) }}"   @imported="onImported">
          
     </classtimes-import>
 

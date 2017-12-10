@@ -45,20 +45,23 @@ class Volunteers
     }
     public function findOrFail($id)
     {
-        $volunteer = Volunteer::findOrFail($id);
-        return $volunteer;
+        return Volunteer::findOrFail($id);
        
     }
-   
-    public function getByCenter($center_id)
+
+    public function getBySID($SID)
     {
-        $volunteers=$this->getAll()->whereHas('centers', function($q) use ($center_id)
-        {
-            $q->where('id',$center_id );
-        });
-       
-       return $volunteers;
-   }
+        $profile=Profile::where('SID',$SID)->first();
+        if(!$profile) return null;
+
+        $user=$profile->user;
+
+        if($user->removed) return null;
+
+        return  $this->getAll()->where('user_id',$user->id)->first();   
+    }
+   
+    
    public function store($user ,$values,$centerIds)
    {
         $volunteer=$user->volunteer;
@@ -133,19 +136,13 @@ class Volunteers
          return $volunteer;
     }
 
-    public function syncCenters($user_id,$centerIds)
+    
+    public function options()
     {
-        $volunteer=$this->findOrFail($user_id);
-        $volunteer->syncCenters($centerIds);
-    }
-    public function options($center)
-    {
-        $volunteerList=$this->getByCenter($center);
-        if(!count($volunteerList)){
-            return [];
-        }
+        $volunteerList=$this->getAll()->get();
         
-        return $this->optionsConverting($volunteerList->get());
+        
+        return $this->optionsConverting($volunteerList);
        
     }
     public function optionsConverting($volunteerList)
@@ -162,21 +159,10 @@ class Volunteers
         return $volunteerOptions;
     }
 
-    public function attachCenter($volunteer_id,$center_id)
+    
+
+    public function delete($id,$admin_id)
     {
-            $volunteer=$this->findOrFail($volunteer_id); 
-            $volunteer->attachCenter($center_id);
-
-    }
-    public function detachCenter($volunteer_id,$center_id)
-    {
-           $volunteer=$this->findOrFail($volunteer_id); 
-           $volunteer->detachCenter($center_id);
-
-    }
-
-   public function delete($id,$admin_id)
-   {
          $volunteer=$this->findOrFail($id); 
         
          $values=[
@@ -187,7 +173,7 @@ class Volunteers
         
          $volunteer->update($values);
          
-   }
+    }
 
    public function importVolunteers($file,$current_user)
    {

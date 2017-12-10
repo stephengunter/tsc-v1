@@ -21,7 +21,7 @@ class Identity extends Model
 
     public function discounts() 
 	{
-        return Discount::where('identity_id',$this->id);
+        return $this->belongsToMany('App\Discount','discount_identity');
 	}
 
     public function validDiscounts()

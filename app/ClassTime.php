@@ -8,7 +8,9 @@ use App\Support\Helper;
 
 class ClassTime extends Model
 {
-    protected $fillable = ['course_id', 'weekday_id', 'on', 'off','updated_by'];
+	protected $fillable = ['course_id', 'weekday_id', 'classroom',
+							'on', 'off','volunteers_ids','updated_by'
+						  ];
 
 	
     public function course() {

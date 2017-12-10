@@ -10,6 +10,7 @@ use App\Http\Requests\Signups\SignupUserRequest;
 
 
 use App\Services\Signup\SignupService;
+use App\Services\Signup\DiscountService;
 
 use App\Signup;
 use App\User;
@@ -31,9 +32,10 @@ class SignupsController extends BaseController
 {
     protected $key='signups';
     
-    public function __construct(SignupService $signupService)                       
+    public function __construct(SignupService $signupService,DiscountService $discountService)                       
     {
         $this->signupService=$signupService;
+        $this->discountService=$discountService;
 
     }
     
@@ -100,8 +102,22 @@ class SignupsController extends BaseController
         return 0;
     }
 
+    private function test()
+    {
+        $course=Course::findOrFail(1);
+        $center_id=$course->center_id;
+        $term=$course->term;
+
+        $discountOptions=$this->discountService->getDiscountOptions($center_id,  $term);
+
+
+        dd($discountOptions);
+    }
+
     public function index()
     {
+        $this->test();
+
         $request = request();
           
         if(!$request->ajax()){

@@ -24,6 +24,8 @@ class CreateClassTimesTable extends Migration
            
 			$table->integer('on');   //上課時間  1000  ,   1830
             $table->integer('off');  //下課時間  1000  ,   1830
+            $table->string('classroom')->nullable(); 
+            
             
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();

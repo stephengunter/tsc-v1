@@ -18,22 +18,18 @@ class Discounts
        return Discount::where('removed',false);
          
     }
-    public function globalDiscount()
-    {
-        return $this->getAll()->where('need_prove',false);
-    }
+    
     public function activeDiscounts($center_id=0)
     {
-        $globalDiscount=$this->globalDiscount()->where('active',true)->get();
+        $all=$this->getAll()->where('active',true);
+        if($center_id){
+            return $all->where('center_id',$center_id)->get();
+        }
 
-        if(!$center_id)  return $globalDiscount;
+        return $all->get()->filter(function ($discount) {
+            return !$discount->center_id;
+        });
 
-       
-
-        $centerDiscounts= $this->getAll()->where('active',true)
-                             ->where('center_id',$center_id)->get();
-
-        return $globalDiscount->merge($centerDiscounts);
          
     }
 

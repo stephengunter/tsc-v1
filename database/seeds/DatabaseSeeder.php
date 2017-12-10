@@ -10,10 +10,14 @@ class DatabaseSeeder extends Seeder {
 	 * @return void
 	 */
 	private function addDev(){
+		$dev=config('app.dev');
+		$name=$dev['name'];
+		$email=$dev['email'];
+		$phone=$dev['phone'];
 		$user=\App\User::create([
-			'name' => 'stephen',
-			'email' =>'traders.com.tw@gmail.com',
-			'phone' => '0936060049',
+			'name' => $name,
+			'email' =>$email,
+			'phone' => $phone,
 			'password' => 'secret',
 			'email_confirmed' => true,
 			'remember_token' => str_random(10),
@@ -52,6 +56,16 @@ class DatabaseSeeder extends Seeder {
 		$this->call(DiscountSeeder::class);
 
 		$this->call(UserSeeder::class);
+
+		$this->call(CategoryTableSeeder::class);
+
+		$this->call(TeacherSeeder::class);
+
+		$this->call(VolunteerSeeder::class);
+
+		$this->call(CourseSeeder::class);
+
+		$this->call(ClassTimeSeeder::class);
 		
 		//$this->call(DownloadSeeder::class);
 
@@ -78,15 +92,15 @@ class DatabaseSeeder extends Seeder {
 		 
 		// $this->call(ClassroomSeeder::class);
 		 
-		 //this->call(CategoryTableSeeder::class);
+		
 
 		
 
 		 
 
-		//  $this->call(TeacherSeeder::class);
+		
 
-		//  $this->call(CourseSeeder::class);
+	
 		//  $this->call(ScheduleSeeder::class);
 		//  $this->call(AdminSeeder::class);
 
