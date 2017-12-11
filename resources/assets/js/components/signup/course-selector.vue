@@ -9,8 +9,9 @@
             </h3>
          </div>  
       <div slot="modal-body" class="modal-body">
-         <combination-select v-if="active"  :search_params="search_params"
-               @ready="onCombinationReady">                           
+         <combination-select v-show="active"  :search_params="search_params"
+            :disable_terms="disable_terms" :disable_centers="disable_centers"  
+            @ready="onCombinationReady">                           
          </combination-select>
       </div>
       <div slot="modal-footer" class="modal-footer" >
@@ -27,6 +28,15 @@ export default {
          type: Boolean,
          default: false
       },
+      disable_terms:{
+            type: Boolean,
+            default: false
+      },
+      disable_centers:{
+            type: Boolean,
+            default: false
+      },
+      
    },
    data(){
       return {

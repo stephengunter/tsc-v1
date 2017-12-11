@@ -40,6 +40,9 @@ class IdentitiesSeeder extends Seeder
 				'name' => '慈濟志業體同仁',
                 'member' => true
 			],
+			[
+				'name' => '慈濟會員',
+			],
             [
 				'name' => '慈誠委員',
                 'member' => true

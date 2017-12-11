@@ -9,7 +9,7 @@ use App\Support\Helper;
 class Bill extends Model
 {
     protected $fillable =  [ 'code', 'signup_ids',
-        'amount', 'points' ,   'discount' ,
+        'amount', 'points' ,   'discount' , 'identity_id',
         'discount_id', 'pay_way', 'identity' ,
         'status' ,  'removed' , 'updated_by'
     ];
@@ -42,7 +42,7 @@ class Bill extends Model
             'discount_id' => '',
             'discount' => '',
             'points' => '',
-
+            'identity_id' => '',
             'pay_way' => '',
             'status' => 0,
 
@@ -52,6 +52,13 @@ class Bill extends Model
             
         ];
     }
+
+    public function getUser()
+    {
+        return $this->signups()->first()->user;
+    }
+
+    
 
     public function invoiceMoney()
     {

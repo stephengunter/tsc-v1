@@ -20,7 +20,7 @@
          
          
         <template scope="props">
-            <row :course="props.item" :viewing="viewing" :index="props.index"
+            <row :course="props.item" :viewing="viewing" :index="parseInt(props.index)"
                 :details_link="details_link" :can_remove="can_remove"
                 :single_select="single_select" :multi_select="multi_select"
                 :been_selected="beenSelected(props.item.id)"  

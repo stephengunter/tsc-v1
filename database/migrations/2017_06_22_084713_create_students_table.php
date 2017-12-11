@@ -19,6 +19,9 @@ class CreateStudentsTable extends Migration
 
             $table->integer('user_id')->unsigned();
 
+            $table->integer('identity_id')->nullable(); 
+            $table->boolean('confirmed')->default(false);
+
             $table->string('number')->nullable();
             $table->date('join_date');
             $table->date('out_date')->nullable();

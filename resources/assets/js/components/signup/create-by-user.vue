@@ -12,6 +12,7 @@
             </button>         
          </div>
          <div class="panel-body">
+           
             <div class="row">
                <div  class="col-sm-12"> 
                   <courses-table v-show="selectedCourses.length"  :courses="selectedCourses"
@@ -21,7 +22,7 @@
                </div>
             </div>  
             <form  @submit.prevent="onSubmit" @keydown="clearErrorMsg($event.target.name)" class="form">
-               <bill-inputs  v-if="center_id" :form="form" :center_id="center_id" :payways="payways"
+               <bill-inputs v-if="course_count" ref="billinputs"   :form="form" :payways="payways"
                   @clear-error="clearErrorMsg">
                </bill-inputs> 
                <div class="row" v-show="canSubmit">
@@ -36,7 +37,9 @@
          </div>   
       </div>  
 
-      <course-selector :show="courseSelector.show" @selected="onCourseSelected" @cancel="courseSelector.show=false">
+      <course-selector :show="courseSelector.show"
+       :disable_terms="selectedCourses.length>0" :disable_centers="selectedCourses.length>0"
+       @selected="onCourseSelected" @cancel="courseSelector.show=false">
 
       </course-selector>
 
@@ -89,7 +92,9 @@
              courseSelector:{
                 show:false,
                 width:600,
-                course_id:0
+                course_id:0,
+                disable_terms:false,
+                disable_centers:false,
              },
 
              courseConfirmModal:{
@@ -108,13 +113,14 @@
          }
       },
       computed: {
+         
          selectingCourse(){
             return Helper.isTrue(this.courseSelector.show)
          },
-         center_id(){
-            if(!this.selectedCourses.length) return 0
-            return parseInt(this.selectedCourses[0].center_id)
+         course_count(){
+             return this.selectedCourses.length
          },
+         
          total(){
             if(!this.selectedCourses.length) return 0
             let tuitions = this.selectedCourses.map((course) => {
@@ -182,8 +188,14 @@
                 course=new Course(data.course)
 
                this.selectedCourses.push(course)
-              
+               this.form.signups.push({
+                   user_id:this.user_id,
+                   course_id:course.id,
+                   tuition:course.tuition
+               })
 
+
+               if(this.$refs.billinputs)  this.$refs.billinputs.init()
                
                
             }).catch(error =>{
@@ -228,19 +240,21 @@
             })
 
             this.selectedCourses.splice(index,1)
+
+            if(this.$refs.billinputs)  this.$refs.billinputs.init()
          },
          clearErrorMsg(name) {
             this.form.errors.clear(name)
          },
          onSubmit() {
-            this.form.signups=[]
-            this.selectedCourses.forEach((course)=> {
-               this.form.signups.push({
-                   user_id:this.user_id,
-                   course_id:course.id,
-                   tuition:course.tuition
-               })
-            })
+            // this.form.signups=[]
+            // this.selectedCourses.forEach((course)=> {
+            //    this.form.signups.push({
+            //        user_id:this.user_id,
+            //        course_id:course.id,
+            //        tuition:course.tuition
+            //    })
+            // })
                
             let store=Bill.store(this.form)
             store.then(data => {

@@ -5,7 +5,7 @@
             <div class="form-group"> 
                <h3>折扣優惠</h3>
                <div>
-						<toggle :items="discounts"   :default_val="discount_id" @selected="onDiscountSelected"></toggle>
+						<toggle :items="discount_options"   :default_val="discount_index" @selected="onDiscountSelected"></toggle>
 					</div>
             </div>  
          </div>
@@ -43,12 +43,11 @@
 </template>
 
 <script>
-import DiscountSelector from "./discounts-selector.vue"
 import TuitionInputs from "../../components/tuition/inputs.vue"
 export default {
    name: 'BillInputs',
    components: {
-		'discounts-selector': DiscountSelector,
+		
 		'tuition-inputs':TuitionInputs
 	},
    props: {
@@ -56,10 +55,7 @@ export default {
 			type: Object,
 			default: null
 		},
-		center_id: {
-			type: Number,
-			default: 0
-      },
+		
       date: {
 			type: String,
 			default: ''
@@ -77,7 +73,9 @@ export default {
 	},
    data() {
 		return {
-			discounts:[]
+			discounts:[],
+			discount_options:[],
+			discount_index:0,
 		}
 	},
 	
@@ -110,7 +108,9 @@ export default {
       },
       fetchData(){
 			
-         let discounts=Bill.discountOptions(this.center_id,this.date)
+			let course_id=this.form.signups[0].course_id
+			let course_count=this.form.signups.length
+         let discounts=Bill.discountOptions(course_id,course_count,this.date)
         
          discounts.then(data => {
 				let discounts= data.discounts
@@ -131,13 +131,37 @@ export default {
 				this.discounts=discounts
 				
 				this.countAmount()
+
+				this.populateOptions()
          })
          .catch(error=> {
              Helper.BusEmitError(error) 
          })
-      },
-		onDiscountSelected(id){
-			this.form.bill.discount_id=id
+		},
+		populateOptions(){
+			this.discount_options=[]
+			for(let i=0; i<this.discounts.length;i++){
+				let discount= this.discounts[i]
+				this.discount_options.push({
+					text:discount.text,
+					value:i
+				})
+			}
+		},
+		onDiscountSelected(index){
+			this.discount_index=index
+
+			let discount=this.discounts[index]
+			
+			
+			this.form.bill.discount_id=discount.value
+			
+			if(discount.identity_id){
+				this.form.bill.identity_id=discount.identity_id
+			}else{
+				this.form.bill.identity_id=0
+			}
+			
 			this.countAmount()
 			  
 		},
@@ -146,13 +170,6 @@ export default {
 			let discount=this.discounts.find((item)=>{
 				return item.value==this.discount_id
 			})
-
-			if(this.discount_id){
-				this.form.bill.discount=discount.text
-			}else{
-				this.form.bill.discount=''
-			}
-
 			
 
 			let points=parseInt(discount.points)

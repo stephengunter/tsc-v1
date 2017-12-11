@@ -3,20 +3,24 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+
+use App\Support\Validator\Signup as SignupValidator;
+use App\Support\Formatter\Signup as SignupFormatter;
 use App\Support\FilterPaginateOrder;
+
 use App\Course;
 use App\Student;
 use Carbon\Carbon;
 
+
+
 class Signup extends Model
 {
-    public $statusList=[
-        '-1' => '已取消',
-        '0' => '待繳費',
-        '1' => '已繳費'
-    ];
-
     use FilterPaginateOrder;
+    use SignupValidator;
+    use SignupFormatter;
+
+   
     protected $fillable =  ['course_id',  'user_id', 'date', 'parent', 
                             'bill_id','tuition','cost' , 'net_signup',
                              'status' ,'ps',  'removed' , 'updated_by'
@@ -61,32 +65,16 @@ class Signup extends Model
     {
 		   return $this->belongsTo('App\Bill');
 	}  
+    
 
     
-    
-    
-    public function isValid()
-    {
-          //是否被有效
-        if($this->removed) return false; 
-
-        return (int)$this->status >= 0;
-       
-    }
-
-    public function isConfirmed()
-    {
-        //是否被取消
-        if(!$this->isValid()) return false; 
-
-        return (int)$this->status > 0;
-    }
 
     public function hasRefund() 
 	{
-		if(!$this->refund) return null;
-        if($this->refund->removed) return null;
-        return $this->refund;
+        $refund=$this->getRefund();
+        if($refund) return true;
+
+        return false;
     }
     
     public function getRefund() 
@@ -94,7 +82,9 @@ class Signup extends Model
 		if(!$this->refund) return null;
         if($this->refund->removed) return null;
         return $this->refund;
-	}
+    }
+    
+   
 
     
     
@@ -103,63 +93,7 @@ class Signup extends Model
         return $this->tuitions()->where('refund',true);
     }
 
-    public function canViewBy($user)
-	{
-        if($user->isDev()) return true;
-		if($user->id==$this->user_id) return true;
-        if($user->isAdmin()){
-           return true;
-        }
-
-        return false; 
-          
-  	}
-    public function canEditBy($user)
-	{
-		if($user->id==$this->user_id) return true;
-        return $this->course->canEditBy($user);
-          
-    }
-    public function canRemove()
-    {
-        //可刪除
-        if($this->status==1)  return false;
-        //有繳費紀錄
-        if($this->tuitions()->count()) return false;
-
-        return true;
-    }
-    public function canRemoveBy($user)
-	{
-        if(!$this->canRemove()) return false;
-
-        return $this->canEditBy($user);
-	}
-    public function canDeleteBy($user)
-	{
-		return $this->canRemoveBy($user);
-	}
-    public function canCancelBy($user)
-	{
-       if(!$this->canCancel()) return false;
-		   return $this->canEditBy($user);
-    }
-    
-    public function canBeginPay() 
-    {
-         return $this->totalIncome() == 0;
-         
-    }
-
-    public function canCancel() 
-    {
-        $status=(int)$this->status;
-        if($status > 0){
-        return false;
-        }else{
-        return true;
-        }
-    }
+   
 
     public function cancel()
     {
@@ -183,40 +117,6 @@ class Signup extends Model
         return $this->tuition;
     }
 
-    
-    public function canPay()
-    {
-        if($this->status==0){
-            //待繳費
-            if($this->course->canceled()) return false;
-
-            //是否額滿
-            if($this->course->peopleFulled()) return false;
-
-            return true;
-        }
-
-        return false;
-    }
-    public function statusText()
-    {
-        $text='待繳費';
-        if($this->status==1) $text='已繳費';
-        else if($this->status==-1) $text='已取消';
-
-
-        return $text;
-    }
-    public function populateViewData()
-    {
-        $this->course->fullname();
-        $this->statusText=$this->statusText();
-        
-        $this->amount =$this->getAmount();
-
-        $this->canRemove=$this->canRemove();
-
-    }
     
 
     public function updateStatus()
@@ -264,14 +164,7 @@ class Signup extends Model
     }
 
 
-    public function formattedPoints()
-    {
-        if(!$this->points) return '';
-
-        $strValue=(String)$this->points;
-
-        return str_replace('0','',$strValue);
-    }
+    
 
     public function subSignups()
     {

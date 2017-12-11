@@ -116,8 +116,6 @@ class SignupsController extends BaseController
 
     public function index()
     {
-        $this->test();
-
         $request = request();
           
         if(!$request->ajax()){

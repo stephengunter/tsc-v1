@@ -2,6 +2,8 @@
 
 namespace App\Support\Validator;
 
+use App\User;
+
 trait Course
 {
    
@@ -22,6 +24,10 @@ trait Course
    } 
    public function canReview()
    {
+      if($this->reviewed) return false;
+      if(!$this->name) return false;
+      if(!$this->number) return false;
+
       if(!$this->weeks) return false;
       if(!$this->hours) return false;
       
@@ -34,6 +40,8 @@ trait Course
       if(!$this->classTimes()->count()) return false;
       if(!$this->categories()->count()) return false;
       if(!$this->teachers()->count()) return false;
+
+      return true;
    }
    public function canReviewBy($user)
    {

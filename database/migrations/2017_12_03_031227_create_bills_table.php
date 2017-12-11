@@ -21,7 +21,7 @@ class CreateBillsTable extends Migration
             $table->integer('discount_id')->unsigned()->nullable();
             $table->integer('points')->unsigned()->nullable();
             $table->string('discount')->nullable();  
-            $table->string('identity')->nullable();  
+            $table->string('identity_id')->nullable();  
 
             $table->string('signup_ids')->nullable(); 
 

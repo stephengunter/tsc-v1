@@ -1,12 +1,12 @@
 <template>
     <div  class="form-inline">
        <div class="form-group">
-            <select  v-model="params.term" @change="onTermChanged"   style="width:auto;" class="form-control selectWidth">
+            <select :disabled="disable_terms"  v-model="params.term" @change="onTermChanged"   style="width:auto;" class="form-control selectWidth">
                 <option v-for="(item,index) in termOptions" :key="index" :value="item.value" v-text="item.text"></option>
             </select>
        </div>
        <div class="form-group">
-            <select  v-model="params.center" @change="onCenterChanged" style="width:auto;" class="form-control selectWidth">
+            <select :disabled="disable_centers" v-model="params.center" @change="onCenterChanged" style="width:auto;" class="form-control selectWidth">
                  <option v-for="(item,index) in centerOptions" :key="index" :value="item.value" v-text="item.text"></option>
             </select>
        </div>
@@ -30,6 +30,14 @@
             search_params:{
                 type: Object,
                 default: null
+            },
+            disable_terms:{
+                type: Boolean,
+                default: false
+            },
+            disable_centers:{
+                type: Boolean,
+                default: false
             },
             empty_course: {
               type: Boolean,
@@ -86,24 +94,22 @@
                this.search_params[key]=0
             },
             init(){
-                
-
                 let options=Signup.indexOptions()
-                options.then(data => {
-                    this.termOptions = data.termOptions
-                    let term=this.termOptions[0].value
-                    this.params.term=term
+                    options.then(data => {
+                        this.termOptions = data.termOptions
+                        let term=this.termOptions[0].value
+                        this.params.term=term
 
-                    this.centerOptions = data.centerOptions                        
-                    let center=this.centerOptions[0].value
-                    this.params.center=center
+                        this.centerOptions = data.centerOptions                        
+                        let center=this.centerOptions[0].value
+                        this.params.center=center
 
-                  
-                    this.loadCourses()
-                })
-                .catch(error => {
-                    Helper.BusEmitError(error)
-                })
+                    
+                        this.loadCourses()
+                    })
+                    .catch(error => {
+                        Helper.BusEmitError(error)
+                    })
              
             },
             loadCourses(){

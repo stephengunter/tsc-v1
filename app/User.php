@@ -192,6 +192,10 @@ class User extends Authenticatable {
 	{
 		return $this->hasMany('App\Account');
 	}
+	public function identities() 
+	{
+		return $this->belongsToMany('App\Identity','user_identity');
+	}
 
 	public function getAccount() 
 	{
@@ -388,6 +392,17 @@ class User extends Authenticatable {
         } 
 		
 	}
+
+	public function addIdentity($identity_id)
+	{
+		if(!$this->identities->contains($identity_id)) 
+		{
+			 $this->identities()->attach($identity_id);
+		}
+
+		
+	}
+
 	public function toOption()
 	{		
 		 return [ 'text' =>   $this->profile->fullname,

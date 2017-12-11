@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Signups\PayRequest;
 
 use App\Services\Signup\SignupService;
+use App\Services\Signup\DiscountService;
 
 use App\Signup;
 use App\User;
@@ -15,6 +16,7 @@ use App\Course;
 use App\Tuition;
 use App\Bill;
 use App\Center;
+use App\Discount;
 
 use App\Support\Helper;
 
@@ -29,9 +31,9 @@ use App\Exceptions\RequestError;
 class BillsController extends BaseController
 {
     
-   public function __construct(SignupService $signupService)                       
+   public function __construct(DiscountService $discountService,SignupService $signupService)                       
    {
-      
+      $this->discountService=$discountService;
       $this->signupService=$signupService;
 
    }
@@ -125,13 +127,25 @@ class BillsController extends BaseController
         $billValues=$request->getBillValues($updated_by);
         $bill=new Bill($billValues);
 
+        $discount=Discount::find($bill->discount_id);
+        if($discount){
+            $bill->discount=$discount->name;
+        }
+
         $tuitionValues=$request->getTuitionValues($updated_by);
         $tuition=new Tuition($tuitionValues);
 
-
-        
-
         $bill= $this->signupService->storeBillAndSignups($bill,$tuition,$signups);
+        
+        if($bill->identity_id){
+            foreach($signups as $signup){
+                $student=$signup->getStudent();
+                $student->identity_id=$bill->identity_id;
+                $student->save();
+            }
+            
+        }
+        
         
         return response()->json($bill);
          
@@ -159,7 +173,8 @@ class BillsController extends BaseController
 
    public function discountOptions()
    {
-      $center_id=(int)request()->center;
+      $course_id=(int)request()->course_id;
+      $course_count=(int)request()->course_count;
       $date=null;
       try {
           $date = Carbon::parse(request()->date);
@@ -167,10 +182,13 @@ class BillsController extends BaseController
       catch (Exception $err) {
           $date=Carbon::today();
       }
+
+      $course=Course::findOrFail($course_id);
       
-      Center::findOrFail($center_id);
       
-      $discounts= $this->signupService->getDiscountOptions($center_id,$date);
+      $term=$course->term;  //default term
+      $center_id=$course->center_id;
+      $discounts= $this->discountService->getDiscountOptions( $center_id, $course_count, $term, $date);
 
       return response()->json([ 'discounts' => $discounts ]); 
       

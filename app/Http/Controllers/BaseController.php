@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Route;
-
+use App\Support\Paginator;
 use App\Center;
 
 use Illuminate\Auth\AuthenticationException;
@@ -80,7 +80,16 @@ class BaseController extends Controller
         return   response()->json([ $key =>  [$msg] ]  ,  422);
        
     }
-
+    protected function createPaginator(Array $items,Request $request=null, int $page=1,int $perPage=999)
+    {
+        return  Paginator::create($items,$request, $page, $perPage);
+       
+    }
+    protected function initPaginator(Array $items, int $page=1,int $perPage=999)
+    {
+        return  Paginator::init($items,$page, $perPage);
+       
+    }
 
     protected function menus($key)
     {

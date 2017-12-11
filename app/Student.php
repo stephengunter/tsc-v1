@@ -9,11 +9,13 @@ class Student extends Model
 {
     use FilterPaginateOrder;
 	protected $filter =  ['user.profile.fullname'];
-	protected $fillable = ['course_id', 'user_id', 'number',
-							'join_date' , 'out_date', 'active', 'ps',
-							'updated_by'
+	protected $fillable = [
+		'course_id', 'user_id', 'number',
+		'identity_id', 'confirmed',
+		'join_date' , 'out_date', 'active', 'ps',
+		'updated_by'
 
-							];
+	];
 
 	
     // public function register() 

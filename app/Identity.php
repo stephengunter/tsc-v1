@@ -24,6 +24,11 @@ class Identity extends Model
         return $this->belongsToMany('App\Discount','discount_identity');
 	}
 
+	public function users() 
+	{
+        return $this->belongsToMany('App\User','user_identity');
+	}
+
     public function validDiscounts()
 	{
         return $this->discounts()->where('removed',false);

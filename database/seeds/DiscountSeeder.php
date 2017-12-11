@@ -32,8 +32,9 @@ class DiscountSeeder extends Seeder
             'need_prove' => 0,
             'active' => 1,
         ]);
+
         $discount=Discount::create([
-            'name' => '舊生、各級學校在校生、慈濟志業體同仁(含慈誠、委員、榮董)',
+            'name' => '舊生、各級學校在校生',
             'center_id' => $center->id,
             'points_one' => 85,
             'need_prove' => 0,
@@ -46,15 +47,21 @@ class DiscountSeeder extends Seeder
         $identity=Identity::where('name','各級學校在校生')->first();
         $discount->identities()->save($identity);
 
+
+
+        $discount=Discount::create([
+            'name' => '慈濟志業體同仁、慈濟會員(含慈誠、委員、榮董)',
+            'center_id' => $center->id,
+            'points_one' => 85,
+            'need_prove' => 0,
+            'active' => 1,
+        ]);
+
         $identity=Identity::where('name','慈濟志業體同仁')->first();
         $discount->identities()->save($identity);
 
-        $identity=Identity::where('name','慈誠委員')->first();
+        $identity=Identity::where('name','慈濟會員')->first();
         $discount->identities()->save($identity);
-
-        $identity=Identity::where('name','榮譽董事')->first();
-        $discount->identities()->save($identity);
-
 
 
 
@@ -103,7 +110,7 @@ class DiscountSeeder extends Seeder
 
         $discount=Discount::create([
             'name' => '宗教師',
-            'ps'=> '【繳費時請提供相關證明】【不限課程】',
+            'ps'=> '【繳費時請提供相關證明】',
             'center_id' => $center->id,
             'points_one' => 50,
             'points_two' => 50,

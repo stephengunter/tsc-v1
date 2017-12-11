@@ -111,10 +111,11 @@ class Bill {
          })
      }
 
-     static discountOptions(centerId,date=''){
+     static discountOptions(course_id,  course_count, date=''){
         return new Promise((resolve, reject) => {
             let url = this.source() + '/discount-options' 
-            url+='?center=' + centerId
+            url+='?course_id=' + course_id
+            url+='&course_count=' + course_count
             if(date) url += '&date=' + date
             axios.get(url)
                 .then(response => {

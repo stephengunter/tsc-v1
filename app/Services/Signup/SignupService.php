@@ -293,6 +293,7 @@ class SignupService
         $bill= DB::transaction(function() use($bill,$tuition,$signups) {
  
              $bill->save();
+             
 
              if(!$tuition->date)  $tuition->date=Carbon::today();
            
@@ -309,6 +310,8 @@ class SignupService
              return $bill;
              
         });
+
+       
 
         return $bill;
     }

@@ -17,7 +17,7 @@ class DiscountGetter
    }
    
 
-   public function getDiscountOptions(int $center_id, Term $term=null, $date=null)
+   public function getDiscountOptions(int $center_id, int $course_count, Term $term=null, $date=null)
    {
       $activeDiscounts=$this->activeDiscounts($center_id);
       
@@ -27,7 +27,7 @@ class DiscountGetter
       $isStageOne=Discount::isStageOne($term,$date);
 
       //過濾0折扣
-      $validDiscounts=$this->filterDiscount($activeDiscounts , $isStageOne);
+      $validDiscounts=$this->filterDiscount($activeDiscounts , $isStageOne ,$course_count);
       $options=$this->optionsConverting($validDiscounts);
       
 
@@ -51,6 +51,13 @@ class DiscountGetter
                   'points' => $discount->points ,
                   'bird' => $discount->isBird() 
                );
+
+               if($discount->isBird()){
+                  $item['text'] .= ' - ' . config('course.bird_discount_name');
+               }
+
+               $item['text'] .= '  '. $discount->getFormattedPoints($discount->points);
+               
               
                array_push($options,  $item);
             }
@@ -86,8 +93,13 @@ class DiscountGetter
       return $this->discounts->activeDiscounts($center_id);
    }
 
-   private function filterDiscount($activeDiscounts , $isStageOne)
+   private function filterDiscount($activeDiscounts , $isStageOne,int $course_count)
    {
+      $activeDiscounts=$activeDiscounts->filter(function ($item) use($course_count) {
+         return $item->course_count <= $course_count ;
+      });
+       
+     
       $validDiscounts=[];
       //過濾0折扣
       if($isStageOne){

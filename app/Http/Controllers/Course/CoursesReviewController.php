@@ -42,30 +42,34 @@ class CoursesReviewController extends BaseController
 
         }      
 
+        
         $params = request()->toArray();
-       
 
         $with=['center','categories','teachers','classTimes'];
-        $courseList=$this->courses->index($params,$with);
-        
+        $courses=$this->courses->index($params,$with)
+                                ->orderBy('begin_date')
+                                ->get(); 
 
-        $courseList=$courseList->where('reviewed',false)
-                                ->filterPaginateOrder();
-       
-        $parentId=Helper::getIntegerByKey($params, 'parent');
-        $parentCourse=null;
-        if($parentId) $parentCourse=Course::with($with)->find($parentId);
-        if($parentCourse) $parentCourse->populateViewData();
-       
-        
-        
-        foreach ($courseList as $course) {
-            $course->populateViewData();
+                                 
+
+        $current_user=$this->currentUser();
+        $courseList=[];
+        foreach ($courses as $course) {
+            if($course->canReviewBy($current_user)){
+                $course->populateViewData();
+                array_push($courseList, $course);
+            }
+           
         }
+        
+             //不分頁
+        $model=$this->initPaginator($courseList);
+     
+       
+        
 
         return response() ->json([
-                                    'model' => $courseList, 
-                                    'parentCourse' => $parentCourse,
+                                    'model' => $model, 
                                     'canEditNumber' => false 
                                  ]);  
     }
@@ -75,9 +79,12 @@ class CoursesReviewController extends BaseController
         $current_user=$this->currentUser();
         $course_ids=$form['course_ids'];
         $reviewed=true;
+
+        $err_msg='';
         if(count($course_ids)){
             for($i = 0;  $i< count($course_ids);  ++$i) {
                 $id=$course_ids[$i];
+                $course=Course::findOrFail($id);
                 $this->courses->updateReview($id,$reviewed,$current_user);
             }
         }

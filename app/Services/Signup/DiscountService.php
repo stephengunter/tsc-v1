@@ -14,10 +14,10 @@ class DiscountService
       $this->discountGetter=$discountGetter;
    }
     
-   public function getDiscountOptions(int $center_id, Term $term=null, $date=null)
+   public function getDiscountOptions(int $center_id, int $course_count,Term $term=null, $date=null)
    {
       
-      return $this->discountGetter->getDiscountOptions($center_id, $term, $date);
+      return $this->discountGetter->getDiscountOptions($center_id, $course_count,$term, $date);
        
    }
 

@@ -282,8 +282,10 @@ class BaseCourse extends Model
     
     public function validSignups()
     {
-        return $this->signups()->where('removed',false)
-                                ->where('status' , '>','-1' );
+        return $this->signups->filter(function($signup){
+            return $signup->isValid();
+        });
+       
     }
     
    
@@ -359,8 +361,8 @@ class BaseCourse extends Model
 
     public function hasSignupBy($user_id)
     {
-        
-        $validSignups=$this->validSignups()->get();
+        $validSignups=$this->validSignups();
+       
        
         if(!count($validSignups)) return false;
 
