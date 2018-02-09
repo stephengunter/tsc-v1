@@ -31,14 +31,22 @@ trait Signup
        $this->amount =$this->getAmount();
 
        $this->canRemove=$this->canRemove();
+       
+       $this->discountText=$this->discountText();
+   }
 
+   public function discountText()
+   {
+       if(!$this->bill->discount) return '';
+       return $this->bill->discount . ' ' .$this->formattedPoints() . ' 折' ;
    }
 
    public function formattedPoints()
    {
-       if(!$this->points) return '';
+       $points=$this->bill->points;
+       if(!$points) return '';
 
-       $strValue=(String)$this->points;
+       $strValue=(String)$points;
 
        return str_replace('0','',$strValue);
    }

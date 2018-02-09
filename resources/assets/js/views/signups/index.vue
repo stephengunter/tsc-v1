@@ -46,6 +46,10 @@
             'signup-list':SignupList,
         },
         props: {
+            hide_create:{
+              type: Boolean,
+              default: false
+            },
             version: {
               type: Number,
               default: 0

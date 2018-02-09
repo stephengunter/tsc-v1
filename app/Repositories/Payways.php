@@ -11,6 +11,8 @@ class Payways
         return config('app.payways');
     }
 
+    
+
     public function payByCreditCard($payway_id)
     {
         return (int)$payway_id == 0;

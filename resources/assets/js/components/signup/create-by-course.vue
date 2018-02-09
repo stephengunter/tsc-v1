@@ -16,8 +16,8 @@
         <div class="panel-body">
             <form v-if="initialized" @submit.prevent="onSubmit" class="form">
                  <div class="row">
-                   <div v-if="form.signup.user_id" class="col-sm-12">
-                       <user-view ref="userview" :user_id="form.signup.user_id"
+                   <div v-if="signup.user_id" class="col-sm-12">
+                       <user-view ref="userview" :user_id="signup.user_id"
                           :can_back="userViewSettings.can_back" @canceled="clearUser">
 
                        </user-view>
@@ -42,7 +42,7 @@
                             <div>
                                 <date-picker :option="datePickerOption" :date="date" ></date-picker>
                             </div>
-                            <input type="hidden" name="signup.date" class="form-control" v-model="form.signup.date"  >
+                            <input type="hidden" name="signup.date" class="form-control" v-model="signup.date"  >
                             <small v-if="form.errors.has('signup.date')" v-text="form.errors.get('signup.date')" class="text-danger"></small>
                         </div>  
                    </div>
@@ -56,8 +56,8 @@
                    </div>
                </div>
               
-                <bill-inputs ref="billinputs" v-if="form.signup.user_id" :form="form" :center_id="center_id" 
-                   :payways="payways" :date="form.signup.date" :can_edit="billInputSettings.can_edit" >
+                <bill-inputs ref="billinputs" v-if="signup.user_id" :form="form" :center_id="center_id" 
+                   :payways="payways" :date="signup.date" :can_edit="billInputSettings.can_edit" >
                  
                 </bill-inputs> 
               
@@ -124,6 +124,8 @@
                
                 form: {},
 
+                signup:{},
+
                 userOptions:[],
 
                 datePickerOption:{},
@@ -137,7 +139,7 @@
         computed: {
            
             canSubmit(){
-                if(!this.form.signup.user_id) return false
+                if(!this.signup.user_id) return false
 
                 return true
             },
@@ -149,14 +151,14 @@
                      user_id=Helper.tryParseInt(this.selectedUser.value)
                 } 
                 
-                this.form.signup.user_id=user_id
+                this.signup.user_id=user_id
 
                 this.clearErrorMsg('signup.user_id') 
             },
             date: {
               handler: function () {
                  
-                  this.form.signup.date=this.date.time
+                  this.signup.date=this.date.time
 
                  
                   this.clearErrorMsg('signup.date')
@@ -176,12 +178,14 @@
 
             },
             fetchData() {
-                
+               
                 let getData=Signup.create(this.course_id,this.user_id)
                      
                 getData.then(data => {
                     let signup=data.signup
                     this.date.time=signup.date
+
+                    this.signup=signup;
 
                     let course=new Course(data.course)
 
@@ -191,7 +195,7 @@
                     
 
                     this.form=new Form({
-                        signup:signup,
+                        signups:[signup],
                         bill:data.bill,
                         tuition:data.tuition,
                        
@@ -210,7 +214,7 @@
                 
             },
             clearUser(){
-                this.form.signup.user_id=0
+                this.signup.user_id=0
                 this.selectedUser=null
             },
             newUserSignupUrl(){
@@ -221,7 +225,7 @@
             onSubmit() {
                 //只能報單一課程,必須繳費
 
-                this.form.signup.tuition=this.form.bill.amount
+                this.signup.tuition=this.form.bill.amount
 
                 let store=Signup.store(this.form)
                 

@@ -61,7 +61,50 @@
                defaultOrder:'',                
                createText:'',
                
-               thead:[],
+               thead:[
+                 {
+                    title: '姓名',
+                    key: 'user.profile.fullname',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
+                    title: '身分別',
+                    key: 'user.identity',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
+                    title: '加入日期',
+                    key: 'join_date',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
+                    title: '手機',
+                    key: 'user.phone',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
+                    title: 'Email',
+                    key: 'user.email',
+                    sort: false,
+                    static:true,
+                    default:true
+
+                },{
+                    title: '',
+                    key: 'active',
+                    sort: false,
+                    static:true,
+                    default:true
+                }
+               ],
                filter: [{
                   title: '姓名',
                   key: 'user.profile.fullname',
@@ -86,7 +129,7 @@
       },
       methods: {
          init() {
-            this.thead=Student.getThead()
+           
             this.searchParams.course=this.course_id
             this.loaded=true
                

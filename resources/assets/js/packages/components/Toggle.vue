@@ -1,6 +1,6 @@
 <template>
     <div class="btn-group">
-        <button type="button" v-for="item in items" @click="changeSelectVal(item.value)"  
+        <button type="button" v-for="(item,index) in items" :key="index" @click="changeSelectVal(item.value)"  
            v-bind:class="[isActive(item.value) ? 'btn btn-info' :  'btn btn-default']" v-text="item.text">
         </button>
     </div>

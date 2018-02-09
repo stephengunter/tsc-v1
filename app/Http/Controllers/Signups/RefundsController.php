@@ -7,16 +7,12 @@ use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
 use App\Http\Requests\Signups\RefundRequest;
-use App\Repositories\Refunds;
-use App\Repositories\Courses;
-use App\Repositories\Signups;
-use App\Repositories\Users;
-use App\Repositories\Payways;
-use App\Repositories\Terms;
-use App\Repositories\Centers;
 
 use App\Signup;
 use App\Refund;
+
+use App\Services\Refund\RefundService;
+use App\Services\Signup\SignupService;
 
 use App\Support\Helper;
 
@@ -27,35 +23,27 @@ use PDF;
 class RefundsController extends BaseController
 {
     protected $key='refunds';
-    public function __construct(Refunds $refunds,Signups $signups, Courses $courses, 
-                                 Terms $terms , Centers $centers,
-                                Payways $payways,Users $users)                      
+    public function __construct(RefundService $refundService,SignupService $signupService)                      
     {
-        
-
-         $this->refunds=$refunds;
-		 $this->courses=$courses;
-         $this->signups=$signups;
-         $this->payways=$payways;
-         $this->users=$users;
-         $this->terms=$terms;
-         $this->centers=$centers;
-
-	}
+         $this->refundService=$refundService;
+         $this->signupService=$signupService;
+    }
+    
     public function indexOptions()
     {
-        $termOptions=$this->terms->options();
-        $centerOptions=$this->centers->options();
-        $statusOptions=$this->refunds->statusOptions();
-
+        $termOptions=$this->signupService->termOptions();
+        $centerOptions=$this->signupService->centerOptions();
+        $statusOptions=$this->refundService->statusOptions();
         return response()
             ->json([
                 'termOptions' => $termOptions,
                 'centerOptions' => $centerOptions,
-                'statusOptions' => $statusOptions,
+                'statusOptions' => $statusOptions
             ]);
 
     }
+
+    
     public function index()
     {
          $request = request();   
@@ -128,15 +116,18 @@ class RefundsController extends BaseController
         $signup_id=(int)$request->signup; 
 
         $signup=Signup::with('course','user.profile')->findOrFail($signup_id);
-        $refund=Refund::initialize($signup);
+        $signup->populateViewData();
 
-        $payOptions=$this->payways->getAll();
+        $refund=Refund::initialize($signup);
+        $refund['tuition'] = $signup->getAmount();
+
+        // $payOptions=$this->payways->getAll();
         
         return response()
             ->json([
                 'signup' => $signup,
                 'refund' => $refund,
-                'payOptions' => $payOptions
+                // 'payOptions' => $payOptions
             ]);
         
     }

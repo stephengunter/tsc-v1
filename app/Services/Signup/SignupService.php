@@ -93,6 +93,7 @@ class SignupService
     {
         return $this->payways->getAll();
     }
+    
 
     public function  getReviewedCourses($term_id,$center_id)
     {

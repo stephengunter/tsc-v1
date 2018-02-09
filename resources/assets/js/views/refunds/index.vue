@@ -17,7 +17,7 @@
      <refund-list v-if="ready" :term_id="termId" :center_id="centerId" :course_id="courseId" 
        :version="version" :hide_create="hide_create" :can_select="can_select"
       @selected="onSelected" @begin-create="onBeginCreate">
-    </refund-list>
+     </refund-list>
 
 </div>
 

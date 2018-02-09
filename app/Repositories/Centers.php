@@ -185,6 +185,8 @@ class Centers
         $centerList=$excel->toArray()[0];
         for($i = 1; $i < count($centerList); ++$i) {
             $row=$centerList[$i];
+
+            
             
             $name=trim($row['name']);
             if(!$name){
@@ -196,21 +198,26 @@ class Centers
                 $err_msg .= '必須填寫中心代碼';
                 continue;
             }
+            
+            $oversea=(int)trim($row['oversea']) > 0 ? true:false;
+            $area_id=0;
+            if($oversea){
 
-            $area_id=trim($row['area_id']);  
-            if(!$area_id){
-                $err_msg .= '必須填寫區域代碼';
-                continue;
+
+            }else{
+                $area_id=trim($row['area_id']);  
+                if(!$area_id){
+                    $err_msg .= '必須填寫區域代碼';
+                    continue;
+                }
+
+                $area = $this->findArea($area_id);
+                if(!$area){
+                    $err_msg .= '區域代碼 ' . $area_id . ' 錯誤' ;
+                    continue;
+                }
+
             }
-
-            $area = $this->findArea($area_id);
-            if(!$area){
-                $err_msg .= '區域代碼 ' . $area_id . ' 錯誤' ;
-                continue;
-            }
-
-
-
             
             $exist_center=$this->getByCode($code);
 
@@ -231,7 +238,7 @@ class Centers
 
 
             
-            $oversea=(int)trim($row['oversea']) > 0 ? true:false;
+            
 
             $updated_by=$current_user->id;
             

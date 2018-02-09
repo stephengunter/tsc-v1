@@ -53,6 +53,10 @@ class StudentsController extends BaseController
         ->with(['user.profile'])->orderBy('active','desc')
         ->filterPaginateOrder();
 
+        foreach($students as $student){
+            $student->populateViewData();
+        }
+
         return response() ->json([ 'model' => $students,
                                    'summary' => $summary
                                 ]);

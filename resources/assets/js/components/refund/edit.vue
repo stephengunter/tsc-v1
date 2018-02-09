@@ -34,7 +34,7 @@
                             
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <div v-if="false" class="col-sm-3">
                         <div class="form-group">                           
                             <label>原繳材料費</label>
                             <input type="text" :value="formatMoney(signup.cost)"  class="form-control" disabled>
@@ -75,14 +75,14 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3">
+                    <!-- <div class="col-sm-3">
                         <div class="form-group">                           
                             <label>收付方式</label>
                             <select  v-model="refund.pay_by" @change="onPaywayChange"  name="refund.pay_by" class="form-control" >
                                 <option v-for="item in payOptions" :value="item.value" v-text="item.text"></option>
                             </select>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-sm-3">
                         <div class="form-group">                           
                             <label>手續費</label>
@@ -97,7 +97,7 @@
                             <small class="text-danger" v-if="form.errors.has('refund.tuition')" v-text="form.errors.get('refund.tuition')"></small>
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <div v-if="false" class="col-sm-3">
                         <div class="form-group">                           
                             <label>可退材料費</label>
                             <input type="text" name="refund.cost" class="form-control" v-model="refund.cost">

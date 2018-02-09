@@ -1,6 +1,6 @@
 <template>
-    <center-list  :hide_create="hide_create" :version="version"  
-        :can_select="can_select" :area_options="area_options"
+    <center-list v-if="ready"  :hide_create="hide_create" :version="version"  
+        :can_select="can_select" :area_options="areaOptions"
         @selected="onSelected" @begin-create="onBeginCreate">
     </center-list>
 
@@ -34,17 +34,20 @@
                 ready:false,
                 course_id:0,
                
-              
+                areaOptions:[],
                 can_select:false,
              
             }
         },
         beforeMount() {
-             this.init()
+            this.init()
         },
         methods: {
             init(){
-                
+                this.areaOptions=this.area_options.splice(0)
+                this.areaOptions.splice(0, 0, { value:0 , text:'---------' }); 
+
+                this.ready=true
              
             },
             onSelected(id){

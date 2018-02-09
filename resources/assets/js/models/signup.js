@@ -18,6 +18,22 @@ class Signup {
         
         
     }
+    static init(user_id,course){
+        return {
+            'user_id' : user_id,
+            'course_id' : course.id,
+            'parent' : 0,
+           
+            'tuition' : 0,
+            'cost':0,
+            'status' : 0,
+            'ps' : '',
+            'net_signup' : 1,
+            'sub_courses' : [],
+
+            'tuition':course.tuition
+        }
+    }
     static roleName(){
         return 'Student'
     }

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Identity;
 use App\Support\FilterPaginateOrder;
 
 class Student extends Model
@@ -43,6 +44,20 @@ class Student extends Model
     public function canEditBy($user)
 	{
        return $this->register->course->canEditBy($user) ;
+	}
+
+	public function populateViewData()
+	{
+		$this->identityText='';
+		$identity=$this->getIdentity();
+		if($identity) $this->identityText=$identity->name;
+ 
+	}
+
+	public function getIdentity()
+	{
+		if(!$this->identity_id) return null;
+		return Identity::find($this->identity_id);
 	}
 
 	public function getScore()

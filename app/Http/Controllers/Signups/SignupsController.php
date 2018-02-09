@@ -221,6 +221,8 @@ class SignupsController extends BaseController
        
         $payways=$this->signupService->getPayways();
 
+        
+
         return response()
         ->json([
             

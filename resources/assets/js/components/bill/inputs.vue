@@ -21,18 +21,19 @@
 			<div  class="col-sm-9">
 				<div class="form-group">
                 <label>備註</label>
-                <input type="text" name="tuition.ps" class="form-control" v-model="form.signup.ps"   >
+                <input type="text" name="tuition.ps" class="form-control" v-model="form.tuition.ps"   >
             
             </div>
 			</div>
 		</div>
       <div v-else class="row">
 			
-         <div class="col-sm-12">
+         <div class="col-sm-6">
             
 				<div class="form-group">
 					 <h3>應繳金額： <span style="color:red"> {{ form.bill.amount | formatMoney }}  </span> 
-            
+					 &nbsp;&nbsp;&nbsp;	
+					 <toggle :items="isPayOptions"   :default_val="isPay" @selected="onIsPaySelected"></toggle>
                </h3>
 				</div> 
          </div>
@@ -76,6 +77,16 @@ export default {
 			discounts:[],
 			discount_options:[],
 			discount_index:0,
+
+			isPay:1,
+
+			isPayOptions:[{
+            text: '現場繳費',
+            value: '1'
+         }, {
+            text: '列印帳單',
+            value: '0'
+         }]
 		}
 	},
 	
@@ -90,7 +101,6 @@ export default {
 		}
 	},
 	watch:{
-		
 		total(){
 			 this.countAmount()
 		},
@@ -108,7 +118,10 @@ export default {
       },
       fetchData(){
 			
+			this.discount_index=0
+
 			let course_id=this.form.signups[0].course_id
+			
 			let course_count=this.form.signups.length
          let discounts=Bill.discountOptions(course_id,course_count,this.date)
         
@@ -165,6 +178,9 @@ export default {
 			this.countAmount()
 			  
 		},
+		onIsPaySelected(val){
+			this.isPay=parseInt(val)
+		},
 		countAmount(){
 			
 			let discount=this.discounts.find((item)=>{
@@ -177,7 +193,7 @@ export default {
 			
 			let amount=0
 			if(points){
-				  amount=points * this.form.bill.total /100
+				  amount=points * this.form.bill.total / 100
 			}else{
 				 amount=this.form.bill.total
 			}

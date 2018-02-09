@@ -41,8 +41,13 @@
                    </button>
                 </td>
                 <td v-html="getFormatedCourseName(props.item.course)"></td>    
-                <td>{{ props.item.tuition | formatMoney }}</td>  
-                <!-- <td v-html="discountText(props.item)"></td> -->
+                <td>
+                    {{ props.item.amount | formatMoney }}
+                        &nbsp;&nbsp;
+                    {{ props.item.discountText}}
+                    
+                </td>  
+              
             </tr>
         </template>
 
@@ -103,12 +108,15 @@
                 loaded:false,
                 source: Signup.source(),
                 page_size:50,
-                defaultSearch:'date',
+                defaultSearch:'user.profile.fullname',
                 defaultOrder:'date',                
                 create: Signup.createUrl(),
                 
                 thead:[],
                 filter: [{
+                    title: '姓名',
+                    key: 'user.profile.fullname',
+                },{
                     title: '報名日期',
                     key: 'date',
                 }],

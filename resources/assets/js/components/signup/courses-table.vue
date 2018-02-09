@@ -13,7 +13,7 @@
       <tbody>
          <tr v-for="(course,index) in courses" :key="index" >
                <td>{{ course.number }}</td>
-               <td>{{ course.fullname }}</td>
+               <td>{{ course.fullName }}</td>
                <td v-html="course.classTimesText"></td>
                <td>{{ course.period }}</td>
                <td>{{ course.tuition | formatMoney}}</td>

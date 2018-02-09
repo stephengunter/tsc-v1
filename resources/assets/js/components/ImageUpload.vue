@@ -12,7 +12,7 @@
                        
                     </label>
                     </form>
-                     <img class="thumbnail" :style="getImageStyle()" :src="image"></img>
+                     <img class="thumbnail" :style="getImageStyle()" :src="image" />
                        <button v-show="hasImage()" @click="submitImage" :enable="submitting"  class="btn btn-success" type="button" id="submit-imgurl" >確認送出</button>
                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                    

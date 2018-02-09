@@ -26,7 +26,7 @@ class Signup extends Model
                              'status' ,'ps',  'removed' , 'updated_by'
                         	];
 
-    protected $filter =  ['date','status','tuition'];
+    protected $filter =  ['user.profile.fullname','date','status','tuition'];
 
     public static function initialize($user_id=0,Course $course=null)
     {
@@ -106,17 +106,20 @@ class Signup extends Model
 
     public function getAmount()
     {
+       
+
         $points=0;
         if($this->bill){
             $points=$this->bill->points;
         }
 
-        if($points) return round($this->tuition * $points);
+        if($points) return round($this->tuition * $points/100);
         
         
         return $this->tuition;
     }
 
+    
     
 
     public function updateStatus()

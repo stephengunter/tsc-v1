@@ -69,26 +69,52 @@
            
             
         }, 
-        beforeMount() {
-            if(this.search_params){
-                for(let property in this.search_params){
-                    this.params[property]=this.search_params[property]
-                }
-            }
-            
-            let defaults=[
-                'term','center'
-            ]
+        watch: {
+            search_params: {
+                handler: function () {
+                    let changed=false
+                    if(this.search_params.term!=this.params.term){
+                       this.params.term = this.search_params.term
+                       changed=true
+                    }
+                    if(this.search_params.center!=this.params.center){
+                        this.params.center = this.search_params.center
+                        changed=true
+                    }
 
-            defaults.forEach((key)=>{
-                if(!this.params.hasOwnProperty(key)){
-                    this.params[key] = 0
-                }
-            })
+                    if(changed) this.loadCourses()
+                 
+                 
+                
+                },
+                deep: true
+            },
+            
+
+        },
+        beforeMount() {
+            this.setParams()
             
             this.init()
         },
         methods: {
+            setParams(){
+                if(this.search_params){
+                    for(let property in this.search_params){
+                        this.params[property]=this.search_params[property]
+                        }
+                    }
+                    
+                    let defaults=[
+                        'term','center'
+                    ]
+
+                    defaults.forEach((key)=>{
+                        if(!this.params.hasOwnProperty(key)){
+                            this.params[key] = 0
+                        }
+                })
+            },
             setDefaultParam(key){
                if(this.search_params.hasOwnProperty(key)) return
                this.search_params[key]=0
@@ -97,12 +123,17 @@
                 let options=Signup.indexOptions()
                     options.then(data => {
                         this.termOptions = data.termOptions
-                        let term=this.termOptions[0].value
-                        this.params.term=term
+
+                        if(!this.params.term){
+                            let term=this.termOptions[0].value
+                            this.params.term=term
+                        }
 
                         this.centerOptions = data.centerOptions                        
-                        let center=this.centerOptions[0].value
-                        this.params.center=center
+                        if(!this.params.center){
+                            let center=this.centerOptions[0].value
+                            this.params.center=center
+                        }
 
                     
                         this.loadCourses()
